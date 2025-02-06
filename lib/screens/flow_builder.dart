@@ -37,7 +37,7 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
           ),
         ],
       ),
-      backgroundColor: Colors.grey[900],
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: GestureDetector(
         onScaleStart: (details) {
           lastScale = scale;

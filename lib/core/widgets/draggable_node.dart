@@ -79,26 +79,33 @@ class _DraggableNodeState extends State<DraggableNode> {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            Container(
-              width: width,
-              height: height,
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              alignment: Alignment.center,
-              child: TextField(
-                controller: textController,
-                maxLines: null, // Allows text to wrap
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-                cursorColor: Colors.white,
-                decoration: const InputDecoration(
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
+            Padding(
+              padding: const EdgeInsets.all(60),
+              child: Container(
+                width: width,
+                height: height,
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Color(0xFFFFD8A8),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.black,
+                    width: 1,
+                  ),
                 ),
-                textAlign: TextAlign.center,
+                alignment: Alignment.center,
+                child: TextField(
+                  controller: textController,
+                  maxLines: null, // Allows text to wrap
+                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  cursorColor: Colors.white,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
             if (isHovered) ..._buildConnectionPoints(),
@@ -110,22 +117,22 @@ class _DraggableNodeState extends State<DraggableNode> {
 
   List<Widget> _buildConnectionPoints() {
     return [
-      _connectionPoint(Offset(0, -height / 2)),  // Top
-      _connectionPoint(Offset(0, height / 2)),   // Bottom
-      _connectionPoint(Offset(-width / 2, 0)),  // Left
-      _connectionPoint(Offset(width / 2, 0)),   // Right
+      _connectionPoint(Offset(0, -height/ 2 -30)),  // Top
+      _connectionPoint(Offset(0, height / 2 + 30)),   // Bottom
+      _connectionPoint(Offset(-width / 2 -30 , 0)),  // Left
+      _connectionPoint(Offset(width/ 2 + 30, 0 )),   // Right
     ];
   }
 
   Widget _connectionPoint(Offset offset) {
     return Positioned(
-      left: (width / 2) + offset.dx - 5,
-      top: (height / 2) + offset.dy - 5,
+      left: (width / 2) + offset.dx +53,
+      top: (height/ 2) + offset.dy +53,
       child: Container(
-        width: 10,
-        height: 10,
+        width: 8,
+        height: 8,
         decoration: const BoxDecoration(
-          color: Colors.red,
+          color: Color.fromARGB(255, 145, 145, 145),
           shape: BoxShape.circle,
         ),
       ),

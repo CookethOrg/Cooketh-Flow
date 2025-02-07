@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:cookethflow/core/widgets/draggable_node.dart';
+import 'package:cookethflow/core/widgets/nodes/rectangular_node.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/drawer.dart';
 import 'package:flutter/material.dart';
@@ -8,7 +8,7 @@ class FlowBuilderScreen extends StatefulWidget {
   const FlowBuilderScreen({super.key});
 
   @override
-  _FlowBuilderScreenState createState() => _FlowBuilderScreenState();
+  State<FlowBuilderScreen> createState() => _FlowBuilderScreenState();
 }
 
 class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
@@ -73,7 +73,7 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
                   Positioned(
                     left: nodePositions[i].dx * scale,
                     top: nodePositions[i].dy * scale,
-                    child: DraggableNode(
+                    child: RectangularNode(
                       onDrag: (offset) {
                         setState(() {
                           nodePositions[i] = offset / scale; // Adjust drag position based on zoom

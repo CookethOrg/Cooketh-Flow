@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 class FloatingDrawer extends StatefulWidget {
   final VoidCallback onClose;
 
-  FloatingDrawer({required this.onClose});
+  const FloatingDrawer({super.key,required this.onClose});
 
   @override
-  _FloatingDrawerState createState() => _FloatingDrawerState();
+  State<FloatingDrawer> createState() => _FloatingDrawerState();
 }
 
 class _FloatingDrawerState extends State<FloatingDrawer> {
   bool isEditing = false; // To toggle between text and textfield
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   bool isHovered = false; // To detect hover effect
   bool isSelected = false; // To track if the drawer is selected
 
@@ -28,7 +28,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
         // Background overlay to close the drawer when tapped
         GestureDetector(
           onTap: widget.onClose,
-          child: Container(
+          child: SizedBox(
             width: double.infinity,
             height: double.infinity,
           ),

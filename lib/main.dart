@@ -1,8 +1,15 @@
+import 'package:cookethflow/providers/node_provider.dart';
 import 'package:cookethflow/screens/flow_builder.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider<NodeProvider>(create: (_) => NodeProvider())
+    ],
+    child: MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

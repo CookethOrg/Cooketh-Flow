@@ -1,24 +1,24 @@
-import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/node_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RectangularNode extends StatelessWidget {
   final Function(Offset) onDrag;
   final Function(int) onConnect;
   final int nodeIndex;
 
-  RectangularNode({
+  const RectangularNode({
     super.key,
     required this.onDrag,
     required this.onConnect,
     required this.nodeIndex,
   });
 
-  final nodeProvider = NodeProvider(ProviderState.inital);
-
   @override
   Widget build(BuildContext context) {
-    return MouseRegion(
+    return Consumer<NodeProvider>(
+      builder: (context, nodeProvider, child) {
+        return MouseRegion(
       onEnter: (_) => nodeProvider.setHover(true),
       onExit: (_) => nodeProvider.setHover(false),
       child: GestureDetector(
@@ -67,63 +67,13 @@ class RectangularNode extends StatelessWidget {
                 ),
               ),
             ),
-            if (nodeProvider.isSelected) ..._buildSelectionBoxes(),
-            if (nodeProvider.isHovered) ..._buildConnectionPoints(),
+            if (nodeProvider.isSelected) ...nodeProvider.buildSelectionBoxes(),
+            if (nodeProvider.isHovered) ...nodeProvider.buildConnectionPoints(),
           ],
         ),
       ),
     );
-  }
-
-  List<Widget> _buildSelectionBoxes() {
-    return [
-      _selectionBox(Offset(-nodeProvider.width / 2 - 10,
-          -nodeProvider.height / 2 - 10)), // Top-left corner
-      _selectionBox(Offset(nodeProvider.width / 2 + 10,
-          -nodeProvider.height / 2 - 10)), // Top-right corner
-      _selectionBox(Offset(-nodeProvider.width / 2 - 10,
-          nodeProvider.height / 2 + 10)), // Bottom-left corner
-      _selectionBox(Offset(nodeProvider.width / 2 + 10,
-          nodeProvider.height / 2 + 10)), // Bottom-right corner
-    ];
-  }
-
-  Widget _selectionBox(Offset offset) {
-    return Positioned(
-      left: (nodeProvider.width / 2) + offset.dx + 53,
-      top: (nodeProvider.height / 2) + offset.dy + 53,
-      child: Container(
-        width: 12,
-        height: 12,
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(4),
-        ),
-      ),
-    );
-  }
-
-  List<Widget> _buildConnectionPoints() {
-    return [
-      _connectionPoint(Offset(0, -nodeProvider.height / 2 - 30)), // Top
-      _connectionPoint(Offset(0, nodeProvider.height / 2 + 30)), // Bottom
-      _connectionPoint(Offset(-nodeProvider.width / 2 - 30, 0)), // Left
-      _connectionPoint(Offset(nodeProvider.width / 2 + 30, 0)), // Right
-    ];
-  }
-
-  Widget _connectionPoint(Offset offset) {
-    return Positioned(
-      left: (nodeProvider.width / 2) + offset.dx + 53,
-      top: (nodeProvider.height / 2) + offset.dy + 53,
-      child: Container(
-        width: 8,
-        height: 8,
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 145, 145, 145),
-          shape: BoxShape.circle,
-        ),
-      ),
+      },
     );
   }
 }

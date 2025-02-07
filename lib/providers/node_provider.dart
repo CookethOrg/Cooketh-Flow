@@ -9,7 +9,7 @@ class NodeProvider extends StateHandler {
   TextEditingController textController = TextEditingController();
 
   // Constructor with an optional initial state
-  NodeProvider([ProviderState? initialState]) : super(initialState) {
+  NodeProvider([super.initialState]) {
     textController.addListener(_updateSize);
   }
 
@@ -69,4 +69,55 @@ class NodeProvider extends StateHandler {
     setHeight((textPainter.height + 20).clamp(50, double.infinity));
   }
   
+  List<Widget> buildSelectionBoxes() {
+    return [
+      _selectionBox(Offset(-_width / 2 - 10,
+          -_height / 2 - 10)), // Top-left corner
+      _selectionBox(Offset(_width / 2 + 10,
+          -_height / 2 - 10)), // Top-right corner
+      _selectionBox(Offset(-_width / 2 - 10,
+          _height / 2 + 10)), // Bottom-left corner
+      _selectionBox(Offset(_width / 2 + 10,
+          _height / 2 + 10)), // Bottom-right corner
+    ];
+  }
+
+  Widget _selectionBox(Offset offset) {
+    return Positioned(
+      left: (_width / 2) + offset.dx + 53,
+      top: (_height / 2) + offset.dy + 53,
+      child: Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+    );
+  }
+
+  List<Widget> buildConnectionPoints() {
+    return [
+      _connectionPoint(Offset(0, -_height / 2 - 30)), // Top
+      _connectionPoint(Offset(0, _height / 2 + 30)), // Bottom
+      _connectionPoint(Offset(-_width / 2 - 30, 0)), // Left
+      _connectionPoint(Offset(_width / 2 + 30, 0)), // Right
+    ];
+  }
+
+  Widget _connectionPoint(Offset offset) {
+    return Positioned(
+      left: (_width / 2) + offset.dx + 53,
+      top: (_height / 2) + offset.dy + 53,
+      child: Container(
+        width: 8,
+        height: 8,
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 145, 145, 145),
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
 }

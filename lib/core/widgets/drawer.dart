@@ -13,6 +13,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
   bool isEditing = false; // To toggle between text and textfield
   TextEditingController _controller = TextEditingController();
   bool isHovered = false; // To detect hover effect
+  bool isSelected = false; // To track if the drawer is selected
 
   @override
   void initState() {
@@ -43,7 +44,10 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.black, width: 1.0),
+                border: Border.all(
+                  color: isSelected ? Colors.blue : Colors.black, // Blue outline if selected
+                  width: 2.0, // Border width
+                ),
               ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -52,6 +56,11 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                     onDoubleTap: () {
                       setState(() {
                         isEditing = !isEditing; // Toggle editing state
+                      });
+                    },
+                    onTap: () {
+                      setState(() {
+                        isSelected = !isSelected; // Toggle selected state
                       });
                     },
                     child: MouseRegion(

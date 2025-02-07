@@ -81,7 +81,10 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
                       },
                       onConnect: (int targetIndex) {
                         setState(() {
-                          connections.add([i, targetIndex]);
+                          // Prevent adding duplicate connections
+                          if (!connections.any((connection) => connection.contains(i) && connection.contains(targetIndex))) {
+                            connections.add([i, targetIndex]);
+                          }
                         });
                       },
                       nodeIndex: i,

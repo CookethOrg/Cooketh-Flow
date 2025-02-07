@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:cookethflow/core/widgets/draggable_node.dart';
+import 'package:cookethflow/core/widgets/nodes/rectangular_node.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/drawer.dart';
 import 'package:flutter/material.dart';

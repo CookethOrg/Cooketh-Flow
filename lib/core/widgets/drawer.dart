@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class FloatingDrawer extends StatefulWidget {
-  final VoidCallback onClose;
 
-  const FloatingDrawer({super.key,required this.onClose});
+  const FloatingDrawer({super.key});
 
   @override
   State<FloatingDrawer> createState() => _FloatingDrawerState();
@@ -34,10 +33,11 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
       children: [
         // Background overlay to close the drawer when tapped
         GestureDetector(
-          onTap: widget.onClose,
           child: SizedBox(
             width: double.infinity,
             height: double.infinity,
+          )
+        ),
         // Background overlay (only when open)
         if (isOpen)
           GestureDetector(

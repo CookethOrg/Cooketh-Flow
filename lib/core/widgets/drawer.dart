@@ -21,6 +21,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
 
   void toggleDrawer() {
     setState(() {
+      if (!isOpen) isEditing = false; // Prevent editing when closed
       isOpen = !isOpen;
     });
   }
@@ -34,129 +35,105 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (isOpen)
-          GestureDetector(
-            onTap: toggleDrawer,
-            child: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.black.withOpacity(0.5),
-            ),
-          ),
-
-        Positioned(
+        // Main Floating Drawer
+        AnimatedPositioned(
+          duration: Duration(milliseconds: 400),
+          curve: Curves.easeInOut,
           top: 24,
           left: 24,
-          child: GestureDetector(
-            onTap: toggleDrawer,
-            child: Container(
+          child: Material(
+            borderRadius: BorderRadius.circular(12),
+            child: AnimatedContainer(
+              duration: Duration(milliseconds: 400),
+              curve: Curves.easeInOut,
               width: 250,
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+              height: isOpen ? 630 : 81,
               decoration: BoxDecoration(
-                color: isOpen ? Colors.blue : Colors.white,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: Colors.black, width: 1),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Text(
-                    getTruncatedTitle(),
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: isOpen ? Colors.white : Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Frederik',
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: isOpen && isEditing
+                              ? TextField(
+                                  controller: _controller,
+                                  decoration: InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding: EdgeInsets.zero,
+                                  ),
+                                  style: TextStyle(
+                                    fontFamily: 'Frederik',
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  autofocus: true,
+                                  onSubmitted: (_) {
+                                    setState(() {
+                                      if (_controller.text.trim().isEmpty) {
+                                        _controller.text = 'Untitled';
+                                      }
+                                      isEditing = false;
+                                    });
+                                  },
+                                )
+                              : GestureDetector(
+                                  onDoubleTap: () {
+                                    if (isOpen) {
+                                      setState(() {
+                                        isEditing = true;
+                                      });
+                                    }
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 9),
+                                    child: Text(
+                                      getTruncatedTitle(),
+                                      style: TextStyle(
+                                        fontFamily: 'Frederik',
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ),
+                        ),
+                        SizedBox(width: 12),
+                        GestureDetector(
+                          onTap: toggleDrawer,
+                          child: Icon(
+                            isOpen ? PhosphorIconsRegular.sidebarSimple : PhosphorIconsFill.sidebarSimple,
+                            color: Colors.black,
+                            size: 24,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: toggleDrawer,
-                    child: Icon(
-                      isOpen ? PhosphorIconsFill.xCircle : PhosphorIconsFill.sidebarSimple,
-                      color: isOpen ? Colors.white : Colors.black,
-                      size: 24,
+
+                  if (isOpen)
+                    Expanded(
+                      child: ListView(
+                        physics: AlwaysScrollableScrollPhysics(),
+                        children: [
+                          ListTile(title: Text('Option 1')),
+                          ListTile(title: Text('Option 2')),
+                          ListTile(title: Text('Option 3')),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),
           ),
         ),
-
-        if (isOpen)
-          Positioned(
-            top: 24,
-            left: 24,
-            child: Material(
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                width: 250,
-                height: 630,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black, width: 1),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          GestureDetector(
-                            onDoubleTap: () {
-                              setState(() {
-                                isEditing = true;
-                              });
-                            },
-                            child: isEditing
-                                ? SizedBox(
-                                    width: 150,
-                                    child: TextField(
-                                      controller: _controller,
-                                      decoration: InputDecoration(border: OutlineInputBorder()),
-                                      style: TextStyle(
-                                        fontFamily: 'Frederik',
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                      onSubmitted: (_) {
-                                        setState(() {
-                                          isEditing = false;
-                                        });
-                                      },
-                                    ),
-                                  )
-                                : Text(
-                                    getTruncatedTitle(),
-                                    style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                          ),
-                          GestureDetector(
-                            onTap: toggleDrawer,
-                            child: Icon(
-                              PhosphorIconsRegular.sidebarSimple,
-                              color: Colors.black,
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Divider(),
-                    ListTile(title: Text('Option 1')),
-                    ListTile(title: Text('Option 2')),
-                  ],
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }

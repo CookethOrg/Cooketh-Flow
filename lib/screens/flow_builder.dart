@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/widgets/toolbar.dart'; // Your Undo/Redo toolbar
 import 'package:cookethflow/core/widgets/nodes/rectangular_node.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/drawer.dart';
@@ -18,12 +19,9 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
   double scale = 1.0; // Initial zoom scale
   double lastScale = 1.0; // Last scale factor for pinch-to-zoom
 
-  void addNode() {
+  void addNode(Offset position) {
     setState(() {
-      nodePositions.add(Offset(
-        Random().nextDouble() * 300, // Random X position
-        Random().nextDouble() * 600, // Random Y position
-      ));
+      nodePositions.add(position);
     });
   }
 
@@ -78,14 +76,10 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
               ],
             ),
           ),
-          FloatingDrawer(), // Updated floating drawer
+          FloatingDrawer(), // Left-side floating drawer
+
+          Toolbar(onAdd: addNode),
         ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        heroTag: "addNodeBtn",
-        onPressed: addNode,
-        backgroundColor: Colors.white,
-        child: Icon(Icons.add, color: Colors.black),
       ),
     );
   }

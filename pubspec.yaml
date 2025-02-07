@@ -37,6 +37,7 @@ dependencies:
   provider: ^6.1.2
   flutter_screenutil: ^5.9.3
   google_fonts: ^6.2.1
+  phosphor_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:

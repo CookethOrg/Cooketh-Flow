@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/widgets/nodes/rectangular_node.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/drawer.dart';
@@ -16,33 +17,19 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
   List<List<int>> connections = []; // Stores connections between nodes
   double scale = 1.0; // Initial zoom scale
   double lastScale = 1.0; // Last scale factor for pinch-to-zoom
-  bool isDrawerOpen = false; // Track drawer visibility
 
-  void toggleDrawer() {
+  void addNode() {
     setState(() {
-      isDrawerOpen = !isDrawerOpen;
+      nodePositions.add(Offset(
+        Random().nextDouble() * 300, // Random X position
+        Random().nextDouble() * 600, // Random Y position
+      ));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Flow Builder"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () {
-              setState(() {
-                nodePositions.add(Offset(
-                  Random().nextDouble() * 300, // Random X position
-                  Random().nextDouble() * 600, // Random Y position
-                ));
-              });
-            },
-          ),
-        ],
-      ),
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Stack(
         children: [
@@ -53,13 +40,12 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
             onScaleUpdate: (details) {
               setState(() {
                 scale = lastScale * details.scale;
-                // Limit the zoom scale
-                scale = scale.clamp(0.5, 3.0);
+                scale = scale.clamp(0.5, 3.0); // Limit zoom scale
               });
             },
             child: Stack(
               children: [
-                // Draw lines between connected nodes
+                // Draw connections between nodes
                 for (var connection in connections)
                   CustomPaint(
                     size: Size.infinite,
@@ -76,13 +62,12 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
                     child: RectangularNode(
                       onDrag: (offset) {
                         setState(() {
-                          nodePositions[i] = offset / scale; // Adjust drag position based on zoom
+                          nodePositions[i] = offset / scale; // Adjust for zoom
                         });
                       },
                       onConnect: (int targetIndex) {
                         setState(() {
-                          // Prevent adding duplicate connections
-                          if (!connections.any((connection) => connection.contains(i) && connection.contains(targetIndex))) {
+                          if (!connections.any((c) => c.contains(i) && c.contains(targetIndex))) {
                             connections.add([i, targetIndex]);
                           }
                         });
@@ -93,13 +78,14 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
               ],
             ),
           ),
-          // Floating Drawer
-          if (isDrawerOpen) FloatingDrawer(onClose: toggleDrawer),
+          FloatingDrawer(), // Updated floating drawer
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: toggleDrawer,
-        child: Icon(Icons.menu),
+        heroTag: "addNodeBtn",
+        onPressed: addNode,
+        backgroundColor: Colors.white,
+        child: Icon(Icons.add, color: Colors.black),
       ),
     );
   }

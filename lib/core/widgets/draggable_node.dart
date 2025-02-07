@@ -18,6 +18,7 @@ class DraggableNode extends StatefulWidget {
 
 class _DraggableNodeState extends State<DraggableNode> {
   bool isHovered = false;
+  bool isSelected = false; // Track if the node is selected
   TextEditingController textController = TextEditingController();
   double width = 100;
   double height = 50;
@@ -60,13 +61,17 @@ class _DraggableNodeState extends State<DraggableNode> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return MouseRegion(
       onEnter: (_) => setState(() => isHovered = true),
       onExit: (_) => setState(() => isHovered = false),
       child: GestureDetector(
+        onTap: () {
+          setState(() {
+            isSelected = !isSelected; // Toggle selection on tap
+          });
+        },
         onPanUpdate: (details) {
           widget.onDrag(Offset(
             details.globalPosition.dx - (width / 2),
@@ -86,11 +91,11 @@ class _DraggableNodeState extends State<DraggableNode> {
                 height: height,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Color(0xFFFFD8A8),
+                  color: Color(0xFFFFD8A8), // Change color when selected
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: Colors.black,
-                    width: 1,
+                    color: isSelected ? Colors.blue : Colors.black, // Blue border when selected
+                    width: isSelected? 2.0 : 1.0, // Border width
                   ),
                 ),
                 alignment: Alignment.center,
@@ -108,6 +113,7 @@ class _DraggableNodeState extends State<DraggableNode> {
                 ),
               ),
             ),
+            if (isSelected) ..._buildSelectionBoxes(),
             if (isHovered) ..._buildConnectionPoints(),
           ],
         ),
@@ -115,19 +121,43 @@ class _DraggableNodeState extends State<DraggableNode> {
     );
   }
 
+  List<Widget> _buildSelectionBoxes() {
+    return [
+      _selectionBox(Offset(-width / 2 - 10, -height / 2 - 10)), // Top-left corner
+      _selectionBox(Offset(width / 2 + 10, -height / 2 - 10)), // Top-right corner
+      _selectionBox(Offset(-width / 2 - 10, height / 2 + 10)), // Bottom-left corner
+      _selectionBox(Offset(width / 2 + 10, height / 2 + 10)), // Bottom-right corner
+    ];
+  }
+
+  Widget _selectionBox(Offset offset) {
+    return Positioned(
+      left: (width / 2) + offset.dx + 53,
+      top: (height / 2) + offset.dy + 53,
+      child: Container(
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(4),
+        ),
+      ),
+    );
+  }
+
   List<Widget> _buildConnectionPoints() {
     return [
-      _connectionPoint(Offset(0, -height/ 2 -30)),  // Top
+      _connectionPoint(Offset(0, -height / 2 - 30)),  // Top
       _connectionPoint(Offset(0, height / 2 + 30)),   // Bottom
-      _connectionPoint(Offset(-width / 2 -30 , 0)),  // Left
-      _connectionPoint(Offset(width/ 2 + 30, 0 )),   // Right
+      _connectionPoint(Offset(-width / 2 - 30, 0)),   // Left
+      _connectionPoint(Offset(width / 2 + 30, 0)),    // Right
     ];
   }
 
   Widget _connectionPoint(Offset offset) {
     return Positioned(
-      left: (width / 2) + offset.dx +53,
-      top: (height/ 2) + offset.dy +53,
+      left: (width / 2) + offset.dx + 53,
+      top: (height / 2) + offset.dy + 53,
       child: Container(
         width: 8,
         height: 8,

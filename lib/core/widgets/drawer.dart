@@ -2,14 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class FloatingDrawer extends StatefulWidget {
+  final VoidCallback onClose;
+
+  const FloatingDrawer({super.key,required this.onClose});
+
   @override
-  _FloatingDrawerState createState() => _FloatingDrawerState();
+  State<FloatingDrawer> createState() => _FloatingDrawerState();
 }
 
 class _FloatingDrawerState extends State<FloatingDrawer> {
   bool isOpen = false; // Controls drawer state
   bool isEditing = false; // To toggle between text and textfield
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
   bool isHovered = false; // To detect hover effect
 
   @override
@@ -28,6 +32,12 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
   Widget build(BuildContext context) {
     return Stack(
       children: [
+        // Background overlay to close the drawer when tapped
+        GestureDetector(
+          onTap: widget.onClose,
+          child: SizedBox(
+            width: double.infinity,
+            height: double.infinity,
         // Background overlay (only when open)
         if (isOpen)
           GestureDetector(

@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/utils/utils.dart';
+import 'package:cookethflow/core/widgets/buttons/connector.dart';
 import 'package:flutter/material.dart';
 
 class NodeProvider extends StateHandler {
@@ -93,7 +94,7 @@ class NodeProvider extends StateHandler {
     setWidth(textPainter.width.clamp(100, 250).toDouble()); // Dynamic width
     setHeight((textPainter.height + 20).clamp(50, double.infinity));
   }
-
+  // Builds selection box
   List<Widget> buildSelectionBoxes() {
     return [
       _selectionBox(
@@ -107,17 +108,19 @@ class NodeProvider extends StateHandler {
     ];
   }
 
+  // Selection widget
   Widget _selectionBox(Offset offset) {
     return Positioned(
-      left: (_width / 2) + offset.dx + 53,
-      top: (_height / 2) + offset.dy + 53,
+      left: (_width / 2) + offset.dx + 40,
+      top: (_height / 2) + offset.dy + 38,
       child: Container(
-        width: 12,
-        height: 12,
+        // width: 5,
+        // height: 5,
         decoration: BoxDecoration(
-          color: Colors.blue,
+          // color: Colors.blue,
           borderRadius: BorderRadius.circular(4),
         ),
+        child: Connector(),
       ),
     );
   }

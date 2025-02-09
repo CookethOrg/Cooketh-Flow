@@ -6,6 +6,9 @@ class NodeProvider extends StateHandler {
   bool _isSelected = false; // Track if the node is selected
   double _width = 100;
   double _height = 50;
+  List<Offset> nodePositions = [Offset(100, 100), Offset(200, 300)];
+  double scale = 1.0; // Initial zoom scale
+  double lastScale = 1.0; // Last scale factor for pinch-to-zoom
   TextEditingController textController = TextEditingController();
 
   // Constructor with an optional initial state
@@ -36,8 +39,29 @@ class NodeProvider extends StateHandler {
     notifyListeners();
   }
 
+  void startScale(ScaleStartDetails details) {
+    lastScale = scale;
+    notifyListeners();
+  }
+
+  void scaleUpdate(ScaleUpdateDetails details) {
+    scale = lastScale * details.scale;
+    scale = scale.clamp(0.5, 3.0); // Limit zoom scale
+    notifyListeners();
+  }
+
+  // void onDragNode(Offset pos, int i) {
+  //   nodePositions[i] = pos / scale;
+  //   notifyListeners();
+  // }
+
   void setHeight(double h) {
     _height = h;
+    notifyListeners();
+  }
+
+  void addNode(Offset position) {
+    nodePositions.add(position);
     notifyListeners();
   }
 

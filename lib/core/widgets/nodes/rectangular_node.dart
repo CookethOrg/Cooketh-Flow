@@ -19,10 +19,10 @@ class RectangularNode extends StatelessWidget {
     return Consumer<NodeProvider>(
       builder: (context, nodeProvider, child) {
         return MouseRegion(
-      onEnter: (_) => nodeProvider.isSelected ? nodeProvider.setHover(false) : nodeProvider.setHover(true),
+      onEnter: (_) => nodeProvider.setHover(true),
       onExit: (_) => nodeProvider.setHover(false),
       child: GestureDetector(
-        onTapCancel: nodeProvider.changeSelected,
+        // onTapCancel: nodeProvider.changeSelected,
         onTap: nodeProvider.changeSelected,
         onPanUpdate: (details) {
           onDrag(Offset(

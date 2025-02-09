@@ -27,6 +27,7 @@ class NodeProvider extends StateHandler {
 
   void changeSelected() {
     _isSelected = !_isSelected;
+    setHover(false);
     notifyListeners();
   }
 
@@ -68,17 +69,17 @@ class NodeProvider extends StateHandler {
     setWidth(textPainter.width.clamp(100, 250).toDouble()); // Dynamic width
     setHeight((textPainter.height + 20).clamp(50, double.infinity));
   }
-  
+
   List<Widget> buildSelectionBoxes() {
     return [
-      _selectionBox(Offset(-_width / 2 - 10,
-          -_height / 2 - 10)), // Top-left corner
-      _selectionBox(Offset(_width / 2 + 10,
-          -_height / 2 - 10)), // Top-right corner
-      _selectionBox(Offset(-_width / 2 - 10,
-          _height / 2 + 10)), // Bottom-left corner
-      _selectionBox(Offset(_width / 2 + 10,
-          _height / 2 + 10)), // Bottom-right corner
+      _selectionBox(
+          Offset(-_width / 2 - 10, -_height / 2 - 10)), // Top-left corner
+      _selectionBox(
+          Offset(_width / 2 + 10, -_height / 2 - 10)), // Top-right corner
+      _selectionBox(
+          Offset(-_width / 2 - 10, _height / 2 + 10)), // Bottom-left corner
+      _selectionBox(
+          Offset(_width / 2 + 10, _height / 2 + 10)), // Bottom-right corner
     ];
   }
 

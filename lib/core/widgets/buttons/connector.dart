@@ -7,13 +7,17 @@ class Connector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-        onPressed: () {},
-        style: IconButton.styleFrom(fixedSize: Size(35, 25)),
-        icon: Icon(
-          icon,
-          color: color ?? Colors.blue,
-          // size: 25,
-        ));
+    return SizedBox(
+      height: 10,
+      width: 10,
+      child: IconButton(
+          onPressed: () {},
+          style: IconButton.styleFrom(fixedSize: Size(10, 5)),
+          icon: Icon(
+            icon,
+            color: color ?? Colors.blue,
+            // size: 25,
+          )),
+    );
   }
 }

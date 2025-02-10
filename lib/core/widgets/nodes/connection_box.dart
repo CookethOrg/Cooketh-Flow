@@ -27,6 +27,10 @@ class ConnectionBox extends StatelessWidget {
         right: (width! / 2) + right!,
         bottom: (height! / 2) + bottom!,
         top: (height! / 2) + top!,
+        // left:left!,
+        // right: right!,
+        // bottom: bottom!,
+        // top:  top!,
         child: Connector(icon: icon));
   }
 }

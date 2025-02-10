@@ -22,6 +22,7 @@ class RectangularNode extends StatelessWidget {
       onEnter: (_) => nodeProvider.setHover(true),
       onExit: (_) => nodeProvider.setHover(false),
       child: GestureDetector(
+        // onTapCancel: nodeProvider.changeSelected,
         onTap: nodeProvider.changeSelected,
         onPanUpdate: (details) {
           onDrag(Offset(

@@ -1,3 +1,4 @@
+import 'package:cookethflow/providers/connection_provider.dart';
 import 'package:cookethflow/providers/node_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -16,8 +17,8 @@ class RectangularNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<NodeProvider>(
-      builder: (context, nodeProvider, child) {
+    return Consumer2<NodeProvider, ConnectionProvider>(
+      builder: (context, nodeProvider,connectionProvider, child) {
         return GestureDetector(
           onTap: nodeProvider.changeSelected,
           onPanUpdate: (details) {
@@ -68,7 +69,7 @@ class RectangularNode extends StatelessWidget {
               ),
               // if(nodeProvider.isHovered) ...nodeProvider.buildConnectionPoints(),
               if (nodeProvider.isSelected) ...nodeProvider.buildSelectionBoxes(),
-              // if (nodeProvider.isSelected) ...nodeProvider.buildConnectionPoints(),
+              if (nodeProvider.isSelected) ...connectionProvider.connectionPointBuilder(),
             ],
           ),
         );

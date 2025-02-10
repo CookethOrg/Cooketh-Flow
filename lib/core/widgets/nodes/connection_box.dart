@@ -4,24 +4,29 @@ import 'package:flutter/material.dart';
 class ConnectionBox extends StatelessWidget {
   const ConnectionBox(
       {super.key,
-      required this.top,
-      required this.bottom,
-      required this.left,
-      required this.right});
-  final double? top;
-  final double? bottom;
+      required this.icon,
+      this.height,
+      this.width,
+      this.left,
+      this.right,
+      this.top,
+      this.bottom});
+  final IconData icon;
+  final double? width;
+  final double? height;
   final double? left;
   final double? right;
+  final double? top;
+  final double? bottom;
+  // final Offset? offset;
 
   @override
   Widget build(BuildContext context) {
     return Positioned(
-        top: top,
-        left: left,
-        bottom: bottom,
-        right: right,
-        child: Connector(
-          icon: Icons.arrow_drop_up_outlined,
-        ));
+        left: (width! / 2) + left!,
+        right: (width! / 2) + right!,
+        bottom: (height! / 2) + bottom!,
+        top: (height! / 2) + top!,
+        child: Connector(icon: icon));
   }
 }

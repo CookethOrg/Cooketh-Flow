@@ -1,6 +1,4 @@
 import 'package:cookethflow/core/utils/utils.dart';
-import 'package:cookethflow/core/widgets/buttons/connector.dart';
-import 'package:cookethflow/core/widgets/nodes/connection_box.dart';
 import 'package:cookethflow/core/widgets/nodes/selection_box.dart';
 import 'package:flutter/material.dart';
 

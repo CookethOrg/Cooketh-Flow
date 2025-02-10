@@ -5,14 +5,15 @@ class Connector extends StatelessWidget {
   final IconData icon;
   final Color? color;
 
-
   @override
   Widget build(BuildContext context) {
     return IconButton(
         onPressed: () {},
         style: IconButton.styleFrom(fixedSize: Size(35, 25)),
-        icon: Icon( icon,
-          color: color?? Colors.blue,
+        icon: Icon(
+          icon,
+          color: color ?? Colors.blue,
+          // size: 25,
         ));
   }
 }

@@ -17,7 +17,7 @@ class SelectionBox extends StatelessWidget {
           height: 10,
           width: 10,
           decoration: BoxDecoration(
-              color: Colors.transparent,
+              color: Colors.blue,
               borderRadius: BorderRadius.circular(0),
               border: Border.all(width: 2.5, color: Colors.blue)),
         ));

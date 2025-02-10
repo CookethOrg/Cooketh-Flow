@@ -1,5 +1,7 @@
 import 'package:cookethflow/core/utils/utils.dart';
 import 'package:cookethflow/core/widgets/buttons/connector.dart';
+import 'package:cookethflow/core/widgets/nodes/connection_box.dart';
+import 'package:cookethflow/core/widgets/nodes/selection_box.dart';
 import 'package:flutter/material.dart';
 
 class NodeProvider extends StateHandler {
@@ -94,58 +96,55 @@ class NodeProvider extends StateHandler {
     setWidth(textPainter.width.clamp(100, 250).toDouble()); // Dynamic width
     setHeight((textPainter.height + 20).clamp(50, double.infinity));
   }
-  // Builds selection box
+
   List<Widget> buildSelectionBoxes() {
     return [
-      _selectionBox(
-          Offset(-_width / 2 - 10, -_height / 2 - 10)), // Top-left corner
-      _selectionBox(
-          Offset(_width / 2 + 10, -_height / 2 - 10)), // Top-right corner
-      _selectionBox(
-          Offset(-_width / 2 - 10, _height / 2 + 10)), // Bottom-left corner
-      _selectionBox(
-          Offset(_width / 2 + 10, _height / 2 + 10)), // Bottom-right corner
+      SelectionBox(
+        height: _height,
+        width: _width,
+        offset: Offset(-_width / 2 + 13, -_height / 2 + 15),
+      ), // Top-left
+      SelectionBox(
+        height: _height,
+        width: _width,
+        offset: Offset(_width / 2 + 17, -_height / 2 + 15),
+      ), // Top-right
+      SelectionBox(
+        height: _height,
+        width: _width,
+        offset: Offset(-_width / 2 + 13, _height / 2 + 15),
+      ), // bottom-left
+      SelectionBox(
+        height: _height,
+        width: _width,
+        offset: Offset(_width / 2 + 17, _height / 2 + 15),
+      ), // bottom-right
     ];
   }
 
-  // Selection widget
-  Widget _selectionBox(Offset offset) {
-    return Positioned(
-      left: (_width / 2) + offset.dx + 40,
-      top: (_height / 2) + offset.dy + 38,
-      child: Container(
-        // width: 5,
-        // height: 5,
-        decoration: BoxDecoration(
-          // color: Colors.blue,
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Connector(),
-      ),
-    );
-  }
+  // List<Widget> buildConnectionPoints() {
+  //   return [
+  //     // ConnectionBox(top: -_height / 2 - 30, bottom: _height / 2 + 30, left: -_width / 2 - 30, right: _width / 2 + 30),
+  //     _connectionPoint(Offset(0, -_height / 2), Icons.arrow_drop_up_outlined), // Top
+  //     _connectionPoint(Offset(0, _height / 2 + 3), Icons.arrow_drop_down_outlined), // Bottom
+  //     _connectionPoint(Offset(-_width / 2 - 2, 0), Icons.arrow_left_outlined), // Left
+  //     _connectionPoint(Offset(_width / 2+ 2, 0), Icons.arrow_right_outlined), // Right
+  //   ];
+  // }
 
-  List<Widget> buildConnectionPoints() {
-    return [
-      _connectionPoint(Offset(0, -_height / 2 - 30)), // Top
-      _connectionPoint(Offset(0, _height / 2 + 30)), // Bottom
-      _connectionPoint(Offset(-_width / 2 - 30, 0)), // Left
-      _connectionPoint(Offset(_width / 2 + 30, 0)), // Right
-    ];
-  }
-
-  Widget _connectionPoint(Offset offset) {
-    return Positioned(
-      left: (_width / 2) + offset.dx + 53,
-      top: (_height / 2) + offset.dy + 53,
-      child: Container(
-        width: 8,
-        height: 8,
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 145, 145, 145),
-          shape: BoxShape.circle,
-        ),
-      ),
-    );
-  }
+  // Widget _connectionPoint(Offset offset, IconData icon) {
+  //   return Positioned(
+  //     // left: (_width / 2) + offset.dx + 40,
+  //     // top: (_height / 2) + offset.dy + 38,
+  //     child: Container(
+  //       width: 8,
+  //       height: 8,
+  //       decoration: const BoxDecoration(
+  //         // color: Color.fromARGB(255, 145, 145, 145),
+  //         // shape: BoxShape.circle,
+  //       ),
+  //       child: Connector(icon: icon,),
+  //     ),
+  //   );
+  // }
 }

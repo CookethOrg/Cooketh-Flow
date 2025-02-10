@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
 class Connector extends StatelessWidget {
-  const Connector({super.key});
+  const Connector({super.key, this.color, required this.icon});
+  final IconData icon;
+  final Color? color;
+
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(onPressed: (){}, icon: Icon(Icons.arrow_drop_up, color: Colors.blue,));
+    return IconButton(
+        onPressed: () {},
+        style: IconButton.styleFrom(fixedSize: Size(35, 25)),
+        icon: Icon( icon,
+          color: color?? Colors.blue,
+        ));
   }
 }

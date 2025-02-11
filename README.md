@@ -1,6 +1,6 @@
 # cookethflow
 
-A new Flutter project.
+For foss hacks
 
 ## Getting Started
 

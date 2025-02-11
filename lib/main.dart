@@ -5,6 +5,7 @@ import 'package:cookethflow/providers/node_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/screens/flow_builder.dart';
 import 'package:cookethflow/screens/log_in.dart';
+import 'package:cookethflow/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

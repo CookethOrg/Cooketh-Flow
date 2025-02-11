@@ -10,13 +10,13 @@ class Dashboard extends StatelessWidget {
     return Consumer(
       builder: (context, provider, child) {
         return Scaffold(
-          appBar: AppBar(
-            title: Text(
-              'Your Projects',
-              style: TextStyle(color: Colors.black),
-            ),
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          body: Stack(
+            children: [
+              DashboardDrawer(),
+              
+            ],
           ),
-          drawer: DashboardDrawer(),
         );
       },
     );

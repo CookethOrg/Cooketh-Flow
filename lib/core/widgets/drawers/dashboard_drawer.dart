@@ -10,96 +10,147 @@ class DashboardDrawer extends StatelessWidget {
     return Consumer<DashboardProvider>(
       builder: (context, provider, child) {
         return Stack(
-        children: [
-          // Main Floating Drawer
-          AnimatedPositioned(
-            duration: Duration(milliseconds: 400),
-            curve: Curves.easeInOut,
-            top: 24,
-            left: 24,
-            child: Material(
-              borderRadius: BorderRadius.circular(12),
-              child: AnimatedContainer(
-                duration: Duration(milliseconds: 400),
-                curve: Curves.easeInOut,
-                width: 250,
-                height: provider.isOpen ? 630 : 81,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black, width: 1),
-                ),
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 16),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: provider.isOpen && provider.isEditing
-                                ? TextField(
-                                    controller: provider.controller,
-                                    decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      contentPadding: EdgeInsets.zero,
-                                    ),
-                                    style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    autofocus: true,
-                                  )
-                                : GestureDetector(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 9),
-                                      child: Text(
-                                        provider.getTruncatedTitle(),
-                                        style: TextStyle(
-                                          fontFamily: 'Frederik',
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ),
-                                  ),
-                          ),
-                          SizedBox(width: 12),
-                          GestureDetector(
-                            onTap: provider.toggleDrawer,
-                            child: Icon(
-                              provider.isOpen
-                                  ? PhosphorIconsRegular.sidebarSimple
-                                  : PhosphorIconsFill.sidebarSimple,
-                              color: Colors.black,
-                              size: 24,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    if (provider.isOpen)
-                      Expanded(
-                        child: ListView(
-                          physics: AlwaysScrollableScrollPhysics(),
+          children: [
+            // Main Floating Drawer
+            Positioned(
+              // duration: Duration(milliseconds: 400),
+              // curve: Curves.easeInOut,
+              top: 24,
+              left: 24,
+              child: Material(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  // duration: Duration(milliseconds: 400),
+                  // curve: Curves.easeInOut,
+                  width: 350,
+                  height: MediaQuery.of(context).size.height * 0.95,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.black, width: 1),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
+                        child: Row(
                           children: [
-                            ListTile(title: Text('Option 1')),
-                            ListTile(title: Text('Option 2')),
-                            ListTile(title: Text('Option 3')),
+                            CircleAvatar(
+                              backgroundImage: AssetImage('assets/pic1.png'),
+                            ),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            Text(
+                              'Subroto Banerjee',
+                              style: TextStyle(
+                                  fontFamily: 'Frederik', fontSize: 20),
+                            ),
+                            IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.keyboard_arrow_down_outlined)),
+                            SizedBox(
+                              width: 10,
+                            ),
+                            IconButton(
+                                onPressed: () {},
+                                iconSize: 30,
+                                icon: Icon(Icons.notifications_on_outlined))
                           ],
                         ),
                       ),
-                  ],
+                      Padding(
+                        padding: const EdgeInsets.only(left: 20),
+                        child: ElevatedButton.icon(
+                            onPressed: () {},
+                            style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                fixedSize: Size(200, 50),
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12))),
+                            icon: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ),
+                            label: Text(
+                              'Add another account',
+                              style: TextStyle(
+                                  fontFamily: 'Frederik',
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white),
+                            )),
+                      ),
+                      SizedBox(
+                        height: 35,
+                      ),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(
+                            PhosphorIconsRegular.fileDoc,
+                            size: 25,
+                            // fill: 20,
+                          ),
+                          label: Text(
+                            'Drafts',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 20,
+                                // fontWeight: FontWeight.w100,
+                                color: Colors.black),
+                          )),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(PhosphorIconsRegular.trash),
+                          label: Text(
+                            'Trash',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 20,
+                                // fontWeight: FontWeight.w100,
+                                color: Colors.black),
+                          )),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(PhosphorIconsRegular.star),
+                          label: Text(
+                            'Starred',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 20,
+                                // fontWeight: FontWeight.w100,
+                                color: Colors.black),
+                          )),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      TextButton.icon(
+                          onPressed: () {},
+                          icon: Icon(PhosphorIconsRegular.engine),
+                          label: Text(
+                            'Settings',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 20,
+                                // fontWeight: FontWeight.w100,
+                                color: Colors.black),
+                          )),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
-      );
+          ],
+        );
       },
     );
   }

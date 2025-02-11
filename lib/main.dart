@@ -4,6 +4,7 @@ import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/node_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/screens/flow_builder.dart';
+import 'package:cookethflow/screens/log_in.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Dashboard(),
+      home: LoginPage(),
     );
   }
 }

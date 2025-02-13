@@ -4,7 +4,7 @@ import 'package:cookethflow/core/widgets/buttons/redo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/undo_button.dart';
 
 class Toolbar extends StatelessWidget {
-  final void Function(Offset) onAdd;
+  final void Function() onAdd;
 
   const Toolbar({super.key, required this.onAdd});
 

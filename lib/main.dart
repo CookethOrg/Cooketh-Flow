@@ -2,10 +2,12 @@ import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/connection_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/node_provider.dart';
+import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
-import 'package:cookethflow/screens/workspace.dart';
+import 'package:cookethflow/screens/flowbuilder.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:cookethflow/screens/sign_up.dart';
+import 'package:cookethflow/screens/workspace.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -14,7 +16,8 @@ void main() {
     providers: [
       ChangeNotifierProvider<NodeProvider>(create: (_) => NodeProvider(ProviderState.loaded)),
       ChangeNotifierProvider<ConnectionProvider>(create: (_)=> ConnectionProvider()),
-      ChangeNotifierProvider<DashboardProvider>(create: (_) => DashboardProvider())
+      ChangeNotifierProvider<DashboardProvider>(create: (_) => DashboardProvider()),
+      ChangeNotifierProvider<WorkspaceProvider>(create: (_) => WorkspaceProvider(ProviderState.loaded)),
     ],
     child: MyApp(),
   ));
@@ -27,7 +30,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: FlowBuilderScreen(),
+      home: Workspace(),
     );
   }
 }

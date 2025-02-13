@@ -12,7 +12,7 @@ class FlowNode {
 
   FlowNode({
     required this.id,
-    required this.data,
+    this.data = 'New Node',
     required this.type,
     required this.position,
   }) : connections = {

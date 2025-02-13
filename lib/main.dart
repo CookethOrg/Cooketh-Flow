@@ -1,10 +1,10 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/connection_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
-import 'package:cookethflow/providers/node_provider.dart';
+import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
-import 'package:cookethflow/screens/flowbuilder.dart';
+import 'package:cookethflow/screens/discarded/flowbuilder.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:cookethflow/screens/sign_up.dart';
 import 'package:cookethflow/screens/workspace.dart';

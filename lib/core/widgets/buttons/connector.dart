@@ -8,16 +8,16 @@ class Connector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 10,
-      width: 10,
-      child: IconButton(
-          onPressed: () {},
-          style: IconButton.styleFrom(fixedSize: Size(10, 5)),
-          icon: Icon(
+      // height: 10,
+      // width: 10,
+      child: GestureDetector(
+        onTap: (){},
+        child: Icon(
             icon,
             color: color ?? Colors.blue,
             // size: 25,
-          )),
+          ),
+      ),
     );
   }
 }

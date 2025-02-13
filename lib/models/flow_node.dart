@@ -4,20 +4,20 @@ import 'package:flutter/material.dart';
 enum NodeType { rectangular, parallelogram, diamond, database }
 
 class FlowNode {
-  final Offset position;
-  final String data;
+  Offset position;
+  final TextEditingController data;
   final NodeType type;
   final String id;
   final Map<ConnectionPoint, Set<Connection>> connections;
 
   FlowNode({
     required this.id,
-    this.data = 'New Node',
+    // required this.data,
     required this.type,
     required this.position,
   }) : connections = {
           for (var point in ConnectionPoint.values) point: <Connection>{}
-        };
+        }, data = TextEditingController(text: 'Node $id');
 
   // Check if a connection point is available
   bool isConnectionPointAvailable(ConnectionPoint point) {

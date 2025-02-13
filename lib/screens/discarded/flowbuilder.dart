@@ -1,6 +1,6 @@
-import 'package:cookethflow/providers/node_provider.dart';
+import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart'; // Your Undo/Redo toolbar
-import 'package:cookethflow/core/widgets/nodes/rectangular_node.dart';
+import 'package:cookethflow/screens/discarded/rectangular_node.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:flutter/material.dart';

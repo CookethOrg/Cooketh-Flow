@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
-import 'package:cookethflow/providers/node_provider.dart';
+import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,6 +30,10 @@ class Workspace extends StatelessWidget {
                       top: workProvider.nodeList[str]!.position.dy,
                       child: Node(
                           id: str,
+                          data: 'node $str',
+                          onDrag: (offset) {
+                            workProvider.dragNode(str, offset);
+                          },
                           position: node.position),
                     ); // Replace with your actual widget
                   }),

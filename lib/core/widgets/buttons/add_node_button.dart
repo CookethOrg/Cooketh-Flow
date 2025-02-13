@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -15,13 +14,7 @@ class AddButton extends StatelessWidget {
       builder: (context, pv, child) {
         return IconButton(
           icon: Icon(PhosphorIconsRegular.plus),
-          onPressed: () {
-            Offset newNodePosition = Offset(
-              Random().nextDouble() * 1500, // Random X position
-              Random().nextDouble() * 800, // Random Y position
-            );
-            pv.addNode();
-          },
+          onPressed: () => pv.addNode(),
           tooltip: "Add Node",
         );
       },

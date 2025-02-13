@@ -1,6 +1,4 @@
 import 'package:cookethflow/models/flow_node.dart';
-import 'package:cookethflow/providers/connection_provider.dart';
-import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -9,24 +7,22 @@ class Node extends StatelessWidget {
   const Node(
       {super.key,
       required this.id,
-      required this.onDrag,
-      this.data = 'New Node',
       this.type = NodeType.rectangular,
+      required this.onDrag,
       required this.position});
   final String id;
-  final Function(Offset) onDrag;
-  final String data;
   final NodeType type;
+  final Function(Offset) onDrag;
   final Offset position;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<WorkspaceProvider,ConnectionProvider>(
-      builder: (context, wp, con, child) {
+    return Consumer<WorkspaceProvider>(
+      builder: (context, wp, child) {
         return GestureDetector(
           onTap: wp.changeSelected,
           onPanUpdate: (details) {
-             onDrag(Offset(
+            onDrag(Offset(
               // During ondrag, there are no more connection box just selection box
               details.globalPosition.dx - (wp.width / 2),
               details.globalPosition.dy - (wp.height / 2),
@@ -47,8 +43,7 @@ class Node extends StatelessWidget {
                       color: wp.isSelected
                           ? Colors.blue
                           : Colors.black, // Blue border when selected
-                      width:
-                          wp.isSelected ? 2.5 : 1.0, // Border width
+                      width: wp.isSelected ? 2.5 : 1.0, // Border width
                     ),
                   ),
                   alignment: Alignment.center,
@@ -70,7 +65,7 @@ class Node extends StatelessWidget {
                 ),
               ),
               if (wp.isSelected) ...wp.buildSelectionBoxes(),
-              if (wp.isSelected) ...con.connectionPointBuilder(),
+              // if (wp.isSelected) ...con.connectionPointBuilder(),
             ],
           ),
         );

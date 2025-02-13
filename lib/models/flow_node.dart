@@ -12,7 +12,6 @@ class FlowNode {
 
   FlowNode({
     required this.id,
-    // required this.data,
     required this.type,
     required this.position,
   }) : connections = {

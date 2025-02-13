@@ -7,7 +7,7 @@ class NodeProvider extends StateHandler {
   bool _isSelected = false; // Track if the node is selected
   double _width = 100;
   double _height = 50;
-  List<Offset> nodePositions = [Offset(100, 100), Offset(200, 300)];
+  List<Offset> nodePositions = [Offset(400, 400), Offset(200, 300)];
   double scale = 1.0; // Initial zoom scale
   double lastScale = 1.0; // Last scale factor for pinch-to-zoom
   TextEditingController textController = TextEditingController();

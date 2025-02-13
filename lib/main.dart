@@ -3,7 +3,7 @@ import 'package:cookethflow/providers/connection_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/node_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
-import 'package:cookethflow/screens/flow_builder.dart';
+import 'package:cookethflow/screens/workspace.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:cookethflow/screens/sign_up.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: LoginPage(),
+      home: FlowBuilderScreen(),
     );
   }
 }

@@ -10,10 +10,13 @@ class WorkspaceProvider extends StateHandler {
   // New instance of flow manager (new file)
   FlowManager flowManager = FlowManager();
   Map<String, FlowNode> _nodeList = {};
-   bool _isHovered = false;
-  bool _isSelected = false; // Track if the node is selected
-  double _width = 100;
-  double _height = 50;
+  bool _isHovered = false;
+  // bool _isSelected = nodeList["1"]!.isSelected; // Track if the node is selected
+  double _width = 150;
+  double _height = 75;
+
+  double getWidth(String id) => nodeList[id]!.size.width;
+  double getHeight(String id) => nodeList[id]!.size.height;
 
   WorkspaceProvider([super.intialState]) {
     _nodeList = {
@@ -21,21 +24,27 @@ class WorkspaceProvider extends StateHandler {
           id: "1",
           // data: t1,
           type: NodeType.rectangular,
-          position: Offset(300, 400)),
+          position: Offset(
+            Random().nextDouble() * 1500, // Random X position
+            Random().nextDouble() * 800, // Random Y position
+          )),
       "2": FlowNode(
           id: "2",
           // data: t2,
           type: NodeType.rectangular,
-          position: Offset(500, 300))
+          position: Offset(
+            Random().nextDouble() * 1500, // Random X position
+            Random().nextDouble() * 800, // Random Y position
+          ))
     };
     updateList();
   }
 
-    // Getters
+  // Getters
   bool get isHovered => _isHovered;
-  bool get isSelected => _isSelected;
-  double get width => _width;
-  double get height => _height;
+  // bool get isSelected => ;
+  // double get width => nodeList[id]?.size.width ?? 200.0;
+  // double get height => _height;
 
   // Setters
   void setHover(bool val) {
@@ -43,9 +52,24 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void changeSelected() {
-    _isSelected = !_isSelected;
-    setHover(false);
+  void onResize(String id, Size newSize) {
+    print(
+        "Resizing node $id to height: ${newSize.height} and width: ${newSize.width}");
+    if (nodeList.containsKey(id)) {
+      // Apply minimum size constraints
+      double width = newSize.width.clamp(100.0, double.infinity);
+      double height = newSize.height.clamp(50.0, double.infinity);
+
+      nodeList[id]!.size = Size(width, height);
+      notifyListeners();
+    }
+  }
+
+  void changeSelected(String nodeId) {
+    flowManager.nodes[nodeId]!.isSelected =
+        !flowManager.nodes[nodeId]!.isSelected;
+    updateList();
+    // setHover(false);
     notifyListeners();
   }
 
@@ -87,6 +111,7 @@ class WorkspaceProvider extends StateHandler {
   Map<String, FlowNode> get nodeList => _nodeList;
   void updateList() {
     flowManager.nodes.addAll(_nodeList);
+    print(flowManager.exportFlow());
     notifyListeners();
   }
 
@@ -113,4 +138,13 @@ class WorkspaceProvider extends StateHandler {
     flowManager.nodes[id]!.position = off;
     notifyListeners();
   }
+
+  // Check if any node is currently selected
+  bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);
+
+  // Get currently selected node (if any)
+  // FlowNode? get selectedNode => nodeList.values.firstWhere(
+  //   (node) => node.isSelected,
+  //   orElse: () => null,
+  // );
 }

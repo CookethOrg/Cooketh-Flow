@@ -14,30 +14,50 @@ class Workspace extends StatelessWidget {
       builder: (context, workProvider, child) {
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          body: Stack(
-            children: [
-              Stack(
-                children: [
-                  ...workProvider.nodeList.entries.map((entry) {
-                    var str = entry.key;
-                    var node = entry.value;
-                    return Positioned(
-                      left: workProvider.nodeList[str]!.position.dx,
-                      top: workProvider.nodeList[str]!.position.dy,
-                      child: Node(
-                          id: str,
-                          onDrag: (offset) {
-                            workProvider.dragNode(str, offset);
-                          },
-                          position: node.position),
-                    ); // Replace with your actual widget
-                  }),
-                ],
-              ),
-              FloatingDrawer(), // Left-side floating drawer
+          body: GestureDetector(
+            onTapDown: (details) {
+              // Check if tap is outside all nodes
+              bool hitNode = false;
+              for (var node in workProvider.nodeList.values) {
+                if (node.bounds.contains(details.globalPosition)) {
+                  hitNode = true;
+                  break;
+                }
+              }
+              if (!hitNode) {
+                for (var node in workProvider.nodeList.values) {
+                  if (node.isSelected) {
+                    workProvider.changeSelected(node.id);
+                  }
+                }
+              }
+            },
+            child: Stack(
+              children: [
+                Stack(
+                  children: [
+                    ...workProvider.nodeList.entries.map((entry) {
+                      var str = entry.key;
+                      var node = entry.value;
+                      return Positioned(
+                        left: workProvider.nodeList[str]!.position.dx,
+                        top: workProvider.nodeList[str]!.position.dy,
+                        child: Node(
+                            id: str,
+                            onResize: (Size newSize) => workProvider.onResize(str, newSize),
+                            onDrag: (offset) {
+                              workProvider.dragNode(str, offset);
+                            },
+                            position: node.position),
+                      ); // Replace with your actual widget
+                    }),
+                  ],
+                ),
+                FloatingDrawer(), // Left-side floating drawer
 
-              Toolbar(onAdd: workProvider.addNode),
-            ],
+                Toolbar(onAdd: workProvider.addNode),
+              ],
+            ),
           ),
         );
       },

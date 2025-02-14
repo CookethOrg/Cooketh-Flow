@@ -3,12 +3,7 @@ import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-enum ResizeHandle {
-  topLeft,
-  topRight,
-  bottomLeft,
-  bottomRight
-}
+enum ResizeHandle { topLeft, topRight, bottomLeft, bottomRight }
 
 class Node extends StatelessWidget {
   const Node({
@@ -26,15 +21,17 @@ class Node extends StatelessWidget {
   final Function(Size) onResize;
   final Offset position;
 
-  Widget _buildResizeHandle(BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
-    final handleSize = 12.0; // Made handle slightly larger for easier interaction
+  Widget _buildResizeHandle(
+      BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
+    final handleSize =
+        12.0; // Made handle slightly larger for easier interaction
     final containerPadding = 20.0;
     late double left, top;
-    
+
     // Total width and height including padding
     final totalWidth = wp.getWidth(id) + (containerPadding * 2);
     final totalHeight = wp.getHeight(id) + (containerPadding * 2);
-    
+
     switch (handle) {
       case ResizeHandle.topLeft:
         left = 0;
@@ -60,7 +57,8 @@ class Node extends StatelessWidget {
       child: MouseRegion(
         cursor: _getCursorForHandle(handle),
         child: GestureDetector(
-          behavior: HitTestBehavior.opaque, // This ensures gestures are captured
+          behavior:
+              HitTestBehavior.opaque, // This ensures gestures are captured
           onPanStart: (details) {
             // Prevent the parent drag from interfering
             details.sourceTimeStamp;
@@ -68,7 +66,7 @@ class Node extends StatelessWidget {
           onPanUpdate: (details) {
             double newWidth = wp.getWidth(id);
             double newHeight = wp.getHeight(id);
-            
+
             switch (handle) {
               case ResizeHandle.topLeft:
                 newWidth = wp.getWidth(id) - details.delta.dx;
@@ -123,11 +121,13 @@ class Node extends StatelessWidget {
   MouseCursor _getCursorForHandle(ResizeHandle handle) {
     switch (handle) {
       case ResizeHandle.topLeft:
+        return SystemMouseCursors.resizeUpLeft;
       case ResizeHandle.bottomRight:
-        return SystemMouseCursors.resizeUpLeftDownRight;
+      return SystemMouseCursors.resizeDownRight;
       case ResizeHandle.topRight:
+        return SystemMouseCursors.resizeUpRight;
       case ResizeHandle.bottomLeft:
-        return SystemMouseCursors.resizeUpLeftDownRight;
+        return SystemMouseCursors.resizeDownLeft;
     }
   }
 
@@ -158,7 +158,9 @@ class Node extends StatelessWidget {
                     color: const Color(0xFFFFD8A8),
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(
-                      color: wp.nodeList[id]!.isSelected ? Colors.blue : Colors.black,
+                      color: wp.nodeList[id]!.isSelected
+                          ? Colors.blue
+                          : Colors.black,
                       width: wp.nodeList[id]!.isSelected ? 2.5 : 1.0,
                     ),
                   ),

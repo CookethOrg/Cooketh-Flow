@@ -1,5 +1,6 @@
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
 import 'package:cookethflow/core/widgets/project_card.dart';
+import 'package:cookethflow/core/widgets/add_project_card.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -13,7 +14,6 @@ class Dashboard extends StatelessWidget {
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           body: Stack(
-            // crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               DashboardDrawer(),
               Positioned(
@@ -24,7 +24,17 @@ class Dashboard extends StatelessWidget {
                   style: TextStyle(fontFamily: 'Frederik', fontSize: 40),
                 ),
               ),
-              Positioned(left: 420, top: 150, child: ProjectCard())
+              Positioned(
+                left: 420,
+                top: 150,
+                child: Row(
+                  children: [
+                    AddProjectCard(),
+                    SizedBox(width: 80),
+                    ProjectCard(),
+                  ],
+                ),
+              ),
             ],
           ),
         );

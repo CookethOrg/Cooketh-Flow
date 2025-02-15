@@ -58,7 +58,6 @@ class Workspace extends StatelessWidget {
                 FloatingDrawer(), // Left-side floating drawer
 
                 Toolbar(onAdd: workProvider.addNode),
-                Positioned(top: 500, left: 500, child: Connector())
               ],
             ),
           ),

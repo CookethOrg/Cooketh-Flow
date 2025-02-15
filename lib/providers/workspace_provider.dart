@@ -103,34 +103,54 @@ class WorkspaceProvider extends StateHandler {
   }
 
   Widget buildConnectionPoints(BuildContext context, ConnectionPoint con, String id) {
-    final pointSize =
-        12.0; // Made handle slightly larger for easier interaction
-    final containerPadding = 20.0;
-    late double left, top;
-
-    // Total width and height including padding
-    final totalWidth = getWidth(id) + (containerPadding * 2);
-    final totalHeight = getHeight(id) + (containerPadding * 2);
-
-    switch (con) {
-      case ConnectionPoint.top:
-        left = 0;
-        top = 0;
-        break;
-      case ConnectionPoint.right:
-        left = totalWidth - pointSize;
-        top = 0;
-        break;
-      case ConnectionPoint.bottom:
-        left = 0;
-        top = totalHeight - pointSize;
-        break;
-      case ConnectionPoint.left:
-        left = totalWidth - pointSize;
-        top = totalHeight - pointSize;
-        break;
-    }
-
-    return Connector();
+  final containerPadding = 20.0;
+  final connectionSize = 16.0; // Size for the connection point
+  final distanceFromEdge = 40.0; // Distance from the edge of the node
+  
+  // Total width and height including padding
+  final totalWidth = getWidth(id) + (containerPadding * 2);
+  final totalHeight = getHeight(id) + (containerPadding * 2);
+  
+  // Calculate center positions
+  late double left, top;
+  
+  switch (con) {
+    case ConnectionPoint.top:
+      left = (totalWidth - connectionSize) / 2;
+      top = -connectionSize / 2;
+      break;
+    case ConnectionPoint.right:
+      left = totalWidth - connectionSize / 2;
+      top = (totalHeight - connectionSize) / 2;
+      break;
+    case ConnectionPoint.bottom:
+      left = (totalWidth - connectionSize) / 2;
+      top = totalHeight - connectionSize / 2;
+      break;
+    case ConnectionPoint.left:
+      left = -connectionSize / 2;
+      top = (totalHeight - connectionSize) / 2;
+      break;
   }
+
+  return Positioned(
+    left: left,
+    top: top,
+    child: GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        print("Connection point ${con.toString()} tapped");
+        // Your tap handling logic here
+      },
+      child: Container(
+        width: connectionSize,
+        height: connectionSize,
+        alignment: Alignment.center,
+        // Optional: Add this to see the touch area
+        // color: Colors.red,
+        child: Connector(),
+      ),
+    ),
+  );
+}
 }

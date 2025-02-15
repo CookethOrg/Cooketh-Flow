@@ -1,3 +1,4 @@
+import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -191,6 +192,12 @@ class Node extends StatelessWidget {
                 _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
                 _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
               ],
+              if(wp.nodeList[id]!.isSelected)...[
+                wp.buildConnectionPoints(context, ConnectionPoint.top, id),
+                wp.buildConnectionPoints(context, ConnectionPoint.right, id),
+                wp.buildConnectionPoints(context, ConnectionPoint.bottom, id),
+                wp.buildConnectionPoints(context, ConnectionPoint.left, id),
+              ]
             ],
           ),
         );

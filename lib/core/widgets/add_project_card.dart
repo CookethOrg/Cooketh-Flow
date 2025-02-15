@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:dotted_border/dotted_border.dart';
 
 class AddProjectCard extends StatelessWidget {
   const AddProjectCard({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.black, width: 2),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(Icons.add, size: 50, color: Colors.black),
-          SizedBox(height: 8),
-          Text(
-            'Start a new Project',
-            style: TextStyle(fontFamily: 'Frederik', fontSize: 20),
-          ),
-        ],
+    return DottedBorder(
+      borderType: BorderType.RRect,
+      radius: const Radius.circular(10),
+      dashPattern: const [16, 12], // [dash length, gap length]
+      color: Colors.black,
+      strokeWidth: 2,
+      child: Container(
+        width: 280,
+        height: 200,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: const [
+            Icon(Icons.add, size: 50, color: Colors.black),
+            SizedBox(height: 8),
+            Text(
+              'Start a new Project',
+              style: TextStyle(fontFamily: 'Frederik', fontSize: 20),
+            ),
+          ],
+        ),
       ),
     );
   }

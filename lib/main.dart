@@ -10,16 +10,28 @@ import 'package:cookethflow/screens/sign_up.dart';
 import 'package:cookethflow/screens/workspace.dart';
 import 'package:cookethflow/screens/test.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: '.env');
+  String supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url";
+  String supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key";
+  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseApiKey);
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider<NodeProvider>(create: (_) => NodeProvider(ProviderState.loaded)),
-      ChangeNotifierProvider<ConnectionProvider>(create: (_)=> ConnectionProvider()),
-      ChangeNotifierProvider<DashboardProvider>(create: (_) => DashboardProvider()),
-      ChangeNotifierProvider<WorkspaceProvider>(create: (_) => WorkspaceProvider(ProviderState.loaded)),
-      ChangeNotifierProvider<AuthenticationProvider>(create: (_) => AuthenticationProvider())
+      ChangeNotifierProvider<NodeProvider>(
+          create: (_) => NodeProvider(ProviderState.loaded)),
+      ChangeNotifierProvider<ConnectionProvider>(
+          create: (_) => ConnectionProvider()),
+      ChangeNotifierProvider<DashboardProvider>(
+          create: (_) => DashboardProvider()),
+      ChangeNotifierProvider<WorkspaceProvider>(
+          create: (_) => WorkspaceProvider(ProviderState.loaded)),
+      ChangeNotifierProvider<AuthenticationProvider>(
+          create: (_) => AuthenticationProvider())
     ],
     child: MyApp(),
   ));
@@ -32,7 +44,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Dashboard(),
+      home: SignupPage(),
     );
   }
 }

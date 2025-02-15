@@ -1,5 +1,5 @@
 import 'package:cookethflow/core/utils/utils.dart';
-import 'package:cookethflow/core/widgets/nodes/selection_box.dart';
+import 'package:cookethflow/screens/discarded/selection_box.dart';
 import 'package:flutter/material.dart';
 
 class NodeProvider extends StateHandler {

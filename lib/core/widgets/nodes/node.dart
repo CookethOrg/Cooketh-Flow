@@ -21,6 +21,7 @@ class Node extends StatelessWidget {
   final Function(Size) onResize;
   final Offset position;
 
+// Function to build selection boxes
   Widget _buildResizeHandle(
       BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
     final handleSize =
@@ -118,6 +119,7 @@ class Node extends StatelessWidget {
     );
   }
 
+  // Function to get cursor
   MouseCursor _getCursorForHandle(ResizeHandle handle) {
     switch (handle) {
       case ResizeHandle.topLeft:

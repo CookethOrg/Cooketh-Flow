@@ -1,5 +1,5 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:cookethflow/core/widgets/nodes/connection_box.dart';
+import 'package:cookethflow/screens/discarded/connection_box.dart';
 import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:flutter/material.dart';
 

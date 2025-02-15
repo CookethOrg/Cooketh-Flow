@@ -1,7 +1,9 @@
 import 'dart:math';
 
 import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:cookethflow/core/widgets/nodes/selection_box.dart';
+import 'package:cookethflow/core/widgets/buttons/connector.dart';
+import 'package:cookethflow/models/connection.dart';
+import 'package:cookethflow/screens/discarded/selection_box.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +11,9 @@ import 'package:flutter/material.dart';
 class WorkspaceProvider extends StateHandler {
   // New instance of flow manager (new file)
   FlowManager flowManager = FlowManager();
+  // Keep track of list of nodes
   Map<String, FlowNode> _nodeList = {};
   bool _isHovered = false;
-  // bool _isSelected = nodeList["1"]!.isSelected; // Track if the node is selected
-  double _width = 150;
-  double _height = 75;
-
-  double getWidth(String id) => nodeList[id]!.size.width;
-  double getHeight(String id) => nodeList[id]!.size.height;
 
   WorkspaceProvider([super.intialState]) {
     _nodeList = {
@@ -42,19 +39,24 @@ class WorkspaceProvider extends StateHandler {
 
   // Getters
   bool get isHovered => _isHovered;
-  // bool get isSelected => ;
-  // double get width => nodeList[id]?.size.width ?? 200.0;
-  // double get height => _height;
+  Map<String, FlowNode> get nodeList => _nodeList;
+  bool get hasSelectedNode => nodeList.values.any(
+      (node) => node.isSelected); // Check if any node is currently selected
+  double getWidth(String id) => nodeList[id]!.size.width;
+  double getHeight(String id) => nodeList[id]!.size.height;
+  // Get currently selected node (if any)
+  FlowNode? get selectedNode => nodeList.values.firstWhere(
+        (node) => node.isSelected,
+        // orElse: () => null,
+      );
 
-  // Setters
+  // Functions ->
   void setHover(bool val) {
     _isHovered = val;
     notifyListeners();
   }
 
   void onResize(String id, Size newSize) {
-    print(
-        "Resizing node $id to height: ${newSize.height} and width: ${newSize.width}");
     if (nodeList.containsKey(id)) {
       // Apply minimum size constraints
       double width = newSize.width.clamp(100.0, double.infinity);
@@ -73,64 +75,25 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void setWidth(double w) {
-    _width = w;
-    notifyListeners();
-  }
-
-  void setHeight(double h) {
-    _height = h;
-    notifyListeners();
-  }
-
-  List<Widget> buildSelectionBoxes() {
-    return [
-      SelectionBox(
-        height: _height,
-        width: _width,
-        offset: Offset(-_width / 2 + 13, -_height / 2 + 15),
-      ), // Top-left
-      SelectionBox(
-        height: _height,
-        width: _width,
-        offset: Offset(_width / 2 + 17, -_height / 2 + 15),
-      ), // Top-right
-      SelectionBox(
-        height: _height,
-        width: _width,
-        offset: Offset(-_width / 2 + 13, _height / 2 + 15),
-      ), // bottom-left
-      SelectionBox(
-        height: _height,
-        width: _width,
-        offset: Offset(_width / 2 + 17, _height / 2 + 15),
-      ), // bottom-right
-    ];
-  }
-
-  Map<String, FlowNode> get nodeList => _nodeList;
   void updateList() {
     flowManager.nodes.addAll(_nodeList);
-    print(flowManager.exportFlow());
+    // print(flowManager.exportFlow());
     notifyListeners();
   }
 
-  // new node
+  // new node addition
   void addNode({
     NodeType type = NodeType.rectangular,
   }) {
-    // TextEditingController newController = TextEditingController();
     FlowNode node = FlowNode(
         id: (_nodeList.length + 1).toString(),
-        // data: newController,
         type: type,
         position: Offset(
-          Random().nextDouble() * 1500, // Random X position
-          Random().nextDouble() * 800, // Random Y position
+          Random().nextDouble() * 1500,
+          Random().nextDouble() * 800,
         ));
     flowManager.addNode(node);
     _nodeList.addAll({node.id: node});
-    // print(flowManager.exportFlow());
     notifyListeners();
   }
 
@@ -139,12 +102,35 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // Check if any node is currently selected
-  bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);
+  Widget buildConnectionPoints(BuildContext context, ConnectionPoint con, String id) {
+    final pointSize =
+        12.0; // Made handle slightly larger for easier interaction
+    final containerPadding = 20.0;
+    late double left, top;
 
-  // Get currently selected node (if any)
-  // FlowNode? get selectedNode => nodeList.values.firstWhere(
-  //   (node) => node.isSelected,
-  //   orElse: () => null,
-  // );
+    // Total width and height including padding
+    final totalWidth = getWidth(id) + (containerPadding * 2);
+    final totalHeight = getHeight(id) + (containerPadding * 2);
+
+    switch (con) {
+      case ConnectionPoint.top:
+        left = 0;
+        top = 0;
+        break;
+      case ConnectionPoint.right:
+        left = totalWidth - pointSize;
+        top = 0;
+        break;
+      case ConnectionPoint.bottom:
+        left = 0;
+        top = totalHeight - pointSize;
+        break;
+      case ConnectionPoint.left:
+        left = totalWidth - pointSize;
+        top = totalHeight - pointSize;
+        break;
+    }
+
+    return Connector();
+  }
 }

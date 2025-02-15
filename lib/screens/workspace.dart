@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/widgets/buttons/connector.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
@@ -44,7 +45,8 @@ class Workspace extends StatelessWidget {
                         top: workProvider.nodeList[str]!.position.dy,
                         child: Node(
                             id: str,
-                            onResize: (Size newSize) => workProvider.onResize(str, newSize),
+                            onResize: (Size newSize) =>
+                                workProvider.onResize(str, newSize),
                             onDrag: (offset) {
                               workProvider.dragNode(str, offset);
                             },
@@ -56,6 +58,7 @@ class Workspace extends StatelessWidget {
                 FloatingDrawer(), // Left-side floating drawer
 
                 Toolbar(onAdd: workProvider.addNode),
+                Positioned(top: 500, left: 500, child: Connector())
               ],
             ),
           ),

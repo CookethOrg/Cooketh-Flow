@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/widgets/toolbox.dart';
-import 'package:cookethflow/core/widgets/custom_cursor.dart';
+import 'package:cookethflow/core/widgets/custom_pointer.dart';
 
 class TestScreen extends StatelessWidget {
   @override
@@ -8,8 +8,8 @@ class TestScreen extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Center(child: CustomToolbar()), // Your actual workspace
-          CustomCursor(), // Overlays the custom cursor
+          Center(child: CustomToolbar()),
+          CustomPointer()
         ],
       ),
     );

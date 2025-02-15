@@ -2,6 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class CustomToolbar extends StatelessWidget {
+  void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -16,69 +25,73 @@ class CustomToolbar extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _toolbarButton(PhosphorIconsRegular.shapes), // Shapes Icon
+            _toolbarButton(context, PhosphorIconsRegular.shapes, "Shapes Button Clicked"),
             _divider(),
             SizedBox(width: 8),
-            _colorPickerButton(),
-            SizedBox(width: 8),
-            _divider(),
-            SizedBox(width: 8),
-            _borderWidthButton(),
+            _colorPickerButton(context),
             SizedBox(width: 8),
             _divider(),
             SizedBox(width: 8),
-            _toolbarButton(PhosphorIconsRegular.textB), // Bold
-            _toolbarButton(PhosphorIconsRegular.textItalic), // Italic
-            _toolbarButton(PhosphorIconsRegular.textUnderline), // Underline
-            _toolbarButton(PhosphorIconsRegular.textStrikethrough), // Strikethrough
+            _borderWidthButton(context),
             SizedBox(width: 8),
             _divider(),
-            _toolbarButton(PhosphorIconsRegular.link), // Link Icon
+            SizedBox(width: 8),
+            _toolbarButton(context, PhosphorIconsRegular.textB, "Bold Button Clicked"),
+            _toolbarButton(context, PhosphorIconsRegular.textItalic, "Italic Button Clicked"),
+            _toolbarButton(context, PhosphorIconsRegular.textUnderline, "Underline Button Clicked"),
+            _toolbarButton(context, PhosphorIconsRegular.textStrikethrough, "Strikethrough Button Clicked"),
+            SizedBox(width: 8),
+            _divider(),
+            _toolbarButton(context, PhosphorIconsRegular.linkSimple, "Link Button Clicked"),
           ],
         ),
       ),
     );
   }
 
-  Widget _borderWidthButton() {
+  Widget _borderWidthButton(BuildContext context) {
     return InkWell(
       onTap: () {
-        print("Text Align Button Clicked");
+        _showMessage(context, "Text Align Button Clicked");
       },
       borderRadius: BorderRadius.circular(12),
       child: Row(
-          children: [
-            Icon(PhosphorIconsRegular.textAlignCenter, color: Colors.black,),
-            SizedBox(width: 4),
-            Icon(PhosphorIconsRegular.caretDown, color: Colors.black, size: 16,),
-          ],
-        ),
-      );
-  }
-
-  Widget _toolbarButton(IconData icon) {
-    return IconButton(
-      icon: Icon(icon, color: Colors.black),
-      onPressed: () {},
+        children: [
+          Icon(PhosphorIconsRegular.textAlignCenter, color: Colors.black),
+          SizedBox(width: 4),
+          Icon(PhosphorIconsRegular.caretDown, color: Colors.black, size: 16),
+        ],
+      ),
     );
   }
 
-  Widget _colorPickerButton() {
+  Widget _toolbarButton(BuildContext context, IconData icon, String message) {
+    return IconButton(
+      icon: Icon(icon, color: Colors.black),
+      onPressed: () {
+        _showMessage(context, message);
+      },
+    );
+  }
+
+  Widget _colorPickerButton(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        _showMessage(context, "Color Picker Button Clicked");
+      },
       child: Row(
-          children: [
-            Container(
-        width: 24,
-        height: 24,
-        decoration: BoxDecoration(
-          color: Color(0xffF9B9B7),
-          shape: BoxShape.circle,
-        ),
-      ),
-            SizedBox(width: 4),
-            Icon(PhosphorIconsRegular.caretDown, color: Colors.black, size: 16,),
-          ]
+        children: [
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: Color(0xffF9B9B7),
+              shape: BoxShape.circle,
+            ),
+          ),
+          SizedBox(width: 4),
+          Icon(PhosphorIconsRegular.caretDown, color: Colors.black, size: 16),
+        ],
       ),
     );
   }

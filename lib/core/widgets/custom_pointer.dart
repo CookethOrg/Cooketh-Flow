@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class CustomCursor extends StatefulWidget {
-  const CustomCursor({super.key});
+class CustomPointer extends StatefulWidget {
+  const CustomPointer({super.key});
 
   @override
-  _CustomCursorState createState() => _CustomCursorState();
+  _CustomPointerState createState() => _CustomPointerState();
 }
 
-class _CustomCursorState extends State<CustomCursor> {
+class _CustomPointerState extends State<CustomPointer> {
   Offset _cursorPosition = Offset.zero;
   bool _isCursorInside = false;
 

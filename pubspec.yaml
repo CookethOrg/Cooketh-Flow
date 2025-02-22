@@ -42,6 +42,8 @@ dependencies:
   flutter_dotenv: ^5.2.1
   supabase_flutter: ^2.8.3
   hive_flutter: ^1.1.0
+  flutter_onboarding_slider: ^1.0.11
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

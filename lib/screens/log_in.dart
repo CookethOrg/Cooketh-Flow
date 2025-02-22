@@ -2,6 +2,7 @@ import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:cookethflow/screens/slider.dart';
 
 class LoginPage extends StatelessWidget {
   @override
@@ -142,9 +143,7 @@ class LoginPage extends StatelessWidget {
               ),
               Expanded(
                 flex: 1,
-                child: Container(
-                  color: Colors.blue.shade50,
-                ),
+                child: SliderStart()
               ),
             ],
           ),

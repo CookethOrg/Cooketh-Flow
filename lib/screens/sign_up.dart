@@ -1,5 +1,6 @@
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
+import 'package:cookethflow/screens/log_in.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -152,10 +153,10 @@ class SignupPage extends StatelessWidget {
                           }
                           ScaffoldMessenger.of(context)
                               .showSnackBar(SnackBar(content: Text(res)));
-                          // Navigator.of(context)
-                          //     .pushReplacement(MaterialPageRoute(
-                          //   builder: (context) => Dashboard(),
-                          // ));
+                          Navigator.of(context)
+                              .pushReplacement(MaterialPageRoute(
+                            builder: (context) => Dashboard(),
+                          ));
                         },
                         child: Padding(
                           padding: const EdgeInsets.symmetric(
@@ -173,7 +174,12 @@ class SignupPage extends StatelessWidget {
                         Text("Already have an account?",
                             style: TextStyle(fontFamily: 'Frederik')),
                         TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            Navigator.of(context)
+                                .pushReplacement(MaterialPageRoute(
+                              builder: (context) => LoginPage(),
+                            ));
+                          },
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.symmetric(horizontal: 5),
                           ),

@@ -4,11 +4,9 @@ import 'package:cookethflow/models/user.dart';
 
 class FlowmanageProvider extends StateHandler {
   UserModel user = UserModel();
-  Map<String, FlowManager> _flowList = {};
+  Map<String, FlowManager> _flowList = {"1": FlowManager(flowId: "1")};
   String _newFlowId = "";
-  FlowmanageProvider([super.intialState]) {
-    _flowList = {"1": FlowManager(flowId: "1")};
-  }
+  FlowmanageProvider(): super();
 
   Map<String, FlowManager> get flowList => _flowList;
   String get newFlowId => _newFlowId;
@@ -26,10 +24,12 @@ class FlowmanageProvider extends StateHandler {
   //   print(flowManager.exportFlow());
   //   notifyListeners();
   // }
+
   void addFlow() {
     FlowManager flowm = FlowManager(flowId: (_flowList.length + 1).toString());
     user.createFlow(flowm);
     _flowList.addAll({flowm.flowId: flowm});
+    print(_flowList);
     notifyListeners();
   }
 }

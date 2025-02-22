@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 
 class WorkspaceProvider extends StateHandler {
   // New instance of flow manager (new file)
-  FlowmanageProvider fl = FlowmanageProvider();
+  // FlowmanageProvider fl = FlowmanageProvider();
   FlowManager flowManager = FlowManager();
   // Keep track of list of nodes
   Map<String, FlowNode> _nodeList = {};
@@ -36,7 +36,7 @@ class WorkspaceProvider extends StateHandler {
             Random().nextDouble() * 800, // Random Y position
           ))
     };
-    flowManager.flowId = fl.newFlowId;
+    // flowManager.flowId = fl.newFlowId;
     print(flowManager.nodes);
     print(flowManager.connections);
 

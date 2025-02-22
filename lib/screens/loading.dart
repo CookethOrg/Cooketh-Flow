@@ -27,7 +27,7 @@ class LoadingScreen extends StatelessWidget {
                     children: [
                       Text(
                         "${(provider.progress * 100).toInt()}%",
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Frederik'),
                       ),
                       const SizedBox(height: 8),
                       Stack(
@@ -58,7 +58,7 @@ class LoadingScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 Text(
                   provider.currentTooltip,
-                  style: const TextStyle(fontSize: 16),
+                  style: const TextStyle(fontSize: 20, fontFamily: 'Frederik'),
                 ),
               ],
             );

@@ -3,6 +3,7 @@ import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_node.dart';
 
 class FlowManager {
+  final String flowName = "Untitled";
   final Map<String, FlowNode> nodes = {};
   final Set<Connection> connections = {};
 
@@ -52,6 +53,7 @@ class FlowManager {
 
   // Export the flow to JSON
   Map<String, dynamic> exportFlow() => {
+        'flowName': flowName,
         'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
         'connections': connections.map((conn) => conn.toJson()).toList(),
         // 'connections': connections.map((conn,data)=> MapEntry(conn, data))

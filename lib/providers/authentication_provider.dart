@@ -21,7 +21,10 @@ class AuthenticationProvider extends StateHandler {
       : supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url",
         supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key",
         super() {
-    supabase = SupabaseClient(supabaseUrl, supabaseApiKey);
+    supabase = SupabaseClient(
+      supabaseUrl, supabaseApiKey,
+      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit)
+    );
   }
 
   bool get obscurePassword => _obscurePassword;

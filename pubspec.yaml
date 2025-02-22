@@ -41,6 +41,7 @@ dependencies:
   dotted_border: ^2.0.0
   flutter_dotenv: ^5.2.1
   supabase_flutter: ^2.8.3
+  hive_flutter: ^1.1.0
 
 dev_dependencies:
   flutter_test:

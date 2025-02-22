@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/services/hive_auth_storage.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
@@ -13,6 +14,7 @@ import 'package:cookethflow/screens/workspace.dart';
 import 'package:cookethflow/screens/test.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -21,7 +23,11 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   String supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url";
   String supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key";
-  await Supabase.initialize(url: supabaseUrl, anonKey: supabaseApiKey);
+  // await Hive.initFlutter();
+  await Supabase.initialize(
+    url: supabaseUrl,
+    anonKey: supabaseApiKey,
+  );
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<FlowmanageProvider>(
@@ -48,7 +54,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // home: Workspace(flowId: "1"),
-      home: Dashboard(),
+      home: SignupPage(),
     );
   }
 }

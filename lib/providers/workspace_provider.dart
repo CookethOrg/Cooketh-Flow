@@ -102,60 +102,66 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  Widget buildConnectionPoints(BuildContext context, ConnectionPoint con, String id) {
-  final containerPadding = 20.0;
-  final connectionSize = 16.0;
-  // Increase touch target size while keeping visual size the same
-  final touchTargetSize = 32.0;
-  
-  final totalWidth = getWidth(id) + (containerPadding * 2);
-  final totalHeight = getHeight(id) + (containerPadding * 2);
-  
-  late double left, top;
-  switch (con) {
-    case ConnectionPoint.top:
-      left = (totalWidth - touchTargetSize) / 2;
-      top = -touchTargetSize / 2;
-      break;
-    case ConnectionPoint.right:
-      left = totalWidth - touchTargetSize / 2;
-      top = (totalHeight - touchTargetSize) / 2;
-      break;
-    case ConnectionPoint.bottom:
-      left = (totalWidth - touchTargetSize) / 2;
-      top = totalHeight - touchTargetSize / 2;
-      break;
-    case ConnectionPoint.left:
-      left = -touchTargetSize / 2;
-      top = (totalHeight - touchTargetSize) / 2;
-      break;
-  }
+  Widget buildConnectionPoints(
+      BuildContext context, ConnectionPoint con, String id) {
+    final containerPadding = 20.0;
+    final connectionSize = 16.0;
+    final touchTargetSize = 32.0;
 
-  return Positioned(
-    left: left,
-    top: top,
-    child: GestureDetector(
-      behavior: HitTestBehavior.translucent,  // Changed from opaque
-      onTapDown: (_) {  // Add onTapDown for more responsive feedback
-        print("Connection point ${con.toString()} tapped down");
-      },
-      onTap: () {
-        print("Connection point ${con.toString()} tapped");
-        // Your tap handling logic here
-      },
-      child: Container(
-        width: touchTargetSize,  // Larger touch target
-        height: touchTargetSize, // Larger touch target
-        alignment: Alignment.center,
-        // Uncomment to debug touch area
-        // color: Colors.red.withOpacity(0.2),
-        child: SizedBox(
-          width: connectionSize,  // Original visual size
-          height: connectionSize, // Original visual size
-          child: Connector(),
-        ),
+    final totalWidth = getWidth(id) + (containerPadding * 2);
+    final totalHeight = getHeight(id) + (containerPadding * 2);
+
+    late double left, top;
+    switch (con) {
+      case ConnectionPoint.top:
+        left = (totalWidth - touchTargetSize) / 2;
+        top = -touchTargetSize / 2;
+        break;
+      case ConnectionPoint.right:
+        left = totalWidth - touchTargetSize / 2;
+        top = (totalHeight - touchTargetSize) / 2;
+        break;
+      case ConnectionPoint.bottom:
+        left = (totalWidth - touchTargetSize) / 2;
+        top = totalHeight - touchTargetSize / 2;
+        break;
+      case ConnectionPoint.left:
+        left = -touchTargetSize / 2;
+        top = (totalHeight - touchTargetSize) / 2;
+        break;
+    }
+
+    ValueNotifier<bool> isHovered = ValueNotifier(false);
+
+    return Positioned(
+      left: left,
+      top: top,
+      child: ValueListenableBuilder<bool>(
+        valueListenable: isHovered,
+        builder: (context, hover, child) {
+          return MouseRegion(
+            hitTestBehavior: HitTestBehavior.translucent,
+            onEnter: (_) => isHovered.value = true,
+            onExit: (_) => isHovered.value = false,
+            child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () {
+                print("Connection point ${con.toString()} of node $id tapped");
+              },
+              child: Container(
+                width: touchTargetSize,
+                height: touchTargetSize,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: connectionSize,
+                  height: connectionSize,
+                  child: Connector(con: con,isHovered: hover),
+                ),
+              ),
+            ),
+          );
+        },
       ),
-    ),
-  );
-}
+    );
+  }
 }

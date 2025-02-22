@@ -1,4 +1,3 @@
-import 'package:cookethflow/core/widgets/buttons/connector.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';

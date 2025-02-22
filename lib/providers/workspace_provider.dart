@@ -1,9 +1,7 @@
 import 'dart:math';
 
 import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:cookethflow/core/widgets/buttons/connector.dart';
 import 'package:cookethflow/models/connection.dart';
-import 'package:cookethflow/screens/discarded/selection_box.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:flutter/material.dart';
@@ -136,69 +134,5 @@ class WorkspaceProvider extends StateHandler {
   void dragNode(String id, Offset off) {
     flowManager.nodes[id]!.position = off;
     notifyListeners();
-  }
-
-  Widget buildConnectionPoints(
-      BuildContext context, ConnectionPoint con, String id) {
-    final containerPadding = 20.0;
-    final connectionSize = 16.0;
-    final touchTargetSize = 32.0;
-
-    final totalWidth = getWidth(id) + (containerPadding * 2);
-    final totalHeight = getHeight(id) + (containerPadding * 2);
-
-    late double left, top;
-    switch (con) {
-      case ConnectionPoint.top:
-        left = (totalWidth - touchTargetSize) / 2;
-        top = -touchTargetSize / 2;
-        break;
-      case ConnectionPoint.right:
-        left = totalWidth - touchTargetSize / 2;
-        top = (totalHeight - touchTargetSize) / 2;
-        break;
-      case ConnectionPoint.bottom:
-        left = (totalWidth - touchTargetSize) / 2;
-        top = totalHeight - touchTargetSize / 2;
-        break;
-      case ConnectionPoint.left:
-        left = -touchTargetSize / 2;
-        top = (totalHeight - touchTargetSize) / 2;
-        break;
-    }
-
-    ValueNotifier<bool> isHovered = ValueNotifier(false);
-
-    return Positioned(
-      left: left,
-      top: top,
-      child: ValueListenableBuilder<bool>(
-        valueListenable: isHovered,
-        builder: (context, hover, child) {
-          return MouseRegion(
-            hitTestBehavior: HitTestBehavior.translucent,
-            onEnter: (_) => isHovered.value = true,
-            onExit: (_) => isHovered.value = false,
-            child: GestureDetector(
-              behavior: HitTestBehavior.translucent,
-              onTap: () {
-                print("Connection point ${con.toString()} of node $id tapped");
-                selectConnection(id, con);
-              },
-              child: Container(
-                width: touchTargetSize,
-                height: touchTargetSize,
-                alignment: Alignment.center,
-                child: SizedBox(
-                  width: connectionSize,
-                  height: connectionSize,
-                  child: Connector(con: con, isHovered: hover),
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-    );
   }
 }

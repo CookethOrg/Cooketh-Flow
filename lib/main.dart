@@ -1,5 +1,4 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:cookethflow/providers/connection_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/screens/discarded/node_provider.dart';
@@ -26,8 +25,6 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider<NodeProvider>(
           create: (_) => NodeProvider(ProviderState.loaded)),
-      ChangeNotifierProvider<ConnectionProvider>(
-          create: (_) => ConnectionProvider()),
       ChangeNotifierProvider<DashboardProvider>(
           create: (_) => DashboardProvider()),
       ChangeNotifierProvider<WorkspaceProvider>(

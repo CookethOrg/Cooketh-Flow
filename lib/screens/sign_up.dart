@@ -138,10 +138,9 @@ class SignupPage extends StatelessWidget {
                         ),
                         onPressed: () async {
                           String res = await provider.createNewUser(
+                            userName: provider.userNameController.text,
                               email: provider.emailController.text,
-                              password: provider.passwordController.text,
-                              confirmPwd:
-                                  provider.confirmPasswordController.text);
+                              password: provider.passwordController.text,);
 
                           print(res);
 

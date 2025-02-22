@@ -13,6 +13,8 @@ class WorkspaceProvider extends StateHandler {
   FlowManager flowManager = FlowManager();
   // Keep track of list of nodes
   Map<String, FlowNode> _nodeList = {};
+  List<Connection> connections = [];
+  ConnectionPointSelection? selectedConnection;
   bool _isHovered = false;
 
   WorkspaceProvider([super.intialState]) {
@@ -56,6 +58,36 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
+  void selectConnection(String nodeId, ConnectionPoint connectionPoint) {
+    if (selectedConnection == null) {
+      // First selection
+      selectedConnection = ConnectionPointSelection(nodeId, connectionPoint);
+      print(
+          "first connection node : ${selectedConnection!.nodeId} and point ${selectedConnection!.connectionPoint}");
+    } else {
+      // Second selection, create a connection
+      // connections.add(Connection(
+      //   fromNode: selectedConnection!.nodeId,
+      //   fromPoint: selectedConnection!.connectionPoint,
+      //   toNode: nodeId,
+      //   toPoint: connectionPoint,
+      // ));
+      // connections.add(Connection(
+      //     sourceNodeId: selectedConnection!.nodeId,
+      //     targetNodeId: nodeId,
+      //     sourcePoint: selectedConnection!.connectionPoint,
+      //     targetPoint: connectionPoint));
+      flowManager.connectNodes(
+          sourceNodeId: selectedConnection!.nodeId,
+          targetNodeId: nodeId,
+          sourcePoint: selectedConnection!.connectionPoint,
+          targetPoint: connectionPoint);
+      selectedConnection = null; // Reset selection
+      updateList();
+    }
+    notifyListeners();
+  }
+
   void onResize(String id, Size newSize) {
     if (nodeList.containsKey(id)) {
       // Apply minimum size constraints
@@ -77,7 +109,9 @@ class WorkspaceProvider extends StateHandler {
 
   void updateList() {
     flowManager.nodes.addAll(_nodeList);
-    // print(flowManager.exportFlow());
+    // flowManager.connections.addAll(connections);
+    connections = flowManager.connections.toList();
+    print(flowManager.exportFlow());
     notifyListeners();
   }
 
@@ -147,6 +181,7 @@ class WorkspaceProvider extends StateHandler {
               behavior: HitTestBehavior.translucent,
               onTap: () {
                 print("Connection point ${con.toString()} of node $id tapped");
+                selectConnection(id, con);
               },
               child: Container(
                 width: touchTargetSize,
@@ -155,7 +190,7 @@ class WorkspaceProvider extends StateHandler {
                 child: SizedBox(
                   width: connectionSize,
                   height: connectionSize,
-                  child: Connector(con: con,isHovered: hover),
+                  child: Connector(con: con, isHovered: hover),
                 ),
               ),
             ),

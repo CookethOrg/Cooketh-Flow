@@ -22,6 +22,7 @@ class Workspace extends StatelessWidget {
               for (var node in workProvider.nodeList.values) {
                 if (node.bounds.contains(details.globalPosition)) {
                   hitNode = true;
+                  // workProvider.changeSelected(node.id);
                   break;
                 }
               }

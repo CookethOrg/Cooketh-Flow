@@ -1,5 +1,12 @@
 enum ConnectionPoint { top, right, bottom, left }
 
+class ConnectionPointSelection {
+  final String nodeId;
+  final ConnectionPoint connectionPoint;
+
+  ConnectionPointSelection(this.nodeId, this.connectionPoint);
+}
+
 class Connection {
   final String sourceNodeId;
   final String targetNodeId;
@@ -16,8 +23,8 @@ class Connection {
   Map<String, dynamic> toJson() => {
     "sourceNodeId" : sourceNodeId,
     "targetNodeId" : targetNodeId,
-    "sourcePoint" : sourcePoint.index,
-    "targetPoint" : targetPoint.index
+    "sourcePoint" : sourcePoint.name,
+    "targetPoint" : targetPoint.name
   };
 
   // For deserialization

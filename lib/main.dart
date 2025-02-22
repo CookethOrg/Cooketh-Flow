@@ -24,8 +24,10 @@ Future<void> main() async {
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseApiKey);
   runApp(MultiProvider(
     providers: [
-      ChangeNotifierProvider<NodeProvider>(
-          create: (_) => NodeProvider(ProviderState.loaded)),
+      ChangeNotifierProvider<FlowmanageProvider>(
+          create: (_) => FlowmanageProvider()),
+      // ChangeNotifierProvider<NodeProvider>(
+      //     create: (_) => NodeProvider(ProviderState.loaded)),
       ChangeNotifierProvider<DashboardProvider>(
           create: (_) => DashboardProvider()),
       ChangeNotifierProvider<WorkspaceProvider>(
@@ -33,8 +35,6 @@ Future<void> main() async {
       ChangeNotifierProvider<AuthenticationProvider>(
           create: (_) => AuthenticationProvider()),
       ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
-      ChangeNotifierProvider<FlowmanageProvider>(
-          create: (_) => FlowmanageProvider())
     ],
     child: MyApp(),
   ));

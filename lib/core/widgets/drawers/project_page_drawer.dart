@@ -21,7 +21,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
   @override
   void initState() {
     super.initState();
-    _controller.text = FlowmanageProvider().flowList[widget.flowId]!.flowName;
+    _controller.text = FlowManager().flowName;
   }
 
   void toggleDrawer() {

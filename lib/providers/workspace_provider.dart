@@ -4,10 +4,12 @@ import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
+import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProvider extends StateHandler {
   // New instance of flow manager (new file)
+  FlowmanageProvider fl = FlowmanageProvider();
   FlowManager flowManager = FlowManager();
   // Keep track of list of nodes
   Map<String, FlowNode> _nodeList = {};
@@ -34,6 +36,7 @@ class WorkspaceProvider extends StateHandler {
             Random().nextDouble() * 800, // Random Y position
           ))
     };
+    flowManager.flowId = fl.newFlowId;
     print(flowManager.nodes);
     print(flowManager.connections);
 

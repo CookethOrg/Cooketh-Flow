@@ -1,11 +1,13 @@
 import 'package:cookethflow/models/flow_manager.dart';
+import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FloatingDrawer extends StatefulWidget {
-  const FloatingDrawer({super.key});
+  const FloatingDrawer({super.key,required this.flowId});
+  final String flowId;
 
   @override
   State<FloatingDrawer> createState() => _FloatingDrawerState();
@@ -19,7 +21,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
   @override
   void initState() {
     super.initState();
-    _controller.text = FlowManager().flowName;
+    _controller.text = FlowmanageProvider().flowList[widget.flowId]!.flowName;
   }
 
   void toggleDrawer() {

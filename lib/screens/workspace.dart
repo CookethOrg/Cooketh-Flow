@@ -7,13 +7,18 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Workspace extends StatelessWidget {
-  const Workspace({super.key});
+  final String flowId;
+  const Workspace({super.key, required this.flowId});
 
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(
       builder: (context, workProvider, child) {
         return Scaffold(
+          appBar: AppBar(
+            title: Text(workProvider.fl.flowList[flowId]!.flowName),
+            centerTitle: true,
+          ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           body: GestureDetector(
             onTapDown: (details) {
@@ -75,7 +80,7 @@ class Workspace extends StatelessWidget {
                     }),
                   ],
                 ),
-                FloatingDrawer(), // Left-side floating drawer
+                FloatingDrawer(flowId: flowId,), // Left-side floating drawer
 
                 Toolbar(onAdd: workProvider.addNode),
               ],

@@ -1,6 +1,6 @@
 # cookethflow
 
-For foss hacks
+For foss hacks.
 
 ## Getting Started
 

@@ -61,7 +61,7 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
                 ],
               ),
             ),
-            FloatingDrawer(), // Left-side floating drawer
+            // FloatingDrawer(), // Left-side floating drawer
       
             // Toolbar(onAdd: provider.addNode),
           ],

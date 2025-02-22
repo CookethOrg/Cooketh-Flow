@@ -120,7 +120,7 @@ class WorkspaceProvider extends StateHandler {
 
   // new node addition
   void addNode({
-    NodeType type = NodeType.rectangular,
+    NodeType type = NodeType.parallelogram,
   }) {
     FlowNode node = FlowNode(
         id: (_nodeList.length + 1).toString(),

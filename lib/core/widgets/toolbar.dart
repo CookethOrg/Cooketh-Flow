@@ -27,7 +27,7 @@ class Toolbar extends StatelessWidget {
             SizedBox(height: 12),
             RedoButton(),
             SizedBox(height: 12),
-            AddButton(onAdd: onAdd),
+            AddButton(),
           ],
         ),
       ),

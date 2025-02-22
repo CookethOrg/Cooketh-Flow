@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class Workspace extends StatelessWidget {
-  const Workspace({super.key});
+  final String flowId;
+  const Workspace({super.key, required this.flowId});
 
   @override
   Widget build(BuildContext context) {

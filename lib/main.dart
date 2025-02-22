@@ -1,5 +1,6 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
+import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
@@ -31,8 +32,9 @@ Future<void> main() async {
           create: (_) => WorkspaceProvider(ProviderState.loaded)),
       ChangeNotifierProvider<AuthenticationProvider>(
           create: (_) => AuthenticationProvider()),
-      ChangeNotifierProvider<LoadingProvider>(
-          create: (_) => LoadingProvider()),
+      ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
+      ChangeNotifierProvider<FlowmanageProvider>(
+          create: (_) => FlowmanageProvider())
     ],
     child: MyApp(),
   ));
@@ -45,7 +47,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: TestScreen(),
+      // home: Workspace(flowId: "1"),
+      home: Dashboard(),
     );
   }
 }

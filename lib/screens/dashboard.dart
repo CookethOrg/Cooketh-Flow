@@ -1,6 +1,8 @@
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
 import 'package:cookethflow/core/widgets/project_card.dart';
 import 'package:cookethflow/core/widgets/add_project_card.dart';
+import 'package:cookethflow/providers/flowmanage_provider.dart';
+import 'package:cookethflow/screens/workspace.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,8 +11,8 @@ class Dashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer(
-      builder: (context, provider, child) {
+    return Consumer<FlowmanageProvider>(
+      builder: (context, pv, child) {
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           body: Stack(
@@ -29,9 +31,19 @@ class Dashboard extends StatelessWidget {
                 top: 150,
                 child: Row(
                   children: [
-                    AddProjectCard(),
+                    AddProjectCard(
+                      onTap: () {
+                        pv.addFlow();
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => Workspace(
+                                  flowId: pv.newFlowId,
+                                )));
+                      },
+                    ),
                     SizedBox(width: 80),
-                    ProjectCard(),
+                    ProjectCard(onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => Workspace(flowId: "1"),));
+                    },),
                   ],
                 ),
               ),

@@ -15,6 +15,10 @@ class Workspace extends StatelessWidget {
     return Consumer<WorkspaceProvider>(
       builder: (context, workProvider, child) {
         return Scaffold(
+          appBar: AppBar(
+            title: Text(workProvider.fl.flowList[flowId]!.flowName),
+            centerTitle: true,
+          ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           body: GestureDetector(
             onTapDown: (details) {
@@ -76,7 +80,7 @@ class Workspace extends StatelessWidget {
                     }),
                   ],
                 ),
-                FloatingDrawer(), // Left-side floating drawer
+                FloatingDrawer(flowId: flowId,), // Left-side floating drawer
 
                 Toolbar(onAdd: workProvider.addNode),
               ],

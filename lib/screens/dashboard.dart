@@ -41,7 +41,7 @@ class Dashboard extends StatelessWidget {
                       },
                     ),
                     SizedBox(width: 80),
-                    ProjectCard(onTap: () {
+                    ProjectCard(flowId: "1",onTap: () {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) => Workspace(flowId: "1"),));
                     },),
                   ],

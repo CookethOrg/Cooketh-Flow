@@ -16,15 +16,14 @@ class AuthenticationProvider extends StateHandler {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   late final SupabaseClient supabase;
+  // final db = Supabase.instance.client.from('User').select();
 
   AuthenticationProvider()
       : supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url",
         supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key",
         super() {
-    supabase = SupabaseClient(
-      supabaseUrl, supabaseApiKey,
-      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit)
-    );
+    supabase = SupabaseClient(supabaseUrl, supabaseApiKey,
+        authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit));
   }
 
   bool get obscurePassword => _obscurePassword;
@@ -51,26 +50,46 @@ class AuthenticationProvider extends StateHandler {
     notifyListeners();
   }
 
-  Future<String> createNewUser(
-      {String userName = "TeeWrath",
-      required String email,
-      required String password,
-      required String confirmPwd}) async {
+  Future<String> createNewUser({
+    required String userName,
+    required String email,
+    required String password,
+  }) async {
     setLoading(true);
-    String res = "Some error occured";
+    String res = "Some error occurred";
+
     try {
-      if (email.isNotEmpty || userName.isNotEmpty || password.isNotEmpty) {
-        final AuthResponse data =
+      if (email.isNotEmpty && userName.isNotEmpty && password.isNotEmpty) {
+        // 1️⃣ Sign up the user
+        final AuthResponse authResponse =
             await supabase.auth.signUp(email: email, password: password);
-        userData = data;
-        print(data);
-        res = "Signed Up Succesfully";
+
+        final user = authResponse.user;
+        if (user == null) {
+          throw Exception("User signup failed.");
+        }
+        print(user);
+        print(user.id);
+        // 2️⃣ Use the same ID from auth.users
+        final String userId = user.id;
+
+        // var file = File('path/to/your/file');
+        // var u = await supabase.storage.from('users').upload(userId, file);
+        // Create an empty file
+        await supabase.from('User').insert({
+          'id': userId,
+          'userName': userName,
+          'email': email,
+          'flowList': {}
+        });
+        res = "Signed Up Successfully";
       }
     } catch (e) {
       res = e.toString();
     } finally {
       setLoading(false);
     }
+
     return res;
   }
 }

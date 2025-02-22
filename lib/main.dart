@@ -53,7 +53,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Workspace(flowId: "1"),
+      // home: Workspace(flowId: "1"),
+      home: SignupPage(),
       // home: Dashboard(),
     );
   }

@@ -29,7 +29,7 @@ class FlowmanageProvider extends StateHandler {
     FlowManager flowm = FlowManager(flowId: (_flowList.length + 1).toString());
     user.createFlow(flowm);
     _flowList.addAll({flowm.flowId: flowm});
-    print(_flowList);
+    print(user.exportUser());
     notifyListeners();
   }
 }

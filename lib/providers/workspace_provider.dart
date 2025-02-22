@@ -36,6 +36,9 @@ class WorkspaceProvider extends StateHandler {
             Random().nextDouble() * 800, // Random Y position
           ))
     };
+    print(flowManager.nodes);
+    print(flowManager.connections);
+
     updateList();
   }
 
@@ -62,30 +65,28 @@ class WorkspaceProvider extends StateHandler {
     if (selectedConnection == null) {
       // First selection
       selectedConnection = ConnectionPointSelection(nodeId, connectionPoint);
-      print(
-          "first connection node : ${selectedConnection!.nodeId} and point ${selectedConnection!.connectionPoint}");
+      print("First connection selected: Node $nodeId, Point $connectionPoint");
+      notifyListeners();
     } else {
-      // Second selection, create a connection
-      // connections.add(Connection(
-      //   fromNode: selectedConnection!.nodeId,
-      //   fromPoint: selectedConnection!.connectionPoint,
-      //   toNode: nodeId,
-      //   toPoint: connectionPoint,
-      // ));
-      // connections.add(Connection(
-      //     sourceNodeId: selectedConnection!.nodeId,
-      //     targetNodeId: nodeId,
-      //     sourcePoint: selectedConnection!.connectionPoint,
-      //     targetPoint: connectionPoint));
-      flowManager.connectNodes(
+      // Prevent connecting to the same node
+      if (selectedConnection!.nodeId != nodeId) {
+        bool connected = flowManager.connectNodes(
           sourceNodeId: selectedConnection!.nodeId,
           targetNodeId: nodeId,
           sourcePoint: selectedConnection!.connectionPoint,
-          targetPoint: connectionPoint);
-      selectedConnection = null; // Reset selection
-      updateList();
+          targetPoint: connectionPoint,
+        );
+
+        if (connected) {
+          print("Connection created between nodes");
+          updateList();
+        } else {
+          print("Connection failed - points might be already in use");
+        }
+      }
+      selectedConnection = null;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   void onResize(String id, Size newSize) {
@@ -109,8 +110,9 @@ class WorkspaceProvider extends StateHandler {
 
   void updateList() {
     flowManager.nodes.addAll(_nodeList);
-    // flowManager.connections.addAll(connections);
     connections = flowManager.connections.toList();
+    // flowManager.connections.addAll(connections);
+    // print("Updated Connections: ${flowManager.connections}");
     print(flowManager.exportFlow());
     notifyListeners();
   }

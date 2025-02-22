@@ -16,8 +16,8 @@ class FlowManager {
     final node = nodes[nodeId];
     if (node != null) {
       // Remove all connections associated with this node
-      connections.removeWhere((conn) =>
-        conn.sourceNodeId == nodeId || conn.targetNodeId == nodeId);
+      connections.removeWhere(
+          (conn) => conn.sourceNodeId == nodeId || conn.targetNodeId == nodeId);
       nodes.remove(nodeId);
     }
   }
@@ -46,12 +46,14 @@ class FlowManager {
     connections.add(connection);
     sourceNode.addConnection(connection);
     targetNode.addConnection(connection);
+    print("Connection added in flow manager: $connection");
     return true;
   }
 
   // Export the flow to JSON
   Map<String, dynamic> exportFlow() => {
-    'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
-    'connections': connections.map((conn) => conn.toJson()).toList(),
-  };
+        'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
+        'connections': connections.map((conn) => conn.toJson()).toList(),
+        // 'connections': connections.map((conn,data)=> MapEntry(conn, data))
+      };
 }

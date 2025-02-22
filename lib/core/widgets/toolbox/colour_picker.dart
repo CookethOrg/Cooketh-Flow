@@ -37,10 +37,11 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
   Widget build(BuildContext context) {
     return PopupMenuButton<Color>(
       onSelected: (color) {},
+      tooltip: "",
       padding: EdgeInsets.zero,
       shadowColor: Colors.transparent,
       offset: Offset(-20, 50),
-      menuPadding: EdgeInsets.symmetric(vertical: 12),
+      menuPadding: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.black, width: 1),

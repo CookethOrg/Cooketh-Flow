@@ -49,7 +49,7 @@ class LinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.blue
+      ..color = Colors.black
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
@@ -103,7 +103,7 @@ class LinePainter extends CustomPainter {
 
     // Draw connection points
     final pointPaint = Paint()
-      ..color = Colors.blue
+      ..color = Colors.black
       ..style = PaintingStyle.fill;
     
     canvas.drawCircle(startOffset, 4, pointPaint);

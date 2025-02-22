@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/core/widgets/nodes/database_node.dart';
+import 'package:cookethflow/core/widgets/nodes/diamond_node.dart';
+import 'package:cookethflow/core/widgets/nodes/parallelogram_node.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
@@ -12,7 +15,7 @@ class WorkspaceProvider extends StateHandler {
   // FlowmanageProvider fl = FlowmanageProvider();
   FlowManager flowManager = FlowManager();
   // Keep track of list of nodes
-  
+
   Map<String, FlowNode> _nodeList = {};
   Map<String, FlowNode> _nodeListCopy = {};
   List<Connection> connections = [];
@@ -46,7 +49,6 @@ class WorkspaceProvider extends StateHandler {
 
     updateList();
   }
-  
 
   // Getters
   bool get isHovered => _isHovered;
@@ -61,18 +63,77 @@ class WorkspaceProvider extends StateHandler {
         // orElse: () => null,
       );
 
-  
   // Functions ->
 
-  
   void setHover(bool val) {
     _isHovered = val;
     notifyListeners();
   }
 
   void cloneNodeList() {
-  _nodeListCopy = _nodeList.map((key, node) => MapEntry(key, node.copy()));  
-}
+    _nodeListCopy = _nodeList.map((key, node) => MapEntry(key, node.copy()));
+  }
+
+  Widget buildNode(String id, NodeType type) {
+    Widget nodeStruct;
+
+    switch (type) {
+      case NodeType.diamond:
+        nodeStruct = DiamondNode(
+          tcontroller: nodeList[id]!.data,
+          height: getHeight(id),
+          width: getWidth(id),
+        );
+        break;
+      case NodeType.database:
+        nodeStruct = DatabaseNode(
+          controller: nodeList[id]!.data,
+          height: getHeight(id),
+          width: getWidth(id),
+        );
+        break;
+      case NodeType.parallelogram:
+        nodeStruct = ParallelogramNode(
+          controller: nodeList[id]!.data,
+          width: getWidth(id),
+          height: getHeight(id),
+        );
+        break;
+      default:
+        nodeStruct = Container(
+          width: getWidth(id),
+          height: getHeight(id),
+          padding: const EdgeInsets.fromLTRB(15, 12, 15, 18),
+          decoration: BoxDecoration(
+            color: const Color(0xFFFFD8A8),
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: nodeList[id]!.isSelected ? Colors.blue : Colors.black,
+              width: nodeList[id]!.isSelected ? 2.5 : 1.0,
+            ),
+          ),
+          alignment: Alignment.center,
+          child: TextField(
+            controller: nodeList[id]!.data,
+            maxLines: null,
+            style: const TextStyle(
+              overflow: TextOverflow.ellipsis,
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+            cursorColor: Colors.white,
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              isDense: true,
+              contentPadding: EdgeInsets.zero,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        );
+    }
+
+    return nodeStruct;
+  }
 
   void selectConnection(String nodeId, ConnectionPoint connectionPoint) {
     if (selectedConnection == null) {
@@ -121,12 +182,12 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-   void _saveStateForUndo() {
+  void _saveStateForUndo() {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
       (key, node) => MapEntry(key, node.copy()),
     )));
   }
-  
+
   void updateList() {
     flowManager.nodes.addAll(_nodeList);
     connections = flowManager.connections.toList();
@@ -176,6 +237,7 @@ class WorkspaceProvider extends StateHandler {
       notifyListeners();
     }
   }
+
   void redo() {
     if (_redoStack.isNotEmpty) {
       _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
@@ -187,4 +249,3 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 }
-

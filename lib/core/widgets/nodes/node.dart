@@ -1,4 +1,7 @@
 import 'package:cookethflow/core/widgets/buttons/connector.dart';
+import 'package:cookethflow/core/widgets/nodes/database_node.dart';
+import 'package:cookethflow/core/widgets/nodes/diamond_node.dart';
+import 'package:cookethflow/core/widgets/nodes/parallelogram_node.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
@@ -11,7 +14,7 @@ class Node extends StatelessWidget {
   const Node({
     super.key,
     required this.id,
-    this.type = NodeType.rectangular,
+    required this.type,
     required this.onDrag,
     required this.position,
     required this.onResize,
@@ -180,7 +183,8 @@ class Node extends StatelessWidget {
               child: GestureDetector(
                 behavior: HitTestBehavior.opaque,
                 onTapDown: (details) {
-                print("Connection point ${con.toString()} of node $id tapped");
+                  print(
+                      "Connection point ${con.toString()} of node $id tapped");
                   // Prevent the tap from propagating to the parent
                   // details.handled = true;
                   wp.selectConnection(id, con);
@@ -220,38 +224,7 @@ class Node extends StatelessWidget {
             children: [
               Padding(
                 padding: const EdgeInsets.all(20),
-                child: Container(
-                  width: wp.getWidth(id),
-                  height: wp.getHeight(id),
-                  padding: const EdgeInsets.fromLTRB(15, 12, 15, 18),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFFFD8A8),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: wp.nodeList[id]!.isSelected
-                          ? Colors.blue
-                          : Colors.black,
-                      width: wp.nodeList[id]!.isSelected ? 2.5 : 1.0,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: TextField(
-                    controller: wp.nodeList[id]!.data,
-                    maxLines: null,
-                    style: const TextStyle(
-                      overflow: TextOverflow.ellipsis,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    cursorColor: Colors.white,
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.zero,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
+                child: wp.buildNode(id, type),
               ),
               if (wp.nodeList[id]!.isSelected) ...[
                 _buildResizeHandle(context, ResizeHandle.topLeft, wp),

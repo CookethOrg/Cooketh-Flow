@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 class DiamondNode extends StatelessWidget {
-  const DiamondNode({super.key});
+  const DiamondNode({super.key, required this.height, required this.width, required this.tcontroller});
+  final double width;
+  final double height;
+  final TextEditingController tcontroller;
 
   @override
   Widget build(BuildContext context) {
@@ -9,8 +12,8 @@ class DiamondNode extends StatelessWidget {
       child: Transform.rotate(
         angle: 0.7854, // Rotating the container to form a diamond
         child: Container(
-          width: 100,
-          height: 100,
+          width: width,
+          height: height,
           decoration: BoxDecoration(
             color: Colors.lightGreen.shade200,
             border: Border.all(color: Colors.black, width: 2),
@@ -18,8 +21,9 @@ class DiamondNode extends StatelessWidget {
           ),
           child: Transform.rotate(
             angle: -0.7854, // Rotating back to keep the text upright
-            child: const Center(
+            child: Center(
               child: TextField(
+                controller: tcontroller,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: Colors.black,

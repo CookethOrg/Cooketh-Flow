@@ -29,14 +29,14 @@ class _FlowBuilderScreenState extends State<FlowBuilderScreen> {
               child: Stack(
                 children: [
                   // Draw connections between nodes
-                  for (var connection in connections)
-                    CustomPaint(
-                      size: Size.infinite,
-                      painter: LinePainter(
-                        start: provider.nodePositions[connection[0]] * provider.scale,
-                        end: provider.nodePositions[connection[1]] * provider.scale,
-                      ),
-                    ),
+                  // for (var connection in connections)
+                  //   CustomPaint(
+                  //     size: Size.infinite,
+                  //     painter: LinePainter(
+                  //       start: provider.nodePositions[connection[0]] * provider.scale,
+                  //       end: provider.nodePositions[connection[1]] * provider.scale,
+                  //     ),
+                  //   ),
                   // Render nodes
                   for (int i = 0; i < provider.nodePositions.length; i++)
                     Positioned(

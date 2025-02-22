@@ -1,5 +1,6 @@
 import 'package:cookethflow/core/widgets/buttons/connector.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
+import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
@@ -38,6 +39,25 @@ class Workspace extends StatelessWidget {
               children: [
                 Stack(
                   children: [
+                    for (var i = 0; i < workProvider.connections.length; i++)
+                      CustomPaint(
+                        size: Size.infinite,
+                        painter: LinePainter(
+                            start: workProvider
+                                .nodeList[
+                                    workProvider.connections[i].sourceNodeId]!
+                                .position,
+                            end: workProvider
+                                .nodeList[
+                                    workProvider.connections[i].targetNodeId]!
+                                .position,
+                            sourceNodeId:
+                                workProvider.connections[i].sourceNodeId,
+                            startPoint: workProvider.connections[i].sourcePoint,
+                            targetNodeId:
+                                workProvider.connections[i].targetNodeId,
+                            endPoint: workProvider.connections[i].targetPoint),
+                      ),
                     ...workProvider.nodeList.entries.map((entry) {
                       var str = entry.key;
                       var node = entry.value;

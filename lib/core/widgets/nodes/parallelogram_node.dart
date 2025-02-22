@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class ParallelogramNode extends StatelessWidget {
-  const ParallelogramNode({super.key});
+  const ParallelogramNode(
+      {super.key, required this.height, required this.width, required this.controller});
+  final double width;
+  final double height;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
@@ -12,8 +16,8 @@ class ParallelogramNode extends StatelessWidget {
           ClipPath(
             clipper: ParallelogramClipper(),
             child: Container(
-              width: 150,
-              height: 70,
+              width: width,
+              height: height,
               decoration: BoxDecoration(
                 color: Colors.black,
                 borderRadius: BorderRadius.circular(6),
@@ -32,7 +36,8 @@ class ParallelogramNode extends StatelessWidget {
                   color: Colors.lightBlue.shade200,
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   alignment: Alignment.center,
-                  child: const TextField(
+                  child: TextField(
+                    controller: controller,
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 16,

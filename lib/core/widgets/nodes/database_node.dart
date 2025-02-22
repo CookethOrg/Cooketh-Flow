@@ -1,13 +1,49 @@
 import 'package:flutter/material.dart';
 
 class DatabaseNode extends StatelessWidget {
-  const DatabaseNode({super.key});
+  const DatabaseNode({
+    super.key,
+    required this.height,
+    required this.width,
+    required this.controller,
+  });
+
+  final double height;
+  final double width;
+  final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: const Size(100, 150),
-      painter: CylinderPainter(),
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        CustomPaint(
+          size: Size(width, height),
+          painter: CylinderPainter(),
+        ),
+        Positioned(
+          top: height * 0.3, // Positioning text centrally
+          child: SizedBox(
+            width: width * 0.8, // Leave some padding
+            child: TextField(
+              controller: controller,
+              maxLines: null,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                overflow: TextOverflow.ellipsis,
+              ),
+              cursorColor: Colors.white,
+              decoration: const InputDecoration(
+                border: InputBorder.none,
+                isDense: true,
+                contentPadding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -18,7 +54,7 @@ class CylinderPainter extends CustomPainter {
     final Paint paint = Paint()
       ..color = Colors.purple.shade200
       ..style = PaintingStyle.fill;
-    
+
     final Paint outline = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke

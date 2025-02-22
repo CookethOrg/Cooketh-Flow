@@ -71,6 +71,7 @@ class Workspace extends StatelessWidget {
                         top: workProvider.nodeList[str]!.position.dy,
                         child: Node(
                             id: str,
+                            type: workProvider.nodeList[str]!.type,
                             onResize: (Size newSize) =>
                                 workProvider.onResize(str, newSize),
                             onDrag: (offset) {
@@ -81,9 +82,15 @@ class Workspace extends StatelessWidget {
                     }),
                   ],
                 ),
-                FloatingDrawer(flowId: flowId,), // Left-side floating drawer
+                FloatingDrawer(
+                  flowId: flowId,
+                ), // Left-side floating drawer
 
-                Toolbar(onAdd: workProvider.addNode, onUndo: workProvider.undo, onRedo: workProvider.redo,),
+                Toolbar(
+                  // onAdd: workProvider.addNode,
+                  onUndo: workProvider.undo,
+                  onRedo: workProvider.redo,
+                ),
               ],
             ),
           ),

@@ -28,7 +28,15 @@ class FlowNode {
     // You can implement custom logic here for maximum connections per point
     return connections[point]!.isEmpty; // Example: one connection per point
   }
-
+    FlowNode copy() {
+    return FlowNode(
+      id: id,
+      type: type,
+      position: position,
+      size: size,
+      isSelected: isSelected,
+    );
+  }
   Rect get bounds {
     // Add padding to account for the resize handles
     const padding = 20.0;

@@ -11,7 +11,6 @@ class RedoButton extends StatelessWidget {
     return IconButton(
       icon: Icon(PhosphorIconsRegular.arrowUUpRight),
       onPressed: onRedo,
-      tooltip: "Redo",
     );
   }
 }

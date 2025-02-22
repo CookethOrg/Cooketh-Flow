@@ -16,7 +16,8 @@ class Workspace extends StatelessWidget {
       builder: (context, workProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            title: Text(workProvider.flowManager.flowName),
+            // title: Text(workProvider.fl.flowList[flowId]!.flowName),
+            title: Text('test'),
             centerTitle: true,
           ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -82,7 +83,7 @@ class Workspace extends StatelessWidget {
                 ),
                 FloatingDrawer(flowId: flowId,), // Left-side floating drawer
 
-                Toolbar(onAdd: workProvider.addNode),
+                Toolbar(onAdd: workProvider.addNode, onUndo: workProvider.undo, onRedo: workProvider.redo,),
               ],
             ),
           ),

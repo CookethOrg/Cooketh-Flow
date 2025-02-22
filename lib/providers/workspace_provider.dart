@@ -12,10 +12,14 @@ class WorkspaceProvider extends StateHandler {
   // FlowmanageProvider fl = FlowmanageProvider();
   FlowManager flowManager = FlowManager();
   // Keep track of list of nodes
+  
   Map<String, FlowNode> _nodeList = {};
+  Map<String, FlowNode> _nodeListCopy = {};
   List<Connection> connections = [];
   ConnectionPointSelection? selectedConnection;
   bool _isHovered = false;
+  final List<Map<String, FlowNode>> _undoStack = [];
+  List<Map<String, FlowNode>> _redoStack = [];
 
   WorkspaceProvider([super.intialState]) {
     _nodeList = {
@@ -42,6 +46,7 @@ class WorkspaceProvider extends StateHandler {
 
     updateList();
   }
+  
 
   // Getters
   bool get isHovered => _isHovered;
@@ -56,11 +61,18 @@ class WorkspaceProvider extends StateHandler {
         // orElse: () => null,
       );
 
+  
   // Functions ->
+
+  
   void setHover(bool val) {
     _isHovered = val;
     notifyListeners();
   }
+
+  void cloneNodeList() {
+  _nodeListCopy = _nodeList.map((key, node) => MapEntry(key, node.copy()));  
+}
 
   void selectConnection(String nodeId, ConnectionPoint connectionPoint) {
     if (selectedConnection == null) {
@@ -109,6 +121,12 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
+   void _saveStateForUndo() {
+    _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
+      (key, node) => MapEntry(key, node.copy()),
+    )));
+  }
+  
   void updateList() {
     flowManager.nodes.addAll(_nodeList);
     connections = flowManager.connections.toList();
@@ -122,6 +140,7 @@ class WorkspaceProvider extends StateHandler {
   void addNode({
     NodeType type = NodeType.parallelogram,
   }) {
+    _saveStateForUndo();
     FlowNode node = FlowNode(
         id: (_nodeList.length + 1).toString(),
         type: type,
@@ -135,7 +154,37 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void dragNode(String id, Offset off) {
+    _saveStateForUndo();
     flowManager.nodes[id]!.position = off;
     notifyListeners();
   }
+
+  void removeNode(String nodeId) {
+    _saveStateForUndo();
+    final node = _nodeList[nodeId];
+    flowManager.removeNode(nodeId);
+    notifyListeners();
+  }
+
+  void undo() {
+    if (_undoStack.isNotEmpty) {
+      _redoStack.add(Map<String, FlowNode>.from(_nodeList.map(
+        (key, node) => MapEntry(key, node.copy()),
+      ))); // Save current state before undoing
+
+      _nodeList = _undoStack.removeLast();
+      notifyListeners();
+    }
+  }
+  void redo() {
+    if (_redoStack.isNotEmpty) {
+      _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
+        (key, node) => MapEntry(key, node.copy()),
+      )));
+
+      _nodeList = _redoStack.removeLast();
+      notifyListeners();
+    }
+  }
 }
+

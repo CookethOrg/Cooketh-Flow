@@ -5,8 +5,10 @@ import 'package:cookethflow/core/widgets/buttons/undo_button.dart';
 
 class Toolbar extends StatelessWidget {
   final void Function() onAdd;
+  final void Function() onUndo;
+  final void Function() onRedo;
 
-  const Toolbar({super.key, required this.onAdd});
+  const Toolbar({super.key, required this.onAdd, required this.onUndo, required this.onRedo});
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +25,9 @@ class Toolbar extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            UndoButton(),
+            UndoButton(onUndo: onUndo),
             SizedBox(height: 12),
-            RedoButton(),
+            RedoButton(onRedo: onRedo),
             SizedBox(height: 12),
             AddButton(),
           ],

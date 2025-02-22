@@ -1,10 +1,12 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/connection_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
+import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/screens/discarded/node_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
+import 'package:cookethflow/screens/loading.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:cookethflow/screens/sign_up.dart';
 import 'package:cookethflow/screens/workspace.dart';
@@ -31,7 +33,9 @@ Future<void> main() async {
       ChangeNotifierProvider<WorkspaceProvider>(
           create: (_) => WorkspaceProvider(ProviderState.loaded)),
       ChangeNotifierProvider<AuthenticationProvider>(
-          create: (_) => AuthenticationProvider())
+          create: (_) => AuthenticationProvider()),
+      ChangeNotifierProvider<LoadingProvider>(
+          create: (_) => LoadingProvider()),
     ],
     child: MyApp(),
   ));
@@ -44,7 +48,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignupPage(),
+      home: LoadingScreen(),
     );
   }
 }

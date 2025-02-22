@@ -1,9 +1,11 @@
 import 'package:cookethflow/providers/authentication_provider.dart';
+import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class LoginPage extends StatelessWidget {
+  const LoginPage({super.key});
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthenticationProvider>(
@@ -41,6 +43,7 @@ class LoginPage extends StatelessWidget {
                               TextStyle(fontSize: 20, fontFamily: 'Frederik')),
                       SizedBox(height: 8),
                       TextField(
+                        controller: provider.userNameController,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 20, horizontal: 16),
@@ -66,6 +69,7 @@ class LoginPage extends StatelessWidget {
                               TextStyle(fontSize: 20, fontFamily: 'Frederik')),
                       SizedBox(height: 8),
                       TextField(
+                        controller: provider.passwordController,
                         obscureText: provider.obscurePassword,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
@@ -103,7 +107,24 @@ class LoginPage extends StatelessWidget {
                             backgroundColor: Colors.black,
                             foregroundColor: Colors.white,
                           ),
-                          onPressed: () {},
+                          onPressed: () async {
+                            String res = await provider.loginUser(
+                                email: provider.emailController.text,
+                                password: provider.passwordController.text);
+                            if (res != "Logged in successfully") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      padding: EdgeInsets.all(50),
+                                      duration: Duration(seconds: 10),
+                                      content: Text(res)));
+                            }
+                            ScaffoldMessenger.of(context)
+                                .showSnackBar(SnackBar(content: Text(res)));
+                            Navigator.of(context)
+                                .pushReplacement(MaterialPageRoute(
+                              builder: (context) => Dashboard(),
+                            ));
+                          },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 32, vertical: 8),

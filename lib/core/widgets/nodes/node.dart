@@ -26,15 +26,12 @@ class Node extends StatelessWidget {
   final Function(Size) onResize;
   final Offset position;
 
-// Function to build selection boxes
   Widget _buildResizeHandle(
       BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
-    final handleSize =
-        12.0; // Made handle slightly larger for easier interaction
+    final handleSize = 12.0;
     final containerPadding = 20.0;
     late double left, top;
 
-    // Total width and height including padding
     final totalWidth = wp.getWidth(id) + (containerPadding * 2);
     final totalHeight = wp.getHeight(id) + (containerPadding * 2);
 
@@ -63,10 +60,8 @@ class Node extends StatelessWidget {
       child: MouseRegion(
         cursor: _getCursorForHandle(handle),
         child: GestureDetector(
-          behavior:
-              HitTestBehavior.opaque, // This ensures gestures are captured
+          behavior: HitTestBehavior.opaque,
           onPanStart: (details) {
-            // Prevent the parent drag from interfering
             details.sourceTimeStamp;
           },
           onPanUpdate: (details) {
@@ -124,7 +119,6 @@ class Node extends StatelessWidget {
     );
   }
 
-  // Function to get cursor
   MouseCursor _getCursorForHandle(ResizeHandle handle) {
     switch (handle) {
       case ResizeHandle.topLeft:
@@ -138,8 +132,13 @@ class Node extends StatelessWidget {
     }
   }
 
-  Widget _buildConnectionPoints(BuildContext context, ConnectionPoint con,
+  Widget _buildConnectionPoints(BuildContext context, ConnectionPoint point,
       String id, WorkspaceProvider wp) {
+    // Check if the connection point is available
+    if (!wp.nodeList[id]!.isConnectionPointAvailable(point)) {
+      return const SizedBox.shrink();
+    }
+
     final containerPadding = 20.0;
     final connectionSize = 16.0;
     final touchTargetSize = 32.0;
@@ -148,7 +147,7 @@ class Node extends StatelessWidget {
     final totalHeight = wp.getHeight(id) + (containerPadding * 2);
 
     late double left, top;
-    switch (con) {
+    switch (point) {
       case ConnectionPoint.top:
         left = (totalWidth - touchTargetSize) / 2;
         top = -touchTargetSize / 2;
@@ -173,35 +172,34 @@ class Node extends StatelessWidget {
       left: left,
       top: top,
       child: ValueListenableBuilder<bool>(
-          valueListenable: isHovered,
-          builder: (context, hover, child) {
-            return MouseRegion(
-              cursor: SystemMouseCursors.click,
-              hitTestBehavior: HitTestBehavior.translucent,
-              onEnter: (_) => isHovered.value = true,
-              onExit: (_) => isHovered.value = false,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapDown: (details) {
-                  print(
-                      "Connection point ${con.toString()} of node $id tapped");
-                  // Prevent the tap from propagating to the parent
-                  // details.handled = true;
-                  wp.selectConnection(id, con);
-                },
-                child: Container(
-                  width: touchTargetSize,
-                  height: touchTargetSize,
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: connectionSize,
-                    height: connectionSize,
-                    child: Connector(con: con, isHovered: hover),
-                  ),
+        valueListenable: isHovered,
+        builder: (context, hover, child) {
+          return MouseRegion(
+            cursor: SystemMouseCursors.click,
+            hitTestBehavior: HitTestBehavior.translucent,
+            onEnter: (_) => isHovered.value = true,
+            onExit: (_) => isHovered.value = false,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (details) {
+                print(
+                    "Connection point ${point.toString()} of node $id tapped");
+                wp.selectConnection(id, point);
+              },
+              child: Container(
+                width: touchTargetSize,
+                height: touchTargetSize,
+                alignment: Alignment.center,
+                child: SizedBox(
+                  width: connectionSize,
+                  height: connectionSize,
+                  child: Connector(con: point, isHovered: hover),
                 ),
               ),
-            );
-          }),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -212,7 +210,6 @@ class Node extends StatelessWidget {
         return GestureDetector(
           onTap: () => wp.changeSelected(id),
           onPanUpdate: (details) {
-            // Only handle drag if we're not resizing
             if (!wp.nodeList[id]!.isSelected) return;
             onDrag(Offset(
               details.globalPosition.dx - (wp.getWidth(id) / 2),
@@ -220,7 +217,7 @@ class Node extends StatelessWidget {
             ));
           },
           child: Stack(
-            clipBehavior: Clip.none, // Allow handles to overflow
+            clipBehavior: Clip.none,
             children: [
               Padding(
                 padding: const EdgeInsets.all(20),
@@ -231,14 +228,6 @@ class Node extends StatelessWidget {
                 _buildResizeHandle(context, ResizeHandle.topRight, wp),
                 _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
                 _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
-              ],
-              // if(wp.nodeList[id]!.isSelected)...[
-              //   wp.buildConnectionPoints(context, ConnectionPoint.top, id),
-              //   wp.buildConnectionPoints(context, ConnectionPoint.right, id),
-              //   wp.buildConnectionPoints(context, ConnectionPoint.bottom, id),
-              //   wp.buildConnectionPoints(context, ConnectionPoint.left, id),
-              // ]
-              if (wp.nodeList[id]!.isSelected) ...[
                 _buildConnectionPoints(context, ConnectionPoint.top, id, wp),
                 _buildConnectionPoints(context, ConnectionPoint.right, id, wp),
                 _buildConnectionPoints(context, ConnectionPoint.bottom, id, wp),

@@ -23,6 +23,7 @@ class WorkspaceProvider extends StateHandler {
   bool _isHovered = false;
   final List<Map<String, FlowNode>> _undoStack = [];
   List<Map<String, FlowNode>> _redoStack = [];
+  TextEditingController flowNameController = TextEditingController();
 
   WorkspaceProvider([super.intialState]) {
     _nodeList = {
@@ -44,6 +45,7 @@ class WorkspaceProvider extends StateHandler {
           ))
     };
     // flowManager.flowId = fl.newFlowId;
+    flowNameController.text = flowManager.flowName;
     print(flowManager.nodes);
     print(flowManager.connections);
 
@@ -67,6 +69,12 @@ class WorkspaceProvider extends StateHandler {
 
   void setHover(bool val) {
     _isHovered = val;
+    notifyListeners();
+  }
+
+  void changeProjectName(String val) {
+    flowNameController.text = val;
+    flowManager.flowName = val;
     notifyListeners();
   }
 
@@ -247,5 +255,33 @@ class WorkspaceProvider extends StateHandler {
       _nodeList = _redoStack.removeLast();
       notifyListeners();
     }
+  }
+
+  bool isOpen = false;
+  bool isEditing = false;
+
+  void toggleDrawer() {
+    if (!isOpen) isEditing = false; // Prevent editing when closed
+    isOpen = !isOpen;
+    notifyListeners();
+  }
+
+  String getTruncatedTitle() {
+    String text = flowNameController.text;
+    return text.length > 12 ? text.substring(0, 12) + '...' : text;
+  }
+
+  void onSubmit() {
+    if (flowNameController.text.trim().isEmpty) {
+      flowNameController.text = 'Untitled';
+    }
+    isEditing = false;
+    changeProjectName(flowNameController.text);
+    notifyListeners();
+  }
+
+  void setEdit() {
+    isEditing = true;
+    notifyListeners();
   }
 }

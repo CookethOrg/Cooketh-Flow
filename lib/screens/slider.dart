@@ -25,7 +25,7 @@ class SliderStart extends StatelessWidget {
             options: CarouselOptions(
               height: MediaQuery.of(context).size.height,
               autoPlay: true,
-              autoPlayInterval: Duration(seconds: 4),
+              autoPlayInterval: Duration(seconds: 3),
               viewportFraction: 1.0,
               enableInfiniteScroll: true,
               scrollPhysics: NeverScrollableScrollPhysics(),

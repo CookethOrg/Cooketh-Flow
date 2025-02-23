@@ -1,16 +1,56 @@
-# cookethflow
+# ![Cooketh Flow Logo](path/to/logo.png)
 
-For foss hacks.
+## 🔄 Cooketh Flow  
 
-## Getting Started
+**Design, collaborate, and streamline your workflows effortlessly.**  
 
-This project is a starting point for a Flutter application.
+Cooketh Flow is a **powerful workflow-building tool** designed for teams and individuals to create, visualize, and optimize processes. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow makes it easy to build and refine workflows with an intuitive interface. A FOSS hacks project.
 
-A few resources to get you started if this is your first Flutter project:
+---
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## ✨ Features  
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+- 🔗 **Customizable Nodes & Connections** – Design workflows that fit your needs.    
+- 📂 **Project Organization** – Manage multiple workflows seamlessly.  
+- ☁ **Cloud Sync with Supabase** – Access your workflows anytime, anywhere.   
+
+---
+
+## 🛠️ Tech Stack  
+
+| Technology | Purpose |
+|------------|---------|
+| **Flutter** | Cross-platform UI development |
+| **Supabase** | Backend & real-time sync |
+| **Provider** | State management |
+
+---
+
+## 🚀 Setup & Installation  
+
+### Prerequisites  
+- Flutter SDK installed  
+- Supabase project setup  
+- A code editor (VS Code / Android Studio recommended)  
+
+### Installation Steps  
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/cooketh-flow.git
+cd cooketh-flow
+
+# Install dependencies
+flutter pub get
+
+# Run the app
+flutter run
+```
+---
+## 📜 License  
+
+This project is licensed under the **MIT License** – see the [`LICENSE`](LICENSE) file for details.  
+
+---
+
+Made with ❤️

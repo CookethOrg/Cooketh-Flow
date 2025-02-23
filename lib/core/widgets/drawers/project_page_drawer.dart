@@ -6,7 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FloatingDrawer extends StatefulWidget {
-  const FloatingDrawer({super.key,required this.flowId});
+  const FloatingDrawer({super.key, required this.flowId});
   final String flowId;
 
   @override
@@ -14,28 +14,6 @@ class FloatingDrawer extends StatefulWidget {
 }
 
 class _FloatingDrawerState extends State<FloatingDrawer> {
-  bool isOpen = false;
-  bool isEditing = false;
-  final TextEditingController _controller = TextEditingController();
-
-  @override
-  void initState() {
-    super.initState();
-    _controller.text = FlowManager().flowName;
-  }
-
-  void toggleDrawer() {
-    setState(() {
-      if (!isOpen) isEditing = false; // Prevent editing when closed
-      isOpen = !isOpen;
-    });
-  }
-
-  String getTruncatedTitle() {
-    String text = _controller.text;
-    return text.length > 12 ? text.substring(0, 12) + '...' : text;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
@@ -53,7 +31,9 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                 duration: Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
                 width: 250,
-                height: isOpen ? 630 : 81,
+                height: pv.isOpen
+                    ? 3.5 * (MediaQuery.of(context).size.height / 4)
+                    : 81,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -67,9 +47,9 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                       child: Row(
                         children: [
                           Expanded(
-                            child: isOpen && isEditing
+                            child: pv.isOpen && pv.isEditing
                                 ? TextField(
-                                    controller: _controller,
+                                    controller: pv.flowNameController,
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
                                       contentPadding: EdgeInsets.zero,
@@ -81,27 +61,20 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                     ),
                                     autofocus: true,
                                     onSubmitted: (_) {
-                                      setState(() {
-                                        if (_controller.text.trim().isEmpty) {
-                                          _controller.text = 'Untitled';
-                                        }
-                                        isEditing = false;
-                                      });
+                                      pv.onSubmit();
                                     },
                                   )
                                 : GestureDetector(
                                     onDoubleTap: () {
-                                      if (isOpen) {
-                                        setState(() {
-                                          isEditing = true;
-                                        });
+                                      if (pv.isOpen) {
+                                        pv.setEdit();
                                       }
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 9),
                                       child: Text(
-                                        getTruncatedTitle(),
+                                        pv.getTruncatedTitle(),
                                         style: TextStyle(
                                           fontFamily: 'Frederik',
                                           fontSize: 20,
@@ -115,9 +88,9 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                           ),
                           SizedBox(width: 12),
                           GestureDetector(
-                            onTap: toggleDrawer,
+                            onTap: pv.toggleDrawer,
                             child: Icon(
-                              isOpen
+                              pv.isOpen
                                   ? PhosphorIconsRegular.sidebarSimple
                                   : PhosphorIconsFill.sidebarSimple,
                               color: Colors.black,
@@ -127,7 +100,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                         ],
                       ),
                     ),
-                    if (isOpen)
+                    if (pv.isOpen)
                       Expanded(
                         child: ListView(
                           physics: AlwaysScrollableScrollPhysics(),
@@ -135,7 +108,9 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                             ...pv.nodeList.entries.map((entry) {
                               var id = entry.key;
                               var node = entry.value;
-                              return ListTile(title: Text(node.data.text),);
+                              return ListTile(
+                                title: Text(node.data.text),
+                              );
                             })
                           ],
                         ),

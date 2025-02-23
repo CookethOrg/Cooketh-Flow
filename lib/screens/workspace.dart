@@ -16,8 +16,7 @@ class Workspace extends StatelessWidget {
       builder: (context, workProvider, child) {
         return Scaffold(
           appBar: AppBar(
-            // title: Text(workProvider.fl.flowList[flowId]!.flowName),
-            title: Text('test'),
+            title: Text(workProvider.flowManager.flowName),
             centerTitle: true,
           ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),

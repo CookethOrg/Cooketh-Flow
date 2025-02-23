@@ -30,16 +30,17 @@ Future<void> main() async {
   );
   runApp(MultiProvider(
     providers: [
+
+      ChangeNotifierProvider<AuthenticationProvider>(
+          create: (_) => AuthenticationProvider()),
       ChangeNotifierProvider<FlowmanageProvider>(
-          create: (_) => FlowmanageProvider()),
+          create: (_) => FlowmanageProvider(AuthenticationProvider())),
       // ChangeNotifierProvider<NodeProvider>(
       //     create: (_) => NodeProvider(ProviderState.loaded)),
       ChangeNotifierProvider<DashboardProvider>(
           create: (_) => DashboardProvider()),
       ChangeNotifierProvider<WorkspaceProvider>(
           create: (_) => WorkspaceProvider(ProviderState.loaded)),
-      ChangeNotifierProvider<AuthenticationProvider>(
-          create: (_) => AuthenticationProvider()),
       ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
     ],
     child: MyApp(),

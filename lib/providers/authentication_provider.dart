@@ -71,6 +71,23 @@ class AuthenticationProvider extends StateHandler {
         .eq('id', user.id)
         .single();
 
+    print(response);
+
+    return response;
+  }
+
+  Future<Map<String,dynamic>?> fetchCurrentUserDetails() async {
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      return null;
+    }
+
+    final response = await supabase
+        .from('User')
+        .select()
+        .eq('id', user.id).single();
+
     // print(response);
 
     return response;

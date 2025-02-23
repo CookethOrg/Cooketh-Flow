@@ -13,13 +13,13 @@ class Dashboard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<FlowmanageProvider>(
       builder: (context, pv, child) {
-        if (pv.isLoading) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
+        // if (pv.isLoading) {
+        //   return const Scaffold(
+        //     body: Center(
+        //       child: CircularProgressIndicator(),
+        //     ),
+        //   );
+        // }
 
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),

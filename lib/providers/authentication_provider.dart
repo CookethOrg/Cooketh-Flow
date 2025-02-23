@@ -38,6 +38,8 @@ class AuthenticationProvider extends StateHandler {
       _confirmPasswordController;
   AuthResponse get userData => _userData;
 
+
+  
   void toggleObscurePassword() {
     _obscurePassword = !_obscurePassword;
     notifyListeners();

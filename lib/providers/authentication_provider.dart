@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -9,6 +10,7 @@ class AuthenticationProvider extends StateHandler {
   bool _obscureConfirmPassword = true;
   String supabaseUrl;
   String supabaseApiKey;
+  LoadingProvider loadingProvider = LoadingProvider();
   late AuthResponse _userData;
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -61,41 +63,41 @@ class AuthenticationProvider extends StateHandler {
     required String email,
     required String password,
   }) async {
-    setLoading(true);
     String res = "Some error occurred";
 
     try {
       if (email.isNotEmpty && userName.isNotEmpty && password.isNotEmpty) {
-        // 1️⃣ Sign up the user
+        // Start loading with initial estimate
+        loadingProvider.startLoading();
+
+        // Update progress for auth signup start (30%)
+        loadingProvider.updateProgress(0.3);
         final AuthResponse authResponse =
             await supabase.auth.signUp(email: email, password: password);
 
         final user = authResponse.user;
-        // _userData = authResponse;
         setUserData(authResponse);
-        if (user == null) {
-          throw Exception("User signup failed.");
-        }
-        print(user);
-        print(user.id);
-        // 2️⃣ Use the same ID from auth.users
-        final String userId = user.id;
 
-        // var file = File('path/to/your/file');
-        // var u = await supabase.storage.from('users').upload(userId, file);
-        // Create an empty file
+        if (user == null) throw Exception("User signup failed.");
+
+        // Update progress for auth signup completion (60%)
+        loadingProvider.updateProgress(0.6);
+
+        // Insert user data
         await supabase.from('User').insert({
-          'id': userId,
+          'id': user.id,
           'userName': userName,
           'email': email,
           'flowList': {}
         });
+
+        // Update progress for database insertion completion (100%)
+        loadingProvider.updateProgress(1.0);
+
         res = "Signed Up Successfully";
       }
     } catch (e) {
       res = e.toString();
-    } finally {
-      setLoading(false);
     }
 
     return res;

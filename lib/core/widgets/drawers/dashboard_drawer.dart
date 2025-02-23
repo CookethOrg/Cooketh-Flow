@@ -1,3 +1,4 @@
+import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -7,8 +8,8 @@ class DashboardDrawer extends StatelessWidget {
   const DashboardDrawer({super.key});
   @override
   Widget build(BuildContext context) {
-    return Consumer<DashboardProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<DashboardProvider,AuthenticationProvider>(
+      builder: (context, provider,auth, child) {
         return Stack(
           children: [
             // Main Floating Drawer
@@ -45,7 +46,7 @@ class DashboardDrawer extends StatelessWidget {
                               width: 10,
                             ),
                             Text(
-                              'Subroto Banerjee',
+                              auth.userNameController.text,
                               style: TextStyle(
                                   fontFamily: 'Frederik', fontSize: 20),
                             ),

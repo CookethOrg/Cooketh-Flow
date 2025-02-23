@@ -54,8 +54,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       // home: Workspace(flowId: "1"),
-      // home: SignupPage(),
-      home: Dashboard(),
+      home: SignupPage(),
+      // home: Dashboard(),
     );
   }
 }

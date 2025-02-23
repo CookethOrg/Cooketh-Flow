@@ -16,7 +16,7 @@ class LoadingScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  provider.currentImage,
+                  provider.currentImage.isNotEmpty ? provider.currentImage : 'assets/default.png',
                   height: 200,
                 ),
                 const SizedBox(height: 20),
@@ -27,7 +27,11 @@ class LoadingScreen extends StatelessWidget {
                     children: [
                       Text(
                         "${(provider.progress * 100).toInt()}%",
-                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, fontFamily: 'Frederik'),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          fontFamily: 'Frederik',
+                        ),
                       ),
                       const SizedBox(height: 8),
                       Stack(
@@ -44,7 +48,7 @@ class LoadingScreen extends StatelessWidget {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: LinearProgressIndicator(
-                              value: provider.progress,
+                              value: provider.progress.clamp(0.0, 1.0),
                               backgroundColor: Colors.white,
                               color: const Color(0xFF3F79FF),
                               minHeight: 16,

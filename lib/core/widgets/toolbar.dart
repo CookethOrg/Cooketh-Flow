@@ -5,10 +5,11 @@ import 'package:cookethflow/core/widgets/buttons/undo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/delete_button.dart';
 
 class Toolbar extends StatelessWidget {
+  final Function() onDelete;
   final void Function() onUndo;
   final void Function() onRedo;
 
-  const Toolbar({super.key, required this.onUndo, required this.onRedo});
+  const Toolbar({super.key, required this.onUndo, required this.onRedo, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,9 @@ class Toolbar extends StatelessWidget {
             SizedBox(height: 12),
             AddButton(),
             SizedBox(height: 12),
-            // DeleteButton(onDelete: onDelete,),
+            DeleteButton(
+              onDelete: onDelete,
+            ),
           ],
         ),
       ),

@@ -87,6 +87,7 @@ class Workspace extends StatelessWidget {
 
                 Toolbar(
                   // onAdd: workProvider.addNode,
+                  onDelete: workProvider.removeSelectedNodes,
                   onUndo: workProvider.undo,
                   onRedo: workProvider.redo,
                 ),

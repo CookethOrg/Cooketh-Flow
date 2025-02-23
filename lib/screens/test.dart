@@ -10,6 +10,7 @@ class TestScreen extends StatelessWidget {
       body: Stack(
         children: [
           Center(child: CustomToolbar()),
+          CustomPointer(),
         ],
       ),
     );

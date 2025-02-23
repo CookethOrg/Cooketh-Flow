@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
+import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -10,7 +11,7 @@ class ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<FlowmanageProvider>(builder: (context, pv, child) {
+    return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
       return InkWell(
         onTap: onTap,
         child: SizedBox(
@@ -43,7 +44,7 @@ class ProjectCard extends StatelessWidget {
               // ),
               Spacer(),
               Text(
-                pv.flowList[flowId]!.flowName,
+                pv.flowManager.flowName,
                 style: TextStyle(fontFamily: 'Frederik', fontSize: 20),
               )
             ],

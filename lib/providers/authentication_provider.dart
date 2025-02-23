@@ -121,12 +121,12 @@ class AuthenticationProvider extends StateHandler {
         loadingProvider.updateProgress(0.6);
 
         // Insert user data
-        await supabase.from('User').insert({
-          'id': user.id,
-          'userName': userName,
-          'email': email,
-          'flowList': {}
-        });
+        // await supabase.from('User').insert({
+        //   'id': user.id,
+        //   'userName': userName,
+        //   'email': email,
+        //   'flowList': {}
+        // });
 
         // Update progress for database insertion completion (100%)
         loadingProvider.updateProgress(1.0);

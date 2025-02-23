@@ -44,7 +44,7 @@ class LoginPage extends StatelessWidget {
                               TextStyle(fontSize: 20, fontFamily: 'Frederik')),
                       SizedBox(height: 8),
                       TextField(
-                        controller: provider.userNameController,
+                        controller: provider.emailController,
                         decoration: InputDecoration(
                           contentPadding: EdgeInsets.symmetric(
                               vertical: 20, horizontal: 16),
@@ -112,12 +112,15 @@ class LoginPage extends StatelessWidget {
                             String res = await provider.loginUser(
                                 email: provider.emailController.text,
                                 password: provider.passwordController.text);
+                            //     var t = await provider.supabase.from('User').select('userName').eq('id', provider.supabase.auth.currentUser?.id ?? '').single();
+                            // print(
+                            //     t['userName'].toString());
                             if (res != "Logged in successfully") {
                               ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                       padding: EdgeInsets.all(50),
                                       duration: Duration(seconds: 10),
-                                      content: Text(res)));
+                                      content: Text('')));
                             }
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(SnackBar(content: Text(res)));
@@ -162,10 +165,7 @@ class LoginPage extends StatelessWidget {
                   ),
                 ),
               ),
-              Expanded(
-                flex: 1,
-                child: SliderStart()
-              ),
+              Expanded(flex: 1, child: SliderStart()),
             ],
           ),
         );

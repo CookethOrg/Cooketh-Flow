@@ -40,6 +40,7 @@ class FlowmanageProvider extends StateHandler {
       notifyListeners();
 
       final currentUser = supabase.auth.currentUser;
+      print(currentUser);
       if (currentUser == null) {
         throw Exception('No authenticated user found');
       }

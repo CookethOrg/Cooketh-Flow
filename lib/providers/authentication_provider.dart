@@ -58,6 +58,24 @@ class AuthenticationProvider extends StateHandler {
     notifyListeners();
   }
 
+  Future<Map<String, dynamic>?> fetchCurrentUser() async {
+    final user = supabase.auth.currentUser;
+
+    if (user == null) {
+      return null;
+    }
+
+    final response = await supabase
+        .from('User')
+        .select('userName')
+        .eq('id', user.id)
+        .single();
+
+    // print(response);
+
+    return response;
+  }
+
   Future<String> createNewUser({
     required String userName,
     required String email,
@@ -118,6 +136,7 @@ class AuthenticationProvider extends StateHandler {
         );
 
         final user = authResponse.user;
+        print(fetchCurrentUser());
 
         if (user == null) {
           throw Exception('Login failed: User not found.');

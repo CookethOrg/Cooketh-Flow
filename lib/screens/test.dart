@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:cookethflow/core/widgets/custom_pointer.dart';
 import 'package:cookethflow/core/widgets/nodes/database_node.dart';
+import 'package:cookethflow/core/widgets/popup_box.dart';
 
 class TestScreen extends StatelessWidget {
   @override
@@ -10,8 +11,8 @@ class TestScreen extends StatelessWidget {
       body: Stack(
         children: [
           Center(child: CustomToolbar()),
-          CustomPointer(),
-        ],
+          ProfileDialog()        
+          ],
       ),
     );
   }

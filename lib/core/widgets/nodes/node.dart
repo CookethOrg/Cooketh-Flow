@@ -26,6 +26,7 @@ class Node extends StatelessWidget {
   final Function(Size) onResize;
   final Offset position;
 
+
   Widget _buildResizeHandle(
       BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
     final handleSize = 12.0;

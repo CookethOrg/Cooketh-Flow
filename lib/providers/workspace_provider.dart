@@ -183,12 +183,14 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void changeSelected(String nodeId) {
-    flowManager.nodes[nodeId]!.isSelected =
-        !flowManager.nodes[nodeId]!.isSelected;
-    updateList();
-    // setHover(false);
+  if (_nodeList.containsKey(nodeId)) {
+    _nodeList.forEach((key, node) {
+      node.isSelected = key == nodeId ? !node.isSelected : false;
+    });
     notifyListeners();
   }
+}
+
 
   void _saveStateForUndo() {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
@@ -228,12 +230,13 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void removeNode(String nodeId) {
-    _saveStateForUndo();
-    final node = _nodeList[nodeId];
-    flowManager.removeNode(nodeId);
-    notifyListeners();
-  }
+  void removeSelectedNodes(String id) {
+  _saveStateForUndo();
+  // _nodeList[id].,
+  // !flowManager.removeNode(id)
+  notifyListeners();
+}
+
 
   void undo() {
     if (_undoStack.isNotEmpty) {

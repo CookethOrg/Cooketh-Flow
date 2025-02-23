@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cookethflow/core/widgets/buttons/add_node_button.dart';
 import 'package:cookethflow/core/widgets/buttons/redo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/undo_button.dart';
+import 'package:cookethflow/core/widgets/buttons/delete_button.dart';
 
 class Toolbar extends StatelessWidget {
   final void Function() onUndo;
@@ -29,6 +30,8 @@ class Toolbar extends StatelessWidget {
             RedoButton(onRedo: onRedo),
             SizedBox(height: 12),
             AddButton(),
+            SizedBox(height: 12),
+            // DeleteButton(onDelete: onDelete,),
           ],
         ),
       ),

@@ -32,9 +32,9 @@ class Toolbar extends StatelessWidget {
             SizedBox(height: 12),
             AddButton(),
             SizedBox(height: 12),
-            DeleteButton(
-              onDelete: onDelete,
-            ),
+            // DeleteButton(
+            //   onUndo: onUndo,
+            // ),
           ],
         ),
       ),

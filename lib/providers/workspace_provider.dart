@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:collection/collection.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/widgets/nodes/database_node.dart';
 import 'package:cookethflow/core/widgets/nodes/diamond_node.dart';
@@ -7,6 +7,7 @@ import 'package:cookethflow/core/widgets/nodes/parallelogram_node.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
+// import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -60,10 +61,25 @@ class WorkspaceProvider extends StateHandler {
   double getWidth(String id) => nodeList[id]!.size.width;
   double getHeight(String id) => nodeList[id]!.size.height;
   // Get currently selected node (if any)
-  FlowNode? get selectedNode => nodeList.values.firstWhere(
-        (node) => node.isSelected,
-        // orElse: () => null,
-      );
+  
+
+  FlowNode? get selectedNode => nodeList.values.firstWhereOrNull(
+  (node) => node.isSelected,
+);
+
+  // Set currently selected node
+  set selectedNode(FlowNode? node) {
+    if (node != null) {
+      nodeList.forEach((key, n) {
+        n.isSelected = n.id == node.id;
+      });
+    } else {
+      nodeList.forEach((key, n) {
+        n.isSelected = false;
+      });
+    }
+    notifyListeners();
+  }
 
   // Functions ->
 
@@ -191,6 +207,15 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+  bool displayToolbox() {
+    if (selectedNode != null && selectedNode!.isSelected) {
+      notifyListeners();
+      return true;
+    }
+    return false;
+  }
+
+
   void _saveStateForUndo() {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
       (key, node) => MapEntry(key, node.copy()),
@@ -230,38 +255,40 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void removeSelectedNodes() {
-    _saveStateForUndo();
-
-    // Collect selected node IDs
-    final selectedNodes = _nodeList.entries
-        .where((entry) => entry.value.isSelected)
-        .map((entry) => entry.key)
-        .toList();
-    print(selectedNodes);
-
-    // Remove selected nodes and their connections
-    for (String nodeId in selectedNodes) {
-      // Remove the node from FlowManager
-      flowManager.removeNode(nodeId);
-
-      // Remove all connections associated with this node
-      connections.removeWhere((connection) =>
-          connection.sourceNodeId == nodeId ||
-          connection.targetNodeId == nodeId);
-
-      // Remove the node from local nodeList
-      _nodeList.remove(nodeId);
+    if (selectedNode == null) {
+      print("Error: No node selected.");
+      return;
     }
 
-    // Clear the FlowManager nodes and re-sync with current state
+    String nodeId = selectedNode!.id;
+
+    if (!_nodeList.containsKey(nodeId)) {
+      print("Error: Node with ID $nodeId not found.");
+      return;
+    }
+
+    print("Removing node: $nodeId");
+
+    _saveStateForUndo(); // Save state before removal
+
+    flowManager.removeNode(nodeId); // Remove node from flow
+    _nodeList.remove(nodeId); // Remove from local list
+
+    // Remove any connections linked to this node
+    connections.removeWhere((connection) =>
+        connection.sourceNodeId == nodeId || connection.targetNodeId == nodeId);
+
+    // Resync FlowManager nodes and connections
     flowManager.nodes.clear();
     flowManager.nodes.addAll(_nodeList);
-
-    // Update connections in FlowManager
     flowManager.connections.clear();
     flowManager.connections.addAll(connections);
 
-    notifyListeners();
+    selectedNode = null; // Clear selection after deletion
+
+    notifyListeners(); // Notify UI update
+
+    print("Node removed successfully.");
   }
 
   void undo() {

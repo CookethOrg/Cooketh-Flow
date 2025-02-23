@@ -6,7 +6,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FloatingDrawer extends StatefulWidget {
-  const FloatingDrawer({super.key,required this.flowId});
+  const FloatingDrawer({super.key, required this.flowId});
   final String flowId;
 
   @override
@@ -53,7 +53,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                 duration: Duration(milliseconds: 400),
                 curve: Curves.easeInOut,
                 width: 250,
-                height: isOpen ? 630 : 81,
+                height: isOpen ? 3.5*(MediaQuery.of(context).size.height/4) : 81,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
@@ -87,6 +87,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                         }
                                         isEditing = false;
                                       });
+                                      pv.changeProjectName(_controller.text);
                                     },
                                   )
                                 : GestureDetector(
@@ -135,7 +136,9 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                             ...pv.nodeList.entries.map((entry) {
                               var id = entry.key;
                               var node = entry.value;
-                              return ListTile(title: Text(node.data.text),);
+                              return ListTile(
+                                title: Text(node.data.text),
+                              );
                             })
                           ],
                         ),

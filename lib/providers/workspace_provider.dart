@@ -23,6 +23,7 @@ class WorkspaceProvider extends StateHandler {
   bool _isHovered = false;
   final List<Map<String, FlowNode>> _undoStack = [];
   List<Map<String, FlowNode>> _redoStack = [];
+  TextEditingController flowNameController = TextEditingController();
 
   WorkspaceProvider([super.intialState]) {
     _nodeList = {
@@ -67,6 +68,12 @@ class WorkspaceProvider extends StateHandler {
 
   void setHover(bool val) {
     _isHovered = val;
+    notifyListeners();
+  }
+
+  void changeProjectName(String val) {
+    flowNameController.text = val;
+    flowManager.flowName = val;
     notifyListeners();
   }
 

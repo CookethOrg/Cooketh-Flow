@@ -183,14 +183,13 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void changeSelected(String nodeId) {
-  if (_nodeList.containsKey(nodeId)) {
-    _nodeList.forEach((key, node) {
-      node.isSelected = key == nodeId ? !node.isSelected : false;
-    });
-    notifyListeners();
+    if (_nodeList.containsKey(nodeId)) {
+      _nodeList.forEach((key, node) {
+        node.isSelected = key == nodeId ? !node.isSelected : false;
+      });
+      notifyListeners();
+    }
   }
-}
-
 
   void _saveStateForUndo() {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
@@ -230,13 +229,40 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void removeSelectedNodes(String id) {
-  _saveStateForUndo();
-  // _nodeList[id].,
-  // !flowManager.removeNode(id)
-  notifyListeners();
-}
+  void removeSelectedNodes() {
+    _saveStateForUndo();
 
+    // Collect selected node IDs
+    final selectedNodes = _nodeList.entries
+        .where((entry) => entry.value.isSelected)
+        .map((entry) => entry.key)
+        .toList();
+    print(selectedNodes);
+
+    // Remove selected nodes and their connections
+    for (String nodeId in selectedNodes) {
+      // Remove the node from FlowManager
+      flowManager.removeNode(nodeId);
+
+      // Remove all connections associated with this node
+      connections.removeWhere((connection) =>
+          connection.sourceNodeId == nodeId ||
+          connection.targetNodeId == nodeId);
+
+      // Remove the node from local nodeList
+      _nodeList.remove(nodeId);
+    }
+
+    // Clear the FlowManager nodes and re-sync with current state
+    flowManager.nodes.clear();
+    flowManager.nodes.addAll(_nodeList);
+
+    // Update connections in FlowManager
+    flowManager.connections.clear();
+    flowManager.connections.addAll(connections);
+
+    notifyListeners();
+  }
 
   void undo() {
     if (_undoStack.isNotEmpty) {

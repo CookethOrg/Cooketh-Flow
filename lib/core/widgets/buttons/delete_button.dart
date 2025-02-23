@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class DeleteButton extends StatelessWidget {
-  final VoidCallback onDelete;
+  final Function() onDelete;
 
   const DeleteButton({super.key, required this.onDelete});
 

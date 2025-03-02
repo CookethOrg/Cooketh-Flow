@@ -28,17 +28,11 @@ Future<void> main() async {
     url: supabaseUrl,
     anonKey: supabaseApiKey,
   );
-
-  // instance.client;
-
-  // SupabaseClient cl = SupabaseClient(supabaseUrl, supabaseApiKey,
-  //     authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit));
+  
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<SupabaseService>(
           create: (_) => SupabaseService(instance.client)),
-      // ChangeNotifierProvider<AuthenticationProvider>(
-      //     create: (_) => AuthenticationProvider()),
       
       ChangeNotifierProxyProvider<SupabaseService, AuthenticationProvider>(
         create: (ctx) => AuthenticationProvider(

@@ -1,4 +1,4 @@
-// import 'package:cookethflow/core/services/hive_auth_storage.dart';
+import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
@@ -23,20 +23,33 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   String supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url";
   String supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key";
-  // await Hive.initFlutter();
-  await Supabase.initialize(
+
+  final instance = await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseApiKey,
   );
+
+  // instance.client;
+
+  // SupabaseClient cl = SupabaseClient(supabaseUrl, supabaseApiKey,
+  //     authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit));
   runApp(MultiProvider(
     providers: [
-
-      ChangeNotifierProvider<AuthenticationProvider>(
-          create: (_) => AuthenticationProvider()),
-      ChangeNotifierProvider<FlowmanageProvider>(
-          create: (_) => FlowmanageProvider(AuthenticationProvider())),
-      // ChangeNotifierProvider<NodeProvider>(
-      //     create: (_) => NodeProvider(ProviderState.loaded)),
+      ChangeNotifierProvider<SupabaseService>(
+          create: (_) => SupabaseService(instance.client)),
+      // ChangeNotifierProvider<AuthenticationProvider>(
+      //     create: (_) => AuthenticationProvider()),
+      ChangeNotifierProxyProvider<SupabaseService, AuthenticationProvider>(
+        create: (ctx) => AuthenticationProvider(
+            Provider.of<SupabaseService>(ctx, listen: false)),
+        update: (context, supabaseService, previousAuth) =>
+            previousAuth ?? AuthenticationProvider(supabaseService),
+      ),
+      ChangeNotifierProxyProvider<SupabaseService, FlowmanageProvider>(
+          create: (context) => FlowmanageProvider(
+              Provider.of<SupabaseService>(context, listen: false)),
+          update: (context, supabaseService, previousFlowProvider) =>
+              previousFlowProvider ?? FlowmanageProvider(supabaseService)),
       ChangeNotifierProvider<DashboardProvider>(
           create: (_) => DashboardProvider()),
       ChangeNotifierProvider<WorkspaceProvider>(
@@ -54,10 +67,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      // home: Workspace(flowId: "1"),
       home: SignupPage(),
-      // home: Dashboard(),
-      // home: TestScreen(),
     );
   }
 }

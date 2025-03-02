@@ -12,7 +12,7 @@ class DashboardDrawer extends StatelessWidget {
     return Consumer2<DashboardProvider, AuthenticationProvider>(
       builder: (context, provider, auth, child) {
         return FutureBuilder(
-            future: auth.fetchCurrentUser(),
+            future: auth.fetchCurrentUserName(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return SizedBox();

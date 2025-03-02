@@ -120,7 +120,7 @@ class LoginPage extends StatelessWidget {
                                   SnackBar(
                                       padding: EdgeInsets.all(50),
                                       duration: Duration(seconds: 10),
-                                      content: Text('')));
+                                      content: Text(res)));
                             }
                             ScaffoldMessenger.of(context)
                                 .showSnackBar(SnackBar(content: Text(res)));

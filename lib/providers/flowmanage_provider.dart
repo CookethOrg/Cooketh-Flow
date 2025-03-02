@@ -1,6 +1,6 @@
 import 'dart:io';
-
-import 'package:cookethflow/core/utils/utils.dart';
+import 'package:cookethflow/core/services/supabase_service.dart';
+import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/user.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
@@ -9,29 +9,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FlowmanageProvider extends StateHandler {
   UserModel user = UserModel();
-  late AuthenticationProvider auth;
+  late final SupabaseService supabaseService;
   late final SupabaseClient supabase;
-  String supabaseUrl;
-  String supabaseApiKey;
-  Map<String, FlowManager> _flowList = {"1": FlowManager(flowId: "1")};
+  // String supabaseUrl;
+  // String supabaseApiKey;
+  final Map<String, FlowManager> _flowList = {"1": FlowManager(flowId: "1")};
   String _newFlowId = "";
 
-  FlowmanageProvider(this.auth)
-      : supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url",
-        supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key",
-        super() {
-    // HttpOverrides.global = MyHttpOverrides();
-    supabase = SupabaseClient(
-      supabaseUrl,
-      supabaseApiKey,
-      authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit),
-    );
+  FlowmanageProvider(this.supabaseService) : super() {
+    supabase = supabaseService.supabase;
     _initializeUser();
   }
 
   Map<String, FlowManager> get flowList => _flowList;
   String get newFlowId => _newFlowId;
-  // bool get isLoading => _isLoading;
 
   void recentFlowId(String val) {
     _newFlowId = val;
@@ -40,22 +31,23 @@ class FlowmanageProvider extends StateHandler {
 
   Future<void> _initializeUser() async {
     try {
-      var res = await auth.fetchCurrentUserDetails();
+      var res = await supabaseService.fetchCurrentUserDetails();
       if (res == null) {
-        throw Exception('No authenticated user found');
+        print('No authenticated user found during initialization');
+        return;
       }
 
-      if (res != null && res['flowList'] != null) {
+      if (res['flowList'] != null) {
         // Convert the database flowList to FlowManager objects
         Map<String, dynamic> dbFlowList =
             Map<String, dynamic>.from(res['flowList']);
-
         _flowList.clear();
         dbFlowList.forEach((key, value) {
           var flowManager = FlowManager(flowId: key);
           // Here you could also restore the nodes and connections if needed
           _flowList[key] = flowManager;
         });
+        notifyListeners();
       }
     } catch (e) {
       print('Error initializing user: $e');
@@ -64,10 +56,10 @@ class FlowmanageProvider extends StateHandler {
 
   Future<void> updateFlowList() async {
     try {
-      var res = await auth.fetchCurrentUserDetails();
-      var us = await auth.userData.user;
+      var res = await supabaseService.fetchCurrentUserDetails();
+      var currentUser = supabaseService.userData;
 
-      if (res == null) {
+      if (currentUser == null) {
         throw Exception('No authenticated user found');
       }
 
@@ -79,25 +71,23 @@ class FlowmanageProvider extends StateHandler {
 
       await supabase
           .from('User')
-          .update({'flowList': flowListJson}).eq('id', us!.id);
+          .update({'flowList': flowListJson}).eq('id', currentUser.user!.id);
     } catch (e) {
       print('Error updating flow list: $e');
-      throw e;
+      rethrow;
     }
   }
 
   Future<void> addFlow() async {
     try {
-      var res = await auth.fetchCurrentUserDetails();
-      print(res);
+      var currentUser = supabaseService.userData;
 
-      if (res == null) {
+      if (currentUser == null) {
         throw Exception('No authenticated user found');
       }
 
       final String newFlowId = (_flowList.length + 1).toString();
       FlowManager flowm = FlowManager(flowId: newFlowId);
-
       _flowList[newFlowId] = flowm;
       _newFlowId = newFlowId;
 
@@ -105,7 +95,7 @@ class FlowmanageProvider extends StateHandler {
       notifyListeners();
     } catch (e) {
       print('Error adding flow: $e');
-      throw e;
+      rethrow;
     }
   }
 

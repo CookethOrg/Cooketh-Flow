@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:flutter/material.dart';
@@ -8,25 +9,14 @@ class AuthenticationProvider extends StateHandler {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  String supabaseUrl;
-  String supabaseApiKey;
   LoadingProvider loadingProvider = LoadingProvider();
   late AuthResponse _userData;
   final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
-  late final SupabaseClient supabase;
-  // final db = Supabase.instance.client.from('User').select();
+  late final SupabaseService supabaseService;
 
-  AuthenticationProvider()
-      : supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url",
-        supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key",
-        super() {
-    supabase = SupabaseClient(supabaseUrl, supabaseApiKey,
-        authOptions: AuthClientOptions(authFlowType: AuthFlowType.implicit));
-  }
+  AuthenticationProvider(this.supabaseService) : super();
 
   bool get obscurePassword => _obscurePassword;
   bool get obscureConfirmPassword => _obscureConfirmPassword;
@@ -34,12 +24,8 @@ class AuthenticationProvider extends StateHandler {
   TextEditingController get userNameController => _userNameController;
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
-  TextEditingController get confirmPasswordController =>
-      _confirmPasswordController;
   AuthResponse get userData => _userData;
 
-
-  
   void toggleObscurePassword() {
     _obscurePassword = !_obscurePassword;
     notifyListeners();
@@ -55,44 +41,42 @@ class AuthenticationProvider extends StateHandler {
     notifyListeners();
   }
 
-  void setUserData(AuthResponse d) {
-    _userData = d;
+  void setUserData() {
+    _userData = supabaseService.userData;
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>?> fetchCurrentUser() async {
-    final user = supabase.auth.currentUser;
+  Future<Map<String, dynamic>?> fetchCurrentUserName() async {
+    final user = supabaseService.fetchCurrentUserName();
 
     if (user == null) {
       return null;
     }
 
-    final response = await supabase
-        .from('User')
-        .select('userName')
-        .eq('id', user.id)
-        .single();
+    // final response = await supabase
+    //     .from('User')
+    //     .select('userName')
+    //     .eq('id', user.id)
+    //     .single();
 
-    print(response);
+    print(user);
 
-    return response;
+    return user;
   }
 
-  Future<Map<String,dynamic>?> fetchCurrentUserDetails() async {
-    final user = supabase.auth.currentUser;
+  Future<Map<String, dynamic>?> fetchCurrentUserDetails() async {
+    final user = supabaseService.fetchCurrentUserDetails();
 
     if (user == null) {
       return null;
     }
 
-    final response = await supabase
-        .from('User')
-        .select()
-        .eq('id', user.id).single();
+    // final response =
+    //     await supabase.from('User').select().eq('id', user.id).single();
 
     // print(response);
 
-    return response;
+    return user;
   }
 
   Future<String> createNewUser({
@@ -109,13 +93,13 @@ class AuthenticationProvider extends StateHandler {
 
         // Update progress for auth signup start (30%)
         loadingProvider.updateProgress(0.3);
-        final AuthResponse authResponse =
-            await supabase.auth.signUp(email: email, password: password);
+        res = await supabaseService.createNewUser(
+            userName: userName, email: email, password: password);
 
-        final user = authResponse.user;
-        setUserData(authResponse);
+        // final user = authResponse.user;
+        // setUserData(authResponse);
 
-        if (user == null) throw Exception("User signup failed.");
+        // if (user == null) throw Exception("User signup failed.");
 
         // Update progress for auth signup completion (60%)
         loadingProvider.updateProgress(0.6);
@@ -131,7 +115,7 @@ class AuthenticationProvider extends StateHandler {
         // Update progress for database insertion completion (100%)
         loadingProvider.updateProgress(1.0);
 
-        res = "Signed Up Successfully";
+        // res = "Signed Up Successfully";
       }
     } catch (e) {
       res = e.toString();
@@ -148,24 +132,20 @@ class AuthenticationProvider extends StateHandler {
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
         // 🛠 Attempt login
-        final AuthResponse authResponse =
-            await supabase.auth.signInWithPassword(
-          email: email,
-          password: password,
-        );
+        res = await supabaseService.loginUser(email: email, password: password);
 
-        final user = authResponse.user;
-        print(fetchCurrentUser());
+        // final user = authResponse.user;
+        // print(fetchCurrentUser());
 
-        if (user == null) {
-          throw Exception('Login failed: User not found.');
-        }
+        // if (user == null) {
+        //   throw Exception('Login failed: User not found.');
+        // }
 
         // ✅ Store user data for future use
-        setUserData(authResponse);
+        // setUserData(authResponse);
 
-        res = 'Logged in successfully';
-        print("✅ Login Successful! User ID: ${user.id}");
+        // res = 'Logged in successfully';
+        // print("✅ Login Successful! User ID: ${user.id}");
       } else {
         res = 'Email and Password cannot be empty';
       }

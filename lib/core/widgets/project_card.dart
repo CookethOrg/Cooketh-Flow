@@ -44,7 +44,7 @@ class ProjectCard extends StatelessWidget {
               // ),
               Spacer(),
               Text(
-                pv.flowManager.flowName,
+                pv.fl.flowList[flowId]!.flowName,
                 style: TextStyle(fontFamily: 'Frederik', fontSize: 20),
               )
             ],

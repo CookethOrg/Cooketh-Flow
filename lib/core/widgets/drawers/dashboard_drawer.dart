@@ -57,7 +57,7 @@ class DashboardDrawer extends StatelessWidget {
                                     width: 10,
                                   ),
                                   Text(
-                                    'TeeWrath',
+                                    user!['userName'],
                                     style: TextStyle(
                                         fontFamily: 'Frederik', fontSize: 20),
                                   ),

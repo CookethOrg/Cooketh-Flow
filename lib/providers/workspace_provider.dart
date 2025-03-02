@@ -13,8 +13,8 @@ import 'package:flutter/material.dart';
 
 class WorkspaceProvider extends StateHandler {
   // New instance of flow manager (new file)
-  // FlowmanageProvider fl = FlowmanageProvider();
-  FlowManager flowManager = FlowManager();
+  late final FlowmanageProvider fl;
+  late final FlowManager flowManager;
   // Keep track of list of nodes
 
   Map<String, FlowNode> _nodeList = {};
@@ -26,7 +26,8 @@ class WorkspaceProvider extends StateHandler {
   List<Map<String, FlowNode>> _redoStack = [];
   TextEditingController flowNameController = TextEditingController();
 
-  WorkspaceProvider([super.intialState]) {
+  WorkspaceProvider(this.fl) : super() {
+    flowManager = fl.flowList[fl.newFlowId]!;
     _nodeList = {
       "1": FlowNode(
           id: "1",
@@ -61,11 +62,10 @@ class WorkspaceProvider extends StateHandler {
   double getWidth(String id) => nodeList[id]!.size.width;
   double getHeight(String id) => nodeList[id]!.size.height;
   // Get currently selected node (if any)
-  
 
   FlowNode? get selectedNode => nodeList.values.firstWhereOrNull(
-  (node) => node.isSelected,
-);
+        (node) => node.isSelected,
+      );
 
   // Set currently selected node
   set selectedNode(FlowNode? node) {
@@ -96,6 +96,7 @@ class WorkspaceProvider extends StateHandler {
 
   void cloneNodeList() {
     _nodeListCopy = _nodeList.map((key, node) => MapEntry(key, node.copy()));
+    notifyListeners();
   }
 
   Widget buildNode(String id, NodeType type) {
@@ -214,7 +215,6 @@ class WorkspaceProvider extends StateHandler {
     }
     return false;
   }
-
 
   void _saveStateForUndo() {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(

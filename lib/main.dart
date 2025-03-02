@@ -39,21 +39,30 @@ Future<void> main() async {
           create: (_) => SupabaseService(instance.client)),
       // ChangeNotifierProvider<AuthenticationProvider>(
       //     create: (_) => AuthenticationProvider()),
+      
       ChangeNotifierProxyProvider<SupabaseService, AuthenticationProvider>(
         create: (ctx) => AuthenticationProvider(
             Provider.of<SupabaseService>(ctx, listen: false)),
         update: (context, supabaseService, previousAuth) =>
             previousAuth ?? AuthenticationProvider(supabaseService),
       ),
+
       ChangeNotifierProxyProvider<SupabaseService, FlowmanageProvider>(
           create: (context) => FlowmanageProvider(
               Provider.of<SupabaseService>(context, listen: false)),
           update: (context, supabaseService, previousFlowProvider) =>
               previousFlowProvider ?? FlowmanageProvider(supabaseService)),
+
+      ChangeNotifierProxyProvider<FlowmanageProvider,WorkspaceProvider>(
+        create: (context) => WorkspaceProvider(
+            Provider.of<FlowmanageProvider>(context, listen: false)),
+        update: (context, flowManage, previousWorkspace) =>
+            previousWorkspace ?? WorkspaceProvider(flowManage),
+      ),
+
       ChangeNotifierProvider<DashboardProvider>(
           create: (_) => DashboardProvider()),
-      ChangeNotifierProvider<WorkspaceProvider>(
-          create: (_) => WorkspaceProvider(ProviderState.loaded)),
+
       ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
     ],
     child: MyApp(),
@@ -67,7 +76,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignupPage(),
+      home: LoginPage(),
     );
   }
 }

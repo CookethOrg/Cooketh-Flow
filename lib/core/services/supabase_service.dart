@@ -126,7 +126,7 @@ class SupabaseService extends StateHandler {
         );
 
         final user = authResponse.user;
-        print(fetchCurrentUserName());
+        // print(fetchCurrentUserName());
 
         if (user == null) {
           throw Exception('Login failed: User not found.');

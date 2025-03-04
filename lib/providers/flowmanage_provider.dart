@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/user.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
@@ -8,13 +9,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class FlowmanageProvider extends StateHandler {
-  UserModel user = UserModel();
   late final SupabaseService supabaseService;
   late final SupabaseClient supabase;
-  // String supabaseUrl;
-  // String supabaseApiKey;
   final Map<String, FlowManager> _flowList = {"1": FlowManager(flowId: "1")};
-  String _newFlowId = "";
+  String _newFlowId = "1";
 
   FlowmanageProvider(this.supabaseService) : super() {
     supabase = supabaseService.supabase;
@@ -25,8 +23,10 @@ class FlowmanageProvider extends StateHandler {
   String get newFlowId => _newFlowId;
 
   void recentFlowId(String val) {
-    _newFlowId = val;
-    notifyListeners();
+    if (_newFlowId != val) {
+      _newFlowId = val;
+      notifyListeners();
+    }
   }
 
   Future<void> _initializeUser() async {
@@ -38,13 +38,17 @@ class FlowmanageProvider extends StateHandler {
       }
 
       if (res['flowList'] != null) {
-        // Convert the database flowList to FlowManager objects
         Map<String, dynamic> dbFlowList =
             Map<String, dynamic>.from(res['flowList']);
-        _flowList.clear();
+        // _flowList.clear();
         dbFlowList.forEach((key, value) {
-          var flowManager = FlowManager(flowId: key);
-          // Here you could also restore the nodes and connections if needed
+          // print(key);
+          // print(value);
+          var flowManager = FlowManager(
+              flowId: key,
+              connections: (value["connections"] as List<dynamic>).toSet(),
+              flowName: value["flowName"],
+              nodes: value["nodes"]);
           _flowList[key] = flowManager;
         });
         notifyListeners();
@@ -63,15 +67,16 @@ class FlowmanageProvider extends StateHandler {
         throw Exception('No authenticated user found');
       }
 
-      // Convert FlowManager objects to JSON
       final flowListJson = {};
       _flowList.forEach((key, value) {
         flowListJson[key] = value.exportFlow();
       });
+      print(_flowList);
 
       await supabase
           .from('User')
           .update({'flowList': flowListJson}).eq('id', currentUser.user!.id);
+      notifyListeners();
     } catch (e) {
       print('Error updating flow list: $e');
       rethrow;
@@ -89,10 +94,9 @@ class FlowmanageProvider extends StateHandler {
       final String newFlowId = (_flowList.length + 1).toString();
       FlowManager flowm = FlowManager(flowId: newFlowId);
       _flowList[newFlowId] = flowm;
-      _newFlowId = newFlowId;
-
-      await updateFlowList();
+      recentFlowId(newFlowId);
       notifyListeners();
+      await updateFlowList();
     } catch (e) {
       print('Error adding flow: $e');
       rethrow;

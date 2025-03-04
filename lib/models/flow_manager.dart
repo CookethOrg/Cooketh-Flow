@@ -3,13 +3,16 @@ import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_node.dart';
 
 class FlowManager {
-  String flowName = "New Project";
+  String flowName;
   String flowId;
-  final Map<String, FlowNode> nodes = {};
-  final Set<Connection> connections = {};
+  Map<String, FlowNode> nodes;
+  Set<Connection> connections;
 
   FlowManager({
     this.flowId = "",
+    this.flowName = "New Project",
+    this.nodes = const {},
+    this.connections = const {}
   });
   // Add a new node
   void addNode(FlowNode node) {

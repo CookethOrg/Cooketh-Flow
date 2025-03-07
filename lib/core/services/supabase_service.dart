@@ -165,6 +165,27 @@ class SupabaseService extends StateHandler {
       throw Exception('Error logging out: ${e.toString()}');
     }
   }
+
+Future<void> deleteUserAccount() async {
+  try {
+    final user = supabase.auth.currentUser;
+    if (user == null) {
+      throw Exception('No authenticated user found');
+    }
+    
+    // Delete user data from database first
+    await supabase.from('User').delete().eq('id', user.id);
+    
+    // Then delete the auth account
+    // await supabase.auth.admin.deleteUser(user.id);
+    
+    // Sign out
+    await supabase.auth.signOut();
+  } catch (e) {
+    print("Error deleting account: $e");
+    throw Exception('Error deleting account: ${e.toString()}');
+  }
+}
   
   // Check if the user is already logged in
   Future<bool> checkUserSession() async {

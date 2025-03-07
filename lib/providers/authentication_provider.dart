@@ -99,6 +99,15 @@ class AuthenticationProvider extends StateHandler {
     return res;
   }
 
+  Future<void> deleteUserAccount() async {
+  try {
+    await supabaseService.deleteUserAccount();
+  } catch (e) {
+    print("Error in AuthProvider - deleteUserAccount: $e");
+    rethrow;
+  }
+}
+
   @override
   void dispose() {
     _userNameController.dispose();

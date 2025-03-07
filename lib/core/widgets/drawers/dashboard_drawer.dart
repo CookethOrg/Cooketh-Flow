@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
+import 'package:cookethflow/core/widgets/popup_box.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -64,7 +65,15 @@ class DashboardDrawer extends StatelessWidget {
                                         fontFamily: 'Frederik', fontSize: 20),
                                   ),
                                   IconButton(
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        // Show the ProfileDialog
+                                        showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return const ProfileDialog();
+                                          },
+                                        );
+                                      },
                                       icon: Icon(
                                           Icons.keyboard_arrow_down_outlined)),
                                   SizedBox(

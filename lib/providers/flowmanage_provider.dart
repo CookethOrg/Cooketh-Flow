@@ -14,15 +14,17 @@ class FlowmanageProvider extends StateHandler {
   final Map<String, FlowManager> _flowList = {};
   String _newFlowId = "";
   bool _isLoading = true;
+  bool _isInitialized = false;
 
   FlowmanageProvider(this.supabaseService) : super() {
     supabase = supabaseService.supabase;
-    _initializeUser();
+    // We'll initialize in a separate method that can be called after construction
   }
 
   Map<String, FlowManager> get flowList => _flowList;
   String get newFlowId => _newFlowId;
   bool get isLoading => _isLoading;
+  bool get isInitialized => _isInitialized;
 
   void recentFlowId(String val) {
     if (_newFlowId != val) {
@@ -31,16 +33,24 @@ class FlowmanageProvider extends StateHandler {
     }
   }
 
+  // Call this method after the widget tree is built
+  Future<void> initialize() async {
+    if (!_isInitialized) {
+      await _initializeUser();
+      _isInitialized = true;
+    }
+  }
+
   Future<void> _initializeUser() async {
     _isLoading = true;
-    notifyListeners();
+    // Do not notify listeners here during initialization
     
     try {
       var res = await supabaseService.fetchCurrentUserDetails();
       if (res == null) {
         print('No authenticated user found during initialization');
         _isLoading = false;
-        notifyListeners();
+        notifyListeners(); // Safe to call here as we're outside the build phase
         return;
       }
 
@@ -76,7 +86,7 @@ class FlowmanageProvider extends StateHandler {
       print('Error initializing user: $e');
     } finally {
       _isLoading = false;
-      notifyListeners();
+      notifyListeners(); // Safe to call here as we're outside the build phase
     }
   }
 
@@ -115,12 +125,12 @@ class FlowmanageProvider extends StateHandler {
     }
   }
 
-  Future<void> addFlow() async {
+  Future<String> addFlow() async {
     _isLoading = true;
     notifyListeners();
     
     try {
-      var currentUser = supabaseService.userData;
+      var currentUser = supabase.auth.currentUser;
 
       if (currentUser == null) {
         throw Exception('No authenticated user found');
@@ -153,6 +163,7 @@ class FlowmanageProvider extends StateHandler {
       await updateFlowList();
       
       print("New flow created with ID: $newFlowId");
+      return newFlowId;
     } catch (e) {
       print('Error adding flow: $e');
       rethrow;
@@ -163,6 +174,8 @@ class FlowmanageProvider extends StateHandler {
   }
 
   Future<void> refreshFlowList() async {
+    _isLoading = true;
+    notifyListeners();
     await _initializeUser();
   }
 }

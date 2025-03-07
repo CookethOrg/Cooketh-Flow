@@ -47,7 +47,7 @@ Future<void> main() async {
           update: (context, supabaseService, previousFlowProvider) =>
               previousFlowProvider ?? FlowmanageProvider(supabaseService)),
 
-      ChangeNotifierProxyProvider<FlowmanageProvider,WorkspaceProvider>(
+      ChangeNotifierProxyProvider<FlowmanageProvider, WorkspaceProvider>(
         create: (context) => WorkspaceProvider(
             Provider.of<FlowmanageProvider>(context, listen: false)),
         update: (context, flowManage, previousWorkspace) =>

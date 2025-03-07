@@ -8,11 +8,13 @@ class SupabaseService extends StateHandler {
   // late String _email;
   // late String _password;
   late AuthResponse _userData;
+  bool _userDataSet = false;
 
   // String get userName => _userName;
   // String get email => _email;
   // String get password => _password;
   AuthResponse get userData => _userData;
+  bool get userDataSet => _userDataSet;
 
   // void setUserName(String val) {
   //   _userName = val;
@@ -31,6 +33,7 @@ class SupabaseService extends StateHandler {
 
   void setUserData(AuthResponse user) {
     _userData = user;
+    _userDataSet = true;
     notifyListeners();
   }
 
@@ -40,15 +43,19 @@ class SupabaseService extends StateHandler {
       return null;
     }
 
-    final response = await supabase
-        .from('User')
-        .select('userName')
-        .eq('id', user.id)
-        .single();
+    try {
+      final response = await supabase
+          .from('User')
+          .select('userName')
+          .eq('id', user.id)
+          .single();
 
-    print(response);
-
-    return response;
+      print("Fetched user name: $response");
+      return response;
+    } catch (e) {
+      print("Error fetching user name: $e");
+      return null;
+    }
   }
 
   Future<Map<String, dynamic>?> fetchCurrentUserDetails() async {
@@ -79,32 +86,27 @@ class SupabaseService extends StateHandler {
 
     try {
       if (email.isNotEmpty && userName.isNotEmpty && password.isNotEmpty) {
-        // Start loading with initial estimate
-        // loadingProvider.startLoading();
-
-        // Update progress for auth signup start (30%)
-        // loadingProvider.updateProgress(0.3);
+        // Sign up user
         final AuthResponse authResponse =
-            await supabase.auth.signUp(email: email, password: password);
+            await supabase.auth.signUp(
+              email: email,
+              password: password,
+              emailRedirectTo: null, // Disable email verification redirect
+              data: {'userName': userName} // Store username in metadata
+            );
 
         final user = authResponse.user;
         setUserData(authResponse);
 
         if (user == null) throw Exception("User signup failed.");
 
-        // Update progress for auth signup completion (60%)
-        // loadingProvider.updateProgress(0.6);
-
-        // Insert user data
+        // Insert user data regardless of email confirmation status
         await supabase.from('User').insert({
           'id': user.id,
           'userName': userName,
           'email': email,
           'flowList': {}
         });
-
-        // Update progress for database insertion completion (100%)
-        // loadingProvider.updateProgress(1.0);
 
         res = "Signed Up Successfully";
       }
@@ -117,7 +119,6 @@ class SupabaseService extends StateHandler {
 
   Future<String> loginUser(
       {required String email, required String password}) async {
-    // setLoading(true);
     String res = 'Some error occurred';
 
     try {
@@ -130,7 +131,6 @@ class SupabaseService extends StateHandler {
         );
 
         final user = authResponse.user;
-        // print(fetchCurrentUserName());
 
         if (user == null) {
           throw Exception('Login failed: User not found.');
@@ -153,10 +153,14 @@ class SupabaseService extends StateHandler {
     } catch (e) {
       res = 'Unexpected error: ${e.toString()}';
       print("❌ Unexpected error: ${e.toString()}");
-    } finally {
-      // setLoading(false);
     }
 
     return res;
+  }
+  
+  // Check if the user is already logged in
+  Future<bool> checkUserSession() async {
+    final user = supabase.auth.currentUser;
+    return user != null;
   }
 }

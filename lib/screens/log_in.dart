@@ -1,12 +1,21 @@
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
+import 'package:cookethflow/screens/loading.dart';
 import 'package:cookethflow/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/screens/slider.dart';
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
+  
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  bool _isLoading = false;
+  
   @override
   Widget build(BuildContext context) {
     return Consumer<AuthenticationProvider>(
@@ -99,7 +108,9 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                       SizedBox(height: 24),
-                      Center(
+                      _isLoading 
+                      ? Center(child: CircularProgressIndicator())
+                      : Center(
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(vertical: 16),
@@ -109,25 +120,51 @@ class LoginPage extends StatelessWidget {
                             foregroundColor: Colors.white,
                           ),
                           onPressed: () async {
-                            String res = await provider.loginUser(
-                                email: provider.emailController.text,
-                                password: provider.passwordController.text);
-                            //     var t = await provider.supabase.from('User').select('userName').eq('id', provider.supabase.auth.currentUser?.id ?? '').single();
-                            // print(
-                            //     t['userName'].toString());
-                            if (res != "Logged in successfully") {
+                            // Validate inputs
+                            if (provider.emailController.text.isEmpty || 
+                                provider.passwordController.text.isEmpty) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      padding: EdgeInsets.all(50),
-                                      duration: Duration(seconds: 10),
-                                      content: Text(res)));
+                                SnackBar(content: Text('Email and password are required'))
+                              );
+                              return;
                             }
-                            ScaffoldMessenger.of(context)
-                                .showSnackBar(SnackBar(content: Text(res)));
-                            Navigator.of(context)
-                                .pushReplacement(MaterialPageRoute(
-                              builder: (context) => Dashboard(),
-                            ));
+                            
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            
+                            try {
+                              String res = await provider.loginUser(
+                                  email: provider.emailController.text,
+                                  password: provider.passwordController.text);
+                                  
+                              if (res == "Logged in successfully") {
+                                Navigator.of(context)
+                                    .pushReplacement(MaterialPageRoute(
+                                  builder: (context) => Dashboard(),
+                                ));
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(res),
+                                    duration: Duration(seconds: 5),
+                                  )
+                                );
+                              }
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Error: ${e.toString()}'),
+                                  duration: Duration(seconds: 5),
+                                )
+                              );
+                            } finally {
+                              if (mounted) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                              }
+                            }
                           },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(

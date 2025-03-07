@@ -129,16 +129,25 @@ class SignupPage extends StatelessWidget {
                             provider.setLoading(false);
 
                             if (res == "Signed Up Successfully") {
+                              // Show a success message
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Account created successfully!'),
+                                  duration: Duration(seconds: 3),
+                                ),
+                              );
+                              
+                              // Navigate to dashboard
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
                                     builder: (context) => const Dashboard()),
                               );
                             } else {
+                              // Show error message
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  padding: const EdgeInsets.all(50),
-                                  duration: const Duration(seconds: 10),
-                                  content: Text(res),
+                                  content: Text('Error: $res'),
+                                  duration: Duration(seconds: 5),
                                 ),
                               );
                             }

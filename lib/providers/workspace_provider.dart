@@ -22,13 +22,20 @@ class WorkspaceProvider extends StateHandler {
   List<Map<String, FlowNode>> _redoStack = [];
   TextEditingController flowNameController = TextEditingController();
   bool _isInitialized = false;
+  String _currentFlowId = "";
 
   WorkspaceProvider(this.fl) : super() {
-    _initializeWorkspace(fl.newFlowId);
+    print("WorkspaceProvider initialized with flow ID: ${fl.newFlowId}");
+    if (fl.newFlowId.isNotEmpty) {
+      initializeWorkspace(fl.newFlowId);
+    }
   }
 
   // Initialize the workspace with a specific flow ID
-  void _initializeWorkspace(String flowId) {
+  void initializeWorkspace(String flowId) {
+    _currentFlowId = flowId;
+    print("Initializing workspace for flow ID: $flowId");
+    
     // Get the FlowManager for this flow ID
     if (fl.flowList.containsKey(flowId)) {
       flowManager = fl.flowList[flowId]!;
@@ -60,6 +67,7 @@ class WorkspaceProvider extends StateHandler {
   }
 
   // Getters
+  String get currentFlowId => _currentFlowId;
   bool get isHovered => _isHovered;
   Map<String, FlowNode> get nodeList => _nodeList;
   bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);

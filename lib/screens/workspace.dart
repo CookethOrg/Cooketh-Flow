@@ -7,18 +7,58 @@ import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Workspace extends StatelessWidget {
+class Workspace extends StatefulWidget {
   final String flowId;
-  const Workspace({super.key, required this.flowId});
+  const Workspace({Key? key, required this.flowId}) : super(key: key);
+
+  @override
+  State<Workspace> createState() => _WorkspaceState();
+}
+
+class _WorkspaceState extends State<Workspace> {
+  bool _isInitialized = false;
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initializeWorkspace();
+    });
+  }
+  
+  void _initializeWorkspace() {
+    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    
+    // Check if we need to initialize or if the workspace is already set to this flow
+    if (workspaceProvider.currentFlowId != widget.flowId) {
+      workspaceProvider.initializeWorkspace(widget.flowId);
+    }
+    
+    setState(() {
+      _isInitialized = true;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(
       builder: (context, workProvider, child) {
+        if (!_isInitialized) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+        
         return Scaffold(
           appBar: AppBar(
             title: Text(workProvider.flowManager.flowName),
             centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
           ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           body: GestureDetector(
@@ -76,7 +116,7 @@ class Workspace extends StatelessWidget {
                     }).toList(), // Ensure the list is a valid `List<Widget>`
                   ],
                 ),
-                FloatingDrawer(flowId: flowId), // Left-side floating drawer
+                FloatingDrawer(flowId: widget.flowId), // Left-side floating drawer
                 Toolbar(
                   onDelete: workProvider.removeSelectedNodes,
                   onUndo: workProvider.undo,
@@ -85,6 +125,11 @@ class Workspace extends StatelessWidget {
                 // if (workProvider.displayToolbox()) CustomToolbar(),
               ],
             ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () => workProvider.addNode(),
+            child: const Icon(Icons.add),
+            tooltip: 'Add Node',
           ),
         );
       },

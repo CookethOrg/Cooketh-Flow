@@ -14,7 +14,7 @@ class AuthenticationProvider extends StateHandler {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   late final SupabaseService supabaseService;
-  
+
   AuthenticationProvider(this.supabaseService) : super();
 
   bool get obscurePassword => _obscurePassword;
@@ -46,7 +46,7 @@ class AuthenticationProvider extends StateHandler {
   Future<Map<String, dynamic>?> fetchCurrentUserDetails() async {
     return await supabaseService.fetchCurrentUserDetails();
   }
-  
+
   // Check if user is already authenticated
   Future<bool> isAuthenticated() async {
     return await supabaseService.checkUserSession();
@@ -64,13 +64,10 @@ class AuthenticationProvider extends StateHandler {
         // Start loading with initial estimate
         loadingProvider.startLoading();
         loadingProvider.updateProgress(0.3);
-        
+
         res = await supabaseService.createNewUser(
-          userName: userName, 
-          email: email, 
-          password: password
-        );
-        
+            userName: userName, email: email, password: password);
+
         loadingProvider.updateProgress(0.6);
         loadingProvider.updateProgress(1.0);
       }
@@ -81,19 +78,14 @@ class AuthenticationProvider extends StateHandler {
     return res;
   }
 
-  Future<String> loginUser({
-    required String email, 
-    required String password
-  }) async {
+  Future<String> loginUser(
+      {required String email, required String password}) async {
     setLoading(true);
     String res = 'Some error occurred';
 
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
-        res = await supabaseService.loginUser(
-          email: email, 
-          password: password
-        );
+        res = await supabaseService.loginUser(email: email, password: password);
       } else {
         res = 'Email and Password cannot be empty';
       }
@@ -105,5 +97,13 @@ class AuthenticationProvider extends StateHandler {
     }
 
     return res;
+  }
+
+  @override
+  void dispose() {
+    _userNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
   }
 }

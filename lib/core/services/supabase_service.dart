@@ -157,6 +157,14 @@ class SupabaseService extends StateHandler {
 
     return res;
   }
+
+  Future<void> logout() async {
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      throw Exception('Error logging out: ${e.toString()}');
+    }
+  }
   
   // Check if the user is already logged in
   Future<bool> checkUserSession() async {

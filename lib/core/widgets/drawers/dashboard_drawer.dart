@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
+import 'package:cookethflow/screens/log_in.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,7 @@ class DashboardDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<SupabaseService>(
-      builder: (context,auth, child) {
+      builder: (context, auth, child) {
         return FutureBuilder(
             future: auth.fetchCurrentUserName(),
             builder: (context, snapshot) {
@@ -160,6 +161,41 @@ class DashboardDrawer extends StatelessWidget {
                                       // fontWeight: FontWeight.w100,
                                       color: Colors.black),
                                 )),
+
+                            // SizedBox(height: 40,),
+                            Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 20),
+                              child: ElevatedButton.icon(
+                                  onPressed: () async {
+                                    await auth.logout();
+                                    Navigator.of(context)
+                                        .pushReplacement(MaterialPageRoute(
+                                      builder: (context) {
+                                        return LoginPage();
+                                      },
+                                    ));
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.black,
+                                      fixedSize: Size(120, 50),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(12))),
+                                  icon: Icon(
+                                    Icons.logout,
+                                    color: Colors.white,
+                                  ),
+                                  label: Text(
+                                    'Log Out',
+                                    style: TextStyle(
+                                        fontFamily: 'Frederik',
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                        color: Colors.white),
+                                  )),
+                            )
                           ],
                         ),
                       ),

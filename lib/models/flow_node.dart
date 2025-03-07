@@ -18,25 +18,29 @@ class FlowNode {
     required this.type,
     required this.position,
     this.size = const Size(150, 75)
-  })  : connections = {
-          for (var point in ConnectionPoint.values) point: <Connection>{}
-        },
-        data = TextEditingController(text: 'Node $id');
+  }) : connections = {
+        for (var point in ConnectionPoint.values) point: <Connection>{}
+      },
+      data = TextEditingController(text: 'Node $id');
 
   // Check if a connection point is available
   bool isConnectionPointAvailable(ConnectionPoint point) {
     // You can implement custom logic here for maximum connections per point
     return connections[point]!.isEmpty; // Example: one connection per point
   }
-    FlowNode copy() {
-    return FlowNode(
+  
+  FlowNode copy() {
+    FlowNode newNode = FlowNode(
       id: id,
       type: type,
-      position: position,
-      size: size,
+      position: Offset(position.dx, position.dy),
+      size: Size(size.width, size.height),
       isSelected: isSelected,
     );
+    newNode.data.text = data.text;
+    return newNode;
   }
+  
   Rect get bounds {
     // Add padding to account for the resize handles
     const padding = 20.0;
@@ -65,14 +69,64 @@ class FlowNode {
   }
 
   // For serialization
-  Map<String, dynamic> toJson() => {
-        "id": id,
-        "data": data,
-        "type": type,
-        "position": position,
-        "size" : size,
-        "connections": connections.map((point, conns) => MapEntry(
-            point.index.toString(),
-            conns.map((conn) => conn.toJson()).toList()))
-      };
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> connectionsJson = {};
+    
+    connections.forEach((point, conns) {
+      connectionsJson[point.index.toString()] = 
+          conns.map((conn) => conn.toJson()).toList();
+    });
+    
+    return {
+      "id": id,
+      "text": data.text,
+      "type": type.index,
+      "position": {
+        "dx": position.dx, 
+        "dy": position.dy
+      },
+      "size": {
+        "width": size.width, 
+        "height": size.height
+      },
+      "connections": connectionsJson
+    };
+  }
+  
+  // For deserialization
+  factory FlowNode.fromJson(Map<String, dynamic> json) {
+    FlowNode node = FlowNode(
+      id: json["id"],
+      type: NodeType.values[json["type"]],
+      position: Offset(
+        json["position"]["dx"].toDouble(), 
+        json["position"]["dy"].toDouble()
+      ),
+      size: Size(
+        json["size"]["width"].toDouble(), 
+        json["size"]["height"].toDouble()
+      ),
+    );
+    
+    // Set text content
+    if (json["text"] != null) {
+      node.data.text = json["text"];
+    }
+    
+    // Add connections if available
+    if (json["connections"] != null) {
+      Map<String, dynamic> connsJson = json["connections"];
+      connsJson.forEach((pointKey, connsData) {
+        ConnectionPoint point = ConnectionPoint.values[int.parse(pointKey)];
+        List<dynamic> connsList = connsData as List<dynamic>;
+        
+        for (var connData in connsList) {
+          Connection conn = Connection.fromJson(connData);
+          node.connections[point]!.add(conn);
+        }
+      });
+    }
+    
+    return node;
+  }
 }

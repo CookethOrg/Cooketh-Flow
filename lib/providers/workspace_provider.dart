@@ -7,62 +7,68 @@ import 'package:cookethflow/core/widgets/nodes/parallelogram_node.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
-// import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
 
 class WorkspaceProvider extends StateHandler {
-  // New instance of flow manager (new file)
+  // Reference to the FlowmanageProvider
   late final FlowmanageProvider fl;
-  late final FlowManager flowManager;
-  // Keep track of list of nodes
-
+  // Reference to the current FlowManager
+  late FlowManager flowManager;
   Map<String, FlowNode> _nodeList = {};
-  Map<String, FlowNode> _nodeListCopy = {};
-  List<Connection> connections = [];
   ConnectionPointSelection? selectedConnection;
   bool _isHovered = false;
   final List<Map<String, FlowNode>> _undoStack = [];
   List<Map<String, FlowNode>> _redoStack = [];
   TextEditingController flowNameController = TextEditingController();
+  bool _isInitialized = false;
 
   WorkspaceProvider(this.fl) : super() {
-    flowManager = fl.flowList[fl.newFlowId]!;
-    _nodeList = {
-      "1": FlowNode(
-          id: "1",
-          // data: t1,
-          type: NodeType.rectangular,
-          position: Offset(
-            Random().nextDouble() * 1500, // Random X position
-            Random().nextDouble() * 800, // Random Y position
-          )),
-      "2": FlowNode(
-          id: "2",
-          // data: t2,
-          type: NodeType.rectangular,
-          position: Offset(
-            Random().nextDouble() * 1500, // Random X position
-            Random().nextDouble() * 800, // Random Y position
-          ))
-    };
-    // flowManager.flowId = fl.newFlowId;
-    flowNameController.text = flowManager.flowName;
-    print(flowManager.nodes);
-    print(flowManager.connections);
+    _initializeWorkspace(fl.newFlowId);
+  }
 
-    updateList();
+  // Initialize the workspace with a specific flow ID
+  void _initializeWorkspace(String flowId) {
+    // Get the FlowManager for this flow ID
+    if (fl.flowList.containsKey(flowId)) {
+      flowManager = fl.flowList[flowId]!;
+      
+      // Copy nodes from FlowManager to local _nodeList
+      _nodeList = {};
+      flowManager.nodes.forEach((id, node) {
+        _nodeList[id] = node.copy();
+      });
+      
+      // Set the flow name in the controller
+      flowNameController.text = flowManager.flowName;
+      
+      print("Initialized workspace for flow ID: $flowId");
+      print("Flow has ${_nodeList.length} nodes and ${flowManager.connections.length} connections");
+      
+      _isInitialized = true;
+      notifyListeners();
+    } else {
+      print("Error: Flow ID $flowId not found in flow list");
+      // Create an empty flow if not found
+      flowManager = FlowManager(flowId: flowId);
+      _nodeList = {};
+      flowNameController.text = "New Project";
+      
+      _isInitialized = false;
+      notifyListeners();
+    }
   }
 
   // Getters
   bool get isHovered => _isHovered;
   Map<String, FlowNode> get nodeList => _nodeList;
-  bool get hasSelectedNode => nodeList.values.any(
-      (node) => node.isSelected); // Check if any node is currently selected
+  bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);
   double getWidth(String id) => nodeList[id]!.size.width;
   double getHeight(String id) => nodeList[id]!.size.height;
-  // Get currently selected node (if any)
+  List<Connection> get connections => flowManager.connections.toList();
+  bool get isInitialized => _isInitialized;
 
+  // Get currently selected node (if any)
   FlowNode? get selectedNode => nodeList.values.firstWhereOrNull(
         (node) => node.isSelected,
       );
@@ -82,7 +88,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   // Functions ->
-
   void setHover(bool val) {
     _isHovered = val;
     notifyListeners();
@@ -91,11 +96,7 @@ class WorkspaceProvider extends StateHandler {
   void changeProjectName(String val) {
     flowNameController.text = val;
     flowManager.flowName = val;
-    notifyListeners();
-  }
-
-  void cloneNodeList() {
-    _nodeListCopy = _nodeList.map((key, node) => MapEntry(key, node.copy()));
+    updateFlowManager();
     notifyListeners();
   }
 
@@ -178,7 +179,7 @@ class WorkspaceProvider extends StateHandler {
 
         if (connected) {
           print("Connection created between nodes");
-          updateList();
+          updateFlowManager();
         } else {
           print("Connection failed - points might be already in use");
         }
@@ -195,6 +196,7 @@ class WorkspaceProvider extends StateHandler {
       double height = newSize.height.clamp(50.0, double.infinity);
 
       nodeList[id]!.size = Size(width, height);
+      updateFlowManager();
       notifyListeners();
     }
   }
@@ -222,36 +224,65 @@ class WorkspaceProvider extends StateHandler {
     )));
   }
 
-  void updateList() {
-    flowManager.nodes.addAll(_nodeList);
-    connections = flowManager.connections.toList();
-    // flowManager.connections.addAll(connections);
-    // print("Updated Connections: ${flowManager.connections}");
-    print(flowManager.exportFlow());
-    notifyListeners();
+  // Sync local _nodeList to flowManager
+  void updateFlowManager() {
+    // Update nodes in the FlowManager
+    flowManager.nodes.clear();
+    _nodeList.forEach((id, node) {
+      flowManager.nodes[id] = node.copy();
+    });
+    
+    // Save to database
+    saveChanges();
   }
 
-  // new node addition
-  void addNode({
-    NodeType type = NodeType.parallelogram,
-  }) {
+  // Save changes to database via FlowmanageProvider
+  Future<void> saveChanges() async {
+    try {
+      await fl.updateFlowList();
+      print("Workspace changes saved to database");
+    } catch (e) {
+      print("Error saving workspace changes: $e");
+    }
+  }
+
+  // Add a new node to the workspace
+  void addNode({NodeType type = NodeType.rectangular}) {
     _saveStateForUndo();
+    
+    // Generate a new unique ID
+    String newId = (_nodeList.length + 1).toString();
+    while (_nodeList.containsKey(newId)) {
+      newId = (int.parse(newId) + 1).toString();
+    }
+    
+    // Create a new node
     FlowNode node = FlowNode(
-        id: (_nodeList.length + 1).toString(),
-        type: type,
-        position: Offset(
-          Random().nextDouble() * 1500,
-          Random().nextDouble() * 800,
-        ));
-    flowManager.addNode(node);
-    _nodeList.addAll({node.id: node});
+      id: newId,
+      type: type,
+      position: Offset(
+        Random().nextDouble() * 300 + 100, // More reasonable positioning
+        Random().nextDouble() * 200 + 100,
+      ),
+    );
+    
+    // Add to local node list
+    _nodeList[newId] = node;
+    
+    // Update the FlowManager and save changes
+    updateFlowManager();
+    
     notifyListeners();
   }
 
   void dragNode(String id, Offset off) {
     _saveStateForUndo();
-    flowManager.nodes[id]!.position = off;
-    notifyListeners();
+    
+    if (_nodeList.containsKey(id)) {
+      _nodeList[id]!.position = off;
+      updateFlowManager();
+      notifyListeners();
+    }
   }
 
   void removeSelectedNodes() {
@@ -271,22 +302,19 @@ class WorkspaceProvider extends StateHandler {
 
     _saveStateForUndo(); // Save state before removal
 
-    flowManager.removeNode(nodeId); // Remove node from flow
-    _nodeList.remove(nodeId); // Remove from local list
+    // Remove the node from the local node list
+    _nodeList.remove(nodeId);
+    
+    // Remove the node from the FlowManager
+    flowManager.removeNode(nodeId);
 
-    // Remove any connections linked to this node
-    connections.removeWhere((connection) =>
-        connection.sourceNodeId == nodeId || connection.targetNodeId == nodeId);
-
-    // Resync FlowManager nodes and connections
-    flowManager.nodes.clear();
-    flowManager.nodes.addAll(_nodeList);
-    flowManager.connections.clear();
-    flowManager.connections.addAll(connections);
-
-    selectedNode = null; // Clear selection after deletion
-
-    notifyListeners(); // Notify UI update
+    // Clear selection after deletion
+    selectedNode = null;
+    
+    // Update the database
+    saveChanges();
+    
+    notifyListeners();
 
     print("Node removed successfully.");
   }
@@ -298,6 +326,7 @@ class WorkspaceProvider extends StateHandler {
       ))); // Save current state before undoing
 
       _nodeList = _undoStack.removeLast();
+      updateFlowManager();
       notifyListeners();
     }
   }
@@ -309,6 +338,7 @@ class WorkspaceProvider extends StateHandler {
       )));
 
       _nodeList = _redoStack.removeLast();
+      updateFlowManager();
       notifyListeners();
     }
   }

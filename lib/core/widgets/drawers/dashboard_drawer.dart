@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ class DashboardDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<DashboardProvider, AuthenticationProvider>(
-      builder: (context, provider, auth, child) {
+    return Consumer<SupabaseService>(
+      builder: (context,auth, child) {
         return FutureBuilder(
             future: auth.fetchCurrentUserName(),
             builder: (context, snapshot) {
@@ -57,7 +58,7 @@ class DashboardDrawer extends StatelessWidget {
                                     width: 10,
                                   ),
                                   Text(
-                                    user!['userName'],
+                                    user?['userName'] ?? "UserName",
                                     style: TextStyle(
                                         fontFamily: 'Frederik', fontSize: 20),
                                   ),

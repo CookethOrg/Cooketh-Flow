@@ -1,4 +1,3 @@
-// Class to manage the entire flow
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_node.dart';
 
@@ -11,9 +10,12 @@ class FlowManager {
   FlowManager({
     this.flowId = "",
     this.flowName = "New Project",
-    this.nodes = const {},
-    this.connections = const {}
-  });
+    Map<String, FlowNode>? nodes,
+    Set<Connection>? connections
+  }) : 
+      nodes = nodes ?? {},
+      connections = connections ?? {};
+      
   // Add a new node
   void addNode(FlowNode node) {
     nodes[node.id] = node;
@@ -59,10 +61,43 @@ class FlowManager {
   }
 
   // Export the flow to JSON
-  Map<String, dynamic> exportFlow() => {
-        'flowName': flowName,
-        'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
-        'connections': connections.map((conn) => conn.toJson()).toList(),
-        // 'connections': connections.map((conn,data)=> MapEntry(conn, data))
-      };
+  Map<String, dynamic> exportFlow() {
+    return {
+      'flowName': flowName,
+      'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
+      'connections': connections.map((conn) => conn.toJson()).toList(),
+    };
+  }
+  
+  // Create a FlowManager from JSON data
+  factory FlowManager.fromJson(Map<String, dynamic> json, String flowId) {
+    // Extract flow name
+    String flowName = json['flowName'] ?? "New Project";
+    
+    // Create empty collections
+    Map<String, FlowNode> nodes = {};
+    Set<Connection> connections = {};
+    
+    // Parse nodes
+    if (json['nodes'] != null) {
+      (json['nodes'] as Map<String, dynamic>).forEach((id, nodeData) {
+        nodes[id] = FlowNode.fromJson(nodeData);
+      });
+    }
+    
+    // Parse connections
+    if (json['connections'] != null) {
+      List<dynamic> connsJson = json['connections'];
+      for (var connJson in connsJson) {
+        connections.add(Connection.fromJson(connJson));
+      }
+    }
+    
+    return FlowManager(
+      flowId: flowId,
+      flowName: flowName,
+      nodes: nodes,
+      connections: connections
+    );
+  }
 }

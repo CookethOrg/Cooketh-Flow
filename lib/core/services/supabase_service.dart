@@ -58,12 +58,16 @@ class SupabaseService extends StateHandler {
       return null;
     }
 
-    final response =
-        await supabase.from('User').select().eq('id', user.id).single();
+    try {
+      final response =
+          await supabase.from('User').select().eq('id', user.id).single();
 
-    // print(response);
-
-    return response;
+      print("Fetched user details: $response");
+      return response;
+    } catch (e) {
+      print("Error fetching user details: $e");
+      return null;
+    }
   }
 
   Future<String> createNewUser({

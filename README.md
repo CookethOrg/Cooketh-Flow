@@ -9,7 +9,7 @@
 </div>
 <div align="center">
   <a href="https://github.com/CookethOrg/Cooketh-Flow">
-  <img src="assets/Frame 265.png" alt="Cooketh Flow logo" height="300" />
+  <img src="assets/Frame 271.png" alt="Cooketh Flow logo" height="300" />
      </a>
 </div>
 

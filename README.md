@@ -12,12 +12,16 @@
   <img src="assets/Frame 271.png" alt="Cooketh Flow logo" height="300" />
      </a>
 </div>
-
 <h2 align="center">Cooketh Flow</h2>
 <p align="center"> Design, collaborate, and streamline your workflows effortlessly. </p>
 <br />
-<br />
+<!-- <br /> -->
 Cooketh Flow is an open-source, powerful visual thinking tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow provides an intuitive drag-and-drop interface that makes building and refining workflows effortless
+<!-- <div align="center">
+  <a href="https://github.com/CookethOrg/Cooketh-Flow">
+  <img src="assets/ss.png" alt="Cooketh Flow logo" height="300" />
+     </a>
+</div> -->
 
 ---
 

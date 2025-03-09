@@ -17,7 +17,7 @@
 <p align="center"> Design, collaborate, and streamline your workflows effortlessly. </p>
 <br />
 <br />
-Cooketh Flow is a powerful workflow-building tool designed for teams and individuals to create, visualize, and optimize processes. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow makes it easy to build and refine workflows with an intuitive interface.
+Cooketh Flow is an open-source, powerful visual thinking tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow provides an intuitive drag-and-drop interface that makes building and refining workflows effortless
 
 ---
 

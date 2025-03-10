@@ -41,6 +41,122 @@ class _WorkspaceState extends State<Workspace> {
     });
   }
 
+  void _showExportOptions(BuildContext context, WorkspaceProvider workProvider) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            'Export Workspace',
+            style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildExportOption(
+                context: context,
+                icon: PhosphorIconsRegular.fileCode,
+                label: 'Export as JSON',
+                onTap: () async {
+                  Navigator.pop(context);
+                  try {
+                    await workProvider.exportWorkspace(exportType: ExportType.json);
+                    _showSuccessSnackbar('JSON file exported successfully!');
+                  } catch (e) {
+                    _showErrorSnackbar('Error exporting JSON: ${e.toString()}');
+                  }
+                },
+              ),
+              SizedBox(height: 8),
+              _buildExportOption(
+                context: context,
+                icon: PhosphorIconsRegular.fileImage,
+                label: 'Export as PNG',
+                onTap: () async {
+                  Navigator.pop(context);
+                  try {
+                    await workProvider.exportWorkspace(exportType: ExportType.png);
+                    _showSuccessSnackbar('PNG file exported successfully!');
+                  } catch (e) {
+                    _showErrorSnackbar('Error exporting PNG: ${e.toString()}');
+                  }
+                },
+              ),
+              SizedBox(height: 8),
+              _buildExportOption(
+                context: context,
+                icon: PhosphorIconsRegular.fileSvg,
+                label: 'Export as SVG',
+                onTap: () async {
+                  Navigator.pop(context);
+                  try {
+                    await workProvider.exportWorkspace(exportType: ExportType.svg);
+                    _showSuccessSnackbar('SVG file exported successfully!');
+                  } catch (e) {
+                    _showErrorSnackbar('Error exporting SVG: ${e.toString()}');
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildExportOption({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 24),
+            SizedBox(width: 12),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Frederik',
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _showErrorSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 5),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(
@@ -55,43 +171,33 @@ class _WorkspaceState extends State<Workspace> {
 
         return Scaffold(
           appBar: AppBar(
-            // backgroundColor: ,
             title: Text(workProvider.flowManager.flowName),
             actions: [
               ElevatedButton.icon(
-                  onPressed: () async {
-                    try {
-                      await workProvider.exportWorkspace();
-
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Exported Workspace Successfully!! Check Downloads directory')));
-                    } catch (e) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text(
-                              'Error exporting workspace: ${e.toString()}'), backgroundColor: Colors.red,));
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                      elevation: 0,
-                      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                      side: BorderSide(color: Colors.black, width: 0.5),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10))),
-                  icon: PhosphorIcon(
-                    PhosphorIcons.export(),
-                    color: Colors.black,
+                onPressed: () => _showExportOptions(context, workProvider),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  side: BorderSide(color: Colors.black, width: 0.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  label: Text(
-                    'Export Workspace',
-                    style: TextStyle(
-                        fontFamily: 'Frederik',
-                        fontSize: 15,
-                        color: Colors.black,
-                        fontWeight: FontWeight.w300),
-                  )),
-              SizedBox(
-                width: 30,
-              )
+                ),
+                icon: PhosphorIcon(
+                  PhosphorIcons.export(),
+                  color: Colors.black,
+                ),
+                label: Text(
+                  'Export Workspace',
+                  style: TextStyle(
+                    fontFamily: 'Frederik',
+                    fontSize: 15,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
+              SizedBox(width: 30),
             ],
             centerTitle: true,
             leading: IconButton(
@@ -100,82 +206,78 @@ class _WorkspaceState extends State<Workspace> {
             ),
           ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          body: GestureDetector(
-            onTapDown: (details) {
-              bool hitNode = false;
-              for (var node in workProvider.nodeList.values) {
-                if (node.bounds.contains(details.globalPosition)) {
-                  hitNode = true;
-                  break;
-                }
-              }
-              if (!hitNode) {
+          body: RepaintBoundary(
+            key: workProvider.repaintBoundaryKey,
+            child: GestureDetector(
+              onTapDown: (details) {
+                bool hitNode = false;
                 for (var node in workProvider.nodeList.values) {
-                  if (node.isSelected) {
-                    workProvider.changeSelected(node.id);
+                  if (node.bounds.contains(details.globalPosition)) {
+                    hitNode = true;
+                    break;
                   }
                 }
-              }
-            },
-            child: Stack(
-              children: [
-                // Lines & Nodes
-                Stack(
-                  children: [
-                    for (var i = 0; i < workProvider.connections.length; i++)
-                      CustomPaint(
-                        size: Size.infinite,
-                        painter: LinePainter(
-                          start: workProvider
-                              .nodeList[
-                                  workProvider.connections[i].sourceNodeId]!
-                              .position,
-                          end: workProvider
-                              .nodeList[
-                                  workProvider.connections[i].targetNodeId]!
-                              .position,
-                          sourceNodeId:
-                              workProvider.connections[i].sourceNodeId,
-                          startPoint: workProvider.connections[i].sourcePoint,
-                          targetNodeId:
-                              workProvider.connections[i].targetNodeId,
-                          endPoint: workProvider.connections[i].targetPoint,
+                if (!hitNode) {
+                  for (var node in workProvider.nodeList.values) {
+                    if (node.isSelected) {
+                      workProvider.changeSelected(node.id);
+                    }
+                  }
+                }
+              },
+              child: Stack(
+                children: [
+                  // Lines & Nodes
+                  Stack(
+                    children: [
+                      for (var i = 0; i < workProvider.connections.length; i++)
+                        CustomPaint(
+                          size: Size.infinite,
+                          painter: LinePainter(
+                            start: workProvider
+                                .nodeList[
+                                    workProvider.connections[i].sourceNodeId]!
+                                .position,
+                            end: workProvider
+                                .nodeList[
+                                    workProvider.connections[i].targetNodeId]!
+                                .position,
+                            sourceNodeId:
+                                workProvider.connections[i].sourceNodeId,
+                            startPoint: workProvider.connections[i].sourcePoint,
+                            targetNodeId:
+                                workProvider.connections[i].targetNodeId,
+                            endPoint: workProvider.connections[i].targetPoint,
+                          ),
                         ),
-                      ),
-                    ...workProvider.nodeList.entries.map((entry) {
-                      var str = entry.key;
-                      var node = entry.value;
-                      return Positioned(
-                        left: node.position.dx,
-                        top: node.position.dy,
-                        child: Node(
-                          id: str,
-                          type: node.type,
-                          onResize: (Size newSize) =>
-                              workProvider.onResize(str, newSize),
-                          onDrag: (offset) =>
-                              workProvider.dragNode(str, offset),
-                          position: node.position,
-                        ),
-                      );
-                    }), // Ensure the list is a valid `List<Widget>`
-                  ],
-                ),
-                FloatingDrawer(
-                    flowId: widget.flowId), // Left-side floating drawer
-                Toolbar(
-                  onDelete: workProvider.removeSelectedNodes,
-                  onUndo: workProvider.undo,
-                  onRedo: workProvider.redo,
-                ),
-                // if (workProvider.displayToolbox()) CustomToolbar(),
-              ],
+                      ...workProvider.nodeList.entries.map((entry) {
+                        var str = entry.key;
+                        var node = entry.value;
+                        return Positioned(
+                          left: node.position.dx,
+                          top: node.position.dy,
+                          child: Node(
+                            id: str,
+                            type: node.type,
+                            onResize: (Size newSize) =>
+                                workProvider.onResize(str, newSize),
+                            onDrag: (offset) =>
+                                workProvider.dragNode(str, offset),
+                            position: node.position,
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
+                  FloatingDrawer(flowId: widget.flowId),
+                  Toolbar(
+                    onDelete: workProvider.removeSelectedNodes,
+                    onUndo: workProvider.undo,
+                    onRedo: workProvider.redo,
+                  ),
+                ],
+              ),
             ),
-          ),
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => workProvider.addNode(),
-            tooltip: 'Add Node',
-            child: const Icon(Icons.add),
           ),
         );
       },

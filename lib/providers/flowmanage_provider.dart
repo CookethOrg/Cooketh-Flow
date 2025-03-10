@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
+import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/models/connection.dart';
@@ -178,6 +180,56 @@ class FlowmanageProvider extends StateHandler {
     notifyListeners();
     await _initializeUser();
   }
+
+Future<String> importWorkspace(Uint8List fileData, String fileName) async {
+  _isLoading = true;
+  notifyListeners();
+  
+  try {
+    var currentUser = supabase.auth.currentUser;
+    if (currentUser == null) {
+      throw Exception('No authenticated user found');
+    }
+    
+    // Parse the JSON file
+    Map<String, dynamic>? jsonData = await FileServices().importJsonFile(fileData);
+    if (jsonData == null) {
+      throw Exception("Failed to parse JSON file");
+    }
+    
+    // Generate a unique ID for the new flow
+    final String newFlowId = DateTime.now().millisecondsSinceEpoch.toString();
+    
+    // Clean the filename to use as the flow name
+    String flowName = fileName.replaceAll(RegExp(r'\.json$'), '');
+    // Further clean the name if needed
+    flowName = flowName.replaceAll(RegExp(r'_\d+$'), ''); // Remove timestamp if present
+    
+    // Create a new flow with the imported data and cleaned name
+    FlowManager flowManager = FlowManager.fromJson(jsonData, newFlowId);
+    flowManager.flowName = flowName;
+    
+    // Add the flow to the local list
+    _flowList[newFlowId] = flowManager;
+    
+    // Set this as the current flow
+    recentFlowId(newFlowId);
+    
+    // Update the database with the new flow
+    await updateFlowList();
+    
+    _isLoading = false;
+    notifyListeners();
+    
+    print("Imported flow created with ID: $newFlowId and name: $flowName");
+    return newFlowId;
+  } catch (e) {
+    _isLoading = false;
+    notifyListeners();
+    print('Error importing flow: $e');
+    rethrow;
+  }
+}
 }
 
 class MyHttpOverrides extends HttpOverrides {

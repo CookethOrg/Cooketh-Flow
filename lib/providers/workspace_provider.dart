@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:math';
+import 'dart:typed_data';
+// import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
@@ -11,6 +13,11 @@ import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'dart:ui' as ui;
+
+// Add this enum to the file
+enum ExportType { json, png, svg }
 
 class WorkspaceProvider extends StateHandler {
   // Reference to the FlowmanageProvider
@@ -21,10 +28,16 @@ class WorkspaceProvider extends StateHandler {
   ConnectionPointSelection? selectedConnection;
   bool _isHovered = false;
   final List<Map<String, FlowNode>> _undoStack = [];
-  List<Map<String, FlowNode>> _redoStack = [];
+  final List<Map<String, FlowNode>> _redoStack = [];
   TextEditingController flowNameController = TextEditingController();
   bool _isInitialized = false;
   String _currentFlowId = "";
+
+  // Add this GlobalKey
+  final GlobalKey _repaintBoundaryKey = GlobalKey();
+
+// Getter for repaint boundary key
+  GlobalKey get repaintBoundaryKey => _repaintBoundaryKey;
 
   WorkspaceProvider(this.fl) : super() {
     print("WorkspaceProvider initialized with flow ID: ${fl.newFlowId}");
@@ -365,7 +378,7 @@ class WorkspaceProvider extends StateHandler {
 
   String getTruncatedTitle() {
     String text = flowNameController.text;
-    return text.length > 12 ? text.substring(0, 12) + '...' : text;
+    return text.length > 12 ? '${text.substring(0, 12)}...' : text;
   }
 
   void onSubmit() {
@@ -382,28 +395,177 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  Future<void> exportWorkspace() async {
+  Future<void> exportWorkspace({required ExportType exportType}) async {
     try {
-      final Map<String, dynamic> workspaceData = flowManager.exportFlow();
-
-      final String jsonString =
-          JsonEncoder.withIndent('  ').convert(workspaceData);
-
       String safeName = flowManager.flowName
           .replaceAll(RegExp(r'[^\w\s-]'), '')
           .replaceAll(RegExp(r'\s+'), '_');
 
       if (safeName.isEmpty) safeName = "workspace";
-      String fileName =
-          "${safeName}_${DateTime.now().millisecondsSinceEpoch}";
+      String fileName = "${safeName}_${DateTime.now().millisecondsSinceEpoch}";
 
-      String res = await FileServices()
-          .exportFile(fileName: fileName, jsonString: jsonString);
+      String res = "";
 
-      print(res + fileName);
+      switch (exportType) {
+        case ExportType.json:
+          final Map<String, dynamic> workspaceData = flowManager.exportFlow();
+          final String jsonString =
+              JsonEncoder.withIndent('  ').convert(workspaceData);
+          res = await FileServices()
+              .exportFile(fileName: fileName, jsonString: jsonString);
+          break;
+
+        case ExportType.png:
+          final boundary = _repaintBoundaryKey.currentContext!
+              .findRenderObject() as RenderRepaintBoundary;
+          final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+          final ByteData? byteData =
+              await image.toByteData(format: ui.ImageByteFormat.png);
+
+          if (byteData != null) {
+            final Uint8List pngBytes = byteData.buffer.asUint8List();
+            res = await FileServices()
+                .exportPNG(fileName: fileName, pngBytes: pngBytes);
+          } else {
+            throw Exception("Failed to generate PNG data");
+          }
+          break;
+
+        case ExportType.svg:
+          final svgString = _generateSVG();
+          res = await FileServices()
+              .exportSVG(fileName: fileName, svgString: svgString);
+          break;
+      }
+
+      print("$res $fileName exported as ${exportType.toString()}");
     } catch (e) {
       print("Error exporting workspace: $e");
       rethrow;
+    }
+  }
+
+// SVG generation method
+  String _generateSVG() {
+    // Canvas dimensions
+    int width = 1000;
+    int height = 800;
+
+    // SVG Header
+    String svg = '''
+  <svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height">
+  <rect width="$width" height="$height" fill="white"/>
+  ''';
+
+    // Add nodes to SVG
+    for (var entry in nodeList.entries) {
+      final node = entry.value;
+      final x = node.position.dx;
+      final y = node.position.dy;
+      final w = node.size.width;
+      final h = node.size.height;
+      final text = node.data.text;
+
+      String nodeShape;
+      String fill;
+
+      switch (node.type) {
+        case NodeType.rectangular:
+          nodeShape =
+              '<rect x="$x" y="$y" width="$w" height="$h" rx="8" ry="8" stroke="black" stroke-width="1" fill="#FFD8A8"/>';
+          fill = '#FFD8A8';
+          break;
+        case NodeType.diamond:
+          // Calculate diamond points
+          final centerX = x + w / 2;
+          final centerY = y + h / 2;
+          final points =
+              '$centerX,$y ${x + w},$centerY $centerX,${y + h} $x,$centerY';
+          nodeShape =
+              '<polygon points="$points" stroke="black" stroke-width="1" fill="#C8E6C9"/>';
+          fill = '#C8E6C9';
+          break;
+        case NodeType.parallelogram:
+          final offset = 20.0;
+          final points =
+              '${x + offset},$y ${x + w},$y ${x + w - offset},${y + h} $x,${y + h}';
+          nodeShape =
+              '<polygon points="$points" stroke="black" stroke-width="1" fill="#BBDEFB"/>';
+          fill = '#BBDEFB';
+          break;
+        case NodeType.database:
+          nodeShape = '''
+        <ellipse cx="${x + w / 2}" cy="$y" rx="${w / 2}" ry="${h * 0.2}" stroke="black" stroke-width="1" fill="#D1C4E9"/>
+        <rect x="$x" y="$y" width="$w" height="${h * 0.8}" stroke="black" stroke-width="1" fill="#D1C4E9"/>
+        <ellipse cx="${x + w / 2}" cy="${y + h * 0.8}" rx="${w / 2}" ry="${h * 0.2}" stroke="black" stroke-width="1" fill="#D1C4E9"/>
+        ''';
+          fill = '#D1C4E9';
+          break;
+      }
+
+      // Add the node shape
+      svg += nodeShape;
+
+      // Add text
+      svg +=
+          '<text x="${x + w / 2}" y="${y + h / 2}" font-family="Arial" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="black">${_escapeXml(text)}</text>';
+    }
+
+    // Add connections
+    for (var connection in flowManager.connections) {
+      final sourceNode = nodeList[connection.sourceNodeId]!;
+      final targetNode = nodeList[connection.targetNodeId]!;
+
+      // Calculate connection points
+      final sourcePoint =
+          _getConnectionPointCoordinates(sourceNode, connection.sourcePoint);
+      final targetPoint =
+          _getConnectionPointCoordinates(targetNode, connection.targetPoint);
+
+      // Draw the connection line
+      svg +=
+          '<path d="M${sourcePoint.dx},${sourcePoint.dy} C${sourcePoint.dx + 50},${sourcePoint.dy} ${targetPoint.dx - 50},${targetPoint.dy} ${targetPoint.dx},${targetPoint.dy}" stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>';
+    }
+
+    // Add arrowhead marker definition
+    svg += '''
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="black"/>
+    </marker>
+  </defs>
+  ''';
+
+    // Close SVG
+    svg += '</svg>';
+
+    return svg;
+  }
+
+// Helper function to escape XML special characters
+  String _escapeXml(String text) {
+    return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
+  }
+
+// Helper to get connection point coordinates
+  Offset _getConnectionPointCoordinates(FlowNode node, ConnectionPoint point) {
+    final centerX = node.position.dx + (node.size.width / 2);
+    final centerY = node.position.dy + (node.size.height / 2);
+
+    switch (point) {
+      case ConnectionPoint.top:
+        return Offset(centerX, node.position.dy);
+      case ConnectionPoint.right:
+        return Offset(node.position.dx + node.size.width, centerY);
+      case ConnectionPoint.bottom:
+        return Offset(centerX, node.position.dy + node.size.height);
+      case ConnectionPoint.left:
+        return Offset(node.position.dx, centerY);
     }
   }
 }

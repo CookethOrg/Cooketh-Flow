@@ -4,7 +4,9 @@ import 'package:cookethflow/core/widgets/add_project_card.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/screens/workspace.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class Dashboard extends StatefulWidget {
@@ -46,6 +48,165 @@ class _DashboardState extends State<Dashboard> {
         setState(() {
           _isLoading = false;
         });
+      }
+    }
+  }
+
+  void _showAddProjectOptions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            'Create Project',
+            style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildProjectOption(
+                context: context,
+                icon: PhosphorIconsRegular.plus,
+                label: 'Start New Project',
+                onTap: () async {
+                  Navigator.pop(context);
+                  _createNewProject();
+                },
+              ),
+              SizedBox(height: 16),
+              _buildProjectOption(
+                context: context,
+                icon: PhosphorIconsRegular.fileArrowDown,
+                label: 'Import Existing Project',
+                onTap: () async {
+                  Navigator.pop(context);
+                  _importExistingProject();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildProjectOption({
+    required BuildContext context,
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 24),
+            SizedBox(width: 16),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Frederik',
+                fontSize: 16,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _createNewProject() async {
+    try {
+      final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
+      String newFlowId = await flowProvider.addFlow();
+      
+      if (context.mounted) {
+        // Create a new instance of WorkspaceProvider just for this flow
+        final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+        // Initialize the workspace with the new flow ID
+        workspaceProvider.initializeWorkspace(newFlowId);
+        
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => Workspace(flowId: newFlowId),
+          ),
+        ).then((_) => flowProvider.refreshFlowList());
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to create project: $e')),
+        );
+      }
+    }
+  }
+
+  Future<void> _importExistingProject() async {
+    try {
+      // Open file picker
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['json'],
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+        final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
+        
+        // Show loading indicator
+        setState(() {
+          _isLoading = true;
+        });
+        
+        // Import the workspace
+        String newFlowId = await flowProvider.importWorkspace(
+          file.bytes!,
+          file.name,
+        );
+        
+        // Hide loading indicator
+        setState(() {
+          _isLoading = false;
+        });
+        
+        if (context.mounted) {
+          // Create a new instance of WorkspaceProvider just for this flow
+          final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+          // Initialize the workspace with the new flow ID
+          workspaceProvider.initializeWorkspace(newFlowId);
+          
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Project imported successfully!')),
+          );
+          
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => Workspace(flowId: newFlowId),
+            ),
+          ).then((_) => flowProvider.refreshFlowList());
+        }
+      }
+    } catch (e) {
+      // Hide loading indicator
+      setState(() {
+        _isLoading = false;
+      });
+      
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error importing project: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -107,28 +268,7 @@ class _DashboardState extends State<Dashboard> {
                                 itemBuilder: (context, index) {
                                   if (index == 0) {
                                     return AddProjectCard(
-                                      onTap: () async {
-                                        try {
-                                          String newFlowId = await flowProvider.addFlow();
-                                          
-                                          if (context.mounted) {
-                                            // Create a new instance of WorkspaceProvider just for this flow
-                                            final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-                                            // Initialize the workspace with the new flow ID
-                                            workspaceProvider.initializeWorkspace(newFlowId);
-                                            
-                                            Navigator.of(context).push(
-                                              MaterialPageRoute(
-                                                builder: (context) => Workspace(flowId: newFlowId),
-                                              ),
-                                            ).then((_) => flowProvider.refreshFlowList());
-                                          }
-                                        } catch (e) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Failed to create project: $e')),
-                                          );
-                                        }
-                                      },
+                                      onTap: () => _showAddProjectOptions(context),
                                     );
                                   } else {
                                     final flowId = flowProvider.flowList.keys.elementAt(index - 1);

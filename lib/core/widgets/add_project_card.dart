@@ -29,7 +29,7 @@ class AddProjectCard extends StatelessWidget {
                 Icon(Icons.add, size: 50, color: Colors.black),
                 SizedBox(height: 8),
                 Text(
-                  'Start a new Project',
+                  'Create Project',
                   style: TextStyle(fontFamily: 'Frederik', fontSize: 20),
                 ),
               ],

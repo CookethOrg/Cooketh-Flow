@@ -64,7 +64,7 @@ class _WorkspaceState extends State<Workspace> {
                       await workProvider.exportWorkspace();
 
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Exported Workspace Successfully!!')));
+                          content: Text('Exported Workspace Successfully!! Check Downloads directory')));
                     } catch (e) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text(

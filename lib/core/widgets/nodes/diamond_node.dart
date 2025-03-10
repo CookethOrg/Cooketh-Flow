@@ -8,31 +8,35 @@ class DiamondNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate the size to ensure perfect symmetry
+    final size = width < height ? width : height;
+    
     return Center(
       child: Transform.rotate(
-        angle: 0.7854, // Rotating the container to form a diamond
+        angle: 0.7854, // 45 degrees in radians
         child: Container(
-          width: width,
-          height: height,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
             color: Colors.lightGreen.shade200,
             border: Border.all(color: Colors.black, width: 2),
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           child: Transform.rotate(
-            angle: -0.7854, // Rotating back to keep the text upright
+            angle: -0.7854, // -45 degrees to keep text upright
             child: Center(
               child: TextField(
                 controller: tcontroller,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: InputBorder.none,
                   isDense: true,
-                  contentPadding: EdgeInsets.zero,
+                  contentPadding: EdgeInsets.symmetric(vertical: 8),
                 ),
               ),
             ),

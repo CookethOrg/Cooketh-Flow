@@ -5,11 +5,12 @@ import 'package:cookethflow/core/widgets/toolbar.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class Workspace extends StatefulWidget {
   final String flowId;
-  const Workspace({Key? key, required this.flowId}) : super(key: key);
+  const Workspace({super.key, required this.flowId});
 
   @override
   State<Workspace> createState() => _WorkspaceState();
@@ -17,7 +18,7 @@ class Workspace extends StatefulWidget {
 
 class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -25,15 +26,16 @@ class _WorkspaceState extends State<Workspace> {
       _initializeWorkspace();
     });
   }
-  
+
   void _initializeWorkspace() {
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-    
+    final workspaceProvider =
+        Provider.of<WorkspaceProvider>(context, listen: false);
+
     // Check if we need to initialize or if the workspace is already set to this flow
     if (workspaceProvider.currentFlowId != widget.flowId) {
       workspaceProvider.initializeWorkspace(widget.flowId);
     }
-    
+
     setState(() {
       _isInitialized = true;
     });
@@ -50,10 +52,47 @@ class _WorkspaceState extends State<Workspace> {
             ),
           );
         }
-        
+
         return Scaffold(
           appBar: AppBar(
+            // backgroundColor: ,
             title: Text(workProvider.flowManager.flowName),
+            actions: [
+              ElevatedButton.icon(
+                  onPressed: () async {
+                    try {
+                      await workProvider.exportWorkspace();
+
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Exported Workspace Successfully!!')));
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text(
+                              'Error exporting workspace: ${e.toString()}'), backgroundColor: Colors.red,));
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                      elevation: 0,
+                      padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                      side: BorderSide(color: Colors.black, width: 0.5),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10))),
+                  icon: PhosphorIcon(
+                    PhosphorIcons.export(),
+                    color: Colors.black,
+                  ),
+                  label: Text(
+                    'Export Workspace',
+                    style: TextStyle(
+                        fontFamily: 'Frederik',
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w300),
+                  )),
+              SizedBox(
+                width: 30,
+              )
+            ],
             centerTitle: true,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
@@ -88,14 +127,18 @@ class _WorkspaceState extends State<Workspace> {
                         size: Size.infinite,
                         painter: LinePainter(
                           start: workProvider
-                              .nodeList[workProvider.connections[i].sourceNodeId]!
+                              .nodeList[
+                                  workProvider.connections[i].sourceNodeId]!
                               .position,
                           end: workProvider
-                              .nodeList[workProvider.connections[i].targetNodeId]!
+                              .nodeList[
+                                  workProvider.connections[i].targetNodeId]!
                               .position,
-                          sourceNodeId: workProvider.connections[i].sourceNodeId,
+                          sourceNodeId:
+                              workProvider.connections[i].sourceNodeId,
                           startPoint: workProvider.connections[i].sourcePoint,
-                          targetNodeId: workProvider.connections[i].targetNodeId,
+                          targetNodeId:
+                              workProvider.connections[i].targetNodeId,
                           endPoint: workProvider.connections[i].targetPoint,
                         ),
                       ),
@@ -108,15 +151,18 @@ class _WorkspaceState extends State<Workspace> {
                         child: Node(
                           id: str,
                           type: node.type,
-                          onResize: (Size newSize) => workProvider.onResize(str, newSize),
-                          onDrag: (offset) => workProvider.dragNode(str, offset),
+                          onResize: (Size newSize) =>
+                              workProvider.onResize(str, newSize),
+                          onDrag: (offset) =>
+                              workProvider.dragNode(str, offset),
                           position: node.position,
                         ),
                       );
-                    }).toList(), // Ensure the list is a valid `List<Widget>`
+                    }), // Ensure the list is a valid `List<Widget>`
                   ],
                 ),
-                FloatingDrawer(flowId: widget.flowId), // Left-side floating drawer
+                FloatingDrawer(
+                    flowId: widget.flowId), // Left-side floating drawer
                 Toolbar(
                   onDelete: workProvider.removeSelectedNodes,
                   onUndo: workProvider.undo,
@@ -128,8 +174,8 @@ class _WorkspaceState extends State<Workspace> {
           ),
           floatingActionButton: FloatingActionButton(
             onPressed: () => workProvider.addNode(),
-            child: const Icon(Icons.add),
             tooltip: 'Add Node',
+            child: const Icon(Icons.add),
           ),
         );
       },

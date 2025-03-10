@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:collection/collection.dart';
+import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/widgets/nodes/database_node.dart';
 import 'package:cookethflow/core/widgets/nodes/diamond_node.dart';
@@ -35,23 +37,24 @@ class WorkspaceProvider extends StateHandler {
   void initializeWorkspace(String flowId) {
     _currentFlowId = flowId;
     print("Initializing workspace for flow ID: $flowId");
-    
+
     // Get the FlowManager for this flow ID
     if (fl.flowList.containsKey(flowId)) {
       flowManager = fl.flowList[flowId]!;
-      
+
       // Copy nodes from FlowManager to local _nodeList
       _nodeList = {};
       flowManager.nodes.forEach((id, node) {
         _nodeList[id] = node.copy();
       });
-      
+
       // Set the flow name in the controller
       flowNameController.text = flowManager.flowName;
-      
+
       print("Initialized workspace for flow ID: $flowId");
-      print("Flow has ${_nodeList.length} nodes and ${flowManager.connections.length} connections");
-      
+      print(
+          "Flow has ${_nodeList.length} nodes and ${flowManager.connections.length} connections");
+
       _isInitialized = true;
       notifyListeners();
     } else {
@@ -60,7 +63,7 @@ class WorkspaceProvider extends StateHandler {
       flowManager = FlowManager(flowId: flowId);
       _nodeList = {};
       flowNameController.text = "New Project";
-      
+
       _isInitialized = false;
       notifyListeners();
     }
@@ -239,7 +242,7 @@ class WorkspaceProvider extends StateHandler {
     _nodeList.forEach((id, node) {
       flowManager.nodes[id] = node.copy();
     });
-    
+
     // Save to database
     saveChanges();
   }
@@ -257,13 +260,13 @@ class WorkspaceProvider extends StateHandler {
   // Add a new node to the workspace
   void addNode({NodeType type = NodeType.rectangular}) {
     _saveStateForUndo();
-    
+
     // Generate a new unique ID
     String newId = (_nodeList.length + 1).toString();
     while (_nodeList.containsKey(newId)) {
       newId = (int.parse(newId) + 1).toString();
     }
-    
+
     // Create a new node
     FlowNode node = FlowNode(
       id: newId,
@@ -273,19 +276,19 @@ class WorkspaceProvider extends StateHandler {
         Random().nextDouble() * 200 + 100,
       ),
     );
-    
+
     // Add to local node list
     _nodeList[newId] = node;
-    
+
     // Update the FlowManager and save changes
     updateFlowManager();
-    
+
     notifyListeners();
   }
 
   void dragNode(String id, Offset off) {
     _saveStateForUndo();
-    
+
     if (_nodeList.containsKey(id)) {
       _nodeList[id]!.position = off;
       updateFlowManager();
@@ -312,16 +315,16 @@ class WorkspaceProvider extends StateHandler {
 
     // Remove the node from the local node list
     _nodeList.remove(nodeId);
-    
+
     // Remove the node from the FlowManager
     flowManager.removeNode(nodeId);
 
     // Clear selection after deletion
     selectedNode = null;
-    
+
     // Update the database
     saveChanges();
-    
+
     notifyListeners();
 
     print("Node removed successfully.");
@@ -377,5 +380,30 @@ class WorkspaceProvider extends StateHandler {
   void setEdit() {
     isEditing = true;
     notifyListeners();
+  }
+
+  Future<void> exportWorkspace() async {
+    try {
+      final Map<String, dynamic> workspaceData = flowManager.exportFlow();
+
+      final String jsonString =
+          JsonEncoder.withIndent('  ').convert(workspaceData);
+
+      String safeName = flowManager.flowName
+          .replaceAll(RegExp(r'[^\w\s-]'), '')
+          .replaceAll(RegExp(r'\s+'), '_');
+
+      if (safeName.isEmpty) safeName = "workspace";
+      String fileName =
+          "${safeName}_${DateTime.now().millisecondsSinceEpoch}";
+
+      String res = await FileServices()
+          .exportFile(fileName: fileName, jsonString: jsonString);
+
+      print(res + fileName);
+    } catch (e) {
+      print("Error exporting workspace: $e");
+      rethrow;
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
 import 'package:cookethflow/core/widgets/project_card.dart';
 import 'package:cookethflow/core/widgets/add_project_card.dart';
@@ -8,6 +9,8 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb, Uint8List;
+// import 'package:file_picker/file_picker.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({Key? key}) : super(key: key);
@@ -150,66 +153,73 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> _importExistingProject() async {
-    try {
-      // Open file picker
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['json'],
-      );
-
-      if (result != null && result.files.isNotEmpty) {
-        final file = result.files.first;
-        final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
-        
-        // Show loading indicator
-        setState(() {
-          _isLoading = true;
-        });
-        
-        // Import the workspace
-        String newFlowId = await flowProvider.importWorkspace(
-          file.bytes!,
-          file.name,
-        );
-        
-        // Hide loading indicator
-        setState(() {
-          _isLoading = false;
-        });
-        
-        if (context.mounted) {
-          // Create a new instance of WorkspaceProvider just for this flow
-          final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-          // Initialize the workspace with the new flow ID
-          workspaceProvider.initializeWorkspace(newFlowId);
-          
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Project imported successfully!')),
-          );
-          
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => Workspace(flowId: newFlowId),
-            ),
-          ).then((_) => flowProvider.refreshFlowList());
-        }
-      }
-    } catch (e) {
-      // Hide loading indicator
+  try {
+    // Show a loading indicator while preparing
+    setState(() {
+      _isLoading = true;
+    });
+    
+    // Use our new file service instead of FilePicker
+    final fileServices = FileServices();
+    final fileData = await fileServices.pickAndReadJsonFile();
+    
+    if (fileData == null) {
       setState(() {
         _isLoading = false;
       });
-      
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error importing project: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('No file selected or file could not be read')),
         );
       }
+      return;
+    }
+    
+    final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
+    
+    // Import the workspace
+    String newFlowId = await flowProvider.importWorkspace(
+      fileData['bytes'],
+      fileData['name'],
+    );
+    
+    // Hide loading indicator
+    setState(() {
+      _isLoading = false;
+    });
+    
+    if (context.mounted) {
+      // Create a new instance of WorkspaceProvider just for this flow
+      final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+      // Initialize the workspace with the new flow ID
+      workspaceProvider.initializeWorkspace(newFlowId);
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Project imported successfully!')),
+      );
+      
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => Workspace(flowId: newFlowId),
+        ),
+      ).then((_) => flowProvider.refreshFlowList());
+    }
+  } catch (e) {
+    // Hide loading indicator
+    setState(() {
+      _isLoading = false;
+    });
+    
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error importing project: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
-// import 'dart:ui' as ui;
+import 'dart:ui' as ui;
 
 import 'package:file_saver/file_saver.dart';
-// import 'package:flutter/rendering.dart';
+import 'package:flutter/rendering.dart';
+import 'package:cookethflow/core/services/platform_file_service.dart';
 
 class FileServices {
   FileSaver fs = FileSaver();
@@ -58,13 +59,10 @@ class FileServices {
 
   // For importing files
   Future<Map<String, dynamic>?> importJsonFile(Uint8List fileData) async {
-    try {
-      final String jsonString = utf8.decode(fileData);
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
-      return jsonData;
-    } catch (e) {
-      print("Error importing JSON file: $e");
-      return null;
-    }
+    return await PlatformFileService.parseJSONFile(fileData);
+  }
+  
+  Future<Map<String, dynamic>?> pickAndReadJsonFile() async {
+    return await PlatformFileService.pickJSONFile();
   }
 }

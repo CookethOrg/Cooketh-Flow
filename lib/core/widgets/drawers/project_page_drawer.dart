@@ -1,4 +1,5 @@
 import 'package:cookethflow/models/flow_manager.dart';
+import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                 curve: Curves.easeInOut,
                 width: 250,
                 height: pv.isOpen
-                    ? 3.5 * (MediaQuery.of(context).size.height / 4)
+                    ? 3.6 * (MediaQuery.of(context).size.height / 4)
                     : 81,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -108,13 +109,42 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                             ...pv.nodeList.entries.map((entry) {
                               var id = entry.key;
                               var node = entry.value;
-                              return ListTile(
-                                title: Text(node.data.text),
+                              var type = node.type;
+                              IconData getIcon(NodeType type){
+                                if(type == NodeType.rectangular) {return PhosphorIconsRegular.square;}
+                                else if(type == NodeType.diamond){return PhosphorIconsRegular.diamond;}
+                                else if(type == NodeType.database){return PhosphorIconsRegular.database;}
+                                return PhosphorIconsRegular.parallelogram;
+                              }
+                              return Container(
+                                margin: EdgeInsets.symmetric(
+                                    vertical: 5, horizontal: 8),
+                                decoration: BoxDecoration(
+                                  // color: Colors.red,
+                                  border: Border.all(
+                                      color: Colors.black, width: 0.5),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: ListTile(
+                                  leading: Icon(getIcon(type)),
+                                  title: TextField(
+                                    controller: pv.nodeList[id]!.data,
+                                    onSubmitted: (value) =>
+                                        pv.updateFlowManager(),
+                                    showCursor: true,
+                                    decoration: InputDecoration(
+                                        border: InputBorder.none),
+                                  ),
+                                ),
                               );
                             })
                           ],
                         ),
                       ),
+                    if (pv.isOpen)
+                      SizedBox(
+                        height: 10,
+                      )
                   ],
                 ),
               ),

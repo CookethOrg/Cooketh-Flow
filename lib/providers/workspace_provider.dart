@@ -35,7 +35,7 @@ class WorkspaceProvider extends StateHandler {
   final GlobalKey _repaintBoundaryKey = GlobalKey();
   double _scale = 1.0; // scaling and zoom in out
   Offset _position = Offset.zero;
-  double _minScale = 0.1;
+  double minScale = 0.1;
   double maxScale = 5.0;
 
   // Getters

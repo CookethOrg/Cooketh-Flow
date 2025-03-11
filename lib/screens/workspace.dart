@@ -221,39 +221,76 @@ class _WorkspaceState extends State<Workspace> {
         }
 
         return Scaffold(
-          appBar: AppBar(
-            title: Text(workProvider.flowManager.flowName),
-            actions: [
-              ElevatedButton.icon(
-                onPressed: () => _showExportOptions(context, workProvider),
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  side: BorderSide(color: Colors.black, width: 0.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                icon: PhosphorIcon(
-                  PhosphorIcons.export(),
-                  color: Colors.black,
-                ),
-                label: Text(
-                  'Export Workspace',
-                  style: TextStyle(
-                    fontFamily: 'Frederik',
-                    fontSize: 15,
+          appBar: PreferredSize(
+            preferredSize: const Size.fromHeight(80),
+            child: Container(
+              decoration: const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
                     color: Colors.black,
-                    fontWeight: FontWeight.w300,
+                    width: 1.0,
                   ),
                 ),
               ),
-              SizedBox(width: 30),
-            ],
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
+              child: AppBar(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                toolbarHeight: 80,
+                centerTitle: true,
+                title: Text(
+                  workProvider.flowManager.flowName,
+                  style: const TextStyle(
+                    fontFamily: 'Frederik',
+                    color: Colors.black,
+                    fontSize: 20,
+                  ),
+                ),
+                leading: Container(
+                  alignment: Alignment.center,
+                  child: IconButton(
+                    padding: const EdgeInsets.only(left: 16.0),
+                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+                actions: [
+                  Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    child: ElevatedButton.icon(
+                      onPressed: () => _showExportOptions(context, workProvider),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                        side: const BorderSide(color: Colors.black, width: 1),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        shadowColor: Colors.transparent,
+                      ),
+                      icon: Padding(
+                        padding: const EdgeInsets.only(right: 12.0),
+                        child: PhosphorIcon(
+                          PhosphorIcons.export(),
+                          color: Colors.black,
+                          size: 20,
+                        ),
+                      ),
+                      label: Text(
+                        'Export Workspace',
+                        style: const TextStyle(
+                          fontFamily: 'Frederik',
+                          fontSize: 16,
+                          color: Colors.black,
+                          fontWeight: FontWeight.w500,
+                          letterSpacing: 0.3,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),

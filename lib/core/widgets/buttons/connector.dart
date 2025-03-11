@@ -8,9 +8,9 @@ class Connector extends StatelessWidget {
     super.key,
     this.color,
     this.isSelected,
-    required this.con, // Made required
+    required this.con,
     this.isHovered = false,
-    this.size = 24.0, // Default size
+    this.size = 24.0,
   });
 
   final Color? color;
@@ -26,27 +26,133 @@ class Connector extends StatelessWidget {
         return SizedBox(
           width: size,
           height: size,
-          child: Icon(
-            _getIcon(), // Call helper function to get the appropriate icon
-            color: color ?? Colors.black,
-            size: size,
+          child: CustomPaint(
+            painter: ConnectorPainter(
+              connectionPoint: con,
+              isHovered: isHovered,
+              color: color ?? Colors.black,
+            ),
           ),
         );
       },
     );
   }
+}
 
-  /// Helper function to return the correct icon based on `con` and `isHovered`
-  IconData _getIcon() {
-    switch (con) {
+class ConnectorPainter extends CustomPainter {
+  final ConnectionPoint connectionPoint;
+  final bool isHovered;
+  final Color color;
+
+  ConnectorPainter({
+    required this.connectionPoint,
+    required this.isHovered,
+    required this.color,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = isHovered ? PaintingStyle.fill : PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    final path = Path();
+    final radius = 4.0; // Radius for rounded corners
+    final arrowSize = size.width * 0.4; // Size of the arrow part
+
+    switch (connectionPoint) {
       case ConnectionPoint.top:
-        return isHovered ? Icons.arrow_circle_up_outlined : Icons.arrow_upward;
+        // Start from bottom-left with rounded corner
+        path.moveTo(size.width * 0.2, size.height * 0.6);
+        // Line to middle-top
+        path.lineTo(size.width * 0.5, size.height * 0.2);
+        // Line to bottom-right
+        path.lineTo(size.width * 0.8, size.height * 0.6);
+        
+        // Create rounded corners using quadratic bezier curves
+        path.quadraticBezierTo(
+          size.width * 0.8, size.height * 0.7,
+          size.width * 0.7, size.height * 0.7,
+        );
+        // Bottom line
+        path.lineTo(size.width * 0.3, size.height * 0.7);
+        // Final rounded corner
+        path.quadraticBezierTo(
+          size.width * 0.2, size.height * 0.7,
+          size.width * 0.2, size.height * 0.6,
+        );
+        break;
+
       case ConnectionPoint.bottom:
-        return isHovered ? Icons.arrow_circle_down_outlined : Icons.arrow_downward;
+        // Rotate the top arrow 180 degrees
+        canvas.translate(size.width / 2, size.height / 2);
+        canvas.rotate(3.14159);
+        canvas.translate(-size.width / 2, -size.height / 2);
+        
+        path.moveTo(size.width * 0.2, size.height * 0.6);
+        path.lineTo(size.width * 0.5, size.height * 0.2);
+        path.lineTo(size.width * 0.8, size.height * 0.6);
+        path.quadraticBezierTo(
+          size.width * 0.8, size.height * 0.7,
+          size.width * 0.7, size.height * 0.7,
+        );
+        path.lineTo(size.width * 0.3, size.height * 0.7);
+        path.quadraticBezierTo(
+          size.width * 0.2, size.height * 0.7,
+          size.width * 0.2, size.height * 0.6,
+        );
+        break;
+
       case ConnectionPoint.left:
-        return isHovered ? Icons.arrow_circle_left_outlined : Icons.arrow_back;
+        // Rotate the top arrow 270 degrees
+        canvas.translate(size.width / 2, size.height / 2);
+        canvas.rotate(-1.5708);
+        canvas.translate(-size.width / 2, -size.height / 2);
+        
+        path.moveTo(size.width * 0.2, size.height * 0.6);
+        path.lineTo(size.width * 0.5, size.height * 0.2);
+        path.lineTo(size.width * 0.8, size.height * 0.6);
+        path.quadraticBezierTo(
+          size.width * 0.8, size.height * 0.7,
+          size.width * 0.7, size.height * 0.7,
+        );
+        path.lineTo(size.width * 0.3, size.height * 0.7);
+        path.quadraticBezierTo(
+          size.width * 0.2, size.height * 0.7,
+          size.width * 0.2, size.height * 0.6,
+        );
+        break;
+
       case ConnectionPoint.right:
-        return isHovered ? Icons.arrow_circle_right_outlined : Icons.arrow_forward;
+        // Rotate the top arrow 90 degrees
+        canvas.translate(size.width / 2, size.height / 2);
+        canvas.rotate(1.5708);
+        canvas.translate(-size.width / 2, -size.height / 2);
+        
+        path.moveTo(size.width * 0.2, size.height * 0.6);
+        path.lineTo(size.width * 0.5, size.height * 0.2);
+        path.lineTo(size.width * 0.8, size.height * 0.6);
+        path.quadraticBezierTo(
+          size.width * 0.8, size.height * 0.7,
+          size.width * 0.7, size.height * 0.7,
+        );
+        path.lineTo(size.width * 0.3, size.height * 0.7);
+        path.quadraticBezierTo(
+          size.width * 0.2, size.height * 0.7,
+          size.width * 0.2, size.height * 0.6,
+        );
+        break;
     }
+
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(ConnectorPainter oldDelegate) {
+    return oldDelegate.connectionPoint != connectionPoint ||
+        oldDelegate.isHovered != isHovered ||
+        oldDelegate.color != color;
   }
 }

@@ -22,53 +22,42 @@ class LinePainter extends CustomPainter {
     required this.startPoint,
     required this.targetNodeId,
     required this.endPoint,
-      this.scale = 1.0,
+    this.scale = 1.0,
   });
 
   Offset _getConnectionPointOffset(Offset nodePosition, ConnectionPoint point) {
-  // Calculate the center of the node with scaling
-  final centerX = nodePosition.dx + ((nodeWidth * scale) / 2) + (containerPadding * scale);
-  final centerY = nodePosition.dy + ((nodeHeight * scale) / 2) + (containerPadding * scale);
+    // Calculate the center of the node without scaling
+    final centerX = nodePosition.dx + (nodeWidth / 2) + containerPadding;
+    final centerY = nodePosition.dy + (nodeHeight / 2) + containerPadding;
 
-  switch (point) {
-    case ConnectionPoint.top:
-      return Offset(centerX, nodePosition.dy + (containerPadding * scale));
-    case ConnectionPoint.right:
-      return Offset(
-          nodePosition.dx + (nodeWidth * scale) + ((containerPadding * scale) * 2), centerY);
-    case ConnectionPoint.bottom:
-      return Offset(
-          centerX, nodePosition.dy + (nodeHeight * scale) + ((containerPadding * scale) * 2));
-    case ConnectionPoint.left:
-      return Offset(nodePosition.dx + (containerPadding * scale), centerY);
+    switch (point) {
+      case ConnectionPoint.top:
+        return Offset(centerX, nodePosition.dy + containerPadding);
+      case ConnectionPoint.right:
+        return Offset(nodePosition.dx + nodeWidth + (containerPadding * 2), centerY);
+      case ConnectionPoint.bottom:
+        return Offset(centerX, nodePosition.dy + nodeHeight + (containerPadding * 2));
+      case ConnectionPoint.left:
+        return Offset(nodePosition.dx + containerPadding, centerY);
+    }
   }
-}
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.black
-      ..strokeWidth = 2*scale
+      ..strokeWidth = 2 // Keep line width consistent regardless of zoom
       ..style = PaintingStyle.stroke;
 
-    // Scale positions
-  final scaledStart = Offset(start.dx * scale, start.dy * scale);
-  final scaledEnd = Offset(end.dx * scale, end.dy * scale);
-
-  // Get actual connection point coordinates with scaling
-  final startOffset = _getConnectionPointOffset(scaledStart, startPoint);
-  final endOffset = _getConnectionPointOffset(scaledEnd, endPoint);
+    // Get actual connection point coordinates
+    final startOffset = _getConnectionPointOffset(start, startPoint);
+    final endOffset = _getConnectionPointOffset(end, endPoint);
 
     // Draw curved path between points
     final path = Path();
     path.moveTo(startOffset.dx, startOffset.dy);
 
-    // Calculate control points for the curve
-    // final midX = (startOffset.dx + endOffset.dx) / 2;
-    // final midY = (startOffset.dy + endOffset.dy) / 2;
-
-    double controlPointOffset =
-        50.0; // Adjust this value to change curve intensity
+    double controlPointOffset = 50.0; // Adjust this value to change curve intensity
 
     switch (startPoint) {
       case ConnectionPoint.right:
@@ -130,6 +119,7 @@ class LinePainter extends CustomPainter {
     return oldDelegate.start != start ||
         oldDelegate.end != end ||
         oldDelegate.startPoint != startPoint ||
-        oldDelegate.endPoint != endPoint;
+        oldDelegate.endPoint != endPoint ||
+        oldDelegate.scale != scale;
   }
 }

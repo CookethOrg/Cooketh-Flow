@@ -319,14 +319,15 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void dragNode(String id, Offset off) {
-    _saveStateForUndo();
+  _saveStateForUndo();
 
-    if (_nodeList.containsKey(id)) {
-      _nodeList[id]!.position = off;
-      updateFlowManager();
-      notifyListeners();
-    }
+  if (_nodeList.containsKey(id)) {
+    // Store the position in the workspace's coordinate space
+    _nodeList[id]!.position = off;
+    updateFlowManager();
+    notifyListeners();
   }
+}
 
   void removeSelectedNodes() {
     if (selectedNode == null) {

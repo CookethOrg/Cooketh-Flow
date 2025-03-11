@@ -66,23 +66,24 @@ class _WorkspaceState extends State<Workspace> {
   }
 
   void _onInteractionUpdate(ScaleUpdateDetails details) {
-  final workspaceProvider = 
-      Provider.of<WorkspaceProvider>(context, listen: false);
+  final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
   
-  // Update provider with new scale and position
-  Matrix4 matrix = _transformationController.value;
+  // Get the current transformation matrix
+  final matrix = _transformationController.value;
   
-  // Get scale from the matrix
-  final scale = math.sqrt(
+  // Extract scale from matrix (using the proper mathematical approach)
+  final scaleX = math.sqrt(
     matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
-    matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+    matrix.getColumn(1)[0] * matrix.getColumn(1)[0]
   );
   
-  // Get translation from the matrix
-  final position = Offset(matrix.getTranslation().x, matrix.getTranslation().y);
+  // Extract translation from matrix
+  final dx = matrix.getTranslation().x;
+  final dy = matrix.getTranslation().y;
   
-  workspaceProvider.updateScale(scale);
-  workspaceProvider.updatePosition(position);
+  // Update provider with scale and position
+  workspaceProvider.updateScale(scaleX);
+  workspaceProvider.updatePosition(Offset(dx, dy));
 }
 
   void _showExportOptions(
@@ -208,196 +209,198 @@ class _WorkspaceState extends State<Workspace> {
   }
 
   @override
-Widget build(BuildContext context) {
-  return Consumer<WorkspaceProvider>(
-    builder: (context, workProvider, child) {
-      if (!_isInitialized) {
-        return const Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        );
-      }
-
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(workProvider.flowManager.flowName),
-          actions: [
-            ElevatedButton.icon(
-              onPressed: () => _showExportOptions(context, workProvider),
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                side: BorderSide(color: Colors.black, width: 0.5),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-              icon: PhosphorIcon(
-                PhosphorIcons.export(),
-                color: Colors.black,
-              ),
-              label: Text(
-                'Export Workspace',
-                style: TextStyle(
-                  fontFamily: 'Frederik',
-                  fontSize: 15,
-                  color: Colors.black,
-                  fontWeight: FontWeight.w300,
-                ),
-              ),
+  Widget build(BuildContext context) {
+    return Consumer<WorkspaceProvider>(
+      builder: (context, workProvider, child) {
+        if (!_isInitialized) {
+          return const Scaffold(
+            body: Center(
+              child: CircularProgressIndicator(),
             ),
-            SizedBox(width: 30),
-          ],
-          centerTitle: true,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () => Navigator.of(context).pop(),
+          );
+        }
+
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(workProvider.flowManager.flowName),
+            actions: [
+              ElevatedButton.icon(
+                onPressed: () => _showExportOptions(context, workProvider),
+                style: ElevatedButton.styleFrom(
+                  elevation: 0,
+                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                  side: BorderSide(color: Colors.black, width: 0.5),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                icon: PhosphorIcon(
+                  PhosphorIcons.export(),
+                  color: Colors.black,
+                ),
+                label: Text(
+                  'Export Workspace',
+                  style: TextStyle(
+                    fontFamily: 'Frederik',
+                    fontSize: 15,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w300,
+                  ),
+                ),
+              ),
+              SizedBox(width: 30),
+            ],
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: () => Navigator.of(context).pop(),
+            ),
           ),
-        ),
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        body: RepaintBoundary(
-          key: workProvider.repaintBoundaryKey,
-          child: Stack(
-            children: [
-              // Use InteractiveViewer for zoom and pan
-              InteractiveViewer(
-                transformationController: _transformationController,
-                minScale: 0.1,
-                maxScale: 5.0,
-                onInteractionEnd: (details) {
-                  _onInteractionUpdate(ScaleUpdateDetails());
-                  _isPanning = false;
-                },
-                onInteractionStart: (details) {
-                  _isPanning = details.pointerCount > 0;
-                },
-                child: GestureDetector(
-                  onTapDown: (details) {
-                    if (_isPanning) return;
-                    
-                    bool hitNode = false;
-                    for (var node in workProvider.nodeList.values) {
-                      // Get transformed bounds
-                      final matrix = _transformationController.value;
-                      final scale = math.sqrt(
-                        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
-                        matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
-                      );
-                      
-                      final transformedBounds = Rect.fromLTWH(
-                        node.position.dx * scale + matrix.getTranslation().x,
-                        node.position.dy * scale + matrix.getTranslation().y,
-                        node.size.width * scale,
-                        node.size.height * scale,
-                      );
-                      
-                      if (transformedBounds.contains(details.globalPosition)) {
-                        hitNode = true;
-                        break;
-                      }
-                    }
-                    
-                    if (!hitNode) {
+          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          body: RepaintBoundary(
+            key: workProvider.repaintBoundaryKey,
+            child: Stack(
+              children: [
+                // Use InteractiveViewer for zoom and pan
+                InteractiveViewer(
+                  transformationController: _transformationController,
+                  minScale: 0.1,
+                  maxScale: 5.0,
+                  onInteractionEnd: (details) {
+                    _onInteractionUpdate(ScaleUpdateDetails());
+                    _isPanning = false;
+                  },
+                  onInteractionStart: (details) {
+                    _isPanning = details.pointerCount > 0;
+                  },
+                  child: GestureDetector(
+                    onTapDown: (details) {
+                      if (_isPanning) return;
+
+                      bool hitNode = false;
                       for (var node in workProvider.nodeList.values) {
-                        if (node.isSelected) {
-                          workProvider.changeSelected(node.id);
+                        // Get transformed bounds
+                        final matrix = _transformationController.value;
+                        final scale = math.sqrt(matrix.getColumn(0)[0] *
+                                matrix.getColumn(0)[0] +
+                            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+
+                        final transformedBounds = Rect.fromLTWH(
+                          node.position.dx * scale + matrix.getTranslation().x,
+                          node.position.dy * scale + matrix.getTranslation().y,
+                          node.size.width * scale,
+                          node.size.height * scale,
+                        );
+
+                        if (transformedBounds
+                            .contains(details.globalPosition)) {
+                          hitNode = true;
+                          break;
                         }
                       }
-                    }
-                  },
-                  child: Container(
-                    // Very large size to allow for "infinite" panning
-                    width: 10000,
-                    height: 10000,
-                    color: Colors.white,
-                    child: Stack(
-                      children: [
-                        // Center point indicator
-                        Positioned(
-                          left: 5000,
-                          top: 5000,
-                          child: Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.5),
-                              shape: BoxShape.circle,
+
+                      if (!hitNode) {
+                        for (var node in workProvider.nodeList.values) {
+                          if (node.isSelected) {
+                            workProvider.changeSelected(node.id);
+                          }
+                        }
+                      }
+                    },
+                    child: Container(
+                      // Very large size to allow for "infinite" panning
+                      width: 10000,
+                      height: 10000,
+                      color: Colors.white,
+                      child: Stack(
+                        children: [
+                          // Center point indicator
+                          Positioned(
+                            left: 5000,
+                            top: 5000,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                color: Colors.red.withOpacity(0.5),
+                                shape: BoxShape.circle,
+                              ),
                             ),
                           ),
-                        ),
-                        // Lines & Nodes
-                        ...workProvider.connections.map((connection) {
-                          return CustomPaint(
-                            size: Size.infinite,
-                            painter: LinePainter(
-                              start: workProvider
-                                  .nodeList[connection.sourceNodeId]!
-                                  .position,
-                              end: workProvider
-                                  .nodeList[connection.targetNodeId]!
-                                  .position,
-                              sourceNodeId: connection.sourceNodeId,
-                              startPoint: connection.sourcePoint,
-                              targetNodeId: connection.targetNodeId,
-                              endPoint: connection.targetPoint,
-                            ),
-                          );
-                        }),
-                        ...workProvider.nodeList.entries.map((entry) {
-                          var id = entry.key;
-                          var node = entry.value;
-                          return Positioned(
-                            left: node.position.dx,
-                            top: node.position.dy,
-                            child: Node(
-                              id: id,
-                              type: node.type,
-                              onResize: (Size newSize) =>
-                                  workProvider.onResize(id, newSize),
-                              onDrag: (offset) =>
-                                  workProvider.dragNode(id, offset),
-                              position: node.position,
-                            ),
-                          );
-                        }),
-                      ],
+                          // Lines & Nodes
+                          ...workProvider.connections.map((connection) {
+                            return CustomPaint(
+                              size: Size.infinite,
+                              painter: LinePainter(
+                                start: workProvider
+                                    .nodeList[connection.sourceNodeId]!
+                                    .position,
+                                end: workProvider
+                                    .nodeList[connection.targetNodeId]!
+                                    .position,
+                                sourceNodeId: connection.sourceNodeId,
+                                startPoint: connection.sourcePoint,
+                                targetNodeId: connection.targetNodeId,
+                                endPoint: connection.targetPoint,
+                                scale: workProvider
+                                    .scale, // Pass the scale parameter
+                              ),
+                            );
+                          }),
+                          ...workProvider.nodeList.entries.map((entry) {
+                            var id = entry.key;
+                            var node = entry.value;
+                            return Positioned(
+                              left: node.position.dx,
+                              top: node.position.dy,
+                              child: Node(
+                                id: id,
+                                type: node.type,
+                                onResize: (Size newSize) =>
+                                    workProvider.onResize(id, newSize),
+                                onDrag: (offset) =>
+                                    workProvider.dragNode(id, offset),
+                                position: node.position,
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              // UI elements that should stay fixed regardless of zoom/pan
-              FloatingDrawer(flowId: widget.flowId),
-              Toolbar(
-                onDelete: workProvider.removeSelectedNodes,
-                onUndo: workProvider.undo,
-                onRedo: workProvider.redo,
-              ),
-              // Add zoom indicator
-              Positioned(
-                right: 24,
-                bottom: 24,
-                child: Container(
-                  padding: EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.black, width: 1),
-                  ),
-                  child: Text(
-                    "${(workProvider.scale * 100).toInt()}%",
-                    style: TextStyle(
-                      fontFamily: 'Frederik',
-                      fontWeight: FontWeight.bold,
+                // UI elements that should stay fixed regardless of zoom/pan
+                FloatingDrawer(flowId: widget.flowId),
+                Toolbar(
+                  onDelete: workProvider.removeSelectedNodes,
+                  onUndo: workProvider.undo,
+                  onRedo: workProvider.redo,
+                ),
+                // Add zoom indicator
+                Positioned(
+                  right: 24,
+                  bottom: 24,
+                  child: Container(
+                    padding: EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.black, width: 1),
+                    ),
+                    child: Text(
+                      "${(workProvider.scale * 100).toInt()}%",
+                      style: TextStyle(
+                        fontFamily: 'Frederik',
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 }

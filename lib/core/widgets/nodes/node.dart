@@ -68,37 +68,44 @@ class Node extends StatelessWidget {
             double newWidth = wp.getWidth(id);
             double newHeight = wp.getHeight(id);
 
+            // Get the current scale factor
+            final scaleFactor = wp.scale;
+
+            // Adjust the deltas by dividing by scale factor
+            final adjustedDeltaX = details.delta.dx / scaleFactor;
+            final adjustedDeltaY = details.delta.dy / scaleFactor;
+
             switch (handle) {
               case ResizeHandle.topLeft:
-                newWidth = wp.getWidth(id) - details.delta.dx;
-                newHeight = wp.getHeight(id) - details.delta.dy;
+                newWidth = wp.getWidth(id) - adjustedDeltaX;
+                newHeight = wp.getHeight(id) - adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
                   onDrag(Offset(
-                    position.dx + details.delta.dx,
-                    position.dy + details.delta.dy,
+                    position.dx + adjustedDeltaX,
+                    position.dy + adjustedDeltaY,
                   ));
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
               case ResizeHandle.topRight:
-                newWidth = wp.getWidth(id) + details.delta.dx;
-                newHeight = wp.getHeight(id) - details.delta.dy;
+                newWidth = wp.getWidth(id) + adjustedDeltaX;
+                newHeight = wp.getHeight(id) - adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  onDrag(Offset(position.dx, position.dy + details.delta.dy));
+                  onDrag(Offset(position.dx, position.dy + adjustedDeltaY));
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
               case ResizeHandle.bottomLeft:
-                newWidth = wp.getWidth(id) - details.delta.dx;
-                newHeight = wp.getHeight(id) + details.delta.dy;
+                newWidth = wp.getWidth(id) - adjustedDeltaX;
+                newHeight = wp.getHeight(id) + adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  onDrag(Offset(position.dx + details.delta.dx, position.dy));
+                  onDrag(Offset(position.dx + adjustedDeltaX, position.dy));
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
               case ResizeHandle.bottomRight:
-                newWidth = wp.getWidth(id) + details.delta.dx;
-                newHeight = wp.getHeight(id) + details.delta.dy;
+                newWidth = wp.getWidth(id) + adjustedDeltaX;
+                newHeight = wp.getHeight(id) + adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
                   onResize(Size(newWidth, newHeight));
                 }
@@ -132,6 +139,7 @@ class Node extends StatelessWidget {
     }
   }
 
+  // In the _buildConnectionPoints method, update the positioning calculations:
   Widget _buildConnectionPoints(BuildContext context, ConnectionPoint point,
       String id, WorkspaceProvider wp) {
     // Check if the connection point is available
@@ -211,10 +219,20 @@ class Node extends StatelessWidget {
           onTap: () => wp.changeSelected(id),
           onPanUpdate: (details) {
             if (!wp.nodeList[id]!.isSelected) return;
+
             final scaleFactor = wp.scale;
+            final matrix = Matrix4.identity()
+              ..translate(wp.position.dx, wp.position.dy)
+              ..scale(scaleFactor);
+
+            // Calculate the position in the scaled coordinate system
+            final localPosition = Offset(
+                (details.globalPosition.dx - wp.position.dx) / scaleFactor,
+                (details.globalPosition.dy - wp.position.dy) / scaleFactor);
+
             onDrag(Offset(
-              details.globalPosition.dx/scaleFactor - (wp.getWidth(id) / 2),
-              details.globalPosition.dy/scaleFactor - (wp.getHeight(id) / 2),
+              localPosition.dx - (wp.getWidth(id) / 2),
+              localPosition.dy - (wp.getHeight(id) / 2),
             ));
           },
           child: Stack(

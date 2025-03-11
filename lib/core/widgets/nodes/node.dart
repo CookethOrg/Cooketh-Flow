@@ -26,7 +26,6 @@ class Node extends StatelessWidget {
   final Function(Size) onResize;
   final Offset position;
 
-
   Widget _buildResizeHandle(
       BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
     final handleSize = 12.0;
@@ -212,9 +211,10 @@ class Node extends StatelessWidget {
           onTap: () => wp.changeSelected(id),
           onPanUpdate: (details) {
             if (!wp.nodeList[id]!.isSelected) return;
+            final scaleFactor = wp.scale;
             onDrag(Offset(
-              details.globalPosition.dx - (wp.getWidth(id) / 2),
-              details.globalPosition.dy - (wp.getHeight(id) / 2),
+              details.globalPosition.dx/scaleFactor - (wp.getWidth(id) / 2),
+              details.globalPosition.dy/scaleFactor - (wp.getHeight(id) / 2),
             ));
           },
           child: Stack(

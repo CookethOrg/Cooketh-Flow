@@ -3,10 +3,10 @@ import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
-import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'dart:math' as math;
 
 class Workspace extends StatefulWidget {
   final String flowId;
@@ -18,6 +18,9 @@ class Workspace extends StatefulWidget {
 
 class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
+  TransformationController _transformationController =
+      TransformationController();
+  bool _isPanning = false;
 
   @override
   void initState() {
@@ -25,6 +28,12 @@ class _WorkspaceState extends State<Workspace> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWorkspace();
     });
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
   }
 
   void _initializeWorkspace() {
@@ -36,20 +45,58 @@ class _WorkspaceState extends State<Workspace> {
       workspaceProvider.initializeWorkspace(widget.flowId);
     }
 
+    // set initial transform based on saved state and position
+    _updateTransformFromProvider();
+
     setState(() {
       _isInitialized = true;
     });
   }
 
-  void _showExportOptions(BuildContext context, WorkspaceProvider workProvider) {
+  void _updateTransformFromProvider() {
+    final workspaceProvider =
+        Provider.of<WorkspaceProvider>(context, listen: false);
+
+    // Create a matrix from the saved scale and position
+    Matrix4 matrix = Matrix4.identity()
+      ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
+      ..scale(workspaceProvider.scale);
+
+    _transformationController.value = matrix;
+  }
+
+  void _onInteractionUpdate(ScaleUpdateDetails details) {
+  final workspaceProvider = 
+      Provider.of<WorkspaceProvider>(context, listen: false);
+  
+  // Update provider with new scale and position
+  Matrix4 matrix = _transformationController.value;
+  
+  // Get scale from the matrix
+  final scale = math.sqrt(
+    matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
+    matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+  );
+  
+  // Get translation from the matrix
+  final position = Offset(matrix.getTranslation().x, matrix.getTranslation().y);
+  
+  workspaceProvider.updateScale(scale);
+  workspaceProvider.updatePosition(position);
+}
+
+  void _showExportOptions(
+      BuildContext context, WorkspaceProvider workProvider) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
             'Export Workspace',
-            style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+            style:
+                TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -61,7 +108,8 @@ class _WorkspaceState extends State<Workspace> {
                 onTap: () async {
                   Navigator.pop(context);
                   try {
-                    await workProvider.exportWorkspace(exportType: ExportType.json);
+                    await workProvider.exportWorkspace(
+                        exportType: ExportType.json);
                     _showSuccessSnackbar('JSON file exported successfully!');
                   } catch (e) {
                     _showErrorSnackbar('Error exporting JSON: ${e.toString()}');
@@ -76,7 +124,8 @@ class _WorkspaceState extends State<Workspace> {
                 onTap: () async {
                   Navigator.pop(context);
                   try {
-                    await workProvider.exportWorkspace(exportType: ExportType.png);
+                    await workProvider.exportWorkspace(
+                        exportType: ExportType.png);
                     _showSuccessSnackbar('PNG file exported successfully!');
                   } catch (e) {
                     _showErrorSnackbar('Error exporting PNG: ${e.toString()}');
@@ -91,7 +140,8 @@ class _WorkspaceState extends State<Workspace> {
                 onTap: () async {
                   Navigator.pop(context);
                   try {
-                    await workProvider.exportWorkspace(exportType: ExportType.svg);
+                    await workProvider.exportWorkspace(
+                        exportType: ExportType.svg);
                     _showSuccessSnackbar('SVG file exported successfully!');
                   } catch (e) {
                     _showErrorSnackbar('Error exporting SVG: ${e.toString()}');
@@ -158,129 +208,196 @@ class _WorkspaceState extends State<Workspace> {
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<WorkspaceProvider>(
-      builder: (context, workProvider, child) {
-        if (!_isInitialized) {
-          return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
-          );
-        }
-
-        return Scaffold(
-          appBar: AppBar(
-            title: Text(workProvider.flowManager.flowName),
-            actions: [
-              ElevatedButton.icon(
-                onPressed: () => _showExportOptions(context, workProvider),
-                style: ElevatedButton.styleFrom(
-                  elevation: 0,
-                  padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
-                  side: BorderSide(color: Colors.black, width: 0.5),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                icon: PhosphorIcon(
-                  PhosphorIcons.export(),
-                  color: Colors.black,
-                ),
-                label: Text(
-                  'Export Workspace',
-                  style: TextStyle(
-                    fontFamily: 'Frederik',
-                    fontSize: 15,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-              ),
-              SizedBox(width: 30),
-            ],
-            centerTitle: true,
-            leading: IconButton(
-              icon: Icon(Icons.arrow_back),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-          ),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          body: RepaintBoundary(
-            key: workProvider.repaintBoundaryKey,
-            child: GestureDetector(
-              onTapDown: (details) {
-                bool hitNode = false;
-                for (var node in workProvider.nodeList.values) {
-                  if (node.bounds.contains(details.globalPosition)) {
-                    hitNode = true;
-                    break;
-                  }
-                }
-                if (!hitNode) {
-                  for (var node in workProvider.nodeList.values) {
-                    if (node.isSelected) {
-                      workProvider.changeSelected(node.id);
-                    }
-                  }
-                }
-              },
-              child: Stack(
-                children: [
-                  // Lines & Nodes
-                  Stack(
-                    children: [
-                      for (var i = 0; i < workProvider.connections.length; i++)
-                        CustomPaint(
-                          size: Size.infinite,
-                          painter: LinePainter(
-                            start: workProvider
-                                .nodeList[
-                                    workProvider.connections[i].sourceNodeId]!
-                                .position,
-                            end: workProvider
-                                .nodeList[
-                                    workProvider.connections[i].targetNodeId]!
-                                .position,
-                            sourceNodeId:
-                                workProvider.connections[i].sourceNodeId,
-                            startPoint: workProvider.connections[i].sourcePoint,
-                            targetNodeId:
-                                workProvider.connections[i].targetNodeId,
-                            endPoint: workProvider.connections[i].targetPoint,
-                          ),
-                        ),
-                      ...workProvider.nodeList.entries.map((entry) {
-                        var str = entry.key;
-                        var node = entry.value;
-                        return Positioned(
-                          left: node.position.dx,
-                          top: node.position.dy,
-                          child: Node(
-                            id: str,
-                            type: node.type,
-                            onResize: (Size newSize) =>
-                                workProvider.onResize(str, newSize),
-                            onDrag: (offset) =>
-                                workProvider.dragNode(str, offset),
-                            position: node.position,
-                          ),
-                        );
-                      }),
-                    ],
-                  ),
-                  FloatingDrawer(flowId: widget.flowId),
-                  Toolbar(
-                    onDelete: workProvider.removeSelectedNodes,
-                    onUndo: workProvider.undo,
-                    onRedo: workProvider.redo,
-                  ),
-                ],
-              ),
-            ),
+Widget build(BuildContext context) {
+  return Consumer<WorkspaceProvider>(
+    builder: (context, workProvider, child) {
+      if (!_isInitialized) {
+        return const Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
           ),
         );
-      },
-    );
-  }
+      }
+
+      return Scaffold(
+        appBar: AppBar(
+          title: Text(workProvider.flowManager.flowName),
+          actions: [
+            ElevatedButton.icon(
+              onPressed: () => _showExportOptions(context, workProvider),
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                padding: EdgeInsets.fromLTRB(20, 20, 20, 20),
+                side: BorderSide(color: Colors.black, width: 0.5),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              icon: PhosphorIcon(
+                PhosphorIcons.export(),
+                color: Colors.black,
+              ),
+              label: Text(
+                'Export Workspace',
+                style: TextStyle(
+                  fontFamily: 'Frederik',
+                  fontSize: 15,
+                  color: Colors.black,
+                  fontWeight: FontWeight.w300,
+                ),
+              ),
+            ),
+            SizedBox(width: 30),
+          ],
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ),
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        body: RepaintBoundary(
+          key: workProvider.repaintBoundaryKey,
+          child: Stack(
+            children: [
+              // Use InteractiveViewer for zoom and pan
+              InteractiveViewer(
+                transformationController: _transformationController,
+                minScale: 0.1,
+                maxScale: 5.0,
+                onInteractionEnd: (details) {
+                  _onInteractionUpdate(ScaleUpdateDetails());
+                  _isPanning = false;
+                },
+                onInteractionStart: (details) {
+                  _isPanning = details.pointerCount > 0;
+                },
+                child: GestureDetector(
+                  onTapDown: (details) {
+                    if (_isPanning) return;
+                    
+                    bool hitNode = false;
+                    for (var node in workProvider.nodeList.values) {
+                      // Get transformed bounds
+                      final matrix = _transformationController.value;
+                      final scale = math.sqrt(
+                        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
+                        matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+                      );
+                      
+                      final transformedBounds = Rect.fromLTWH(
+                        node.position.dx * scale + matrix.getTranslation().x,
+                        node.position.dy * scale + matrix.getTranslation().y,
+                        node.size.width * scale,
+                        node.size.height * scale,
+                      );
+                      
+                      if (transformedBounds.contains(details.globalPosition)) {
+                        hitNode = true;
+                        break;
+                      }
+                    }
+                    
+                    if (!hitNode) {
+                      for (var node in workProvider.nodeList.values) {
+                        if (node.isSelected) {
+                          workProvider.changeSelected(node.id);
+                        }
+                      }
+                    }
+                  },
+                  child: Container(
+                    // Very large size to allow for "infinite" panning
+                    width: 10000,
+                    height: 10000,
+                    color: Colors.white,
+                    child: Stack(
+                      children: [
+                        // Center point indicator
+                        Positioned(
+                          left: 5000,
+                          top: 5000,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: Colors.red.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ),
+                        // Lines & Nodes
+                        ...workProvider.connections.map((connection) {
+                          return CustomPaint(
+                            size: Size.infinite,
+                            painter: LinePainter(
+                              start: workProvider
+                                  .nodeList[connection.sourceNodeId]!
+                                  .position,
+                              end: workProvider
+                                  .nodeList[connection.targetNodeId]!
+                                  .position,
+                              sourceNodeId: connection.sourceNodeId,
+                              startPoint: connection.sourcePoint,
+                              targetNodeId: connection.targetNodeId,
+                              endPoint: connection.targetPoint,
+                            ),
+                          );
+                        }),
+                        ...workProvider.nodeList.entries.map((entry) {
+                          var id = entry.key;
+                          var node = entry.value;
+                          return Positioned(
+                            left: node.position.dx,
+                            top: node.position.dy,
+                            child: Node(
+                              id: id,
+                              type: node.type,
+                              onResize: (Size newSize) =>
+                                  workProvider.onResize(id, newSize),
+                              onDrag: (offset) =>
+                                  workProvider.dragNode(id, offset),
+                              position: node.position,
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              // UI elements that should stay fixed regardless of zoom/pan
+              FloatingDrawer(flowId: widget.flowId),
+              Toolbar(
+                onDelete: workProvider.removeSelectedNodes,
+                onUndo: workProvider.undo,
+                onRedo: workProvider.redo,
+              ),
+              // Add zoom indicator
+              Positioned(
+                right: 24,
+                bottom: 24,
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.black, width: 1),
+                  ),
+                  child: Text(
+                    "${(workProvider.scale * 100).toInt()}%",
+                    style: TextStyle(
+                      fontFamily: 'Frederik',
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
 }

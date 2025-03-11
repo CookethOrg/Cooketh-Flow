@@ -32,12 +32,27 @@ class WorkspaceProvider extends StateHandler {
   TextEditingController flowNameController = TextEditingController();
   bool _isInitialized = false;
   String _currentFlowId = "";
-
-  // Add this GlobalKey
   final GlobalKey _repaintBoundaryKey = GlobalKey();
+  double _scale = 1.0; // scaling and zoom in out
+  Offset _position = Offset.zero;
+  double _minScale = 0.1;
+  double maxScale = 5.0;
 
-// Getter for repaint boundary key
+  // Getters
+  String get currentFlowId => _currentFlowId;
+  bool get isHovered => _isHovered;
+  Map<String, FlowNode> get nodeList => _nodeList;
+  bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);
+  double getWidth(String id) => nodeList[id]!.size.width;
+  double getHeight(String id) => nodeList[id]!.size.height;
+  List<Connection> get connections => flowManager.connections.toList();
+  bool get isInitialized => _isInitialized;
   GlobalKey get repaintBoundaryKey => _repaintBoundaryKey;
+  FlowNode? get selectedNode => nodeList.values.firstWhereOrNull(
+        (node) => node.isSelected,
+      );
+  double get scale => _scale;
+  Offset get position => _position;
 
   WorkspaceProvider(this.fl) : super() {
     print("WorkspaceProvider initialized with flow ID: ${fl.newFlowId}");
@@ -64,6 +79,10 @@ class WorkspaceProvider extends StateHandler {
       // Set the flow name in the controller
       flowNameController.text = flowManager.flowName;
 
+      // load the scale and position from flowmanager
+      _scale = flowManager.scale ?? 1.0;
+      _position = flowManager.position ?? Offset.zero;
+
       print("Initialized workspace for flow ID: $flowId");
       print(
           "Flow has ${_nodeList.length} nodes and ${flowManager.connections.length} connections");
@@ -76,26 +95,23 @@ class WorkspaceProvider extends StateHandler {
       flowManager = FlowManager(flowId: flowId);
       _nodeList = {};
       flowNameController.text = "New Project";
+      _scale = 1.0;
+      _position = Offset.zero;
 
       _isInitialized = false;
       notifyListeners();
     }
   }
 
-  // Getters
-  String get currentFlowId => _currentFlowId;
-  bool get isHovered => _isHovered;
-  Map<String, FlowNode> get nodeList => _nodeList;
-  bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);
-  double getWidth(String id) => nodeList[id]!.size.width;
-  double getHeight(String id) => nodeList[id]!.size.height;
-  List<Connection> get connections => flowManager.connections.toList();
-  bool get isInitialized => _isInitialized;
+  void updatePosition(Offset newPos) {
+    _position = newPos;
+    notifyListeners();
+  }
 
-  // Get currently selected node (if any)
-  FlowNode? get selectedNode => nodeList.values.firstWhereOrNull(
-        (node) => node.isSelected,
-      );
+  void updateScale(double newScale) {
+    _scale = newScale;
+    notifyListeners();
+  }
 
   // Set currently selected node
   set selectedNode(FlowNode? node) {
@@ -255,6 +271,9 @@ class WorkspaceProvider extends StateHandler {
     _nodeList.forEach((id, node) {
       flowManager.nodes[id] = node.copy();
     });
+
+    flowManager.scale = _scale;
+    flowManager.position = _position;
 
     // Save to database
     saveChanges();

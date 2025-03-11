@@ -8,6 +8,7 @@ class LinePainter extends CustomPainter {
   final ConnectionPoint endPoint;
   final String sourceNodeId;
   final String targetNodeId;
+  final double scale;
 
   // Node dimensions
   static const double nodeWidth = 150.0; // Default node width
@@ -21,37 +22,42 @@ class LinePainter extends CustomPainter {
     required this.startPoint,
     required this.targetNodeId,
     required this.endPoint,
+      this.scale = 1.0,
   });
 
   Offset _getConnectionPointOffset(Offset nodePosition, ConnectionPoint point) {
-    // Calculate the center of the node
-    final centerX = nodePosition.dx + (nodeWidth / 2) + containerPadding;
-    final centerY = nodePosition.dy + (nodeHeight / 2) + containerPadding;
+  // Calculate the center of the node with scaling
+  final centerX = nodePosition.dx + ((nodeWidth * scale) / 2) + (containerPadding * scale);
+  final centerY = nodePosition.dy + ((nodeHeight * scale) / 2) + (containerPadding * scale);
 
-    switch (point) {
-      case ConnectionPoint.top:
-        return Offset(centerX, nodePosition.dy + containerPadding);
-      case ConnectionPoint.right:
-        return Offset(
-            nodePosition.dx + nodeWidth + (containerPadding * 2), centerY);
-      case ConnectionPoint.bottom:
-        return Offset(
-            centerX, nodePosition.dy + nodeHeight + (containerPadding * 2));
-      case ConnectionPoint.left:
-        return Offset(nodePosition.dx + containerPadding, centerY);
-    }
+  switch (point) {
+    case ConnectionPoint.top:
+      return Offset(centerX, nodePosition.dy + (containerPadding * scale));
+    case ConnectionPoint.right:
+      return Offset(
+          nodePosition.dx + (nodeWidth * scale) + ((containerPadding * scale) * 2), centerY);
+    case ConnectionPoint.bottom:
+      return Offset(
+          centerX, nodePosition.dy + (nodeHeight * scale) + ((containerPadding * scale) * 2));
+    case ConnectionPoint.left:
+      return Offset(nodePosition.dx + (containerPadding * scale), centerY);
   }
+}
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.black
-      ..strokeWidth = 2
+      ..strokeWidth = 2*scale
       ..style = PaintingStyle.stroke;
 
-    // Get actual connection point coordinates
-    final startOffset = _getConnectionPointOffset(start, startPoint);
-    final endOffset = _getConnectionPointOffset(end, endPoint);
+    // Scale positions
+  final scaledStart = Offset(start.dx * scale, start.dy * scale);
+  final scaledEnd = Offset(end.dx * scale, end.dy * scale);
+
+  // Get actual connection point coordinates with scaling
+  final startOffset = _getConnectionPointOffset(scaledStart, startPoint);
+  final endOffset = _getConnectionPointOffset(scaledEnd, endPoint);
 
     // Draw curved path between points
     final path = Path();

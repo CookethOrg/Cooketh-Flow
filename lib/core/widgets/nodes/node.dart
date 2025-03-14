@@ -62,11 +62,14 @@ class Node extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanStart: (details) {
-            details.sourceTimeStamp;
+            print("Pan started on $handle handle for node $id");
           },
           onPanUpdate: (details) {
+            print("Pan update on $handle handle: deltaX=${details.delta.dx}, deltaY=${details.delta.dy}");
+
             double newWidth = wp.getWidth(id);
             double newHeight = wp.getHeight(id);
+            Offset newPosition = position;
 
             // Get the current scale factor
             final scaleFactor = wp.scale;
@@ -80,10 +83,11 @@ class Node extends StatelessWidget {
                 newWidth = wp.getWidth(id) - adjustedDeltaX;
                 newHeight = wp.getHeight(id) - adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  onDrag(Offset(
+                  newPosition = Offset(
                     position.dx + adjustedDeltaX,
                     position.dy + adjustedDeltaY,
-                  ));
+                  );
+                  onDrag(newPosition);
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
@@ -91,7 +95,11 @@ class Node extends StatelessWidget {
                 newWidth = wp.getWidth(id) + adjustedDeltaX;
                 newHeight = wp.getHeight(id) - adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  onDrag(Offset(position.dx, position.dy + adjustedDeltaY));
+                  newPosition = Offset(
+                    position.dx,
+                    position.dy + adjustedDeltaY,
+                  );
+                  onDrag(newPosition);
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
@@ -99,7 +107,11 @@ class Node extends StatelessWidget {
                 newWidth = wp.getWidth(id) - adjustedDeltaX;
                 newHeight = wp.getHeight(id) + adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  onDrag(Offset(position.dx + adjustedDeltaX, position.dy));
+                  newPosition = Offset(
+                    position.dx + adjustedDeltaX,
+                    position.dy,
+                  );
+                  onDrag(newPosition);
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
@@ -107,17 +119,19 @@ class Node extends StatelessWidget {
                 newWidth = wp.getWidth(id) + adjustedDeltaX;
                 newHeight = wp.getHeight(id) + adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
+                  newPosition = position; // No position change needed
+                  onDrag(newPosition);
                   onResize(Size(newWidth, newHeight));
                 }
                 break;
             }
+            print("New size: $newWidth x $newHeight, New position: $newPosition");
           },
           child: Container(
             width: handleSize,
             height: handleSize,
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.blue, width: 1),
+              color: Colors.blue,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

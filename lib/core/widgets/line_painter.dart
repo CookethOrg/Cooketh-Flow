@@ -11,6 +11,8 @@ class LinePainter extends CustomPainter {
   final String targetNodeId;
   final double scale;
   final double cornerRadius;
+  final Function(Offset, Connection)? onTap;
+final Connection? connection;
 
   // Node dimensions
   static const double nodeWidth = 150.0; // Default node width
@@ -25,7 +27,9 @@ class LinePainter extends CustomPainter {
     required this.targetNodeId,
     required this.endPoint,
     this.scale = 1.0,
-    this.cornerRadius = 10.0, // Rounded corner radius
+    this.cornerRadius = 10.0,
+    this.onTap,
+    this.connection // Rounded corner radius
   });
 
   Offset _getConnectionPointOffset(Offset nodePosition, ConnectionPoint point) {

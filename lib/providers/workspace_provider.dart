@@ -330,38 +330,57 @@ class WorkspaceProvider extends StateHandler {
 }
 
   void removeSelectedNodes() {
-    if (selectedNode == null) {
-      print("Error: No node selected.");
-      return;
-    }
-
-    String nodeId = selectedNode!.id;
-
-    if (!_nodeList.containsKey(nodeId)) {
-      print("Error: Node with ID $nodeId not found.");
-      return;
-    }
-
-    print("Removing node: $nodeId");
-
-    _saveStateForUndo(); // Save state before removal
-
-    // Remove the node from the local node list
-    _nodeList.remove(nodeId);
-
-    // Remove the node from the FlowManager
-    flowManager.removeNode(nodeId);
-
-    // Clear selection after deletion
-    selectedNode = null;
-
-    // Update the database
-    saveChanges();
-
-    notifyListeners();
-
-    print("Node removed successfully.");
+  if (selectedNode == null) {
+    print("No node selected for removal.");
+    return;
   }
+
+  String nodeId = selectedNode!.id;
+
+  if (!_nodeList.containsKey(nodeId)) {
+    print("Error: Node with ID $nodeId not found.");
+    return;
+  }
+
+  _saveStateForUndo(); // Save state before removal
+
+  // Get all connections involving this node
+  List<Connection> connectionsToRemove = [];
+  for (var connection in flowManager.connections) {
+    if (connection.sourceNodeId == nodeId || connection.targetNodeId == nodeId) {
+      connectionsToRemove.add(connection);
+    }
+  }
+
+  // Remove each connection
+  for (var connection in connectionsToRemove) {
+    flowManager.connections.remove(connection);
+    
+    // Clean up connection from the other node too
+    String otherNodeId = connection.sourceNodeId == nodeId 
+      ? connection.targetNodeId 
+      : connection.sourceNodeId;
+    
+    if (_nodeList.containsKey(otherNodeId)) {
+      _nodeList[otherNodeId]!.removeConnection(connection);
+    }
+  }
+
+  // Remove the node from local list
+  _nodeList.remove(nodeId);
+  
+  // Remove the node from FlowManager
+  flowManager.removeNode(nodeId);
+
+  // Clear selection
+  selectedNode = null;
+
+  // Update the database
+  saveChanges();
+  notifyListeners();
+  
+  print("Node and its connections removed successfully.");
+}
 
   void undo() {
     if (_undoStack.isNotEmpty) {
@@ -588,4 +607,23 @@ class WorkspaceProvider extends StateHandler {
         return Offset(node.position.dx, centerY);
     }
   }
+
+  void removeConnection(Connection connection) {
+  _saveStateForUndo();
+  
+  // Remove the connection from the nodes
+  if (_nodeList.containsKey(connection.sourceNodeId)) {
+    _nodeList[connection.sourceNodeId]!.removeConnection(connection);
+  }
+  if (_nodeList.containsKey(connection.targetNodeId)) {
+    _nodeList[connection.targetNodeId]!.removeConnection(connection);
+  }
+  
+  // Remove from the flowManager
+  flowManager.connections.remove(connection);
+  
+  // Update database
+  saveChanges();
+  notifyListeners();
+}
 }

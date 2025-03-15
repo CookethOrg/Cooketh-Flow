@@ -2,6 +2,8 @@ import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
+import 'package:cookethflow/models/connection.dart';
+import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
@@ -52,6 +54,91 @@ class _WorkspaceState extends State<Workspace> {
     setState(() {
       _isInitialized = true;
     });
+  }
+
+  void _showConnectionContextMenu(
+      BuildContext context, Connection connection, Offset position) {
+    final RenderBox overlay =
+        Overlay.of(context)!.context.findRenderObject() as RenderBox;
+
+    showMenu(
+      context: context,
+      position: RelativeRect.fromRect(
+        Rect.fromPoints(position, position),
+        Rect.fromLTWH(0, 0, overlay.size.width, overlay.size.height),
+      ),
+      items: [
+        PopupMenuItem(
+          child: Row(
+            children: [
+              Icon(PhosphorIconsRegular.trash, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Delete Connection'),
+            ],
+          ),
+          onTap: () {
+            // Remove the connection
+            final workspaceProvider =
+                Provider.of<WorkspaceProvider>(context, listen: false);
+            workspaceProvider.removeConnection(connection);
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showDeleteWorkspaceDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          title: Text(
+            'Delete Workspace',
+            style:
+                TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+          ),
+          content: Text(
+            'Are you sure you want to delete this workspace? This action cannot be undone.',
+            style: TextStyle(fontFamily: 'Frederik'),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context);
+
+                try {
+                  final workspaceProvider =
+                      Provider.of<WorkspaceProvider>(context, listen: false);
+                  final flowProvider =
+                      Provider.of<FlowmanageProvider>(context, listen: false);
+
+                  await flowProvider.deleteWorkspace(widget.flowId);
+
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text('Workspace deleted successfully')));
+
+                  Navigator.of(context).pop(); // Return to dashboard
+                } catch (e) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Error deleting workspace: ${e.toString()}'),
+                    backgroundColor: Colors.red,
+                  ));
+                }
+              },
+              child: Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _updateTransformFromProvider() {
@@ -257,6 +344,16 @@ class _WorkspaceState extends State<Workspace> {
                   Container(
                     alignment: Alignment.center,
                     padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 8.0),
+                    child: IconButton(
+                      icon: Icon(PhosphorIconsRegular.trash, color: Colors.red),
+                      tooltip: 'Delete Workspace',
+                      onPressed: () => _showDeleteWorkspaceDialog(context),
+                    ),
+                  ),
+                  Container(
+                    alignment: Alignment.center,
+                    padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: ElevatedButton.icon(
                       onPressed: () =>
@@ -369,21 +466,31 @@ class _WorkspaceState extends State<Workspace> {
                           ),
                           // Lines & Nodes
                           ...workProvider.connections.map((connection) {
-                            return CustomPaint(
-                              size: Size.infinite,
-                              painter: LinePainter(
-                                start: workProvider
-                                    .nodeList[connection.sourceNodeId]!
-                                    .position,
-                                end: workProvider
-                                    .nodeList[connection.targetNodeId]!
-                                    .position,
-                                sourceNodeId: connection.sourceNodeId,
-                                startPoint: connection.sourcePoint,
-                                targetNodeId: connection.targetNodeId,
-                                endPoint: connection.targetPoint,
-                                scale: workProvider
-                                    .scale, // Pass the scale parameter
+                            return GestureDetector(
+                              onTapDown: (details) {
+                                // We'll implement detection of taps on the line here
+                                // This is a simplistic approach - for production, you might want
+                                // to implement proper hit-testing on the path
+                                _showConnectionContextMenu(context, connection,
+                                    details.globalPosition);
+                              },
+                              child: CustomPaint(
+                                size: Size.infinite,
+                                painter: LinePainter(
+                                  start: workProvider
+                                      .nodeList[connection.sourceNodeId]!
+                                      .position,
+                                  end: workProvider
+                                      .nodeList[connection.targetNodeId]!
+                                      .position,
+                                  sourceNodeId: connection.sourceNodeId,
+                                  startPoint: connection.sourcePoint,
+                                  targetNodeId: connection.targetNodeId,
+                                  endPoint: connection.targetPoint,
+                                  scale: workProvider.scale,
+                                  connection:
+                                      connection, // Pass the connection object
+                                ),
                               ),
                             );
                           }),

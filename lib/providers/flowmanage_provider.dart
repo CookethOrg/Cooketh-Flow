@@ -230,6 +230,41 @@ Future<String> importWorkspace(Uint8List fileData, String fileName) async {
     rethrow;
   }
 }
+
+Future<void> deleteWorkspace(String flowId) async {
+  _isLoading = true;
+  notifyListeners();
+  
+  try {
+    var currentUser = supabase.auth.currentUser;
+    if (currentUser == null) {
+      throw Exception('No authenticated user found');
+    }
+
+    if (!_flowList.containsKey(flowId)) {
+      throw Exception('Flow with ID $flowId not found');
+    }
+    
+    // Remove the flow from the local list
+    _flowList.remove(flowId);
+    
+    // Update newFlowId if necessary
+    if (_newFlowId == flowId) {
+      _newFlowId = _flowList.isNotEmpty ? _flowList.keys.first : "";
+    }
+    
+    // Update the database
+    await updateFlowList();
+    
+    print("Workspace deleted successfully: $flowId");
+  } catch (e) {
+    print('Error deleting workspace: $e');
+    rethrow;
+  } finally {
+    _isLoading = false;
+    notifyListeners();
+  }
+}
 }
 
 class MyHttpOverrides extends HttpOverrides {

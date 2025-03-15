@@ -279,16 +279,114 @@ class SupabaseService extends StateHandler {
     return user != null;
   }
 
+  // Update user name in both Auth and User table
   Future<String> updateUserName({required String userName}) async {
-    String res = 'some error occured';
+    String res = 'Some error occurred';
+    
     try {
-      UserResponse user = await supabase.auth
-          .updateUser(UserAttributes(data: {'userName': userName}));
-
-      res = 'User Name Updated succesfully';
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+      
+      // Input validation
+      if (userName.trim().isEmpty) {
+        throw Exception('Username cannot be empty');
+      }
+      
+      // Update username in Auth metadata
+      await supabase.auth.updateUser(UserAttributes(data: {'userName': userName}));
+      
+      // Also update username in User table
+      await supabase.from('User')
+        .update({'userName': userName})
+        .eq('id', user.id);
+      
+      res = 'Username updated successfully';
+      notifyListeners(); // Notify listeners of the change
       return res;
     } catch (e) {
-      return e.toString();
+      res = e.toString();
+      throw Exception(res);
+    }
+  }
+  
+  // Update user email (would typically require email verification)
+  Future<String> updateUserEmail({required String email}) async {
+    String res = 'Some error occurred';
+    
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+      
+      // Input validation
+      if (email.trim().isEmpty) {
+        throw Exception('Email cannot be empty');
+      }
+      
+      // Basic email validation regex
+      final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+      if (!emailRegex.hasMatch(email)) {
+        throw Exception('Please enter a valid email address');
+      }
+      
+      // Update email in Auth
+      // Note: This would typically send a confirmation email
+      await supabase.auth.updateUser(UserAttributes(email: email));
+      
+      // Also update email in User table
+      await supabase.from('User')
+        .update({'email': email})
+        .eq('id', user.id);
+      
+      res = 'Email update requested. Please check your inbox to confirm.';
+      notifyListeners();
+      return res;
+    } catch (e) {
+      res = e.toString();
+      throw Exception(res);
+    }
+  }
+  
+  // Update user password
+  Future<String> updateUserPassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    String res = 'Some error occurred';
+    
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('No authenticated user found');
+      }
+      
+      // Input validation
+      if (newPassword.length < 6) {
+        throw Exception('Password must be at least 6 characters');
+      }
+      
+      // Verify current password by attempting to sign in
+      await supabase.auth.signInWithPassword(
+        email: user.email!,
+        password: currentPassword,
+      );
+      
+      // Update the password
+      await supabase.auth.updateUser(
+        UserAttributes(password: newPassword),
+      );
+      
+      res = 'Password updated successfully';
+      return res;
+    } catch (AuthException) {
+      res = 'Current password is incorrect';
+      throw Exception(res);
+    } catch (e) {
+      res = e.toString();
+      throw Exception(res);
     }
   }
 }

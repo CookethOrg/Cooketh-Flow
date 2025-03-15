@@ -100,13 +100,47 @@ class AuthenticationProvider extends StateHandler {
   }
 
   Future<void> deleteUserAccount() async {
-  try {
-    await supabaseService.deleteUserAccount();
-  } catch (e) {
-    print("Error in AuthProvider - deleteUserAccount: $e");
-    rethrow;
+    try {
+      await supabaseService.deleteUserAccount();
+    } catch (e) {
+      print("Error in AuthProvider - deleteUserAccount: $e");
+      rethrow;
+    }
   }
-}
+
+  // Update user profile methods
+  Future<String> updateUserName(String userName) async {
+    try {
+      return await supabaseService.updateUserName(userName: userName);
+    } catch (e) {
+      print("Error in AuthProvider - updateUserName: $e");
+      rethrow;
+    }
+  }
+
+  Future<String> updateUserEmail(String email) async {
+    try {
+      return await supabaseService.updateUserEmail(email: email);
+    } catch (e) {
+      print("Error in AuthProvider - updateUserEmail: $e");
+      rethrow;
+    }
+  }
+
+  Future<String> updateUserPassword({
+    required String currentPassword,
+    required String newPassword,
+  }) async {
+    try {
+      return await supabaseService.updateUserPassword(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      );
+    } catch (e) {
+      print("Error in AuthProvider - updateUserPassword: $e");
+      rethrow;
+    }
+  }
 
   @override
   void dispose() {

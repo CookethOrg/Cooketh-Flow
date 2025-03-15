@@ -1,8 +1,11 @@
+// lib/core/widgets/toolbar.dart
+
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/widgets/buttons/add_node_button.dart';
 import 'package:cookethflow/core/widgets/buttons/redo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/undo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/delete_button.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class Toolbar extends StatelessWidget {
   final Function() onDelete;
@@ -32,9 +35,8 @@ class Toolbar extends StatelessWidget {
             SizedBox(height: 12),
             AddButton(),
             SizedBox(height: 12),
-            // DeleteButton(
-            //   onUndo: onUndo,
-            // ),
+            DeleteButton(onDelete: onDelete), // Use the DeleteButton that was already defined
+            SizedBox(height: 12),
           ],
         ),
       ),

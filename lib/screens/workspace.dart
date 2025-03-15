@@ -412,6 +412,7 @@ class _WorkspaceState extends State<Workspace> {
                 // UI elements that should stay fixed regardless of zoom/pan
                 FloatingDrawer(flowId: widget.flowId),
                 // Replace the existing Toolbar and CustomToolbar sections in your Stack with:
+                // Replace the existing Toolbar and CustomToolbar section in the Stack with:
                 Positioned(
                   top: 20, // Add some spacing from the app bar
                   right: 20,
@@ -424,7 +425,13 @@ class _WorkspaceState extends State<Workspace> {
                         onRedo: workProvider.redo,
                       ),
                       SizedBox(height: 16), // Add spacing between the toolbars
-                      CustomToolbar(),
+                      Opacity(
+                        opacity: workProvider.hasSelectedNode ? 1.0 : 0.5,
+                        child: IgnorePointer(
+                          ignoring: !workProvider.hasSelectedNode,
+                          child: CustomToolbar(),
+                        ),
+                      ),
                     ],
                   ),
                 ),

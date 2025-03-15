@@ -93,20 +93,26 @@ class _CustomToolbarState extends State<CustomToolbar> {
         color: Colors.white,
       ),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // SelectNode(
-            //   selectedNode: selectedNode,
-            //   onNodeSelected: _selectNode,
-            // ),
-            // _divider(),
-            // ColorPickerButton(
-            //   selectedColor: selectedColor,
-            //   onColorSelected: _selectColor,
-            // ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: SelectNode(
+                selectedNode: selectedNode,
+                onNodeSelected: _selectNode,
+              ),
+            ),
+            _divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: ColorPickerButton(
+                selectedColor: selectedColor,
+                onColorSelected: _selectColor,
+              ),
+            ),
             _divider(),
             _toggleableButton(
               isActive: isBold,

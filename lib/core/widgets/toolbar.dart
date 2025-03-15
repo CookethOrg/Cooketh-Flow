@@ -17,7 +17,7 @@ class Toolbar extends StatelessWidget {
       right: 24,
       top: 24,
       child: Container(
-        padding: EdgeInsets.all(12),
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),

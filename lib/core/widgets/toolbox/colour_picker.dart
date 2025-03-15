@@ -40,7 +40,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
       tooltip: "",
       padding: EdgeInsets.zero,
       shadowColor: Colors.transparent,
-      offset: Offset(-20, 50),
+      offset: Offset(-80, -15),
       menuPadding: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
@@ -51,37 +51,55 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
         return [
           PopupMenuItem<Color>(
             enabled: false,
-            child: StatefulBuilder(
-              builder: (context, setStatePopup) {
-                return Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: colors.map((color) {
-                    return GestureDetector(
-                      onTap: () {
-                        setStatePopup(() {
-                          _tempSelectedColor = color;
-                        });
-                        widget.onColorSelected(color);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        child: Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: color,
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: _tempSelectedColor == color ? Colors.blue : Colors.transparent,
-                              width: 2,
-                            ),
-                          ),
-                        ),
+            padding: EdgeInsets.zero, // Remove default padding
+            child: Material(
+              color: Colors.transparent,
+              child: StatefulBuilder(
+                builder: (context, setStatePopup) {
+                  return IntrinsicWidth(
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8), // More left & right padding
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
                       ),
-                    );
-                  }).toList(),
-                );
-              },
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: colors.map((color) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6), // More spacing between circles
+                            child: GestureDetector(
+                              onTap: () {
+                                setStatePopup(() {
+                                  _tempSelectedColor = color;
+                                });
+                                widget.onColorSelected(color);
+                              },
+                              child: Container(
+                                width: 28,
+                                height: 28,
+                                decoration: BoxDecoration(
+                                  color: color,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: _tempSelectedColor == color
+                                        ? Colors.blue
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
         ];

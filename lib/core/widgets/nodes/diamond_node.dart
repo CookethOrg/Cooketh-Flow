@@ -19,7 +19,7 @@ class DiamondNode extends StatelessWidget {
           height: size,
           decoration: BoxDecoration(
             color: Colors.lightGreen.shade200,
-            border: Border.all(color: Colors.black, width: 2),
+            border: Border.all(color: Colors.black, width: 1),
             borderRadius: const BorderRadius.all(Radius.circular(12)),
           ),
           child: Transform.rotate(

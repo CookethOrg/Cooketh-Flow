@@ -58,7 +58,7 @@ class CylinderPainter extends CustomPainter {
     final Paint outline = Paint()
       ..color = Colors.black
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
+      ..strokeWidth = 1;
 
     final double width = size.width;
     final double height = size.height;

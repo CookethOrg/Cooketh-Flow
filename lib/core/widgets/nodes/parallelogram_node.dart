@@ -27,7 +27,7 @@ class ParallelogramNode extends StatelessWidget {
           // Inner blue box with text
           Positioned.fill(
             child: Padding(
-              padding: const EdgeInsets.all(2), // Outline thickness
+              padding: const EdgeInsets.all(1), // Outline thickness
               child: ClipPath(
                 clipper: ParallelogramClipper(),
                 child: Container(

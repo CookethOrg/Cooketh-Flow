@@ -3,6 +3,7 @@ import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
 import 'package:cookethflow/models/connection.dart';
+import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
@@ -54,6 +55,124 @@ class _WorkspaceState extends State<Workspace> {
     setState(() {
       _isInitialized = true;
     });
+  }
+
+  // Check if a point is close to a connection line
+  bool _isPointNearConnection(Offset point, Connection connection, WorkspaceProvider provider, Matrix4 matrix) {
+    final scale = math.sqrt(matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+        matrix.getColumn(1)[0] * matrix.getColumn(1)[0]);
+    
+    final sourceNode = provider.nodeList[connection.sourceNodeId]!;
+    final targetNode = provider.nodeList[connection.targetNodeId]!;
+    
+    // Calculate connection points in world coordinates
+    final sourcePoint = _getConnectionPointCoordinates(
+      sourceNode, 
+      connection.sourcePoint,
+      matrix
+    );
+    
+    final targetPoint = _getConnectionPointCoordinates(
+      targetNode,
+      connection.targetPoint,
+      matrix
+    );
+    
+    // Calculate midpoint for orthogonal routing
+    final midX = (sourcePoint.dx + targetPoint.dx) / 2;
+    final midY = (sourcePoint.dy + targetPoint.dy) / 2;
+    
+    // Create points for orthogonal path
+    List<Offset> pathPoints = [sourcePoint];
+    
+    // Add intermediate points based on connection points
+    if (_isHorizontal(connection.sourcePoint) && _isHorizontal(connection.targetPoint)) {
+      pathPoints.add(Offset(midX, sourcePoint.dy));
+      pathPoints.add(Offset(midX, targetPoint.dy));
+    } else if (_isVertical(connection.sourcePoint) && _isVertical(connection.targetPoint)) {
+      pathPoints.add(Offset(sourcePoint.dx, midY));
+      pathPoints.add(Offset(targetPoint.dx, midY));
+    } else if (_isHorizontal(connection.sourcePoint) && _isVertical(connection.targetPoint)) {
+      pathPoints.add(Offset(targetPoint.dx, sourcePoint.dy));
+    } else if (_isVertical(connection.sourcePoint) && _isHorizontal(connection.targetPoint)) {
+      pathPoints.add(Offset(sourcePoint.dx, targetPoint.dy));
+    }
+    
+    pathPoints.add(targetPoint);
+    
+    // Check if point is close to any line segment of the path
+    for (int i = 0; i < pathPoints.length - 1; i++) {
+      if (_isPointNearLineSegment(point, pathPoints[i], pathPoints[i + 1])) {
+        return true;
+      }
+    }
+    
+    return false;
+  }
+
+  bool _isHorizontal(ConnectionPoint point) {
+    return point == ConnectionPoint.left || point == ConnectionPoint.right;
+  }
+  
+  bool _isVertical(ConnectionPoint point) {
+    return point == ConnectionPoint.top || point == ConnectionPoint.bottom;
+  }
+
+  // Check if a point is near a line segment
+  bool _isPointNearLineSegment(Offset point, Offset lineStart, Offset lineEnd) {
+    const double hitThreshold = 10.0; // Distance in pixels within which we consider a hit
+    
+    // Calculate squared length of the line segment
+    final lengthSquared = (lineEnd - lineStart).distanceSquared;
+    
+    if (lengthSquared == 0) {
+      // Line segment is actually a point
+      return (point - lineStart).distance < hitThreshold;
+    }
+    
+    // Calculate projection of point onto line segment
+    final t = ((point.dx - lineStart.dx) * (lineEnd.dx - lineStart.dx) +
+              (point.dy - lineStart.dy) * (lineEnd.dy - lineStart.dy)) / lengthSquared;
+    
+    if (t < 0) {
+      // Point is beyond the lineStart end of the line segment
+      return (point - lineStart).distance < hitThreshold;
+    } else if (t > 1) {
+      // Point is beyond the lineEnd end of the line segment
+      return (point - lineEnd).distance < hitThreshold;
+    }
+    
+    // Calculate the projection point
+    final projection = Offset(
+      lineStart.dx + t * (lineEnd.dx - lineStart.dx),
+      lineStart.dy + t * (lineEnd.dy - lineStart.dy)
+    );
+    
+    // Calculate distance from point to line
+    return (point - projection).distance < hitThreshold;
+  }
+
+  // Helper to get connection point coordinates
+  Offset _getConnectionPointCoordinates(FlowNode node, ConnectionPoint point, Matrix4 matrix) {
+    final scale = math.sqrt(matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+        matrix.getColumn(1)[0] * matrix.getColumn(1)[0]);
+    
+    final dx = matrix.getTranslation().x;
+    final dy = matrix.getTranslation().y;
+    
+    final centerX = node.position.dx * scale + dx + (node.size.width * scale / 2);
+    final centerY = node.position.dy * scale + dy + (node.size.height * scale / 2);
+
+    switch (point) {
+      case ConnectionPoint.top:
+        return Offset(centerX, node.position.dy * scale + dy);
+      case ConnectionPoint.right:
+        return Offset(node.position.dx * scale + dx + node.size.width * scale, centerY);
+      case ConnectionPoint.bottom:
+        return Offset(centerX, node.position.dy * scale + dy + node.size.height * scale);
+      case ConnectionPoint.left:
+        return Offset(node.position.dx * scale + dx, centerY);
+    }
   }
 
   void _showConnectionContextMenu(
@@ -414,6 +533,33 @@ class _WorkspaceState extends State<Workspace> {
                     onTapDown: (details) {
                       if (_isPanning) return;
 
+                      // First check if the click is on a connection
+                      bool hitConnection = false;
+                      Connection? hitConnectionObj;
+                      
+                      for (var connection in workProvider.connections) {
+                        if (_isPointNearConnection(
+                          details.globalPosition, 
+                          connection, 
+                          workProvider,
+                          _transformationController.value
+                        )) {
+                          hitConnection = true;
+                          hitConnectionObj = connection;
+                          break;
+                        }
+                      }
+                      
+                      if (hitConnection && hitConnectionObj != null) {
+                        _showConnectionContextMenu(
+                          context, 
+                          hitConnectionObj, 
+                          details.globalPosition
+                        );
+                        return;
+                      }
+
+                      // If not a connection, check if it's a node
                       bool hitNode = false;
                       for (var node in workProvider.nodeList.values) {
                         // Get transformed bounds
@@ -437,6 +583,7 @@ class _WorkspaceState extends State<Workspace> {
                       }
 
                       if (!hitNode) {
+                        // Click on empty space deselects all nodes
                         for (var node in workProvider.nodeList.values) {
                           if (node.isSelected) {
                             workProvider.changeSelected(node.id);
@@ -464,36 +611,28 @@ class _WorkspaceState extends State<Workspace> {
                               ),
                             ),
                           ),
-                          // Lines & Nodes
+                          // Draw connections
                           ...workProvider.connections.map((connection) {
-                            return GestureDetector(
-                              onTapDown: (details) {
-                                // We'll implement detection of taps on the line here
-                                // This is a simplistic approach - for production, you might want
-                                // to implement proper hit-testing on the path
-                                _showConnectionContextMenu(context, connection,
-                                    details.globalPosition);
-                              },
-                              child: CustomPaint(
-                                size: Size.infinite,
-                                painter: LinePainter(
-                                  start: workProvider
-                                      .nodeList[connection.sourceNodeId]!
-                                      .position,
-                                  end: workProvider
-                                      .nodeList[connection.targetNodeId]!
-                                      .position,
-                                  sourceNodeId: connection.sourceNodeId,
-                                  startPoint: connection.sourcePoint,
-                                  targetNodeId: connection.targetNodeId,
-                                  endPoint: connection.targetPoint,
-                                  scale: workProvider.scale,
-                                  connection:
-                                      connection, // Pass the connection object
-                                ),
+                            return CustomPaint(
+                              size: Size.infinite,
+                              painter: LinePainter(
+                                start: workProvider
+                                    .nodeList[connection.sourceNodeId]!
+                                    .position,
+                                end: workProvider
+                                    .nodeList[connection.targetNodeId]!
+                                    .position,
+                                sourceNodeId: connection.sourceNodeId,
+                                startPoint: connection.sourcePoint,
+                                targetNodeId: connection.targetNodeId,
+                                endPoint: connection.targetPoint,
+                                scale: workProvider.scale,
+                                connection: connection,
                               ),
                             );
                           }),
+                          
+                          // Draw nodes
                           ...workProvider.nodeList.entries.map((entry) {
                             var id = entry.key;
                             var node = entry.value;
@@ -519,7 +658,6 @@ class _WorkspaceState extends State<Workspace> {
                 // UI elements that should stay fixed regardless of zoom/pan
                 FloatingDrawer(flowId: widget.flowId),
                 // Replace the existing Toolbar and CustomToolbar sections in your Stack with:
-                // Replace the existing Toolbar and CustomToolbar section in the Stack with:
                 Positioned(
                   top: 20, // Add some spacing from the app bar
                   right: 20,

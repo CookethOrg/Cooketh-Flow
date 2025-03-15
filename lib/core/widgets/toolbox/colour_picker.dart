@@ -6,13 +6,13 @@ class ColorPickerButton extends StatefulWidget {
   final Function(Color) onColorSelected;
 
   const ColorPickerButton({
-    Key? key,
+    super.key,
     required this.selectedColor,
     required this.onColorSelected,
-  }) : super(key: key);
+  });
 
   @override
-  _ColorPickerButtonState createState() => _ColorPickerButtonState();
+  State<ColorPickerButton> createState() => _ColorPickerButtonState();
 }
 
 class _ColorPickerButtonState extends State<ColorPickerButton> {

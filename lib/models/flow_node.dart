@@ -6,7 +6,7 @@ enum NodeType { rectangular, parallelogram, diamond, database }
 class FlowNode {
   Offset position;
   final TextEditingController data;
-  final NodeType type;
+  NodeType type;
   final String id;
   bool isSelected;
   final Map<ConnectionPoint, Set<Connection>> connections;

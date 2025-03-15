@@ -1,149 +1,77 @@
+import 'package:cookethflow/models/flow_node.dart';
+import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/widgets/toolbox/colour_picker.dart';
 import 'package:cookethflow/core/widgets/toolbox/select_node.dart';
+import 'package:provider/provider.dart';
 
-class CustomToolbar extends StatefulWidget {
-  @override
-  _CustomToolbarState createState() => _CustomToolbarState();
-}
-
-class _CustomToolbarState extends State<CustomToolbar> {
-  Color selectedColor = const Color(0xffF9B9B7);
-  IconData selectedNode = PhosphorIconsRegular.circle;
-
-  bool isBold = false;
-  bool isItalic = false;
-  bool isUnderline = false;
-  bool isStrikethrough = false;
-
-  void _selectColor(Color color) {
-    setState(() {
-      selectedColor = color;
-    });
-  }
-
-  void _selectNode(IconData node) {
-    setState(() {
-      selectedNode = node;
-    });
-  }
-
-  void _toggleBold() {
-    setState(() {
-      isBold = !isBold;
-    });
-  }
-
-  void _toggleItalic() {
-    setState(() {
-      isItalic = !isItalic;
-    });
-  }
-
-  void _toggleUnderline() {
-    setState(() {
-      isUnderline = !isUnderline;
-    });
-  }
-
-  void _toggleStrikethrough() {
-    setState(() {
-      isStrikethrough = !isStrikethrough;
-    });
-  }
-
-  void _showLinkDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Insert Link"),
-          content: TextField(
-            decoration: InputDecoration(
-              hintText: "Type or paste URL",
-              border: OutlineInputBorder(),
-            ),
-            keyboardType: TextInputType.url,
-            autofocus: true,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text("Insert"),
-            ),
-          ],
-        );
-      },
-    );
-  }
+class CustomToolbar extends StatelessWidget {
+  CustomToolbar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1),
-        borderRadius: BorderRadius.circular(12),
-        color: Colors.white,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: SelectNode(
-                selectedNode: selectedNode,
-                onNodeSelected: _selectNode,
-              ),
-            ),
-            _divider(),
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: ColorPickerButton(
-                selectedColor: selectedColor,
-                onColorSelected: _selectColor,
-              ),
-            ),
-            _divider(),
-            _toggleableButton(
-              isActive: isBold,
-              activeIcon: PhosphorIconsBold.textB,
-              inactiveIcon: PhosphorIconsRegular.textB,
-              onPressed: _toggleBold,
-            ),
-            _toggleableButton(
-              isActive: isItalic,
-              activeIcon: PhosphorIconsBold.textItalic,
-              inactiveIcon: PhosphorIconsRegular.textItalic,
-              onPressed: _toggleItalic,
-            ),
-            _toggleableButton(
-              isActive: isUnderline,
-              activeIcon: PhosphorIconsBold.textUnderline,
-              inactiveIcon: PhosphorIconsRegular.textUnderline,
-              onPressed: _toggleUnderline,
-            ),
-            _toggleableButton(
-              isActive: isStrikethrough,
-              activeIcon: PhosphorIconsBold.textStrikethrough,
-              inactiveIcon: PhosphorIconsRegular.textStrikethrough,
-              onPressed: _toggleStrikethrough,
-            ),
-            _divider(),
-            _toolbarButton(PhosphorIconsRegular.linkSimple, _showLinkDialog),
-          ],
+    return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
+      return Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: 1),
+          borderRadius: BorderRadius.circular(12),
+          color: Colors.white,
         ),
-      ),
-    );
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: SelectNode(
+                  selectedNode: pv.selectedNodeIcon,
+                  onNodeSelected: pv.selectNode,
+                ),
+              ),
+              _divider(),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: ColorPickerButton(
+                  selectedColor: pv.selectedColor,
+                  onColorSelected: pv.selectColor,
+                ),
+              ),
+              _divider(),
+              _toggleableButton(
+                isActive: pv.isBold,
+                activeIcon: PhosphorIconsBold.textB,
+                inactiveIcon: PhosphorIconsRegular.textB,
+                onPressed: pv.toggleBold,
+              ),
+              _toggleableButton(
+                isActive: pv.isItalic,
+                activeIcon: PhosphorIconsBold.textItalic,
+                inactiveIcon: PhosphorIconsRegular.textItalic,
+                onPressed: pv.toggleItalic,
+              ),
+              _toggleableButton(
+                isActive: pv.isUnderline,
+                activeIcon: PhosphorIconsBold.textUnderline,
+                inactiveIcon: PhosphorIconsRegular.textUnderline,
+                onPressed: pv.toggleUnderline,
+              ),
+              _toggleableButton(
+                isActive: pv.isStrikethrough,
+                activeIcon: PhosphorIconsBold.textStrikethrough,
+                inactiveIcon: PhosphorIconsRegular.textStrikethrough,
+                onPressed: pv.toggleStrikethrough,
+              ),
+              _divider(),
+              _toolbarButton(PhosphorIconsRegular.linkSimple,
+                  () => pv.showLinkDialog(context)),
+            ],
+          ),
+        ),
+      );
+    });
   }
 
   Widget _toolbarButton(IconData icon, VoidCallback onPressed) {

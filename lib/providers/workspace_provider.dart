@@ -16,6 +16,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'dart:ui' as ui;
 
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 // Add this enum to the file
 enum ExportType { json, png, svg }
 
@@ -319,68 +321,69 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void dragNode(String id, Offset off) {
-  _saveStateForUndo();
+    _saveStateForUndo();
 
-  if (_nodeList.containsKey(id)) {
-    // Store the position in the workspace's coordinate space
-    _nodeList[id]!.position = off;
-    updateFlowManager();
-    notifyListeners();
+    if (_nodeList.containsKey(id)) {
+      // Store the position in the workspace's coordinate space
+      _nodeList[id]!.position = off;
+      updateFlowManager();
+      notifyListeners();
+    }
   }
-}
 
   void removeSelectedNodes() {
-  if (selectedNode == null) {
-    print("No node selected for removal.");
-    return;
-  }
-
-  String nodeId = selectedNode!.id;
-
-  if (!_nodeList.containsKey(nodeId)) {
-    print("Error: Node with ID $nodeId not found.");
-    return;
-  }
-
-  _saveStateForUndo(); // Save state before removal
-
-  // Get all connections involving this node
-  List<Connection> connectionsToRemove = [];
-  for (var connection in flowManager.connections) {
-    if (connection.sourceNodeId == nodeId || connection.targetNodeId == nodeId) {
-      connectionsToRemove.add(connection);
+    if (selectedNode == null) {
+      print("No node selected for removal.");
+      return;
     }
-  }
 
-  // Remove each connection
-  for (var connection in connectionsToRemove) {
-    flowManager.connections.remove(connection);
-    
-    // Clean up connection from the other node too
-    String otherNodeId = connection.sourceNodeId == nodeId 
-      ? connection.targetNodeId 
-      : connection.sourceNodeId;
-    
-    if (_nodeList.containsKey(otherNodeId)) {
-      _nodeList[otherNodeId]!.removeConnection(connection);
+    String nodeId = selectedNode!.id;
+
+    if (!_nodeList.containsKey(nodeId)) {
+      print("Error: Node with ID $nodeId not found.");
+      return;
     }
+
+    _saveStateForUndo(); // Save state before removal
+
+    // Get all connections involving this node
+    List<Connection> connectionsToRemove = [];
+    for (var connection in flowManager.connections) {
+      if (connection.sourceNodeId == nodeId ||
+          connection.targetNodeId == nodeId) {
+        connectionsToRemove.add(connection);
+      }
+    }
+
+    // Remove each connection
+    for (var connection in connectionsToRemove) {
+      flowManager.connections.remove(connection);
+
+      // Clean up connection from the other node too
+      String otherNodeId = connection.sourceNodeId == nodeId
+          ? connection.targetNodeId
+          : connection.sourceNodeId;
+
+      if (_nodeList.containsKey(otherNodeId)) {
+        _nodeList[otherNodeId]!.removeConnection(connection);
+      }
+    }
+
+    // Remove the node from local list
+    _nodeList.remove(nodeId);
+
+    // Remove the node from FlowManager
+    flowManager.removeNode(nodeId);
+
+    // Clear selection
+    selectedNode = null;
+
+    // Update the database
+    saveChanges();
+    notifyListeners();
+
+    print("Node and its connections removed successfully.");
   }
-
-  // Remove the node from local list
-  _nodeList.remove(nodeId);
-  
-  // Remove the node from FlowManager
-  flowManager.removeNode(nodeId);
-
-  // Clear selection
-  selectedNode = null;
-
-  // Update the database
-  saveChanges();
-  notifyListeners();
-  
-  print("Node and its connections removed successfully.");
-}
 
   void undo() {
     if (_undoStack.isNotEmpty) {
@@ -609,21 +612,143 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void removeConnection(Connection connection) {
-  _saveStateForUndo();
-  
-  // Remove the connection from the nodes
-  if (_nodeList.containsKey(connection.sourceNodeId)) {
-    _nodeList[connection.sourceNodeId]!.removeConnection(connection);
+    _saveStateForUndo();
+
+    // Remove the connection from the nodes
+    if (_nodeList.containsKey(connection.sourceNodeId)) {
+      _nodeList[connection.sourceNodeId]!.removeConnection(connection);
+    }
+    if (_nodeList.containsKey(connection.targetNodeId)) {
+      _nodeList[connection.targetNodeId]!.removeConnection(connection);
+    }
+
+    // Remove from the flowManager
+    flowManager.connections.remove(connection);
+
+    // Update database
+    saveChanges();
+    notifyListeners();
   }
-  if (_nodeList.containsKey(connection.targetNodeId)) {
-    _nodeList[connection.targetNodeId]!.removeConnection(connection);
+
+  void changeNodeType(NodeType type, String nodeId) {
+    _nodeList[nodeId]?.type = type;
+    flowManager.nodes[nodeId]?.type = type;
+    updateFlowManager();
+    _saveStateForUndo();
+    saveChanges();
+    notifyListeners();
   }
-  
-  // Remove from the flowManager
-  flowManager.connections.remove(connection);
-  
-  // Update database
-  saveChanges();
-  notifyListeners();
-}
+
+  NodeType getNodeTypeFromIcon(IconData nodeIcon) {
+    NodeType nodeType = NodeType.rectangular; // Default value
+
+    switch (nodeIcon) {
+      case PhosphorIconsRegular.square:
+        nodeType = NodeType.rectangular;
+        break;
+      case PhosphorIconsRegular.diamond:
+        nodeType = NodeType.diamond;
+        break;
+      case PhosphorIconsRegular.database:
+        nodeType = NodeType.database;
+        break;
+      case PhosphorIconsRegular.parallelogram:
+        nodeType = NodeType.parallelogram;
+        break;
+    }
+
+    return nodeType;
+  }
+
+  IconData getNodeIcon(NodeType node) {
+    IconData nodeIcon = PhosphorIconsRegular.square;
+    switch (node) {
+      case NodeType.rectangular:
+        nodeIcon = PhosphorIconsRegular.square ;
+        break;
+      case NodeType.diamond:
+        nodeIcon = PhosphorIconsRegular.diamond;
+        break;
+      case NodeType.database:
+        nodeIcon = PhosphorIconsRegular.database;
+        break;
+      case NodeType.parallelogram:
+        nodeIcon = PhosphorIconsRegular.parallelogram;
+        break;
+    }
+
+    return nodeIcon;
+  }
+
+  Color selectedColor = const Color(0xffF9B9B7);
+  IconData selectedNodeIcon = PhosphorIconsRegular.square;
+
+  bool isBold = false;
+  bool isItalic = false;
+  bool isUnderline = false;
+  bool isStrikethrough = false;
+
+  void selectColor(Color color) {
+    selectedColor = color;
+    notifyListeners();
+  }
+
+  void selectNode(IconData node) {
+    selectedNodeIcon = node;
+    NodeType type = getNodeTypeFromIcon(node);
+    String nodeId = selectedNode!.id;
+    changeNodeType(type, nodeId);
+    notifyListeners();
+  }
+
+  void toggleBold() {
+    isBold = !isBold;
+    notifyListeners();
+  }
+
+  void toggleItalic() {
+    isItalic = !isItalic;
+    notifyListeners();
+  }
+
+  void toggleUnderline() {
+    isUnderline = !isUnderline;
+    notifyListeners();
+  }
+
+  void toggleStrikethrough() {
+    isStrikethrough = !isStrikethrough;
+    notifyListeners();
+  }
+
+  void showLinkDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Insert Link"),
+          content: TextField(
+            decoration: InputDecoration(
+              hintText: "Type or paste URL",
+              border: OutlineInputBorder(),
+            ),
+            keyboardType: TextInputType.url,
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel"),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text("Insert"),
+            ),
+          ],
+        );
+      },
+    );
+  }
 }

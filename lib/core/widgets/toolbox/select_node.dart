@@ -6,13 +6,13 @@ class SelectNode extends StatefulWidget {
   final Function(IconData) onNodeSelected;
 
   const SelectNode({
-    Key? key,
+    super.key,
     required this.selectedNode,
     required this.onNodeSelected,
-  }) : super(key: key);
+  });
 
   @override
-  _SelectNodeWidgetState createState() => _SelectNodeWidgetState();
+  State<SelectNode> createState() => _SelectNodeWidgetState();
 }
 
 class _SelectNodeWidgetState extends State<SelectNode> {
@@ -21,7 +21,7 @@ class _SelectNodeWidgetState extends State<SelectNode> {
     PhosphorIconsRegular.diamond,
     PhosphorIconsRegular.parallelogram,
     PhosphorIconsRegular.database,
-    PhosphorIconsRegular.circle,
+    // PhosphorIconsRegular.circle,
   ];
 
   IconData? _tempSelectedNode;

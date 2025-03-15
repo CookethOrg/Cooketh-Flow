@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class AddProjectCard extends StatelessWidget {
   const AddProjectCard({super.key, required this.onTap});
@@ -17,16 +18,15 @@ class AddProjectCard extends StatelessWidget {
         strokeWidth: 2,
         child: Center(
           child: Container(
-            width: 280,
-            height: 200,
+
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: const [
-                Icon(Icons.add, size: 50, color: Colors.black),
+                Icon(PhosphorIconsRegular.plus, size: 50, color: Colors.black),
                 SizedBox(height: 8),
                 Text(
                   'Create Project',

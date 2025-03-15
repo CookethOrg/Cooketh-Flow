@@ -3,6 +3,7 @@ import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -66,25 +67,24 @@ class _WorkspaceState extends State<Workspace> {
   }
 
   void _onInteractionUpdate(ScaleUpdateDetails details) {
-  final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-  
-  // Get the current transformation matrix
-  final matrix = _transformationController.value;
-  
-  // Extract scale from matrix (using the proper mathematical approach)
-  final scaleX = math.sqrt(
-    matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
-    matrix.getColumn(1)[0] * matrix.getColumn(1)[0]
-  );
-  
-  // Extract translation from matrix
-  final dx = matrix.getTranslation().x;
-  final dy = matrix.getTranslation().y;
-  
-  // Update provider with scale and position
-  workspaceProvider.updateScale(scaleX);
-  workspaceProvider.updatePosition(Offset(dx, dy));
-}
+    final workspaceProvider =
+        Provider.of<WorkspaceProvider>(context, listen: false);
+
+    // Get the current transformation matrix
+    final matrix = _transformationController.value;
+
+    // Extract scale from matrix (using the proper mathematical approach)
+    final scaleX = math.sqrt(matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+        matrix.getColumn(1)[0] * matrix.getColumn(1)[0]);
+
+    // Extract translation from matrix
+    final dx = matrix.getTranslation().x;
+    final dy = matrix.getTranslation().y;
+
+    // Update provider with scale and position
+    workspaceProvider.updateScale(scaleX);
+    workspaceProvider.updatePosition(Offset(dx, dy));
+  }
 
   void _showExportOptions(
       BuildContext context, WorkspaceProvider workProvider) {
@@ -256,13 +256,16 @@ class _WorkspaceState extends State<Workspace> {
                 actions: [
                   Container(
                     alignment: Alignment.center,
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0, vertical: 8.0),
                     child: ElevatedButton.icon(
-                      onPressed: () => _showExportOptions(context, workProvider),
+                      onPressed: () =>
+                          _showExportOptions(context, workProvider),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 18),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 28, vertical: 18),
                         side: const BorderSide(color: Colors.black, width: 1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
@@ -408,10 +411,22 @@ class _WorkspaceState extends State<Workspace> {
                 ),
                 // UI elements that should stay fixed regardless of zoom/pan
                 FloatingDrawer(flowId: widget.flowId),
-                Toolbar(
-                  onDelete: workProvider.removeSelectedNodes,
-                  onUndo: workProvider.undo,
-                  onRedo: workProvider.redo,
+                // Replace the existing Toolbar and CustomToolbar sections in your Stack with:
+                Positioned(
+                  top: 20, // Add some spacing from the app bar
+                  right: 20,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Toolbar(
+                        onDelete: workProvider.removeSelectedNodes,
+                        onUndo: workProvider.undo,
+                        onRedo: workProvider.redo,
+                      ),
+                      SizedBox(height: 16), // Add spacing between the toolbars
+                      CustomToolbar(),
+                    ],
+                  ),
                 ),
                 // Add zoom indicator
                 Positioned(

@@ -41,7 +41,7 @@ class _CustomToolbarState extends State<CustomToolbar> {
     });
   }
 
-    void _toggleUnderline() {
+  void _toggleUnderline() {
     setState(() {
       isUnderline = !isUnderline;
     });
@@ -69,7 +69,7 @@ class _CustomToolbarState extends State<CustomToolbar> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context), 
+              onPressed: () => Navigator.pop(context),
               child: Text("Cancel"),
             ),
             TextButton(
@@ -87,26 +87,26 @@ class _CustomToolbarState extends State<CustomToolbar> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1),
         borderRadius: BorderRadius.circular(12),
         color: Colors.white,
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            SelectNode(
-              selectedNode: selectedNode,
-              onNodeSelected: _selectNode,
-            ),
-            _divider(),
-            ColorPickerButton(
-              selectedColor: selectedColor,
-              onColorSelected: _selectColor,
-            ),
+            // SelectNode(
+            //   selectedNode: selectedNode,
+            //   onNodeSelected: _selectNode,
+            // ),
+            // _divider(),
+            // ColorPickerButton(
+            //   selectedColor: selectedColor,
+            //   onColorSelected: _selectColor,
+            // ),
             _divider(),
             _toggleableButton(
               isActive: isBold,
@@ -120,7 +120,6 @@ class _CustomToolbarState extends State<CustomToolbar> {
               inactiveIcon: PhosphorIconsRegular.textItalic,
               onPressed: _toggleItalic,
             ),
-
             _toggleableButton(
               isActive: isUnderline,
               activeIcon: PhosphorIconsBold.textUnderline,
@@ -165,10 +164,10 @@ class _CustomToolbarState extends State<CustomToolbar> {
 
   Widget _divider() {
     return Container(
-      width: 1,
-      height: 24,
+      width: 24,
+      height: 1,
       color: Colors.black,
-      margin: EdgeInsets.symmetric(horizontal: 8),
+      margin: EdgeInsets.symmetric(vertical: 8),
     );
   }
 }

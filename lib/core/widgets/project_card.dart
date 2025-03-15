@@ -15,38 +15,40 @@ class ProjectCard extends StatelessWidget {
       return InkWell(
         onTap: onTap,
         child: SizedBox(
-          width: 280,
-          height: 200,
+          width: 350,
+          height: 250,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.black, width: 2),
-                ),
-                child: ClipRRect(
-                  borderRadius:
-                      BorderRadius.circular(10), // Apply border radius
-                  child: ImageFiltered(
-                    imageFilter:
-                        ImageFilter.blur(sigmaX: 2, sigmaY: 2), // Blur effect
+              Expanded(
+                child: Container(
+                  width: 340,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.black, width: 2),
+                  ),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
-                      height: 320,
-                      'assets/pic1.png',
-                      fit: BoxFit.cover,
+                        'assets/pic1.png',
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              // SizedBox(
-              //   height: 8,
-              // ),
-              Spacer(),
-              Text(
-                pv.fl.flowList[flowId]!.flowName,
-                style: TextStyle(fontFamily: 'Frederik', fontSize: 20),
-              )
+              
+              const SizedBox(height: 12), // Reduced spacing to fit within height
+              SizedBox(
+                  child: Text(
+                    pv.fl.flowList[flowId]!.flowName,
+                    style: const TextStyle(fontFamily: 'Frederik', fontSize: 20),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+
             ],
           ),
         ),

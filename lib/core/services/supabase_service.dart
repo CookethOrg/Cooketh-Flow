@@ -63,13 +63,13 @@ class SupabaseService extends StateHandler {
   // Creates a template workspace with predefined nodes
   FlowManager createTemplateWorkspace() {
     String flowId = DateTime.now().millisecondsSinceEpoch.toString();
-    
+
     // Create flow manager
     FlowManager flowManager = FlowManager(
       flowId: flowId,
       flowName: "Get Started with Cooketh Flow",
     );
-    
+
     // Create the nodes with correct text and positions
     FlowNode startNode = FlowNode(
       id: "node1",
@@ -78,7 +78,7 @@ class SupabaseService extends StateHandler {
     );
     // Set text for start node
     startNode.data.text = "start";
-    
+
     FlowNode decisionNode = FlowNode(
       id: "node2",
       type: NodeType.parallelogram,
@@ -86,7 +86,7 @@ class SupabaseService extends StateHandler {
     );
     // Set text for decision node
     decisionNode.data.text = "decision node";
-    
+
     FlowNode pageNode = FlowNode(
       id: "node3",
       type: NodeType.diamond,
@@ -94,7 +94,7 @@ class SupabaseService extends StateHandler {
     );
     // Set text for page node
     pageNode.data.text = "some page";
-    
+
     FlowNode dbNode = FlowNode(
       id: "node4",
       type: NodeType.database,
@@ -102,7 +102,7 @@ class SupabaseService extends StateHandler {
     );
     // Set text for database node
     dbNode.data.text = "database details";
-    
+
     FlowNode endNode = FlowNode(
       id: "node5",
       type: NodeType.rectangular,
@@ -110,14 +110,14 @@ class SupabaseService extends StateHandler {
     );
     // Set text for end node
     endNode.data.text = "end";
-    
+
     // Add nodes to flow manager
     flowManager.addNode(startNode);
     flowManager.addNode(decisionNode);
     flowManager.addNode(pageNode);
     flowManager.addNode(dbNode);
     flowManager.addNode(endNode);
-    
+
     // Create connections between nodes
     flowManager.connectNodes(
       sourceNodeId: "node1",
@@ -125,28 +125,28 @@ class SupabaseService extends StateHandler {
       sourcePoint: ConnectionPoint.bottom,
       targetPoint: ConnectionPoint.top,
     );
-    
+
     flowManager.connectNodes(
       sourceNodeId: "node2",
       targetNodeId: "node3",
       sourcePoint: ConnectionPoint.bottom,
       targetPoint: ConnectionPoint.top,
     );
-    
+
     flowManager.connectNodes(
       sourceNodeId: "node3",
       targetNodeId: "node4",
       sourcePoint: ConnectionPoint.bottom,
       targetPoint: ConnectionPoint.top,
     );
-    
+
     flowManager.connectNodes(
       sourceNodeId: "node4",
       targetNodeId: "node5",
       sourcePoint: ConnectionPoint.bottom,
       targetPoint: ConnectionPoint.top,
     );
-    
+
     return flowManager;
   }
 
@@ -165,7 +165,7 @@ class SupabaseService extends StateHandler {
             password: password,
             emailRedirectTo: null, // Disable email verification redirect
             data: {'userName': userName} // Store username in metadata
-        );
+            );
 
         final user = authResponse.user;
         setUserData(authResponse);
@@ -174,10 +174,10 @@ class SupabaseService extends StateHandler {
 
         // Create template workspace for the new user
         FlowManager templateWorkspace = createTemplateWorkspace();
-        
+
         // Export the flow to JSON
         Map<String, dynamic> flowData = templateWorkspace.exportFlow();
-        
+
         // Create flowList with the template workspace
         Map<String, dynamic> flowListMap = {
           templateWorkspace.flowId: {
@@ -277,5 +277,18 @@ class SupabaseService extends StateHandler {
   Future<bool> checkUserSession() async {
     final user = supabase.auth.currentUser;
     return user != null;
+  }
+
+  Future<String> updateUserName({required String userName}) async {
+    String res = 'some error occured';
+    try {
+      UserResponse user = await supabase.auth
+          .updateUser(UserAttributes(data: {'userName': userName}));
+
+      res = 'User Name Updated succesfully';
+      return res;
+    } catch (e) {
+      return e.toString();
+    }
   }
 }

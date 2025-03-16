@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:cookethflow/core/services/platform_file_service.dart';
 
@@ -10,7 +12,7 @@ class FileServices {
   FileSaver fs = FileSaver();
 
   Future<String> exportFile({
-    required String fileName, 
+    required String fileName,
     required String jsonString,
   }) async {
     try {
@@ -31,10 +33,7 @@ class FileServices {
   }) async {
     try {
       await fs.saveFile(
-          name: fileName,
-          bytes: pngBytes,
-          ext: 'png',
-          mimeType: MimeType.png);
+          name: fileName, bytes: pngBytes, ext: 'png', mimeType: MimeType.png);
       return 'success';
     } catch (e) {
       return e.toString();
@@ -61,7 +60,7 @@ class FileServices {
   Future<Map<String, dynamic>?> importJsonFile(Uint8List fileData) async {
     return await PlatformFileService.parseJSONFile(fileData);
   }
-  
+
   Future<Map<String, dynamic>?> pickAndReadJsonFile() async {
     return await PlatformFileService.pickJSONFile();
   }

@@ -487,6 +487,16 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+// create workspace image for workspace card
+  Future<dynamic> createImg() async {
+    final boundary = _repaintBoundaryKey.currentContext!.findRenderObject()
+        as RenderRepaintBoundary;
+    final ui.Image image = await boundary.toImage(pixelRatio: 3.0);
+    final ByteData? byteData =
+        await image.toByteData(format: ui.ImageByteFormat.png);
+    return byteData;
+  }
+
 // SVG generation method
   String _generateSVG() {
     // Canvas dimensions
@@ -664,7 +674,7 @@ class WorkspaceProvider extends StateHandler {
     IconData nodeIcon = PhosphorIconsRegular.square;
     switch (node) {
       case NodeType.rectangular:
-        nodeIcon = PhosphorIconsRegular.square ;
+        nodeIcon = PhosphorIconsRegular.square;
         break;
       case NodeType.diamond:
         nodeIcon = PhosphorIconsRegular.diamond;

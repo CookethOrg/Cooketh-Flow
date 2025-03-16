@@ -3,6 +3,7 @@ import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/core/widgets/popup_box.dart';
 import 'package:cookethflow/screens/log_in.dart';
+import 'package:cookethflow/screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +48,8 @@ class DashboardDrawer extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 24, vertical: 32),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween, // Distributes space evenly
+                                mainAxisAlignment: MainAxisAlignment
+                                    .spaceBetween, // Distributes space evenly
                                 children: [
                                   Row(
                                     children: [
@@ -55,7 +57,9 @@ class DashboardDrawer extends StatelessWidget {
                                         backgroundImage:
                                             AssetImage('assets/pic1.png'),
                                       ),
-                                      SizedBox(width: 12), // Slightly increased spacing
+                                      SizedBox(
+                                          width:
+                                              12), // Slightly increased spacing
                                       Text(
                                         user?['userName'] ?? "UserName",
                                         style: TextStyle(
@@ -92,9 +96,15 @@ class DashboardDrawer extends StatelessWidget {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20), // Consistent horizontal padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal:
+                                      20), // Consistent horizontal padding
                               child: ElevatedButton.icon(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  await auth.logout();
+                                  Navigator.of(context)
+                                      .pushReplacement(MaterialPageRoute(builder: (context) => SignupPage(),));
+                                },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,
                                   fixedSize: Size(200, 50),
@@ -116,9 +126,13 @@ class DashboardDrawer extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 40), // Slightly increased for better spacing
+                            SizedBox(
+                                height:
+                                    40), // Slightly increased for better spacing
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20), // Consistent horizontal padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal:
+                                      20), // Consistent horizontal padding
                               child: TextButton.icon(
                                 onPressed: () {},
                                 icon: Icon(
@@ -135,9 +149,12 @@ class DashboardDrawer extends StatelessWidget {
                                 ),
                               ),
                             ),
-                            SizedBox(height: 16), // Increased spacing between items
+                            SizedBox(
+                                height: 16), // Increased spacing between items
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20), // Consistent horizontal padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal:
+                                      20), // Consistent horizontal padding
                               child: TextButton.icon(
                                 onPressed: () {},
                                 icon: Icon(
@@ -156,7 +173,9 @@ class DashboardDrawer extends StatelessWidget {
                             ),
                             SizedBox(height: 16), // Increased spacing
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20), // Consistent horizontal padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal:
+                                      20), // Consistent horizontal padding
                               child: TextButton.icon(
                                 onPressed: () {},
                                 icon: Icon(
@@ -175,7 +194,9 @@ class DashboardDrawer extends StatelessWidget {
                             ),
                             SizedBox(height: 16), // Increased spacing
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 20), // Consistent horizontal padding
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal:
+                                      20), // Consistent horizontal padding
                               child: TextButton.icon(
                                 onPressed: () {},
                                 icon: Icon(
@@ -195,7 +216,8 @@ class DashboardDrawer extends StatelessWidget {
                             Spacer(),
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 24), // Increased vertical padding
+                                  horizontal: 20,
+                                  vertical: 24), // Increased vertical padding
                               child: ElevatedButton.icon(
                                 onPressed: () async {
                                   await auth.logout();

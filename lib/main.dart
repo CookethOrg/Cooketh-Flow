@@ -1,5 +1,6 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
@@ -29,43 +30,53 @@ Future<void> main() async {
     url: supabaseUrl,
     anonKey: supabaseApiKey,
   );
-  
+
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider<SupabaseService>(
           create: (_) => SupabaseService(instance.client)),
-      
       ChangeNotifierProxyProvider<SupabaseService, AuthenticationProvider>(
         create: (ctx) => AuthenticationProvider(
             Provider.of<SupabaseService>(ctx, listen: false)),
         update: (context, supabaseService, previousAuth) =>
             previousAuth ?? AuthenticationProvider(supabaseService),
       ),
-
       ChangeNotifierProxyProvider<SupabaseService, FlowmanageProvider>(
           create: (context) => FlowmanageProvider(
               Provider.of<SupabaseService>(context, listen: false)),
           update: (context, supabaseService, previousFlowProvider) =>
               previousFlowProvider ?? FlowmanageProvider(supabaseService)),
-
       ChangeNotifierProxyProvider<FlowmanageProvider, WorkspaceProvider>(
         create: (context) => WorkspaceProvider(
             Provider.of<FlowmanageProvider>(context, listen: false)),
         update: (context, flowManage, previousWorkspace) =>
             previousWorkspace ?? WorkspaceProvider(flowManage),
       ),
-
       ChangeNotifierProvider<DashboardProvider>(
           create: (_) => DashboardProvider()),
-
       ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
     ],
     child: MyApp(),
   ));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  final UpdateManager _updateManager = UpdateManager();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateManager.checkAndPromptForUpdate(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -33,32 +33,32 @@ class ProjectCard extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    // child: Image.asset(
-                    //     'assets/pic1.png',
-                    //     width: double.infinity,
-                    //     height: double.infinity,
-                    //     fit: BoxFit.cover,
-                    //   ),
-                    child: FutureBuilder<ByteData>(
-                      future: getImg(),
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
-                          return const Center(child: CircularProgressIndicator());
-                        } else if (snapshot.hasError) {
-                          return const Center(child: Icon(Icons.error));
-                        } else if (snapshot.hasData) {
-                          return Image(
-                            image: MemoryImage(snapshot.data!.buffer.asUint8List()),
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                            height: double.infinity,
-                            opacity: const AlwaysStoppedAnimation<double>(0.5),
-                          );
-                        } else {
-                          return const Center(child: Icon(Icons.image_not_supported));
-                        }
-                      },
-                    ),
+                    child: Image.asset(
+                        'assets/pic1.png',
+                        width: double.infinity,
+                        height: double.infinity,
+                        fit: BoxFit.cover,
+                      ),
+                    // child: FutureBuilder<ByteData>(
+                    //   future: getImg(),
+                    //   builder: (context, snapshot) {
+                    //     if (snapshot.connectionState == ConnectionState.waiting) {
+                    //       return const Center(child: CircularProgressIndicator());
+                    //     } else if (snapshot.hasError) {
+                    //       return const Center(child: Icon(Icons.error));
+                    //     } else if (snapshot.hasData) {
+                    //       return Image(
+                    //         image: MemoryImage(snapshot.data!.buffer.asUint8List()),
+                    //         fit: BoxFit.cover,
+                    //         width: double.infinity,
+                    //         height: double.infinity,
+                    //         opacity: const AlwaysStoppedAnimation<double>(0.5),
+                    //       );
+                    //     } else {
+                    //       return const Center(child: Icon(Icons.image_not_supported));
+                    //     }
+                    //   },
+                    // ),
                     ),
                   ),
                 ),

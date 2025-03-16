@@ -4,6 +4,8 @@ import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 
 class ProfileDialog extends StatelessWidget {
   const ProfileDialog({super.key});
@@ -22,252 +24,262 @@ class ProfileDialog extends StatelessWidget {
             }
             var user = snapshot.data;
             return Dialog(
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0)),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Header with Close Button
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.close, size: 24),
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-
-                    // Username Section
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Profile Image
-                        Container(
-                          width: 150,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            image: const DecorationImage(
-                                image: AssetImage('assets/Frame 268.png')),
-                            border: Border.all(
-                              color: Colors.grey.shade300,
-                              width: 1.0,
+              backgroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16.0),
+                side: BorderSide(
+                  color: Colors.black,
+                  width: 2.0,
+                  style: BorderStyle.solid,
+                ),
+                ),
+              child: SizedBox(
+                width: 800,
+                child: Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Header with Close Button
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          IconButton(
+                            icon: const Icon(PhosphorIconsRegular.xCircle, size: 40, color: Colors.black,),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                            onPressed: () => Navigator.pop(context),
+                          ),
+                        ],
+                      ),
+                
+                      // Username Section
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Profile Image
+                          Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: const DecorationImage(
+                                  image: AssetImage('assets/Frame 268.png')),
+                              border: Border.all(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                                width: 1.0,
+                              ),
                             ),
-                          ),
-                          child: Stack(
-                            children: [
-                              Positioned(
-                                right: 0,
-                                bottom: 0,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    border:
-                                        Border.all(color: Colors.grey.shade300),
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  right: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      border:
+                                          Border.all(color: const Color.fromARGB(255, 0, 0, 0)),
+                                    ),
+                                    padding: const EdgeInsets.all(2),
+                                    child: IconButton(
+                                        style: IconButton.styleFrom(
+                                            backgroundColor: transparent,
+                                            hoverColor: transparent),
+                                        onPressed: () {
+                                          // TODO: Implement profile picture change
+                                          ScaffoldMessenger.of(context).showSnackBar(
+                                            const SnackBar(content: Text('Profile picture change coming soon!'))
+                                          );
+                                        },
+                                        icon: const Icon(Icons.edit, size: 12)),
                                   ),
-                                  padding: const EdgeInsets.all(2),
-                                  child: IconButton(
-                                      style: IconButton.styleFrom(
-                                          backgroundColor: transparent,
-                                          hoverColor: transparent),
-                                      onPressed: () {
-                                        // TODO: Implement profile picture change
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Profile picture change coming soon!'))
-                                        );
-                                      },
-                                      icon: const Icon(Icons.edit, size: 12)),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 16),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Username
-                    const Text(
-                      "User Name",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(
-                          user?['userName'] ?? "John Doe",
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () {
-                            showEditDialog(
-                              context, 
-                              'User Name', 
-                              user?['userName'] ?? "John Doe",
-                              (newValue) async {
-                                final result = await pv.updateUserName(userName: newValue);
-                                return result;
-                              }
-                            );
-                          },
-                          icon: Icon(Icons.edit,
-                              size: 16, color: Colors.blue.shade400),
-                        )
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Email Address
-                    const Text(
-                      "Email Address",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Text(
-                          user?['email'] ?? "john.doe@example.com",
-                          style: const TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.w500),
-                        ),
-                        const SizedBox(width: 8),
-                        IconButton(
-                          onPressed: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Email update requires verification. Coming soon!'))
-                            );
-                          },
-                          icon: Icon(Icons.edit,
-                              size: 16, color: Colors.blue.shade400),
-                        )
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Password
-                    const Text(
-                      "Password",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 8),
-                    TextButton(
-                      onPressed: () {
-                        showPasswordChangeDialog(context);
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.zero,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        "Change Password",
-                        style: TextStyle(
-                            fontSize: 18, color: Colors.blue.shade400),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Delete Account Button (uncomment if needed)
-                    SizedBox(
-                      height: 44,
-                      width: 180,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          final confirmed = await showDialog<bool>(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              title: const Text('Delete Account'),
-                              content: const Text(
-                                'Are you sure you want to delete your account? This action cannot be undone.',
-                                style: TextStyle(fontFamily: 'Frederik'),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
-                                ),
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Delete',
-                                      style: TextStyle(color: Colors.red)),
                                 ),
                               ],
                             ),
-                          );
-
-                          if (confirmed == true) {
-                            try {
-                              // Show loading indicator
-                              if (context.mounted) {
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (context) => const Center(
-                                    child: CircularProgressIndicator(),
+                          ),
+                          const SizedBox(width: 16),
+                        ],
+                      ),
+                
+                      const SizedBox(height: 24),
+                
+                      // Username
+                      const Text(
+                        "User Name",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text(
+                            user?['userName'] ?? "John Doe",
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              showEditDialog(
+                                context, 
+                                'User Name', 
+                                user?['userName'] ?? "John Doe",
+                                (newValue) async {
+                                  final result = await pv.updateUserName(userName: newValue);
+                                  return result;
+                                }
+                              );
+                            },
+                            icon: Icon(Icons.edit,
+                                size: 16, color: Colors.blue.shade400),
+                          )
+                        ],
+                      ),
+                
+                      const SizedBox(height: 24),
+                
+                      // Email Address
+                      const Text(
+                        "Email Address",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Text(
+                            user?['email'] ?? "john.doe@example.com",
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w500),
+                          ),
+                          const SizedBox(width: 8),
+                          IconButton(
+                            onPressed: () {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(content: Text('Email update requires verification. Coming soon!'))
+                              );
+                            },
+                            icon: Icon(Icons.edit,
+                                size: 16, color: Colors.blue.shade400),
+                          )
+                        ],
+                      ),
+                
+                      const SizedBox(height: 24),
+                
+                      // Password
+                      const Text(
+                        "Password",
+                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () {
+                          showPasswordChangeDialog(context);
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: Text(
+                          "Change Password",
+                          style: TextStyle(
+                              fontSize: 18, color: Colors.blue.shade400),
+                        ),
+                      ),
+                
+                      const SizedBox(height: 24),
+                
+                      // Delete Account Button (uncomment if needed)
+                      SizedBox(
+                        height: 44,
+                        width: 180,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final confirmed = await showDialog<bool>(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Delete Account'),
+                                content: const Text(
+                                  'Are you sure you want to delete your account? This action cannot be undone.',
+                                  style: TextStyle(fontFamily: 'Frederik'),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, false),
+                                    child: const Text('Cancel'),
                                   ),
-                                );
-                              }
-
-                              // Delete account
-                              await pv.deleteUserAccount();
-
-                              // Close the loading dialog and the profile dialog
-                              if (context.mounted) {
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop(); // Close loading
-                                Navigator.of(context, rootNavigator: true)
-                                    .pop(); // Close profile dialog
-
-                                // Navigate to login page
-                                Navigator.of(context, rootNavigator: true)
-                                    .pushAndRemoveUntil(
-                                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                                  (route) => false,
-                                );
-                              }
-                            } catch (e) {
-                              // Close loading dialog
-                              if (context.mounted) {
-                                Navigator.of(context, rootNavigator: true).pop();
-
-                                // Show error
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Error deleting account: ${e.toString()}'),
-                                    backgroundColor: Colors.red,
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context, true),
+                                    child: const Text('Delete',
+                                        style: TextStyle(color: Color(0xFFC30101))),
                                   ),
-                                );
+                                ],
+                              ),
+                            );
+                
+                            if (confirmed == true) {
+                              try {
+                                // Show loading indicator
+                                if (context.mounted) {
+                                  showDialog(
+                                    context: context,
+                                    barrierDismissible: false,
+                                    builder: (context) => const Center(
+                                      child: CircularProgressIndicator(),
+                                    ),
+                                  );
+                                }
+                
+                                // Delete account
+                                await pv.deleteUserAccount();
+                
+                                // Close the loading dialog and the profile dialog
+                                if (context.mounted) {
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop(); // Close loading
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pop(); // Close profile dialog
+                
+                                  // Navigate to login page
+                                  Navigator.of(context, rootNavigator: true)
+                                      .pushAndRemoveUntil(
+                                    MaterialPageRoute(builder: (context) => const LoginPage()),
+                                    (route) => false,
+                                  );
+                                }
+                              } catch (e) {
+                                // Close loading dialog
+                                if (context.mounted) {
+                                  Navigator.of(context, rootNavigator: true).pop();
+                
+                                  // Show error
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text('Error deleting account: ${e.toString()}'),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
                               }
                             }
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.red,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8)),
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.red,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                          ),
+                          child: const Text("Delete Account",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500)),
                         ),
-                        child: const Text("Delete Account",
-                            style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500)),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             );

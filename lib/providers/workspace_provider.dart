@@ -111,7 +111,8 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void updateScale(double newScale) {
-    _scale = newScale;
+    // Ensure the scale is within the acceptable range
+    _scale = newScale.clamp(0.1, 5.0);
     notifyListeners();
   }
 
@@ -324,7 +325,7 @@ class WorkspaceProvider extends StateHandler {
     _saveStateForUndo();
 
     if (_nodeList.containsKey(id)) {
-      // Store the position in the workspace's coordinate space
+      // Store the position directly
       _nodeList[id]!.position = off;
       updateFlowManager();
       notifyListeners();

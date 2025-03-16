@@ -65,7 +65,8 @@ class Node extends StatelessWidget {
             print("Pan started on $handle handle for node $id");
           },
           onPanUpdate: (details) {
-            print("Pan update on $handle handle: deltaX=${details.delta.dx}, deltaY=${details.delta.dy}");
+            print(
+                "Pan update on $handle handle: deltaX=${details.delta.dx}, deltaY=${details.delta.dy}");
 
             double newWidth = wp.getWidth(id);
             double newHeight = wp.getHeight(id);
@@ -125,7 +126,8 @@ class Node extends StatelessWidget {
                 }
                 break;
             }
-            print("New size: $newWidth x $newHeight, New position: $newPosition");
+            print(
+                "New size: $newWidth x $newHeight, New position: $newPosition");
           },
           child: Container(
             width: handleSize,
@@ -234,19 +236,17 @@ class Node extends StatelessWidget {
           onPanUpdate: (details) {
             if (!wp.nodeList[id]!.isSelected) return;
 
+            // Get the current scale factor
             final scaleFactor = wp.scale;
-            final matrix = Matrix4.identity()
-              ..translate(wp.position.dx, wp.position.dy)
-              ..scale(scaleFactor);
 
-            // Calculate the position in the scaled coordinate system
-            final localPosition = Offset(
-                (details.globalPosition.dx - wp.position.dx) / scaleFactor,
-                (details.globalPosition.dy - wp.position.dy) / scaleFactor);
+            // Calculate the adjusted delta based on scale
+            final adjustedDeltaX = details.delta.dx / scaleFactor;
+            final adjustedDeltaY = details.delta.dy / scaleFactor;
 
+            // Update position by adding the adjusted delta
             onDrag(Offset(
-              localPosition.dx - (wp.getWidth(id) / 2),
-              localPosition.dy - (wp.getHeight(id) / 2),
+              wp.nodeList[id]!.position.dx + adjustedDeltaX,
+              wp.nodeList[id]!.position.dy + adjustedDeltaY,
             ));
           },
           child: Stack(

@@ -29,6 +29,8 @@ class _WorkspaceState extends State<Workspace> {
   @override
   void initState() {
     super.initState();
+    // Set up initial transformation controller
+    _transformationController = TransformationController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWorkspace();
     });
@@ -483,7 +485,6 @@ class _WorkspaceState extends State<Workspace> {
                     child: ElevatedButton.icon(
                       onPressed: () =>
                           _showExportOptions(context, workProvider),
-                          
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         elevation: 0,
@@ -528,11 +529,14 @@ class _WorkspaceState extends State<Workspace> {
                 // Use InteractiveViewer for zoom and pan
                 InteractiveViewer(
                   transformationController: _transformationController,
-                  minScale: 0.1,
+                  minScale: 0.1, // Lower this to 0.1 to allow zoom out to 10%
                   maxScale: 5.0,
                   onInteractionEnd: (details) {
                     _onInteractionUpdate(ScaleUpdateDetails());
                     _isPanning = false;
+                  },
+                  onInteractionUpdate: (details) {
+                    _onInteractionUpdate(details);
                   },
                   onInteractionStart: (details) {
                     _isPanning = details.pointerCount > 0;

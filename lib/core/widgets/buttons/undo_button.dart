@@ -8,6 +8,8 @@ class UndoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      hoverColor: Colors.orange.withOpacity(0.1),
+      tooltip: 'Undo',
       icon: Icon(PhosphorIconsRegular.arrowUUpLeft),
       onPressed: onUndo,
     );

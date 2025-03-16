@@ -169,7 +169,8 @@ class _DashboardState extends State<Dashboard> {
       });
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('No file selected or file could not be read')),
+          // SnackBar(content: Text('No file selected or file could not be read')),
+          SnackBar(content: Text('Feature coming soon!!'), backgroundColor: Colors.blue,),
         );
       }
       return;
@@ -263,7 +264,7 @@ class _DashboardState extends State<Dashboard> {
                             ),
                             const SizedBox(height: 50),
                             SizedBox(
-                              width: constraints.maxWidth - 440,
+                              width: constraints.maxWidth - 400,
                               child: GridView.builder(
                                 shrinkWrap: true,
                                 physics: const NeverScrollableScrollPhysics(),

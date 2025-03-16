@@ -7,7 +7,7 @@ import 'package:cookethflow/core/widgets/toolbox/select_node.dart';
 import 'package:provider/provider.dart';
 
 class CustomToolbar extends StatelessWidget {
-  CustomToolbar({super.key});
+  const CustomToolbar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -41,32 +41,36 @@ class CustomToolbar extends StatelessWidget {
               ),
               _divider(),
               _toggleableButton(
-                isActive: pv.isBold,
+                // isActive: pv.isBold,
+                isActive: false,
                 activeIcon: PhosphorIconsBold.textB,
                 inactiveIcon: PhosphorIconsRegular.textB,
                 onPressed: pv.toggleBold,
               ),
               _toggleableButton(
-                isActive: pv.isItalic,
+                // isActive: pv.isItalic,
+                isActive: false,
                 activeIcon: PhosphorIconsBold.textItalic,
                 inactiveIcon: PhosphorIconsRegular.textItalic,
                 onPressed: pv.toggleItalic,
               ),
               _toggleableButton(
-                isActive: pv.isUnderline,
+                // isActive: pv.isUnderline,
+                isActive: false,
                 activeIcon: PhosphorIconsBold.textUnderline,
                 inactiveIcon: PhosphorIconsRegular.textUnderline,
                 onPressed: pv.toggleUnderline,
               ),
               _toggleableButton(
-                isActive: pv.isStrikethrough,
+                // isActive: pv.isStrikethrough,
+                isActive: false,
                 activeIcon: PhosphorIconsBold.textStrikethrough,
                 inactiveIcon: PhosphorIconsRegular.textStrikethrough,
                 onPressed: pv.toggleStrikethrough,
               ),
-              _divider(),
-              _toolbarButton(PhosphorIconsRegular.linkSimple,
-                  () => pv.showLinkDialog(context)),
+              // _divider(),
+              // _toolbarButton(PhosphorIconsRegular.linkSimple,
+              //     () => pv.showLinkDialog(context)),
             ],
           ),
         ),
@@ -88,9 +92,12 @@ class CustomToolbar extends StatelessWidget {
     required VoidCallback onPressed,
   }) {
     return IconButton(
+      tooltip: 'Feature Coming Soon',
       icon: Icon(
         isActive ? activeIcon : inactiveIcon,
+        // inactiveIcon,
         color: isActive ? Colors.blue : Colors.black,
+        // color: Colors.black.withOpacity(0.5),
       ),
       onPressed: onPressed,
     );

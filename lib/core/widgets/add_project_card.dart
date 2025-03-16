@@ -10,6 +10,7 @@ class AddProjectCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
+      hoverColor: Colors.orange.withOpacity(0.1),
       child: DottedBorder(
         borderType: BorderType.RRect,
         radius: const Radius.circular(10),

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -18,15 +19,16 @@ class ProjectCard extends StatelessWidget {
       }
       return InkWell(
         onTap: onTap,
+        hoverColor: Colors.orange.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(25),
         child: SizedBox(
-          width: 350,
-          height: 250,
+          width: 450,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 child: Container(
-                  width: 340,
+                  width: 430,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: Colors.black, width: 2),
@@ -34,7 +36,7 @@ class ProjectCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: Image.asset(
-                        'assets/pic1.png',
+                        'assets/Frame 265.png',
                         width: double.infinity,
                         height: double.infinity,
                         fit: BoxFit.cover,
@@ -65,11 +67,15 @@ class ProjectCard extends StatelessWidget {
               
               const SizedBox(height: 12), // Reduced spacing to fit within height
               SizedBox(
-                  child: Text(
-                    pv.fl.flowList[flowId]!.flowName,
-                    style: const TextStyle(fontFamily: 'Frederik', fontSize: 20),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      pv.fl.flowList[flowId]!.flowName,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(fontFamily: 'Frederik', fontSize: 20),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ),
 

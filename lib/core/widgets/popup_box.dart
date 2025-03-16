@@ -193,91 +193,91 @@ class ProfileDialog extends StatelessWidget {
                       const SizedBox(height: 24),
                 
                       // Delete Account Button (uncomment if needed)
-                      SizedBox(
-                        height: 44,
-                        width: 180,
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final confirmed = await showDialog<bool>(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                title: const Text('Delete Account'),
-                                content: const Text(
-                                  'Are you sure you want to delete your account? This action cannot be undone.',
-                                  style: TextStyle(fontFamily: 'Frederik'),
-                                ),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, false),
-                                    child: const Text('Cancel'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, true),
-                                    child: const Text('Delete',
-                                        style: TextStyle(color: Color(0xFFC30101))),
-                                  ),
-                                ],
-                              ),
-                            );
+                      // SizedBox(
+                      //   height: 44,
+                      //   width: 180,
+                      //   child: ElevatedButton(
+                      //     onPressed: () async {
+                      //       final confirmed = await showDialog<bool>(
+                      //         context: context,
+                      //         builder: (context) => AlertDialog(
+                      //           title: const Text('Delete Account Data'),
+                      //           content: const Text(
+                      //             'Are you sure you want to delete your account data? This action cannot be undone.',
+                      //             style: TextStyle(fontFamily: 'Frederik'),
+                      //           ),
+                      //           actions: [
+                      //             TextButton(
+                      //               onPressed: () => Navigator.pop(context, false),
+                      //               child: const Text('Cancel'),
+                      //             ),
+                      //             TextButton(
+                      //               onPressed: () => Navigator.pop(context, true),
+                      //               child: const Text('Delete',
+                      //                   style: TextStyle(color: Color(0xFFC30101))),
+                      //             ),
+                      //           ],
+                      //         ),
+                      //       );
                 
-                            if (confirmed == true) {
-                              try {
-                                // Show loading indicator
-                                if (context.mounted) {
-                                  showDialog(
-                                    context: context,
-                                    barrierDismissible: false,
-                                    builder: (context) => const Center(
-                                      child: CircularProgressIndicator(),
-                                    ),
-                                  );
-                                }
+                      //       if (confirmed == true) {
+                      //         try {
+                      //           // Show loading indicator
+                      //           if (context.mounted) {
+                      //             showDialog(
+                      //               context: context,
+                      //               barrierDismissible: false,
+                      //               builder: (context) => const Center(
+                      //                 child: CircularProgressIndicator(),
+                      //               ),
+                      //             );
+                      //           }
                 
-                                // Delete account
-                                await pv.deleteUserAccount();
+                      //           // Delete account
+                      //           await pv.deleteUserAccount();
                 
-                                // Close the loading dialog and the profile dialog
-                                if (context.mounted) {
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop(); // Close loading
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pop(); // Close profile dialog
+                      //           // Close the loading dialog and the profile dialog
+                      //           if (context.mounted) {
+                      //             Navigator.of(context, rootNavigator: true)
+                      //                 .pop(); // Close loading
+                      //             Navigator.of(context, rootNavigator: true)
+                      //                 .pop(); // Close profile dialog
                 
-                                  // Navigate to login page
-                                  Navigator.of(context, rootNavigator: true)
-                                      .pushAndRemoveUntil(
-                                    MaterialPageRoute(builder: (context) => const LoginPage()),
-                                    (route) => false,
-                                  );
-                                }
-                              } catch (e) {
-                                // Close loading dialog
-                                if (context.mounted) {
-                                  Navigator.of(context, rootNavigator: true).pop();
+                      //             // Navigate to login page
+                      //             // Navigator.of(context, rootNavigator: true)
+                      //             //     .pushAndRemoveUntil(
+                      //             //   MaterialPageRoute(builder: (context) => const LoginPage()),
+                      //             //   (route) => false,
+                      //             // );
+                      //           }
+                      //         } catch (e) {
+                      //           // Close loading dialog
+                      //           if (context.mounted) {
+                      //             Navigator.of(context, rootNavigator: true).pop();
                 
-                                  // Show error
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('Error deleting account: ${e.toString()}'),
-                                      backgroundColor: Colors.red,
-                                    ),
-                                  );
-                                }
-                              }
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8)),
-                          ),
-                          child: const Text("Delete Account",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500)),
-                        ),
-                      ),
+                      //             // Show error
+                      //             ScaffoldMessenger.of(context).showSnackBar(
+                      //               SnackBar(
+                      //                 content: Text('Error deleting account data: ${e.toString()}'),
+                      //                 backgroundColor: Colors.red,
+                      //               ),
+                      //             );
+                      //           }
+                      //         }
+                      //       }
+                      //     },
+                      //     style: ElevatedButton.styleFrom(
+                      //       backgroundColor: Colors.red,
+                      //       shape: RoundedRectangleBorder(
+                      //           borderRadius: BorderRadius.circular(8)),
+                      //     ),
+                      //     child: const Text("Delete Account Data",
+                      //         style: TextStyle(
+                      //             color: Colors.white,
+                      //             fontSize: 16,
+                      //             fontWeight: FontWeight.w500)),
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

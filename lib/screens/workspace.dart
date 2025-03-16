@@ -375,6 +375,7 @@ class _WorkspaceState extends State<Workspace> {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
+      hoverColor: Colors.orange.withOpacity(0.1),
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         decoration: BoxDecoration(
@@ -469,6 +470,7 @@ class _WorkspaceState extends State<Workspace> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 8.0),
                     child: IconButton(
+                      hoverColor: Colors.red.withOpacity(0.1),
                       icon: Icon(PhosphorIconsRegular.trash, color: Colors.red),
                       tooltip: 'Delete Workspace',
                       onPressed: () => _showDeleteWorkspaceDialog(context),
@@ -481,9 +483,11 @@ class _WorkspaceState extends State<Workspace> {
                     child: ElevatedButton.icon(
                       onPressed: () =>
                           _showExportOptions(context, workProvider),
+                          
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         elevation: 0,
+                        overlayColor: Colors.orange.withOpacity(0.1),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 28, vertical: 18),
                         side: const BorderSide(color: Colors.black, width: 1),

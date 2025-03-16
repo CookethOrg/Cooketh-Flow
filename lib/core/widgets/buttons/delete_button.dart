@@ -9,7 +9,9 @@ class DeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
-      icon: Icon(PhosphorIconsRegular.trash),
+      tooltip: 'Delete selected node',
+      hoverColor: Colors.red.withOpacity(0.1),
+      icon: Icon(PhosphorIconsRegular.trash, color: Colors.red,),
       onPressed: onDelete,
     );
   }

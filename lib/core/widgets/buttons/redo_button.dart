@@ -9,6 +9,8 @@ class RedoButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return IconButton(
+      tooltip: 'Redo',
+      hoverColor: Colors.orange.withOpacity(0.1),
       icon: Icon(PhosphorIconsRegular.arrowUUpRight),
       onPressed: onRedo,
     );

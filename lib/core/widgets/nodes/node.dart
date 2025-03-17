@@ -62,7 +62,7 @@ class Node extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanStart: (details) {
-            print("Pan started on $handle handle for node $id");
+            // Start resizing
           },
           onPanUpdate: (details) {
             double newWidth = wp.getWidth(id);
@@ -201,8 +201,6 @@ class Node extends StatelessWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTapDown: (details) {
-                print(
-                    "Connection point ${point.toString()} of node $id tapped");
                 wp.selectConnection(id, point);
               },
               child: Container(
@@ -228,6 +226,12 @@ class Node extends StatelessWidget {
       builder: (context, wp, child) {
         return GestureDetector(
           onTap: () => wp.changeSelected(id),
+          onPanStart: (details) {
+            // Only allow dragging if the node is selected
+            if (!wp.nodeList[id]!.isSelected) {
+              wp.changeSelected(id); // Select the node on drag start
+            }
+          },
           onPanUpdate: (details) {
             if (!wp.nodeList[id]!.isSelected) return;
 

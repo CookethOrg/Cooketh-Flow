@@ -24,13 +24,7 @@ class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
   TransformationController _transformationController = TransformationController();
   bool _isPanning = false;
-  double _previousScale = 1.0;
   
-  // Pan offset tracking
-  Offset _startingFocalPoint = Offset.zero;
-  Offset _previousOffset = Offset.zero;
-  Offset _totalOffset = Offset.zero;
-
   @override
   void initState() {
     super.initState();
@@ -53,10 +47,6 @@ class _WorkspaceState extends State<Workspace> {
       workspaceProvider.initializeWorkspace(widget.flowId);
     }
 
-    // Set initial values
-    _previousScale = workspaceProvider.scale;
-    _totalOffset = workspaceProvider.position;
-    
     // Set up initial transformation matrix based on saved state
     _updateTransformationMatrix();
     
@@ -70,7 +60,7 @@ class _WorkspaceState extends State<Workspace> {
     
     // Create a new matrix based on the current scale and offset
     Matrix4 matrix = Matrix4.identity()
-      ..translate(_totalOffset.dx, _totalOffset.dy)
+      ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
       ..scale(workspaceProvider.scale);
     
     _transformationController.value = matrix;
@@ -80,64 +70,24 @@ class _WorkspaceState extends State<Workspace> {
   void _syncWithProvider() {
     final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
     
+    // Extract matrix values
+    final Matrix4 matrix = _transformationController.value;
+    
+    // Extract scale (using proper mathematical approach to extract scale)
+    final double scaleX = math.sqrt(
+      matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
+      matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+    );
+    
+    // Extract translation
+    final Offset offset = Offset(matrix.getTranslation().x, matrix.getTranslation().y);
+    
     // Update provider values
-    workspaceProvider.updateScale(_previousScale);
-    workspaceProvider.updatePosition(_totalOffset);
+    workspaceProvider.updateScale(scaleX);
+    workspaceProvider.updatePosition(offset);
     
     // Update flow manager to persist zoom/pan state
     workspaceProvider.updateFlowManager();
-  }
-
-  // Check if a point is close to a connection line
-  bool _isPointNearConnection(Offset point, Connection connection,
-      WorkspaceProvider provider, Matrix4 matrix) {
-    final scale = math.sqrt(matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-        matrix.getColumn(1)[0] * matrix.getColumn(1)[0]);
-
-    final sourceNode = provider.nodeList[connection.sourceNodeId]!;
-    final targetNode = provider.nodeList[connection.targetNodeId]!;
-
-    // Calculate connection points in world coordinates
-    final sourcePoint = _getConnectionPointCoordinates(
-        sourceNode, connection.sourcePoint, matrix);
-
-    final targetPoint = _getConnectionPointCoordinates(
-        targetNode, connection.targetPoint, matrix);
-
-    // Calculate midpoint for orthogonal routing
-    final midX = (sourcePoint.dx + targetPoint.dx) / 2;
-    final midY = (sourcePoint.dy + targetPoint.dy) / 2;
-
-    // Create points for orthogonal path
-    List<Offset> pathPoints = [sourcePoint];
-
-    // Add intermediate points based on connection points
-    if (_isHorizontal(connection.sourcePoint) &&
-        _isHorizontal(connection.targetPoint)) {
-      pathPoints.add(Offset(midX, sourcePoint.dy));
-      pathPoints.add(Offset(midX, targetPoint.dy));
-    } else if (_isVertical(connection.sourcePoint) &&
-        _isVertical(connection.targetPoint)) {
-      pathPoints.add(Offset(sourcePoint.dx, midY));
-      pathPoints.add(Offset(targetPoint.dx, midY));
-    } else if (_isHorizontal(connection.sourcePoint) &&
-        _isVertical(connection.targetPoint)) {
-      pathPoints.add(Offset(targetPoint.dx, sourcePoint.dy));
-    } else if (_isVertical(connection.sourcePoint) &&
-        _isHorizontal(connection.targetPoint)) {
-      pathPoints.add(Offset(sourcePoint.dx, targetPoint.dy));
-    }
-
-    pathPoints.add(targetPoint);
-
-    // Check if point is close to any line segment of the path
-    for (int i = 0; i < pathPoints.length - 1; i++) {
-      if (_isPointNearLineSegment(point, pathPoints[i], pathPoints[i + 1])) {
-        return true;
-      }
-    }
-
-    return false;
   }
 
   bool _isHorizontal(ConnectionPoint point) {
@@ -146,98 +96,6 @@ class _WorkspaceState extends State<Workspace> {
 
   bool _isVertical(ConnectionPoint point) {
     return point == ConnectionPoint.top || point == ConnectionPoint.bottom;
-  }
-
-  // Check if a point is near a line segment
-  bool _isPointNearLineSegment(Offset point, Offset lineStart, Offset lineEnd) {
-    const double hitThreshold = 10.0; // Distance in pixels within which we consider a hit
-
-    // Calculate squared length of the line segment
-    final lengthSquared = (lineEnd - lineStart).distanceSquared;
-
-    if (lengthSquared == 0) {
-      // Line segment is actually a point
-      return (point - lineStart).distance < hitThreshold;
-    }
-
-    // Calculate projection of point onto line segment
-    final t = ((point.dx - lineStart.dx) * (lineEnd.dx - lineStart.dx) +
-            (point.dy - lineStart.dy) * (lineEnd.dy - lineStart.dy)) /
-        lengthSquared;
-
-    if (t < 0) {
-      // Point is beyond the lineStart end of the line segment
-      return (point - lineStart).distance < hitThreshold;
-    } else if (t > 1) {
-      // Point is beyond the lineEnd end of the line segment
-      return (point - lineEnd).distance < hitThreshold;
-    }
-
-    // Calculate the projection point
-    final projection = Offset(lineStart.dx + t * (lineEnd.dx - lineStart.dx),
-        lineStart.dy + t * (lineEnd.dy - lineStart.dy));
-
-    // Calculate distance from point to line
-    return (point - projection).distance < hitThreshold;
-  }
-
-  // Helper to get connection point coordinates
-  Offset _getConnectionPointCoordinates(
-      FlowNode node, ConnectionPoint point, Matrix4 matrix) {
-    final scale = math.sqrt(matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-        matrix.getColumn(1)[0] * matrix.getColumn(1)[0]);
-
-    final dx = matrix.getTranslation().x;
-    final dy = matrix.getTranslation().y;
-
-    final centerX =
-        node.position.dx * scale + dx + (node.size.width * scale / 2);
-    final centerY =
-        node.position.dy * scale + dy + (node.size.height * scale / 2);
-
-    switch (point) {
-      case ConnectionPoint.top:
-        return Offset(centerX, node.position.dy * scale + dy);
-      case ConnectionPoint.right:
-        return Offset(
-            node.position.dx * scale + dx + node.size.width * scale, centerY);
-      case ConnectionPoint.bottom:
-        return Offset(
-            centerX, node.position.dy * scale + dy + node.size.height * scale);
-      case ConnectionPoint.left:
-        return Offset(node.position.dx * scale + dx, centerY);
-    }
-  }
-
-  void _showConnectionContextMenu(
-      BuildContext context, Connection connection, Offset position) {
-    final RenderBox overlay =
-        Overlay.of(context)!.context.findRenderObject() as RenderBox;
-
-    showMenu(
-      context: context,
-      position: RelativeRect.fromRect(
-        Rect.fromPoints(position, position),
-        Rect.fromLTWH(0, 0, overlay.size.width, overlay.size.height),
-      ),
-      items: [
-        PopupMenuItem(
-          child: Row(
-            children: [
-              Icon(PhosphorIconsRegular.trash, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Delete Connection'),
-            ],
-          ),
-          onTap: () {
-            // Remove the connection
-            final workspaceProvider =
-                Provider.of<WorkspaceProvider>(context, listen: false);
-            workspaceProvider.removeConnection(connection);
-          },
-        ),
-      ],
-    );
   }
 
   void _showDeleteWorkspaceDialog(BuildContext context) {
@@ -530,28 +388,22 @@ class _WorkspaceState extends State<Workspace> {
                   maxScale: 5.0,
                   boundaryMargin: EdgeInsets.all(double.infinity), // Allow infinite panning
                   onInteractionStart: (details) {
-                    // Keep track of interaction state
                     _isPanning = true;
-                    _startingFocalPoint = details.focalPoint;
-                    _previousOffset = _totalOffset;
                   },
                   onInteractionUpdate: (details) {
-                    if (details.scale != 1.0) {
-                      // Handle zoom
-                      final newScale = _previousScale * details.scale;
-                      _previousScale = newScale.clamp(0.1, 5.0);
-                      
-                      // Update workProvider's scale for node dragging calculations
-                      workProvider.updateScale(_previousScale);
-                    }
+                    // Update provider with current scale and position for node dragging calculations
+                    final Matrix4 matrix = _transformationController.value;
                     
-                    // Update total offset regardless of whether it's a zoom or pan
-                    setState(() {
-                      _totalOffset = _previousOffset + details.focalPointDelta;
-                      
-                      // Update provider for node dragging calculations
-                      workProvider.updatePosition(_totalOffset);
-                    });
+                    // Extract scale from the transformation matrix
+                    final scaleX = math.sqrt(
+                      matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
+                      matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+                    );
+                    
+                    final translation = Offset(matrix.getTranslation().x, matrix.getTranslation().y);
+                    
+                    workProvider.updateScale(scaleX);
+                    workProvider.updatePosition(translation);
                   },
                   onInteractionEnd: (details) {
                     // Sync final state with provider
@@ -562,36 +414,15 @@ class _WorkspaceState extends State<Workspace> {
                     onTapDown: (details) {
                       if (_isPanning) return;
 
-                      // First check if the click is on a connection
-                      bool hitConnection = false;
-                      Connection? hitConnectionObj;
-
-                      for (var connection in workProvider.connections) {
-                        if (_isPointNearConnection(
-                            details.globalPosition,
-                            connection,
-                            workProvider,
-                            _transformationController.value)) {
-                          hitConnection = true;
-                          hitConnectionObj = connection;
-                          break;
-                        }
-                      }
-
-                      if (hitConnection && hitConnectionObj != null) {
-                        _showConnectionContextMenu(
-                            context, hitConnectionObj, details.globalPosition);
-                        return;
-                      }
-
                       // If not a connection, check if it's a node
                       bool hitNode = false;
                       for (var node in workProvider.nodeList.values) {
                         // Get transformed bounds
                         final matrix = _transformationController.value;
-                        final scale = math.sqrt(matrix.getColumn(0)[0] *
-                                matrix.getColumn(0)[0] +
-                            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+                        final scale = math.sqrt(
+                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+                          matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+                        );
 
                         final transformedBounds = Rect.fromLTWH(
                           node.position.dx * scale + matrix.getTranslation().x,
@@ -600,8 +431,7 @@ class _WorkspaceState extends State<Workspace> {
                           node.size.height * scale,
                         );
 
-                        if (transformedBounds
-                            .contains(details.globalPosition)) {
+                        if (transformedBounds.contains(details.globalPosition)) {
                           hitNode = true;
                           break;
                         }
@@ -716,12 +546,26 @@ class _WorkspaceState extends State<Workspace> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.black, width: 1),
                     ),
-                    child: Text(
-                      "${(workProvider.scale * 100).toInt()}%",
-                      style: TextStyle(
-                        fontFamily: 'Frederik',
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Builder(
+                      builder: (context) {
+                        // Get the current matrix
+                        final matrix = _transformationController.value;
+                        
+                        // Extract the scale value accurately
+                        final scale = math.sqrt(
+                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
+                          matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
+                        );
+                        
+                        // Display accurate percentage
+                        return Text(
+                          "${(scale * 100).toInt()}%",
+                          style: TextStyle(
+                            fontFamily: 'Frederik',
+                            fontWeight: FontWeight.bold,
+                          ),
+                        );
+                      }
                     ),
                   ),
                 ),

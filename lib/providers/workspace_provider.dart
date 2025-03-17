@@ -262,6 +262,11 @@ class WorkspaceProvider extends StateHandler {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
       (key, node) => MapEntry(key, node.copy()),
     )));
+    
+    // Limit the undo stack size to prevent memory issues
+    if (_undoStack.length > 20) {
+      _undoStack.removeAt(0);
+    }
   }
 
   // Sync local _nodeList to flowManager

@@ -48,7 +48,7 @@ class _LoginPageState extends State<LoginPage> {
                             fontWeight: FontWeight.w200),
                       ),
                       SizedBox(height: 24),
-                      Text("Username / Email Address",
+                      Text("Email Address",
                           style:
                               TextStyle(fontSize: 20, fontFamily: 'Frederik')),
                       SizedBox(height: 8),
@@ -59,7 +59,7 @@ class _LoginPageState extends State<LoginPage> {
                               vertical: 20, horizontal: 16),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          hintText: 'Enter your Username / Email Address',
+                          hintText: 'Enter your Email Address',
                           hintStyle: TextStyle(
                               color: Colors.grey,
                               fontFamily: 'Frederik',

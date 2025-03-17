@@ -62,12 +62,9 @@ class Node extends StatelessWidget {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanStart: (details) {
-            print("Pan started on $handle handle for node $id");
+            // Start resizing
           },
           onPanUpdate: (details) {
-            print(
-                "Pan update on $handle handle: deltaX=${details.delta.dx}, deltaY=${details.delta.dy}");
-
             double newWidth = wp.getWidth(id);
             double newHeight = wp.getHeight(id);
             Offset newPosition = position;
@@ -126,8 +123,6 @@ class Node extends StatelessWidget {
                 }
                 break;
             }
-            print(
-                "New size: $newWidth x $newHeight, New position: $newPosition");
           },
           child: Container(
             width: handleSize,
@@ -206,8 +201,6 @@ class Node extends StatelessWidget {
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTapDown: (details) {
-                print(
-                    "Connection point ${point.toString()} of node $id tapped");
                 wp.selectConnection(id, point);
               },
               child: Container(
@@ -233,20 +226,26 @@ class Node extends StatelessWidget {
       builder: (context, wp, child) {
         return GestureDetector(
           onTap: () => wp.changeSelected(id),
+          onPanStart: (details) {
+            // Only allow dragging if the node is selected
+            if (!wp.nodeList[id]!.isSelected) {
+              wp.changeSelected(id); // Select the node on drag start
+            }
+          },
           onPanUpdate: (details) {
             if (!wp.nodeList[id]!.isSelected) return;
 
             // Get the current scale factor
             final scaleFactor = wp.scale;
-
-            // Calculate the adjusted delta based on scale
+            
+            // Calculate the delta in the current coordinate system
             final adjustedDeltaX = details.delta.dx / scaleFactor;
             final adjustedDeltaY = details.delta.dy / scaleFactor;
-
-            // Update position by adding the adjusted delta
+            
+            // Directly add the delta to the node's current position
             onDrag(Offset(
-              wp.nodeList[id]!.position.dx + adjustedDeltaX,
-              wp.nodeList[id]!.position.dy + adjustedDeltaY,
+              position.dx + adjustedDeltaX,
+              position.dy + adjustedDeltaY,
             ));
           },
           child: Stack(

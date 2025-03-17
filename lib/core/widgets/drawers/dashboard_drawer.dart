@@ -55,7 +55,7 @@ class DashboardDrawer extends StatelessWidget {
                                     children: [
                                       CircleAvatar(
                                         backgroundImage:
-                                            AssetImage('assets/pic1.png'),
+                                            AssetImage('assets/Frame 266.png'),
                                       ),
                                       SizedBox(
                                           width:

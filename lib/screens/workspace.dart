@@ -22,9 +22,10 @@ class Workspace extends StatefulWidget {
 
 class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
-  TransformationController _transformationController = TransformationController();
+  TransformationController _transformationController =
+      TransformationController();
   bool _isPanning = false;
-  
+
   @override
   void initState() {
     super.initState();
@@ -40,7 +41,8 @@ class _WorkspaceState extends State<Workspace> {
   }
 
   void _initializeWorkspace() {
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    final workspaceProvider =
+        Provider.of<WorkspaceProvider>(context, listen: false);
 
     // Check if we need to initialize or if the workspace is already set to this flow
     if (workspaceProvider.currentFlowId != widget.flowId) {
@@ -49,43 +51,45 @@ class _WorkspaceState extends State<Workspace> {
 
     // Set up initial transformation matrix based on saved state
     _updateTransformationMatrix();
-    
+
     setState(() {
       _isInitialized = true;
     });
   }
-  
+
   void _updateTransformationMatrix() {
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-    
+    final workspaceProvider =
+        Provider.of<WorkspaceProvider>(context, listen: false);
+
     // Create a new matrix based on the current scale and offset
     Matrix4 matrix = Matrix4.identity()
       ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
       ..scale(workspaceProvider.scale);
-    
+
     _transformationController.value = matrix;
   }
 
   // Connect the transformation controller to the workspace provider
   void _syncWithProvider() {
-    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-    
+    final workspaceProvider =
+        Provider.of<WorkspaceProvider>(context, listen: false);
+
     // Extract matrix values
     final Matrix4 matrix = _transformationController.value;
-    
+
     // Extract scale (using proper mathematical approach to extract scale)
     final double scaleX = math.sqrt(
-      matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
-      matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
-    );
-    
+        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+
     // Extract translation
-    final Offset offset = Offset(matrix.getTranslation().x, matrix.getTranslation().y);
-    
+    final Offset offset =
+        Offset(matrix.getTranslation().x, matrix.getTranslation().y);
+
     // Update provider values
     workspaceProvider.updateScale(scaleX);
     workspaceProvider.updatePosition(offset);
-    
+
     // Update flow manager to persist zoom/pan state
     workspaceProvider.updateFlowManager();
   }
@@ -339,7 +343,6 @@ class _WorkspaceState extends State<Workspace> {
                     child: ElevatedButton.icon(
                       onPressed: () =>
                           _showExportOptions(context, workProvider),
-                          
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         elevation: 0,
@@ -381,27 +384,30 @@ class _WorkspaceState extends State<Workspace> {
             key: workProvider.repaintBoundaryKey,
             child: Stack(
               children: [
-                // Use InteractiveViewer for zoom and pan
+                // The infinite canvas
                 InteractiveViewer(
                   transformationController: _transformationController,
                   minScale: 0.1, // Allow zoom out to 10%
                   maxScale: 5.0,
-                  boundaryMargin: EdgeInsets.all(double.infinity), // Allow infinite panning
+                  constrained:
+                      false, // This is critical - don't constrain the canvas
+                  boundaryMargin:
+                      EdgeInsets.all(double.infinity), // Allow infinite panning
                   onInteractionStart: (details) {
                     _isPanning = true;
                   },
                   onInteractionUpdate: (details) {
                     // Update provider with current scale and position for node dragging calculations
                     final Matrix4 matrix = _transformationController.value;
-                    
+
                     // Extract scale from the transformation matrix
                     final scaleX = math.sqrt(
-                      matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
-                      matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
-                    );
-                    
-                    final translation = Offset(matrix.getTranslation().x, matrix.getTranslation().y);
-                    
+                        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+                            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+
+                    final translation = Offset(
+                        matrix.getTranslation().x, matrix.getTranslation().y);
+
                     workProvider.updateScale(scaleX);
                     workProvider.updatePosition(translation);
                   },
@@ -410,111 +416,86 @@ class _WorkspaceState extends State<Workspace> {
                     _syncWithProvider();
                     _isPanning = false;
                   },
-                  child: GestureDetector(
-                    onTapDown: (details) {
-                      if (_isPanning) return;
+                  child: SizedBox(
+                    // Huge size for effectively infinite canvas
+                    width: 10000000,
+                    height: 10000000,
+                    child: Stack(
+                      children: [
+                        // Background grid for better visual orientation
+                        Container(
+                          width: double.infinity,
+                          height: double.infinity,
+                          color: Colors.white,
+                        ),
+                        // Positioned.fill(
+                        //   child: CustomPaint(
+                        //     painter: GridPainter(),
+                        //   ),
+                        // ),
 
-                      // If not a connection, check if it's a node
-                      bool hitNode = false;
-                      for (var node in workProvider.nodeList.values) {
-                        // Get transformed bounds
-                        final matrix = _transformationController.value;
-                        final scale = math.sqrt(
-                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-                          matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
-                        );
+                        // Center point indicator
+                        // Positioned(
+                        //   left: 10000,
+                        //   top: 10000,
+                        //   child: Container(
+                        //     width: 10,
+                        //     height: 10,
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.red.withOpacity(0.5),
+                        //       shape: BoxShape.circle,
+                        //     ),
+                        //   ),
+                        // ),
 
-                        final transformedBounds = Rect.fromLTWH(
-                          node.position.dx * scale + matrix.getTranslation().x,
-                          node.position.dy * scale + matrix.getTranslation().y,
-                          node.size.width * scale,
-                          node.size.height * scale,
-                        );
-
-                        if (transformedBounds.contains(details.globalPosition)) {
-                          hitNode = true;
-                          break;
-                        }
-                      }
-
-                      if (!hitNode) {
-                        // Click on empty space deselects all nodes
-                        for (var node in workProvider.nodeList.values) {
-                          if (node.isSelected) {
-                            workProvider.changeSelected(node.id);
-                          }
-                        }
-                      }
-                    },
-                    child: Container(
-                      // Very large size to allow for "infinite" panning
-                      width: 10000,
-                      height: 10000,
-                      color: Colors.white,
-                      child: Stack(
-                        children: [
-                          // Center point indicator
-                          Positioned(
-                            left: 5000,
-                            top: 5000,
-                            child: Container(
-                              width: 10,
-                              height: 10,
-                              decoration: BoxDecoration(
-                                color: Colors.red.withOpacity(0.5),
-                                shape: BoxShape.circle,
-                              ),
+                        // Draw connections
+                        ...workProvider.connections.map((connection) {
+                          return CustomPaint(
+                            size: Size.infinite,
+                            painter: LinePainter(
+                              start: workProvider
+                                  .nodeList[connection.sourceNodeId]!.position,
+                              end: workProvider
+                                  .nodeList[connection.targetNodeId]!.position,
+                              sourceNodeId: connection.sourceNodeId,
+                              startPoint: connection.sourcePoint,
+                              targetNodeId: connection.targetNodeId,
+                              endPoint: connection.targetPoint,
+                              scale: workProvider.scale,
+                              connection: connection,
                             ),
-                          ),
-                          // Draw connections
-                          ...workProvider.connections.map((connection) {
-                            return CustomPaint(
-                              size: Size.infinite,
-                              painter: LinePainter(
-                                start: workProvider
-                                    .nodeList[connection.sourceNodeId]!
-                                    .position,
-                                end: workProvider
-                                    .nodeList[connection.targetNodeId]!
-                                    .position,
-                                sourceNodeId: connection.sourceNodeId,
-                                startPoint: connection.sourcePoint,
-                                targetNodeId: connection.targetNodeId,
-                                endPoint: connection.targetPoint,
-                                scale: workProvider.scale,
-                                connection: connection,
-                              ),
-                            );
-                          }),
+                          );
+                        }),
 
-                          // Draw nodes
-                          ...workProvider.nodeList.entries.map((entry) {
-                            var id = entry.key;
-                            var node = entry.value;
-                            return Positioned(
-                              left: node.position.dx,
-                              top: node.position.dy,
-                              child: Node(
-                                id: id,
-                                type: node.type,
-                                onResize: (Size newSize) =>
-                                    workProvider.onResize(id, newSize),
-                                onDrag: (offset) =>
-                                    workProvider.dragNode(id, offset),
-                                position: node.position,
-                              ),
-                            );
-                          }),
-                        ],
-                      ),
+                        // Draw nodes
+                        ...workProvider.nodeList.entries.map((entry) {
+                          var id = entry.key;
+                          var node = entry.value;
+                          return Positioned(
+                            left: node.position.dx,
+                            top: node.position.dy,
+                            child: Node(
+                              id: id,
+                              type: node.type,
+                              onResize: (Size newSize) =>
+                                  workProvider.onResize(id, newSize),
+                              onDrag: (offset) =>
+                                  workProvider.dragNode(id, offset),
+                              position: node.position,
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   ),
                 ),
+
                 // UI elements that should stay fixed regardless of zoom/pan
                 FloatingDrawer(flowId: widget.flowId),
-                // Replace the existing Toolbar and CustomToolbar sections in your Stack with:
+
+                // Toolbar and node editing tools
                 Positioned(
-                  top: 20, // Add some spacing from the app bar
+                  top: 20,
                   right: 20,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -524,7 +505,7 @@ class _WorkspaceState extends State<Workspace> {
                         onUndo: workProvider.undo,
                         onRedo: workProvider.redo,
                       ),
-                      SizedBox(height: 16), // Add spacing between the toolbars
+                      SizedBox(height: 16),
                       Opacity(
                         opacity: workProvider.hasSelectedNode ? 1.0 : 0.5,
                         child: IgnorePointer(
@@ -535,7 +516,8 @@ class _WorkspaceState extends State<Workspace> {
                     ],
                   ),
                 ),
-                // Add zoom indicator
+
+                // Zoom indicator
                 Positioned(
                   right: 24,
                   bottom: 24,
@@ -546,27 +528,24 @@ class _WorkspaceState extends State<Workspace> {
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(color: Colors.black, width: 1),
                     ),
-                    child: Builder(
-                      builder: (context) {
-                        // Get the current matrix
-                        final matrix = _transformationController.value;
-                        
-                        // Extract the scale value accurately
-                        final scale = math.sqrt(
-                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] + 
-                          matrix.getColumn(0)[1] * matrix.getColumn(0)[1]
-                        );
-                        
-                        // Display accurate percentage
-                        return Text(
-                          "${(scale * 100).toInt()}%",
-                          style: TextStyle(
-                            fontFamily: 'Frederik',
-                            fontWeight: FontWeight.bold,
-                          ),
-                        );
-                      }
-                    ),
+                    child: Builder(builder: (context) {
+                      // Get the current matrix
+                      final matrix = _transformationController.value;
+
+                      // Extract the scale value accurately
+                      final scale = math.sqrt(
+                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+                              matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+
+                      // Display accurate percentage
+                      return Text(
+                        "${(scale * 100).toInt()}%",
+                        style: TextStyle(
+                          fontFamily: 'Frederik',
+                          fontWeight: FontWeight.bold,
+                        ),
+                      );
+                    }),
                   ),
                 ),
               ],
@@ -576,4 +555,27 @@ class _WorkspaceState extends State<Workspace> {
       },
     );
   }
+}
+
+// Grid painter to add visual orientation to the canvas
+class GridPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.grey.withOpacity(0.1)
+      ..strokeWidth = 1;
+
+    // Draw grid lines every 100 pixels
+    const spacing = 100.0;
+    for (double i = 0; i < size.width; i += spacing) {
+      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
+    }
+
+    for (double i = 0; i < size.height; i += spacing) {
+      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

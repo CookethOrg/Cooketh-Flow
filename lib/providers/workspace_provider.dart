@@ -84,6 +84,8 @@ class WorkspaceProvider extends StateHandler {
       _scale = flowManager.scale ?? 1.0;
       _scale = _scale.clamp(0.1, 5.0); // Ensure it's within valid range
 
+      // Set initial position to center of canvas
+      // If no position is saved, default to the center (0,0 in our coordinate system)
       _position = flowManager.position ?? Offset.zero;
 
       _isInitialized = true;
@@ -262,7 +264,7 @@ class WorkspaceProvider extends StateHandler {
     _undoStack.add(Map<String, FlowNode>.from(_nodeList.map(
       (key, node) => MapEntry(key, node.copy()),
     )));
-    
+
     // Limit the undo stack size to prevent memory issues
     if (_undoStack.length > 20) {
       _undoStack.removeAt(0);
@@ -305,13 +307,14 @@ class WorkspaceProvider extends StateHandler {
       newId = (int.parse(newId) + 1).toString();
     }
 
-    // Create a new node
+    // Create a new node with coordinates relative to center
+    // We'll use a more random distribution around the center
     FlowNode node = FlowNode(
       id: newId,
       type: type,
       position: Offset(
-        Random().nextDouble() * 300 + 100, // More reasonable positioning
-        Random().nextDouble() * 200 + 100,
+        (Random().nextDouble() - 0.5) * 300, // -150 to +150 range
+        (Random().nextDouble() - 0.5) * 200, // -100 to +100 range
       ),
     );
 

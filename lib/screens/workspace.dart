@@ -418,14 +418,14 @@ class _WorkspaceState extends State<Workspace> {
                   },
                   child: SizedBox(
                     // Huge size for effectively infinite canvas
-                    width: 50000,
-                    height: 50000,
+                    width: 10000000,
+                    height: 10000000,
                     child: Stack(
                       children: [
                         // Background grid for better visual orientation
                         Container(
-                          width: 50000,
-                          height: 50000,
+                          width: double.infinity,
+                          height: double.infinity,
                           color: Colors.white,
                         ),
                         // Positioned.fill(
@@ -435,18 +435,18 @@ class _WorkspaceState extends State<Workspace> {
                         // ),
 
                         // Center point indicator
-                        Positioned(
-                          left: 10000,
-                          top: 10000,
-                          child: Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: Colors.red.withOpacity(0.5),
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ),
+                        // Positioned(
+                        //   left: 10000,
+                        //   top: 10000,
+                        //   child: Container(
+                        //     width: 10,
+                        //     height: 10,
+                        //     decoration: BoxDecoration(
+                        //       color: Colors.red.withOpacity(0.5),
+                        //       shape: BoxShape.circle,
+                        //     ),
+                        //   ),
+                        // ),
 
                         // Draw connections
                         ...workProvider.connections.map((connection) {

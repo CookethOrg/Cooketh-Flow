@@ -557,7 +557,7 @@ class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.withOpacity(0.5)
+      ..color = Colors.grey.withOpacity(0.1)
       ..strokeWidth = 1;
 
     // Draw grid lines every 100 pixels

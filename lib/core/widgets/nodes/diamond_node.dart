@@ -28,9 +28,6 @@ class DiamondNode extends StatelessWidget {
         Container(
           width: boundingSize,
           height: boundingSize,
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.red, width: 1, style: BorderStyle.solid),
-          ),
         ),
         // Rotated Diamond Node
         Transform.rotate(

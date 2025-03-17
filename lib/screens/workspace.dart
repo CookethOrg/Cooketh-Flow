@@ -423,16 +423,11 @@ class _WorkspaceState extends State<Workspace> {
                     child: Stack(
                       children: [
                         // Background grid for better visual orientation
-                        Container(
-                          width: double.infinity,
-                          height: double.infinity,
-                          color: Colors.white,
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: GridPainter(),
+                          ),
                         ),
-                        // Positioned.fill(
-                        //   child: CustomPaint(
-                        //     painter: GridPainter(),
-                        //   ),
-                        // ),
 
                         // Center point indicator
                         // Positioned(
@@ -562,7 +557,7 @@ class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.withOpacity(0.1)
+      ..color = Colors.grey.withOpacity(0.5)
       ..strokeWidth = 1;
 
     // Draw grid lines every 100 pixels

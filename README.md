@@ -13,11 +13,12 @@
      </a>
 </div>
 <h2 align="center">Cooketh Flow</h2>
-<p align="center"> Design, collaborate, and streamline your workflows effortlessly. </p>
+<p align="center"> Design, collaborate, and streamline your whiteboards effortlessly. </p>
 <br />
 <!-- <br /> -->
-Cooketh Flow is an open-source, powerful visual thinking tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow provides an intuitive drag-and-drop interface that makes building and refining workflows effortless
-<!-- <div align="center">
+
+ [Cooketh Flow](https://cookethflow.framer.website/) is an open-source, powerful visual thinking tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow provides an intuitive drag-and-drop interface that makes building and refining workflows effortless
+   <!-- <div align="center">
   <a href="https://github.com/CookethOrg/Cooketh-Flow">
   <img src="assets/ss.png" alt="Cooketh Flow logo" height="300" />
      </a>
@@ -53,8 +54,11 @@ Cooketh Flow is an open-source, powerful visual thinking tool designed for teams
 - Supabase project setup  
 - A code editor (VS Code / Android Studio recommended)  
 
-### Installation Steps  
+### Installation Steps
+Cooketh Flow is currently available for windows and linux only.
+Check out the latest [release](https://github.com/CookethOrg/Cooketh-Flow/releases).
 
+### Setup for build
 ```bash
 # Clone the repository
 git clone https://github.com/your-username/cooketh-flow.git

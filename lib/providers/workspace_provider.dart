@@ -66,7 +66,6 @@ class WorkspaceProvider extends StateHandler {
   // Initialize the workspace with a specific flow ID
   void initializeWorkspace(String flowId) {
     _currentFlowId = flowId;
-    print("Initializing workspace for flow ID: $flowId");
 
     // Get the FlowManager for this flow ID
     if (fl.flowList.containsKey(flowId)) {
@@ -81,13 +80,11 @@ class WorkspaceProvider extends StateHandler {
       // Set the flow name in the controller
       flowNameController.text = flowManager.flowName;
 
-      // load the scale and position from flowmanager
+      // Restore saved scale and position
       _scale = flowManager.scale ?? 1.0;
-      _position = flowManager.position ?? Offset.zero;
+      _scale = _scale.clamp(0.1, 5.0); // Ensure it's within valid range
 
-      print("Initialized workspace for flow ID: $flowId");
-      print(
-          "Flow has ${_nodeList.length} nodes and ${flowManager.connections.length} connections");
+      _position = flowManager.position ?? Offset.zero;
 
       _isInitialized = true;
       notifyListeners();
@@ -111,7 +108,7 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void updateScale(double newScale) {
-    // Ensure the scale is within the acceptable range
+    // Ensure scale is clamped between 0.1 (10%) and 5.0 (500%)
     _scale = newScale.clamp(0.1, 5.0);
     notifyListeners();
   }
@@ -275,6 +272,7 @@ class WorkspaceProvider extends StateHandler {
       flowManager.nodes[id] = node.copy();
     });
 
+    // Save the current view state
     flowManager.scale = _scale;
     flowManager.position = _position;
 
@@ -325,7 +323,7 @@ class WorkspaceProvider extends StateHandler {
     _saveStateForUndo();
 
     if (_nodeList.containsKey(id)) {
-      // Store the position directly
+      // Directly update the node position with the provided offset
       _nodeList[id]!.position = off;
       updateFlowManager();
       notifyListeners();

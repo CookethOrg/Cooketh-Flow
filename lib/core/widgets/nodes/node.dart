@@ -65,9 +65,6 @@ class Node extends StatelessWidget {
             print("Pan started on $handle handle for node $id");
           },
           onPanUpdate: (details) {
-            print(
-                "Pan update on $handle handle: deltaX=${details.delta.dx}, deltaY=${details.delta.dy}");
-
             double newWidth = wp.getWidth(id);
             double newHeight = wp.getHeight(id);
             Offset newPosition = position;
@@ -126,8 +123,6 @@ class Node extends StatelessWidget {
                 }
                 break;
             }
-            print(
-                "New size: $newWidth x $newHeight, New position: $newPosition");
           },
           child: Container(
             width: handleSize,
@@ -238,15 +233,15 @@ class Node extends StatelessWidget {
 
             // Get the current scale factor
             final scaleFactor = wp.scale;
-
-            // Calculate the adjusted delta based on scale
+            
+            // Calculate the delta in the current coordinate system
             final adjustedDeltaX = details.delta.dx / scaleFactor;
             final adjustedDeltaY = details.delta.dy / scaleFactor;
-
-            // Update position by adding the adjusted delta
+            
+            // Directly add the delta to the node's current position
             onDrag(Offset(
-              wp.nodeList[id]!.position.dx + adjustedDeltaX,
-              wp.nodeList[id]!.position.dy + adjustedDeltaY,
+              position.dx + adjustedDeltaX,
+              position.dy + adjustedDeltaY,
             ));
           },
           child: Stack(

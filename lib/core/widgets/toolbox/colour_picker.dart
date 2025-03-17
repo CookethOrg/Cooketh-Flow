@@ -37,7 +37,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
   Widget build(BuildContext context) {
     return PopupMenuButton<Color>(
       onSelected: (color) {},
-      tooltip: "",
+      tooltip: "Change node color",
       padding: EdgeInsets.zero,
       shadowColor: Colors.transparent,
       offset: Offset(-80, -15),
@@ -67,34 +67,35 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         mainAxisAlignment: MainAxisAlignment.start,
-                        children: colors.map((color) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 6), // More spacing between circles
-                            child: GestureDetector(
-                              onTap: () {
-                                setStatePopup(() {
-                                  _tempSelectedColor = color;
-                                });
-                                widget.onColorSelected(color);
-                              },
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  color: color,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: _tempSelectedColor == color
-                                        ? Colors.blue
-                                        : Colors.transparent,
-                                    width: 2,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                        children: [Text('Feature Coming Soon', style: TextStyle(fontFamily: 'Fredrick'),)],
+                        // children: colors.map((color) {
+                        //   return Padding(
+                        //     padding: const EdgeInsets.symmetric(
+                        //         horizontal: 6), // More spacing between circles
+                        //     child: GestureDetector(
+                        //       onTap: () {
+                        //         setStatePopup(() {
+                        //           _tempSelectedColor = color;
+                        //         });
+                        //         widget.onColorSelected(color);
+                        //       },
+                        //       child: Container(
+                        //         width: 28,
+                        //         height: 28,
+                        //         decoration: BoxDecoration(
+                        //           color: color,
+                        //           shape: BoxShape.circle,
+                        //           border: Border.all(
+                        //             color: _tempSelectedColor == color
+                        //                 ? Colors.blue
+                        //                 : Colors.transparent,
+                        //             width: 2,
+                        //           ),
+                        //         ),
+                        //       ),
+                        //     ),
+                        //   );
+                        // }).toList(),
                       ),
                     ),
                   );

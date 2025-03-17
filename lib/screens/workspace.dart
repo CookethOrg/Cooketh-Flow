@@ -22,15 +22,18 @@ class Workspace extends StatefulWidget {
 
 class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
-  TransformationController _transformationController =
-      TransformationController();
+  TransformationController _transformationController = TransformationController();
   bool _isPanning = false;
+  double _previousScale = 1.0;
+  
+  // Pan offset tracking
+  Offset _startingFocalPoint = Offset.zero;
+  Offset _previousOffset = Offset.zero;
+  Offset _totalOffset = Offset.zero;
 
   @override
   void initState() {
     super.initState();
-    // Set up initial transformation controller
-    _transformationController = TransformationController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWorkspace();
     });
@@ -43,20 +46,46 @@ class _WorkspaceState extends State<Workspace> {
   }
 
   void _initializeWorkspace() {
-    final workspaceProvider =
-        Provider.of<WorkspaceProvider>(context, listen: false);
+    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
 
     // Check if we need to initialize or if the workspace is already set to this flow
     if (workspaceProvider.currentFlowId != widget.flowId) {
       workspaceProvider.initializeWorkspace(widget.flowId);
     }
 
-    // set initial transform based on saved state and position
-    _updateTransformFromProvider();
-
+    // Set initial values
+    _previousScale = workspaceProvider.scale;
+    _totalOffset = workspaceProvider.position;
+    
+    // Set up initial transformation matrix based on saved state
+    _updateTransformationMatrix();
+    
     setState(() {
       _isInitialized = true;
     });
+  }
+  
+  void _updateTransformationMatrix() {
+    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    
+    // Create a new matrix based on the current scale and offset
+    Matrix4 matrix = Matrix4.identity()
+      ..translate(_totalOffset.dx, _totalOffset.dy)
+      ..scale(workspaceProvider.scale);
+    
+    _transformationController.value = matrix;
+  }
+
+  // Connect the transformation controller to the workspace provider
+  void _syncWithProvider() {
+    final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+    
+    // Update provider values
+    workspaceProvider.updateScale(_previousScale);
+    workspaceProvider.updatePosition(_totalOffset);
+    
+    // Update flow manager to persist zoom/pan state
+    workspaceProvider.updateFlowManager();
   }
 
   // Check if a point is close to a connection line
@@ -121,8 +150,7 @@ class _WorkspaceState extends State<Workspace> {
 
   // Check if a point is near a line segment
   bool _isPointNearLineSegment(Offset point, Offset lineStart, Offset lineEnd) {
-    const double hitThreshold =
-        10.0; // Distance in pixels within which we consider a hit
+    const double hitThreshold = 10.0; // Distance in pixels within which we consider a hit
 
     // Calculate squared length of the line segment
     final lengthSquared = (lineEnd - lineStart).distanceSquared;
@@ -264,38 +292,6 @@ class _WorkspaceState extends State<Workspace> {
         );
       },
     );
-  }
-
-  void _updateTransformFromProvider() {
-    final workspaceProvider =
-        Provider.of<WorkspaceProvider>(context, listen: false);
-
-    // Create a matrix from the saved scale and position
-    Matrix4 matrix = Matrix4.identity()
-      ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
-      ..scale(workspaceProvider.scale);
-
-    _transformationController.value = matrix;
-  }
-
-  void _onInteractionUpdate(ScaleUpdateDetails details) {
-    final workspaceProvider =
-        Provider.of<WorkspaceProvider>(context, listen: false);
-
-    // Get the current transformation matrix
-    final matrix = _transformationController.value;
-
-    // Extract scale from matrix (using the proper mathematical approach)
-    final scaleX = math.sqrt(matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-        matrix.getColumn(1)[0] * matrix.getColumn(1)[0]);
-
-    // Extract translation from matrix
-    final dx = matrix.getTranslation().x;
-    final dy = matrix.getTranslation().y;
-
-    // Update provider with scale and position
-    workspaceProvider.updateScale(scaleX);
-    workspaceProvider.updatePosition(Offset(dx, dy));
   }
 
   void _showExportOptions(
@@ -485,6 +481,7 @@ class _WorkspaceState extends State<Workspace> {
                     child: ElevatedButton.icon(
                       onPressed: () =>
                           _showExportOptions(context, workProvider),
+                          
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         elevation: 0,
@@ -529,17 +526,37 @@ class _WorkspaceState extends State<Workspace> {
                 // Use InteractiveViewer for zoom and pan
                 InteractiveViewer(
                   transformationController: _transformationController,
-                  minScale: 0.1, // Lower this to 0.1 to allow zoom out to 10%
+                  minScale: 0.1, // Allow zoom out to 10%
                   maxScale: 5.0,
-                  onInteractionEnd: (details) {
-                    _onInteractionUpdate(ScaleUpdateDetails());
-                    _isPanning = false;
+                  boundaryMargin: EdgeInsets.all(double.infinity), // Allow infinite panning
+                  onInteractionStart: (details) {
+                    // Keep track of interaction state
+                    _isPanning = true;
+                    _startingFocalPoint = details.focalPoint;
+                    _previousOffset = _totalOffset;
                   },
                   onInteractionUpdate: (details) {
-                    _onInteractionUpdate(details);
+                    if (details.scale != 1.0) {
+                      // Handle zoom
+                      final newScale = _previousScale * details.scale;
+                      _previousScale = newScale.clamp(0.1, 5.0);
+                      
+                      // Update workProvider's scale for node dragging calculations
+                      workProvider.updateScale(_previousScale);
+                    }
+                    
+                    // Update total offset regardless of whether it's a zoom or pan
+                    setState(() {
+                      _totalOffset = _previousOffset + details.focalPointDelta;
+                      
+                      // Update provider for node dragging calculations
+                      workProvider.updatePosition(_totalOffset);
+                    });
                   },
-                  onInteractionStart: (details) {
-                    _isPanning = details.pointerCount > 0;
+                  onInteractionEnd: (details) {
+                    // Sync final state with provider
+                    _syncWithProvider();
+                    _isPanning = false;
                   },
                   child: GestureDetector(
                     onTapDown: (details) {

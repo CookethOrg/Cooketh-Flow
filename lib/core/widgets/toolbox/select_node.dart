@@ -36,7 +36,7 @@ class _SelectNodeWidgetState extends State<SelectNode> {
   Widget build(BuildContext context) {
     return PopupMenuButton<IconData>(
       onSelected: (node) {},
-      tooltip: "",
+      tooltip: "Change node type",
       padding: EdgeInsets.zero,
       shadowColor: Colors.transparent,
       offset: Offset(0, 50),

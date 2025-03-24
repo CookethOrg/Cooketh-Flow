@@ -33,7 +33,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                 curve: Curves.easeInOut,
                 width: 250,
                 height: pv.isOpen
-                    ? 3.6 * (MediaQuery.of(context).size.height / 4)
+                    ? 3.5 * (MediaQuery.of(context).size.height / 4)
                     : 81,
                 decoration: BoxDecoration(
                   color: Colors.white,

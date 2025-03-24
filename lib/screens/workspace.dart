@@ -49,8 +49,26 @@ class _WorkspaceState extends State<Workspace> {
       workspaceProvider.initializeWorkspace(widget.flowId);
     }
 
-    // Set up initial transformation matrix based on saved state
-    _updateTransformationMatrix();
+    // Get the screen size
+    final screenSize = MediaQuery.of(context).size;
+
+    // Calculate the initial offset to center the view
+    // Canvas size is 100000x100000, so center is (50000, 50000)
+    // Adjust the offset to center it relative to the screen size
+    final double centerX = 50000.0 - (screenSize.width / 2);
+    final double centerY = 50000.0 - (screenSize.height / 2);
+
+    // Set the initial transformation matrix to center the view
+    Matrix4 matrix = Matrix4.identity()
+      ..translate(-centerX,
+          -centerY); // Negative because we move the canvas opposite to center it
+
+    _transformationController.value = matrix;
+
+    // Sync initial state with provider
+    workspaceProvider.updatePosition(Offset(-centerX, -centerY));
+    workspaceProvider.updateScale(1.0); // Default scale
+    workspaceProvider.updateFlowManager();
 
     setState(() {
       _isInitialized = true;
@@ -419,8 +437,8 @@ class _WorkspaceState extends State<Workspace> {
                   },
                   child: SizedBox(
                     // Huge size for effectively infinite canvas
-                    width: 10000000,
-                    height: 10000000,
+                    width: 100000,
+                    height: 100000,
                     child: Stack(
                       children: [
                         // Background grid for better visual orientation
@@ -555,6 +573,7 @@ class GridPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.grey.withOpacity(0.1)
+      // ..color = Colors.red
       ..strokeWidth = 1;
 
     // Draw grid lines every 100 pixels

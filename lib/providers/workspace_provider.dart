@@ -321,8 +321,8 @@ class WorkspaceProvider extends StateHandler {
       id: newId,
       type: type,
       position: Offset(
-        (Random().nextDouble() - 0.5) * 300, // -150 to +150 range
-        (Random().nextDouble() - 0.5) * 200, // -100 to +100 range
+        49900 + Random().nextDouble() * 300, //  49900 to 50200 range
+        49900 + Random().nextDouble() * 300, // -49900 to 50200 range
       ),
     );
 

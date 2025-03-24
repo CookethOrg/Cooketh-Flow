@@ -150,7 +150,7 @@ class FlowmanageProvider extends StateHandler {
           "1": FlowNode(
             id: "1",
             type: NodeType.rectangular,
-            position: Offset(100, 100),
+            position: Offset(50000, 50000),
           )
         }
       );

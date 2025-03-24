@@ -24,7 +24,7 @@ class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
   TransformationController _transformationController =
       TransformationController();
-  bool _isPanning = false;
+  // bool _isPanning = false;
 
   @override
   void initState() {
@@ -291,6 +291,7 @@ class _WorkspaceState extends State<Workspace> {
           );
         }
 
+        // bool _isPanning = workProvider.isPanning;
         return Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(80),
@@ -394,7 +395,7 @@ class _WorkspaceState extends State<Workspace> {
                   boundaryMargin:
                       EdgeInsets.all(double.infinity), // Allow infinite panning
                   onInteractionStart: (details) {
-                    _isPanning = true;
+                    workProvider.updatePanning(true);
                   },
                   onInteractionUpdate: (details) {
                     // Update provider with current scale and position for node dragging calculations
@@ -414,7 +415,7 @@ class _WorkspaceState extends State<Workspace> {
                   onInteractionEnd: (details) {
                     // Sync final state with provider
                     _syncWithProvider();
-                    _isPanning = false;
+                    workProvider.updatePanning(false);
                   },
                   child: SizedBox(
                     // Huge size for effectively infinite canvas
@@ -466,18 +467,14 @@ class _WorkspaceState extends State<Workspace> {
                         ...workProvider.nodeList.entries.map((entry) {
                           var id = entry.key;
                           var node = entry.value;
-                          return Positioned(
-                            left: node.position.dx,
-                            top: node.position.dy,
-                            child: Node(
-                              id: id,
-                              type: node.type,
-                              onResize: (Size newSize) =>
-                                  workProvider.onResize(id, newSize),
-                              onDrag: (offset) =>
-                                  workProvider.dragNode(id, offset),
-                              position: node.position,
-                            ),
+                          return Node(
+                            id: id,
+                            type: node.type,
+                            onResize: (Size newSize) =>
+                                workProvider.onResize(id, newSize),
+                            onDrag: (offset) =>
+                                workProvider.dragNode(id, offset),
+                            position: node.position,
                           );
                         }),
                       ],

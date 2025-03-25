@@ -15,6 +15,7 @@ class Node extends StatelessWidget {
     super.key,
     required this.id,
     required this.type,
+    required this.colour,
     required this.onDrag,
     required this.position,
     required this.onResize,
@@ -22,6 +23,7 @@ class Node extends StatelessWidget {
 
   final String id;
   final NodeType type;
+  final Color colour;
   final Function(Offset) onDrag;
   final Function(Size) onResize;
   final Offset position;

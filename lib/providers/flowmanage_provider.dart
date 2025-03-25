@@ -151,6 +151,7 @@ class FlowmanageProvider extends StateHandler {
             id: "1",
             type: NodeType.rectangular,
             position: Offset(100, 100),
+            colour: Color(0xffFAD7A0),
           )
         }
       );

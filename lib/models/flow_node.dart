@@ -8,6 +8,7 @@ class FlowNode {
   final TextEditingController data;
   NodeType type;
   final String id;
+  Color colour = Color(0xffFAD7A0);
   bool isSelected;
   final Map<ConnectionPoint, Set<Connection>> connections;
   Size size;
@@ -17,7 +18,7 @@ class FlowNode {
     this.isSelected = false,
     required this.type,
     required this.position,
-    this.size = const Size(150, 75)
+    this.size = const Size(150, 75), required Color colour
   }) : connections = {
         for (var point in ConnectionPoint.values) point: <Connection>{}
       },
@@ -33,6 +34,7 @@ class FlowNode {
     FlowNode newNode = FlowNode(
       id: id,
       type: type,
+      colour: colour,
       position: Offset(position.dx, position.dy),
       size: Size(size.width, size.height),
       isSelected: isSelected,
@@ -106,6 +108,7 @@ class FlowNode {
         json["size"]["width"].toDouble(), 
         json["size"]["height"].toDouble()
       ),
+      colour: Color(0xffFAD7A0), // Provide a default or desired color
     );
     
     // Set text content
@@ -129,4 +132,5 @@ class FlowNode {
     
     return node;
   }
+
 }

@@ -74,7 +74,8 @@ class SupabaseService extends StateHandler {
     FlowNode startNode = FlowNode(
       id: "node1",
       type: NodeType.rectangular,
-      position: Offset(100, 100),
+      position: Offset(100, 100), 
+      colour: Color(0xffFAD7A0),
     );
     // Set text for start node
     startNode.data.text = "start";
@@ -82,7 +83,8 @@ class SupabaseService extends StateHandler {
     FlowNode decisionNode = FlowNode(
       id: "node2",
       type: NodeType.parallelogram,
-      position: Offset(300, 150),
+      position: Offset(300, 150), 
+      colour: Color(0xffFAD7A0),
     );
     // Set text for decision node
     decisionNode.data.text = "decision node";
@@ -91,6 +93,7 @@ class SupabaseService extends StateHandler {
       id: "node3",
       type: NodeType.diamond,
       position: Offset(500, 150),
+      colour: Color(0xffFAD7A0),
     );
     // Set text for page node
     pageNode.data.text = "some page";
@@ -99,6 +102,7 @@ class SupabaseService extends StateHandler {
       id: "node4",
       type: NodeType.database,
       position: Offset(700, 100),
+      colour: Color(0xffFAD7A0),
     );
     // Set text for database node
     dbNode.data.text = "database details";
@@ -107,6 +111,7 @@ class SupabaseService extends StateHandler {
       id: "node5",
       type: NodeType.rectangular,
       position: Offset(900, 150),
+      colour: Color(0xffFAD7A0),
     );
     // Set text for end node
     endNode.data.text = "end";

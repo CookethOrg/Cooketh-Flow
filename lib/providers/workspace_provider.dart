@@ -315,7 +315,7 @@ class WorkspaceProvider extends StateHandler {
       position: Offset(
         (Random().nextDouble() - 0.5) * 300, // -150 to +150 range
         (Random().nextDouble() - 0.5) * 200, // -100 to +100 range
-      ),
+      ), colour: Color(0xffFAD7A0),
     );
 
     // Add to local node list
@@ -655,6 +655,16 @@ class WorkspaceProvider extends StateHandler {
     saveChanges();
     notifyListeners();
   }
+  void changeNodeColour(Color newColour, String nodeId) {
+  if (_nodeList.containsKey(nodeId)) {
+    _nodeList[nodeId]?.colour = newColour;
+    flowManager.nodes[nodeId]?.colour = newColour;
+    updateFlowManager();
+    _saveStateForUndo();
+    saveChanges();
+    notifyListeners();
+  }
+}
 
   NodeType getNodeTypeFromIcon(IconData nodeIcon) {
     NodeType nodeType = NodeType.rectangular; // Default value

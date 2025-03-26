@@ -33,7 +33,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                 curve: Curves.easeInOut,
                 width: 250,
                 height: pv.isOpen
-                    ? 3.6 * (MediaQuery.of(context).size.height / 4)
+                    ? 3.5 * (MediaQuery.of(context).size.height / 4)
                     : 81,
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -120,14 +120,17 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                 margin: EdgeInsets.symmetric(
                                     vertical: 5, horizontal: 8),
                                 decoration: BoxDecoration(
-                                  // color: Colors.red,
+                                  color: pv.nodeList[id]!.isSelected ? Colors.blue.shade50 : Colors.white,
                                   border: Border.all(
-                                      color: Colors.black, width: 0.5),
+                                      color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black, width: pv.nodeList[id]!.isSelected ? 1 : 0.5),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: ListTile(
-                                  leading: Icon(getIcon(type)),
+                                  // tileColor: Colors.red,
+                                  onTap: () => pv.changeSelected(id),
+                                  leading: Icon(getIcon(type), color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black,),
                                   title: TextField(
+                                    style: TextStyle(color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black),
                                     controller: pv.nodeList[id]!.data,
                                     onSubmitted: (value) =>
                                         pv.updateFlowManager(),

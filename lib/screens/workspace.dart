@@ -24,7 +24,7 @@ class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
   TransformationController _transformationController =
       TransformationController();
-  bool _isPanning = false;
+  // bool _isPanning = false;
 
   @override
   void initState() {
@@ -49,8 +49,26 @@ class _WorkspaceState extends State<Workspace> {
       workspaceProvider.initializeWorkspace(widget.flowId);
     }
 
-    // Set up initial transformation matrix based on saved state
-    _updateTransformationMatrix();
+    // Get the screen size
+    final screenSize = MediaQuery.of(context).size;
+
+    // Calculate the initial offset to center the view
+    // Canvas size is 100000x100000, so center is (50000, 50000)
+    // Adjust the offset to center it relative to the screen size
+    final double centerX = 50000.0 - (screenSize.width / 2);
+    final double centerY = 50000.0 - (screenSize.height / 2);
+
+    // Set the initial transformation matrix to center the view
+    Matrix4 matrix = Matrix4.identity()
+      ..translate(-centerX,
+          -centerY); // Negative because we move the canvas opposite to center it
+
+    _transformationController.value = matrix;
+
+    // Sync initial state with provider
+    workspaceProvider.updatePosition(Offset(-centerX, -centerY));
+    workspaceProvider.updateScale(1.0); // Default scale
+    workspaceProvider.updateFlowManager();
 
     setState(() {
       _isInitialized = true;
@@ -291,6 +309,7 @@ class _WorkspaceState extends State<Workspace> {
           );
         }
 
+        // bool _isPanning = workProvider.isPanning;
         return Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(80),
@@ -394,7 +413,7 @@ class _WorkspaceState extends State<Workspace> {
                   boundaryMargin:
                       EdgeInsets.all(double.infinity), // Allow infinite panning
                   onInteractionStart: (details) {
-                    _isPanning = true;
+                    workProvider.updatePanning(true);
                   },
                   onInteractionUpdate: (details) {
                     // Update provider with current scale and position for node dragging calculations
@@ -414,12 +433,12 @@ class _WorkspaceState extends State<Workspace> {
                   onInteractionEnd: (details) {
                     // Sync final state with provider
                     _syncWithProvider();
-                    _isPanning = false;
+                    workProvider.updatePanning(false);
                   },
                   child: SizedBox(
                     // Huge size for effectively infinite canvas
-                    width: 10000000,
-                    height: 10000000,
+                    width: 100000,
+                    height: 100000,
                     child: Stack(
                       children: [
                         // Background grid for better visual orientation
@@ -559,6 +578,7 @@ class GridPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
       ..color = Colors.grey.withOpacity(0.1)
+      // ..color = Colors.red
       ..strokeWidth = 1;
 
     // Draw grid lines every 100 pixels

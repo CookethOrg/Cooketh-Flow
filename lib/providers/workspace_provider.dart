@@ -39,6 +39,7 @@ class WorkspaceProvider extends StateHandler {
   Offset _position = Offset.zero;
   double minScale = 0.1;
   double maxScale = 5.0;
+  bool _isPanning = false;
 
   // Getters
   String get currentFlowId => _currentFlowId;
@@ -55,12 +56,19 @@ class WorkspaceProvider extends StateHandler {
       );
   double get scale => _scale;
   Offset get position => _position;
+  bool get isPanning => _isPanning;
 
   WorkspaceProvider(this.fl) : super() {
     print("WorkspaceProvider initialized with flow ID: ${fl.newFlowId}");
     if (fl.newFlowId.isNotEmpty) {
       initializeWorkspace(fl.newFlowId);
     }
+  }
+
+  // update panning
+  void updatePanning(bool val) {
+    _isPanning = val;
+    notifyListeners();
   }
 
   // Initialize the workspace with a specific flow ID
@@ -313,8 +321,8 @@ class WorkspaceProvider extends StateHandler {
       id: newId,
       type: type,
       position: Offset(
-        (Random().nextDouble() - 0.5) * 300, // -150 to +150 range
-        (Random().nextDouble() - 0.5) * 200, // -100 to +100 range
+        49900 + Random().nextDouble() * 300, //  49900 to 50200 range
+        49900 + Random().nextDouble() * 300, // -49900 to 50200 range
       ), colour: Color(0xffFAD7A0),
     );
 
@@ -328,10 +336,8 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void dragNode(String id, Offset off) {
-    _saveStateForUndo();
-
     if (_nodeList.containsKey(id)) {
-      // Directly update the node position with the provided offset
+      _saveStateForUndo();
       _nodeList[id]!.position = off;
       updateFlowManager();
       notifyListeners();

@@ -129,28 +129,28 @@ class DashboardDrawer extends StatelessWidget {
                             SizedBox(
                                 height:
                                     40), // Slightly increased for better spacing
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      20), // Consistent horizontal padding
-                              child: TextButton.icon(
-                                onPressed: () {},
-                                icon: Icon(
-                                  PhosphorIconsRegular.file,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
-                                label: Text(
-                                  'Drafts',
-                                  style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                                height: 16), // Increased spacing between items
+                            // Padding(
+                            //   padding: const EdgeInsets.symmetric(
+                            //       horizontal:
+                            //           20), // Consistent horizontal padding
+                            //   child: TextButton.icon(
+                            //     onPressed: () {},
+                            //     icon: Icon(
+                            //       PhosphorIconsRegular.file,
+                            //       color: Colors.black,
+                            //       size: 24,
+                            //     ),
+                            //     label: Text(
+                            //       'Drafts',
+                            //       style: TextStyle(
+                            //           fontFamily: 'Frederik',
+                            //           fontSize: 16,
+                            //           color: Colors.black),
+                            //     ),
+                            //   ),
+                            // ),
+                            // SizedBox(
+                            //     height: 16), // Increased spacing between items
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal:

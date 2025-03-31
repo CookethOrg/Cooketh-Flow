@@ -244,52 +244,48 @@ class _NodeState extends State<Node> {
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(
       builder: (context, wp, child) {
-        return Positioned(
-          left: _currentPosition.dx,
-          top: _currentPosition.dy,
-          child: GestureDetector(
-            onTap: () => wp.changeSelected(widget.id),
-            onPanStart: (details) {
-              if (!wp.nodeList[widget.id]!.isSelected) {
-                wp.changeSelected(widget.id);
-              }
-            },
-            onPanUpdate: (details) {
-              if (!wp.nodeList[widget.id]!.isSelected || wp.isPanning) return;
-
-              final scaleFactor = wp.scale;
-              final adjustedDelta = details.delta / scaleFactor;
-              setState(() {
-                _currentPosition += adjustedDelta;
-              });
-              wp.dragNode(widget.id, _currentPosition);
-            },
-            onPanEnd: (details) {
-              widget.onDrag(_currentPosition);
-            },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: wp.buildNode(widget.id, widget.type),
-                ),
-                if (wp.nodeList[widget.id]!.isSelected) ...[
-                  _buildResizeHandle(context, ResizeHandle.topLeft, wp),
-                  _buildResizeHandle(context, ResizeHandle.topRight, wp),
-                  _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
-                  _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
-                  _buildConnectionPoints(
-                      context, ConnectionPoint.top, widget.id, wp),
-                  _buildConnectionPoints(
-                      context, ConnectionPoint.right, widget.id, wp),
-                  _buildConnectionPoints(
-                      context, ConnectionPoint.bottom, widget.id, wp),
-                  _buildConnectionPoints(
-                      context, ConnectionPoint.left, widget.id, wp),
-                ]
-              ],
-            ),
+        return GestureDetector(
+          onTap: () => wp.changeSelected(widget.id),
+          onPanStart: (details) {
+            if (!wp.nodeList[widget.id]!.isSelected) {
+              wp.changeSelected(widget.id);
+            }
+          },
+          onPanUpdate: (details) {
+            if (!wp.nodeList[widget.id]!.isSelected || wp.isPanning) return;
+        
+            final scaleFactor = wp.scale;
+            final adjustedDelta = details.delta / scaleFactor;
+            setState(() {
+              _currentPosition += adjustedDelta;
+            });
+            wp.dragNode(widget.id, _currentPosition);
+          },
+          onPanEnd: (details) {
+            widget.onDrag(_currentPosition);
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: wp.buildNode(widget.id, widget.type),
+              ),
+              if (wp.nodeList[widget.id]!.isSelected) ...[
+                _buildResizeHandle(context, ResizeHandle.topLeft, wp),
+                _buildResizeHandle(context, ResizeHandle.topRight, wp),
+                _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
+                _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
+                _buildConnectionPoints(
+                    context, ConnectionPoint.top, widget.id, wp),
+                _buildConnectionPoints(
+                    context, ConnectionPoint.right, widget.id, wp),
+                _buildConnectionPoints(
+                    context, ConnectionPoint.bottom, widget.id, wp),
+                _buildConnectionPoints(
+                    context, ConnectionPoint.left, widget.id, wp),
+              ]
+            ],
           ),
         );
       },

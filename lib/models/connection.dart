@@ -21,11 +21,13 @@ class Connection {
 
   // for serialization
   Map<String, dynamic> toJson() => {
-    "sourceNodeId": sourceNodeId,
-    "targetNodeId": targetNodeId,
-    "sourcePoint": sourcePoint.index,  // Use index instead of name for proper serialization
-    "targetPoint": targetPoint.index   // Use index instead of name for proper serialization
-  };
+        "sourceNodeId": sourceNodeId,
+        "targetNodeId": targetNodeId,
+        "sourcePoint": sourcePoint
+            .index, // Use index instead of name for proper serialization
+        "targetPoint": targetPoint
+            .index // Use index instead of name for proper serialization
+      };
 
   // For deserialization
   factory Connection.fromJson(Map<String, dynamic> json) {
@@ -36,12 +38,21 @@ class Connection {
       targetPoint: ConnectionPoint.values[json['targetPoint']],
     );
   }
-  
+
   @override
   String toString() {
     return 'Connection(sourceNodeId: $sourceNodeId, targetNodeId: $targetNodeId, sourcePoint: $sourcePoint, targetPoint: $targetPoint)';
   }
-  
+
+  Connection copy() {
+    Connection newCon = Connection(
+        sourceNodeId: sourceNodeId,
+        targetNodeId: targetNodeId,
+        sourcePoint: sourcePoint,
+        targetPoint: targetPoint);
+    return newCon;
+  }
+
   // For set equality
   @override
   bool operator ==(Object other) {
@@ -54,9 +65,9 @@ class Connection {
   }
 
   @override
-  int get hashCode => 
-    sourceNodeId.hashCode ^ 
-    targetNodeId.hashCode ^ 
-    sourcePoint.hashCode ^ 
-    targetPoint.hashCode;
+  int get hashCode =>
+      sourceNodeId.hashCode ^
+      targetNodeId.hashCode ^
+      sourcePoint.hashCode ^
+      targetPoint.hashCode;
 }

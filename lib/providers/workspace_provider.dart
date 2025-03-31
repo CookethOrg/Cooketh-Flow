@@ -337,14 +337,25 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void dragNode(String id, Offset off) {
-    if (_nodeList.containsKey(id)) {
-      _saveStateForUndo();
-      _nodeList[id]!.position = off;
-      updateFlowManager();
-      notifyListeners();
+  void dragNode(String id, Offset newPosition) {
+  if (_nodeList.containsKey(id)) {
+    final node = _nodeList[id]!;
+    final delta = newPosition - node.position;
+    node.position = newPosition;
+
+    // Force update connections by removing and re-adding them
+    final connectionsToUpdate = flowManager.connections.where(
+      (c) => c.sourceNodeId == id || c.targetNodeId == id
+    ).toList();
+
+    for (final connection in connectionsToUpdate) {
+      flowManager.connections.remove(connection);
+      flowManager.connections.add(connection.copy());
     }
+
+    notifyListeners();
   }
+}
 
   void removeSelectedNodes() {
     if (selectedNode == null) {

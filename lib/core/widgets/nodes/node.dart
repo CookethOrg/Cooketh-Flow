@@ -172,8 +172,8 @@ class _NodeState extends State<Node> {
     }
   }
 
-  Widget _buildConnectionPoints(
-      BuildContext context, ConnectionPoint point, String id, WorkspaceProvider wp) {
+  Widget _buildConnectionPoints(BuildContext context, ConnectionPoint point,
+      String id, WorkspaceProvider wp) {
     if (!wp.nodeList[id]!.isConnectionPointAvailable(point)) {
       return const SizedBox.shrink();
     }
@@ -262,6 +262,7 @@ class _NodeState extends State<Node> {
               setState(() {
                 _currentPosition += adjustedDelta;
               });
+              wp.dragNode(widget.id, _currentPosition);
             },
             onPanEnd: (details) {
               widget.onDrag(_currentPosition);
@@ -278,10 +279,14 @@ class _NodeState extends State<Node> {
                   _buildResizeHandle(context, ResizeHandle.topRight, wp),
                   _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
                   _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.top, widget.id, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.right, widget.id, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.bottom, widget.id, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.left, widget.id, wp),
+                  _buildConnectionPoints(
+                      context, ConnectionPoint.top, widget.id, wp),
+                  _buildConnectionPoints(
+                      context, ConnectionPoint.right, widget.id, wp),
+                  _buildConnectionPoints(
+                      context, ConnectionPoint.bottom, widget.id, wp),
+                  _buildConnectionPoints(
+                      context, ConnectionPoint.left, widget.id, wp),
                 ]
               ],
             ),

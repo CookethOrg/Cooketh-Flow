@@ -23,7 +23,7 @@ class Workspace extends StatefulWidget {
 
 class _WorkspaceState extends State<Workspace> {
   bool _isInitialized = false;
-  TransformationController _transformationController =
+  final TransformationController _transformationController =
       TransformationController();
   // bool _isPanning = false;
 

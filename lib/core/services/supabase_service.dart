@@ -1,7 +1,10 @@
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/models/connection.dart';
+import 'package:cookethflow/providers/flowmanage_provider.dart';
+import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -62,6 +65,7 @@ class SupabaseService extends StateHandler {
 
   // Creates a template workspace with predefined nodes
   FlowManager createTemplateWorkspace() {
+    double cv = (canvasDimension / 2) - 100;
     String flowId = DateTime.now().millisecondsSinceEpoch.toString();
 
     // Create flow manager
@@ -74,7 +78,7 @@ class SupabaseService extends StateHandler {
     FlowNode startNode = FlowNode(
       id: "node1",
       type: NodeType.rectangular,
-      position: Offset(100, 100), 
+      position: Offset(cv + 100,cv +  100),
       colour: Color(0xffFAD7A0),
     );
     // Set text for start node
@@ -83,7 +87,7 @@ class SupabaseService extends StateHandler {
     FlowNode decisionNode = FlowNode(
       id: "node2",
       type: NodeType.parallelogram,
-      position: Offset(300, 150), 
+      position: Offset(cv + 300,cv +  150),
       colour: Color(0xffFAD7A0),
     );
     // Set text for decision node
@@ -92,7 +96,7 @@ class SupabaseService extends StateHandler {
     FlowNode pageNode = FlowNode(
       id: "node3",
       type: NodeType.diamond,
-      position: Offset(500, 150),
+      position: Offset(cv + 500,cv +  150),
       colour: Color(0xffFAD7A0),
     );
     // Set text for page node
@@ -101,7 +105,7 @@ class SupabaseService extends StateHandler {
     FlowNode dbNode = FlowNode(
       id: "node4",
       type: NodeType.database,
-      position: Offset(700, 100),
+      position: Offset(cv + 700,cv +  100),
       colour: Color(0xffFAD7A0),
     );
     // Set text for database node
@@ -110,7 +114,7 @@ class SupabaseService extends StateHandler {
     FlowNode endNode = FlowNode(
       id: "node5",
       type: NodeType.rectangular,
-      position: Offset(900, 150),
+      position: Offset(cv + 900,cv +  150),
       colour: Color(0xffFAD7A0),
     );
     // Set text for end node
@@ -287,26 +291,27 @@ class SupabaseService extends StateHandler {
   // Update user name in both Auth and User table
   Future<String> updateUserName({required String userName}) async {
     String res = 'Some error occurred';
-    
+
     try {
       final user = supabase.auth.currentUser;
       if (user == null) {
         throw Exception('No authenticated user found');
       }
-      
+
       // Input validation
       if (userName.trim().isEmpty) {
         throw Exception('Username cannot be empty');
       }
-      
+
       // Update username in Auth metadata
-      await supabase.auth.updateUser(UserAttributes(data: {'userName': userName}));
-      
+      await supabase.auth
+          .updateUser(UserAttributes(data: {'userName': userName}));
+
       // Also update username in User table
-      await supabase.from('User')
-        .update({'userName': userName})
-        .eq('id', user.id);
-      
+      await supabase
+          .from('User')
+          .update({'userName': userName}).eq('id', user.id);
+
       res = 'Username updated successfully';
       notifyListeners(); // Notify listeners of the change
       return res;
@@ -315,37 +320,35 @@ class SupabaseService extends StateHandler {
       throw Exception(res);
     }
   }
-  
+
   // Update user email (would typically require email verification)
   Future<String> updateUserEmail({required String email}) async {
     String res = 'Some error occurred';
-    
+
     try {
       final user = supabase.auth.currentUser;
       if (user == null) {
         throw Exception('No authenticated user found');
       }
-      
+
       // Input validation
       if (email.trim().isEmpty) {
         throw Exception('Email cannot be empty');
       }
-      
+
       // Basic email validation regex
       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
       if (!emailRegex.hasMatch(email)) {
         throw Exception('Please enter a valid email address');
       }
-      
+
       // Update email in Auth
       // Note: This would typically send a confirmation email
       await supabase.auth.updateUser(UserAttributes(email: email));
-      
+
       // Also update email in User table
-      await supabase.from('User')
-        .update({'email': email})
-        .eq('id', user.id);
-      
+      await supabase.from('User').update({'email': email}).eq('id', user.id);
+
       res = 'Email update requested. Please check your inbox to confirm.';
       notifyListeners();
       return res;
@@ -354,36 +357,36 @@ class SupabaseService extends StateHandler {
       throw Exception(res);
     }
   }
-  
+
   // Update user password
   Future<String> updateUserPassword({
     required String currentPassword,
     required String newPassword,
   }) async {
     String res = 'Some error occurred';
-    
+
     try {
       final user = supabase.auth.currentUser;
       if (user == null) {
         throw Exception('No authenticated user found');
       }
-      
+
       // Input validation
       if (newPassword.length < 6) {
         throw Exception('Password must be at least 6 characters');
       }
-      
+
       // Verify current password by attempting to sign in
       await supabase.auth.signInWithPassword(
         email: user.email!,
         password: currentPassword,
       );
-      
+
       // Update the password
       await supabase.auth.updateUser(
         UserAttributes(password: newPassword),
       );
-      
+
       res = 'Password updated successfully';
       return res;
     } catch (AuthException) {

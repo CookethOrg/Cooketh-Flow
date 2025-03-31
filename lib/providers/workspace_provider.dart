@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/core/widgets/nodes/database_node.dart';
 import 'package:cookethflow/core/widgets/nodes/diamond_node.dart';
 import 'package:cookethflow/core/widgets/nodes/parallelogram_node.dart';
@@ -321,9 +322,10 @@ class WorkspaceProvider extends StateHandler {
       id: newId,
       type: type,
       position: Offset(
-        49900 + Random().nextDouble() * 300, //  49900 to 50200 range
-        49900 + Random().nextDouble() * 300, // -49900 to 50200 range
-      ), colour: Color(0xffFAD7A0),
+        ((canvasDimension/2)-100) + Random().nextDouble() * 300, //  49900 to 50200 range
+        ((canvasDimension/2)-100) + Random().nextDouble() * 300, // -49900 to 50200 range
+      ),
+      colour: Color(0xffFAD7A0),
     );
 
     // Add to local node list
@@ -661,16 +663,17 @@ class WorkspaceProvider extends StateHandler {
     saveChanges();
     notifyListeners();
   }
+
   void changeNodeColour(Color newColour, String nodeId) {
-  if (_nodeList.containsKey(nodeId)) {
-    _nodeList[nodeId]?.colour = newColour;
-    flowManager.nodes[nodeId]?.colour = newColour;
-    updateFlowManager();
-    _saveStateForUndo();
-    saveChanges();
-    notifyListeners();
+    if (_nodeList.containsKey(nodeId)) {
+      _nodeList[nodeId]?.colour = newColour;
+      flowManager.nodes[nodeId]?.colour = newColour;
+      updateFlowManager();
+      _saveStateForUndo();
+      saveChanges();
+      notifyListeners();
+    }
   }
-}
 
   NodeType getNodeTypeFromIcon(IconData nodeIcon) {
     NodeType nodeType = NodeType.rectangular; // Default value

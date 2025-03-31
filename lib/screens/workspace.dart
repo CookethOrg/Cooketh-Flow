@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
@@ -55,8 +56,8 @@ class _WorkspaceState extends State<Workspace> {
     // Calculate the initial offset to center the view
     // Canvas size is 100000x100000, so center is (50000, 50000)
     // Adjust the offset to center it relative to the screen size
-    final double centerX = 50000.0 - (screenSize.width / 2);
-    final double centerY = 50000.0 - (screenSize.height / 2);
+    final double centerX = (canvasDimension/2) - (screenSize.width / 2);
+    final double centerY = (canvasDimension/2) - (screenSize.height / 2);
 
     // Set the initial transformation matrix to center the view
     Matrix4 matrix = Matrix4.identity()
@@ -437,8 +438,8 @@ class _WorkspaceState extends State<Workspace> {
                   },
                   child: SizedBox(
                     // Huge size for effectively infinite canvas
-                    width: 100000,
-                    height: 100000,
+                    width: canvasDimension,
+                    height: canvasDimension,
                     child: Stack(
                       children: [
                         // Background grid for better visual orientation

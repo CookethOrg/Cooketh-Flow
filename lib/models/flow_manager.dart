@@ -14,9 +14,12 @@ class FlowManager {
       {this.flowId = "",
       this.flowName = "New Project",
       Map<String, FlowNode>? nodes,
-      Set<Connection>? connections, this.scale = 1.0, Offset? position})
+      Set<Connection>? connections,
+      this.scale = 1.0,
+      Offset? position})
       : nodes = nodes ?? {},
-        connections = connections ?? {}, position = position ?? Offset.zero;
+        connections = connections ?? {},
+        position = position ?? Offset.zero;
 
   // Add a new node
   void addNode(FlowNode node) {
@@ -64,58 +67,59 @@ class FlowManager {
 
   // Export the flow to JSON
   Map<String, dynamic> exportFlow() {
-  return {
-    'flowName': flowName,
-    'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
-    'connections': connections.map((conn) => conn.toJson()).toList(),
-    'scale': scale,
-    'position': position != null ? {'dx': position!.dx, 'dy': position!.dy} : null,
-  };
-}
+    return {
+      'flowName': flowName,
+      'nodes': nodes.map((id, node) => MapEntry(id, node.toJson())),
+      'connections': connections.map((conn) => conn.toJson()).toList(),
+      'scale': scale,
+      'position':
+          position != null ? {'dx': position!.dx, 'dy': position!.dy} : null,
+    };
+  }
 
   // Create a FlowManager from JSON data
   factory FlowManager.fromJson(Map<String, dynamic> json, String flowId) {
-  // Extract flow name
-  String flowName = json['flowName'] ?? "New Project";
-  
-  // Create empty collections
-  Map<String, FlowNode> nodes = {};
-  Set<Connection> connections = {};
-  
-  // Parse nodes
-  if (json['nodes'] != null) {
-    (json['nodes'] as Map<String, dynamic>).forEach((id, nodeData) {
-      nodes[id] = FlowNode.fromJson(nodeData);
-    });
-  }
-  
-  // Parse connections
-  if (json['connections'] != null) {
-    List<dynamic> connsJson = json['connections'];
-    for (var connJson in connsJson) {
-      connections.add(Connection.fromJson(connJson));
+    // Extract flow name
+    String flowName = json['flowName'] ?? "New Project";
+
+    // Create empty collections
+    Map<String, FlowNode> nodes = {};
+    Set<Connection> connections = {};
+
+    // Parse nodes
+    if (json['nodes'] != null) {
+      (json['nodes'] as Map<String, dynamic>).forEach((id, nodeData) {
+        nodes[id] = FlowNode.fromJson(nodeData);
+      });
     }
-  }
-  
-  // Parse scale and position
-  double? scale = json['scale']?.toDouble() ?? 1.0;
-  Offset? position;
-  if (json['position'] != null) {
-    position = Offset(
-      json['position']['dx']?.toDouble() ?? 0.0,
-      json['position']['dy']?.toDouble() ?? 0.0,
+
+    // Parse connections
+    if (json['connections'] != null) {
+      List<dynamic> connsJson = json['connections'];
+      for (var connJson in connsJson) {
+        connections.add(Connection.fromJson(connJson));
+      }
+    }
+
+    // Parse scale and position
+    double? scale = json['scale']?.toDouble() ?? 1.0;
+    Offset? position;
+    if (json['position'] != null) {
+      position = Offset(
+        json['position']['dx']?.toDouble() ?? 0.0,
+        json['position']['dy']?.toDouble() ?? 0.0,
+      );
+    } else {
+      position = Offset.zero;
+    }
+
+    return FlowManager(
+      flowId: flowId,
+      flowName: flowName,
+      nodes: nodes,
+      connections: connections,
+      scale: scale,
+      position: position,
     );
-  } else {
-    position = Offset.zero;
   }
-  
-  return FlowManager(
-    flowId: flowId,
-    flowName: flowName,
-    nodes: nodes,
-    connections: connections,
-    scale: scale,
-    position: position,
-  );
-}
 }

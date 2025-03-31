@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
@@ -150,7 +151,7 @@ class FlowmanageProvider extends StateHandler {
           "1": FlowNode(
             id: "1",
             type: NodeType.rectangular,
-            position: Offset(50000, 50000),
+            position: Offset(canvasDimension/2, canvasDimension/2),
             colour: Color(0xffFAD7A0),
           )
         }

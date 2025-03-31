@@ -26,7 +26,7 @@ class ProjectCard extends StatelessWidget {
 
       return InkWell(
         onTap: onTap,
-        hoverColor: Colors.orange.withOpacity(0.1),
+        hoverColor: Colors.grey.withOpacity(0.1),
         borderRadius: BorderRadius.circular(25),
         child: SizedBox(
           width: 450,
@@ -42,19 +42,16 @@ class ProjectCard extends StatelessWidget {
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      color: Colors.white.withAlpha(128),
-                      child: Center(
-                        child: CircleAvatar(
-                          maxRadius: 50,
-                          backgroundColor: Colors.black,
-                          child: Text(
-                            getFlowNameInitials(),
-                            style: TextStyle(
-                                fontFamily: 'Fredrick',
-                                fontSize: 30,
-                                color: Colors.white),
-                          ),
+                    child: Center(
+                      child: CircleAvatar(
+                        maxRadius: 50,
+                        backgroundColor: Colors.orange,
+                        child: Text(
+                          getFlowNameInitials(),
+                          style: TextStyle(
+                              fontFamily: 'Fredrick',
+                              fontSize: 30,
+                              color: Colors.white),
                         ),
                       ),
                     ),

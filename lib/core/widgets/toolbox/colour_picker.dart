@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -16,14 +17,6 @@ class ColorPickerButton extends StatefulWidget {
 }
 
 class _ColorPickerButtonState extends State<ColorPickerButton> {
-  final List<Color> colors = [
-    Color(0xffFAD7A0),
-    Color(0xffF9B9B7),
-    Color(0xFFA7C7E7),
-    Color(0xffA9DFBF),
-    Color(0xffC39BD3),
-    Color(0xFFE0E0E0)
-  ];
 
   Color? _tempSelectedColor;
 
@@ -64,11 +57,11 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
+                      child: Wrap(
+                        spacing: 12,
+                        runSpacing: 8,
                         // children: [Text('Feature Coming Soon', style: TextStyle(fontFamily: 'Fredrick'),)],
-                        children: colors.map((color) {
+                        children: nodeColors.map((color) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 6), // More spacing between circles

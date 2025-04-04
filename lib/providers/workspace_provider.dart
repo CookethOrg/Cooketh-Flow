@@ -4,6 +4,7 @@ import 'dart:typed_data';
 // import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:cookethflow/core/services/file_services.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/core/widgets/nodes/database_node.dart';
@@ -182,7 +183,7 @@ class WorkspaceProvider extends StateHandler {
           height: getHeight(id),
           padding: const EdgeInsets.fromLTRB(15, 12, 15, 18),
           decoration: BoxDecoration(
-            color: const Color(0xFFFFD8A8),
+            color: selectedColor ?? nodeColors[0],
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: nodeList[id]!.isSelected ? Colors.blue : Colors.black,
@@ -727,7 +728,7 @@ class WorkspaceProvider extends StateHandler {
     return nodeIcon;
   }
 
-  Color selectedColor = const Color(0xffF9B9B7);
+  Color selectedColor = nodeColors[0];
   IconData selectedNodeIcon = PhosphorIconsRegular.square;
 
   bool isBold = false;

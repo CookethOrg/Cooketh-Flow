@@ -1,4 +1,7 @@
+import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class DatabaseNode extends StatelessWidget {
   const DatabaseNode({
@@ -14,45 +17,51 @@ class DatabaseNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        CustomPaint(
-          size: Size(width, height),
-          painter: CylinderPainter(),
-        ),
-        Positioned(
-          top: height * 0.3, // Positioning text centrally
-          child: SizedBox(
-            width: width * 0.8, // Leave some padding
-            child: TextField(
-              controller: controller,
-              maxLines: null,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                overflow: TextOverflow.ellipsis,
-              ),
-              cursorColor: Colors.white,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                isDense: true,
-                contentPadding: EdgeInsets.zero,
+    return Consumer<WorkspaceProvider>(
+      builder: (context,pv,child) {
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            CustomPaint(
+              size: Size(width, height),
+              painter: CylinderPainter(color: pv.selectedColor ?? Colors.purple.shade200),
+            ),
+            Positioned(
+              top: height * 0.3, // Positioning text centrally
+              child: SizedBox(
+                width: width * 0.8, // Leave some padding
+                child: TextField(
+                  controller: controller,
+                  maxLines: null,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  cursorColor: Colors.white,
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
-      ],
+          ],
+        );
+      }
     );
   }
 }
 
 class CylinderPainter extends CustomPainter {
+  Color color;
+  CylinderPainter({required this.color});
   @override
   void paint(Canvas canvas, Size size) {
     final Paint paint = Paint()
-      ..color = Colors.purple.shade200
+      ..color = color
       ..style = PaintingStyle.fill;
 
     final Paint outline = Paint()

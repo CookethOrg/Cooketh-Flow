@@ -35,7 +35,7 @@ class DatabaseNode extends StatelessWidget {
                 maxLines: null,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontStyle: pv.nodeList[id]!.isItalic
                       ? FontStyle.italic
                       : FontStyle.normal,

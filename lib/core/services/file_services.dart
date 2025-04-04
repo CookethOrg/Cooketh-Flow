@@ -12,18 +12,44 @@ import 'package:flutter/rendering.dart';
 import 'package:cookethflow/core/services/platform_file_service.dart';
 
 class FileServices {
-  FileSaver fs = FileSaver();
+  final FileSelectorPlatform fileSelector = FileSelectorPlatform.instance;
 
   Future<String> exportFile({
-    required String fileName,
+    required String defaultName,
     required String jsonString,
   }) async {
     try {
-      await fs.saveFile(
-          name: fileName,
-          bytes: Uint8List.fromList(utf8.encode(jsonString)),
-          ext: 'json',
-          mimeType: MimeType.json);
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: 'JSON',
+        extensions: ['json'],
+        mimeTypes: ['application/json'],
+      );
+
+      // Ensure the default name ends with .json
+      if (!defaultName.toLowerCase().endsWith('.json')) {
+        defaultName = '$defaultName.json';
+      }
+
+      final String? path = await fileSelector.getSavePath(
+        acceptedTypeGroups: [typeGroup],
+        suggestedName: defaultName,
+      );
+
+      if (path == null) {
+        return 'Save operation cancelled';
+      }
+
+      // Ensure the selected path ends with .json
+      final String savePath =
+          path.toLowerCase().endsWith('.json') ? path : '$path.json';
+
+      final XFile file = XFile.fromData(
+        Uint8List.fromList(utf8.encode(jsonString)),
+        mimeType: 'application/json',
+        name: savePath.split('/').last,
+      );
+
+      await file.saveTo(savePath);
       return 'success';
     } catch (e) {
       return e.toString();
@@ -31,12 +57,33 @@ class FileServices {
   }
 
   Future<String> exportPNG({
-    required String fileName,
+    required String defaultName,
     required Uint8List pngBytes,
   }) async {
     try {
-      await fs.saveFile(
-          name: fileName, bytes: pngBytes, ext: 'png', mimeType: MimeType.png);
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: 'PNG Images',
+        extensions: ['png'],
+        mimeTypes: ['image/png'],
+      );
+
+      final String? path = await fileSelector.getSavePath(
+        acceptedTypeGroups: [typeGroup],
+        suggestedName: defaultName,
+      );
+
+      if (path == null) {
+        return 'Save operation cancelled';
+      }
+
+      final XFile file = XFile.fromData(
+        pngBytes,
+        mimeType: 'image/png',
+        name: path.split('/').last,
+        path: path,
+      );
+
+      await file.saveTo(path);
       return 'success';
     } catch (e) {
       return e.toString();
@@ -44,15 +91,33 @@ class FileServices {
   }
 
   Future<String> exportSVG({
-    required String fileName,
+    required String defaultName,
     required String svgString,
   }) async {
     try {
-      await fs.saveFile(
-          name: fileName,
-          bytes: Uint8List.fromList(utf8.encode(svgString)),
-          ext: 'svg',
-          mimeType: MimeType.other);
+      const XTypeGroup typeGroup = XTypeGroup(
+        label: 'SVG Images',
+        extensions: ['svg'],
+        mimeTypes: ['image/svg+xml'],
+      );
+
+      final String? path = await fileSelector.getSavePath(
+        acceptedTypeGroups: [typeGroup],
+        suggestedName: defaultName,
+      );
+
+      if (path == null) {
+        return 'Save operation cancelled';
+      }
+
+      final XFile file = XFile.fromData(
+        Uint8List.fromList(utf8.encode(svgString)),
+        mimeType: 'image/svg+xml',
+        name: path.split('/').last,
+        path: path,
+      );
+
+      await file.saveTo(path);
       return 'success';
     } catch (e) {
       return e.toString();
@@ -70,7 +135,7 @@ class FileServices {
 
   Future<XFile?> selectImages() async {
     // For Linux, you can specify the MIME types or extensions
-    final fileSelector = FileSelectorPlatform.instance;
+    // final fileSelector = FileSelectorPlatform.instance;
     const XTypeGroup typeGroup = XTypeGroup(
       label: 'Images',
       mimeTypes: ['image/*'], // All image types
@@ -95,7 +160,7 @@ class FileServices {
   }
 
   Future<XFile?> importJsonFiles() async {
-    final fileSelector = FileSelectorPlatform.instance;
+    // final fileSelector = FileSelectorPlatform.instance;
     const XTypeGroup typeGroup = XTypeGroup(
       label: 'JSON',
       mimeTypes: ['application/json'],

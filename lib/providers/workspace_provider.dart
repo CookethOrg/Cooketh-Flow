@@ -199,7 +199,7 @@ class WorkspaceProvider extends StateHandler {
             maxLines: null,
             style: TextStyle(
               overflow: TextOverflow.ellipsis,
-              color: Colors.white,
+              color: Colors.black,
               fontStyle: nodeList[id]!.isItalic ? FontStyle.italic : FontStyle.normal,
               fontWeight: nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
               decoration: TextDecoration.combine([
@@ -491,7 +491,7 @@ class WorkspaceProvider extends StateHandler {
           final String jsonString =
               JsonEncoder.withIndent('  ').convert(workspaceData);
           res = await FileServices()
-              .exportFile(fileName: fileName, jsonString: jsonString);
+              .exportFile(defaultName: fileName, jsonString: jsonString);
           break;
 
         case ExportType.png:
@@ -504,7 +504,7 @@ class WorkspaceProvider extends StateHandler {
           if (byteData != null) {
             final Uint8List pngBytes = byteData.buffer.asUint8List();
             res = await FileServices()
-                .exportPNG(fileName: fileName, pngBytes: pngBytes);
+                .exportPNG(defaultName: fileName, pngBytes: pngBytes);
           } else {
             throw Exception("Failed to generate PNG data");
           }
@@ -513,7 +513,7 @@ class WorkspaceProvider extends StateHandler {
         case ExportType.svg:
           final svgString = _generateSVG();
           res = await FileServices()
-              .exportSVG(fileName: fileName, svgString: svgString);
+              .exportSVG(defaultName: fileName, svgString: svgString);
           break;
       }
 

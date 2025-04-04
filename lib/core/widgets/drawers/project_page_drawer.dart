@@ -3,6 +3,7 @@ import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -65,27 +66,31 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                       pv.onSubmit();
                                     },
                                   )
-                                : GestureDetector(
-                                    onDoubleTap: () {
-                                      if (pv.isOpen) {
-                                        pv.setEdit();
-                                      }
-                                    },
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 9),
-                                      child: Text(
-                                        pv.getTruncatedTitle(),
-                                        style: TextStyle(
-                                          fontFamily: 'Frederik',
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
+                                : MouseRegion(
+                                  cursor: SystemMouseCursors.text,
+                                  child: GestureDetector(
+                                    
+                                      onDoubleTap: () {
+                                        if (pv.isOpen) {
+                                          pv.setEdit();
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 9),
+                                        child: Text(
+                                          pv.getTruncatedTitle(),
+                                          style: TextStyle(
+                                            fontFamily: 'Frederik',
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                  ),
+                                ),
                           ),
                           SizedBox(width: 12),
                           GestureDetector(

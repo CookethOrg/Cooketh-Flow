@@ -75,11 +75,33 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                       pv.onSubmit();
                                     },
                                   )
-                                : MouseRegion(
+                                : pv.isOpen ? MouseRegion(
                                   cursor: SystemMouseCursors.text,
                                   onEnter: (event) => setHovered(true),
                                   onExit: (event) => setHovered(false),
                                   child: GestureDetector(
+                                    
+                                      onDoubleTap: () {
+                                        if (pv.isOpen) {
+                                          pv.setEdit();
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 9),
+                                        child: Text(
+                                          pv.getTruncatedTitle(),
+                                          style: TextStyle(
+                                            fontFamily: 'Frederik',
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: _isHovered ? const Color.fromARGB(255, 81, 81, 81) : Colors.black,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ),
+                                ) : GestureDetector(
                                     
                                       onDoubleTap: () {
                                         if (pv.isOpen) {
@@ -101,7 +123,6 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                         ),
                                       ),
                                     ),
-                                ),
                           ),
                           SizedBox(width: 12),
                           GestureDetector(
@@ -134,11 +155,11 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                               }
                               return Container(
                                 margin: EdgeInsets.symmetric(
-                                    vertical: 5, horizontal: 8),
+                                    vertical: 5, horizontal: 16),
                                 decoration: BoxDecoration(
                                   color: pv.nodeList[id]!.isSelected ? Colors.blue.shade50 : Colors.white,
                                   border: Border.all(
-                                      color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black, width: pv.nodeList[id]!.isSelected ? 1 : 0.5),
+                                      color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black, width: pv.nodeList[id]!.isSelected ? 2 : 1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: ListTile(

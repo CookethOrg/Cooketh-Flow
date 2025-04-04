@@ -8,7 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FloatingDrawer extends StatefulWidget {
-  FloatingDrawer({super.key, required this.flowId});
+  const FloatingDrawer({super.key, required this.flowId});
   final String flowId;
 
   @override
@@ -18,13 +18,14 @@ class FloatingDrawer extends StatefulWidget {
 class _FloatingDrawerState extends State<FloatingDrawer> {
   bool _isHovered = false;
 
-  void setHovered(bool val){
-    if(_isHovered != val){
+  void setHovered(bool val) {
+    if (_isHovered != val) {
       setState(() {
         _isHovered = val;
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
@@ -51,7 +52,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                   border: Border.all(color: Colors.black, width: 1),
                 ),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  // mainAxisAlignment: pv.isOpen ? MainAxisAlignment.start : MainAxisAlignment.center,
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -77,54 +78,61 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                       print('onsubmit called');
                                     },
                                   )
-                                : pv.isOpen ? MouseRegion(
-                                  cursor: SystemMouseCursors.text,
-                                  onEnter: (event) => setHovered(true),
-                                  onExit: (event) => setHovered(false),
-                                  child: GestureDetector(
-                                    
-                                      onDoubleTap: () {
-                                        if (pv.isOpen) {
-                                          pv.setEdit();
-                                        }
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 9),
-                                        child: Text(
-                                          pv.getTruncatedTitle(),
-                                          style: TextStyle(
-                                            fontFamily: 'Frederik',
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: _isHovered ? const Color.fromARGB(255, 81, 81, 81) : Colors.black,
+                                : pv.isOpen
+                                    ? MouseRegion(
+                                        cursor: SystemMouseCursors.text,
+                                        onEnter: (event) => setHovered(true),
+                                        onExit: (event) => setHovered(false),
+                                        child: GestureDetector(
+                                          onDoubleTap: () {
+                                            if (pv.isOpen) {
+                                              pv.setEdit();
+                                            }
+                                          },
+                                          child: Padding(
+                                            padding:
+                                                const EdgeInsets.symmetric(
+                                                    vertical: 9),
+                                            child: Text(
+                                              pv.getTruncatedTitle(),
+                                              style: TextStyle(
+                                                fontFamily: 'Frederik',
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold,
+                                                color: _isHovered
+                                                    ? const Color.fromARGB(
+                                                        255, 81, 81, 81)
+                                                    : Colors.black,
+                                              ),
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
                                           ),
-                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      )
+                                    : GestureDetector(
+                                        onDoubleTap: () {
+                                          if (pv.isOpen) {
+                                            pv.setEdit();
+                                          }
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 9),
+                                          child: Text(
+                                            pv.getTruncatedTitle(),
+                                            style: TextStyle(
+                                              fontFamily: 'Frederik',
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: _isHovered
+                                                  ? const Color.fromARGB(
+                                                      255, 61, 61, 61)
+                                                  : Colors.black,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                ) : GestureDetector(
-                                    
-                                      onDoubleTap: () {
-                                        if (pv.isOpen) {
-                                          pv.setEdit();
-                                        }
-                                      },
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 9),
-                                        child: Text(
-                                          pv.getTruncatedTitle(),
-                                          style: TextStyle(
-                                            fontFamily: 'Frederik',
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: _isHovered ? const Color.fromARGB(255, 61, 61, 61) : Colors.black,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                      ),
-                                    ),
                           ),
                           SizedBox(width: 12),
                           GestureDetector(
@@ -149,27 +157,46 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                               var id = entry.key;
                               var node = entry.value;
                               var type = node.type;
-                              IconData getIcon(NodeType type){
-                                if(type == NodeType.rectangular) {return PhosphorIconsRegular.square;}
-                                else if(type == NodeType.diamond){return PhosphorIconsRegular.diamond;}
-                                else if(type == NodeType.database){return PhosphorIconsRegular.database;}
+                              IconData getIcon(NodeType type) {
+                                if (type == NodeType.rectangular) {
+                                  return PhosphorIconsRegular.square;
+                                } else if (type == NodeType.diamond) {
+                                  return PhosphorIconsRegular.diamond;
+                                } else if (type == NodeType.database) {
+                                  return PhosphorIconsRegular.database;
+                                }
                                 return PhosphorIconsRegular.parallelogram;
                               }
+
                               return Container(
                                 margin: EdgeInsets.symmetric(
                                     vertical: 5, horizontal: 16),
                                 decoration: BoxDecoration(
-                                  color: pv.nodeList[id]!.isSelected ? Colors.blue.shade50 : Colors.white,
+                                  color: pv.nodeList[id]!.isSelected
+                                      ? Colors.blue.shade50
+                                      : Colors.white,
                                   border: Border.all(
-                                      color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black, width: pv.nodeList[id]!.isSelected ? 2 : 1),
+                                      color: pv.nodeList[id]!.isSelected
+                                          ? Colors.blue
+                                          : Colors.black,
+                                      width:
+                                          pv.nodeList[id]!.isSelected ? 2 : 1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: ListTile(
                                   // tileColor: Colors.red,
                                   onTap: () => pv.changeSelected(id),
-                                  leading: Icon(getIcon(type), color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black,),
+                                  leading: Icon(
+                                    getIcon(type),
+                                    color: pv.nodeList[id]!.isSelected
+                                        ? Colors.blue
+                                        : Colors.black,
+                                  ),
                                   title: TextField(
-                                    style: TextStyle(color: pv.nodeList[id]!.isSelected ? Colors.blue : Colors.black),
+                                    style: TextStyle(
+                                        color: pv.nodeList[id]!.isSelected
+                                            ? Colors.blue
+                                            : Colors.black),
                                     controller: pv.nodeList[id]!.data,
                                     onSubmitted: (value) =>
                                         pv.updateFlowManager(),

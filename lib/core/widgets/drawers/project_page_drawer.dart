@@ -8,7 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class FloatingDrawer extends StatefulWidget {
-  const FloatingDrawer({super.key, required this.flowId});
+  FloatingDrawer({super.key, required this.flowId});
   final String flowId;
 
   @override
@@ -16,6 +16,15 @@ class FloatingDrawer extends StatefulWidget {
 }
 
 class _FloatingDrawerState extends State<FloatingDrawer> {
+  bool _isHovered = false;
+
+  void setHovered(bool val){
+    if(_isHovered != val){
+      setState(() {
+        _isHovered = val;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
@@ -68,6 +77,8 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                   )
                                 : MouseRegion(
                                   cursor: SystemMouseCursors.text,
+                                  onEnter: (event) => setHovered(true),
+                                  onExit: (event) => setHovered(false),
                                   child: GestureDetector(
                                     
                                       onDoubleTap: () {
@@ -84,7 +95,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                             fontFamily: 'Frederik',
                                             fontSize: 20,
                                             fontWeight: FontWeight.bold,
-                                            color: Colors.black,
+                                            color: _isHovered ? const Color.fromARGB(255, 61, 61, 61) : Colors.black,
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),

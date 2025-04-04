@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
@@ -54,8 +56,12 @@ class DashboardDrawer extends StatelessWidget {
                                   Row(
                                     children: [
                                       CircleAvatar(
-                                        backgroundImage:
-                                            AssetImage('assets/Frame 266.png'),
+                                        backgroundImage: auth.userPfp != null
+                                            ? FileImage(
+                                                File(auth.userPfp!.path))
+                                            : const AssetImage(
+                                                    'assets/Frame 271.png')
+                                                as ImageProvider,
                                       ),
                                       SizedBox(
                                           width:
@@ -103,7 +109,9 @@ class DashboardDrawer extends StatelessWidget {
                                 onPressed: () async {
                                   await auth.logout();
                                   Navigator.of(context)
-                                      .pushReplacement(MaterialPageRoute(builder: (context) => SignupPage(),));
+                                      .pushReplacement(MaterialPageRoute(
+                                    builder: (context) => SignupPage(),
+                                  ));
                                 },
                                 style: ElevatedButton.styleFrom(
                                   backgroundColor: Colors.black,

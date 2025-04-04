@@ -93,4 +93,25 @@ class FileServices {
       return null;
     }
   }
+
+  Future<XFile?> importJsonFiles() async {
+    final fileSelector = FileSelectorPlatform.instance;
+    const XTypeGroup typeGroup = XTypeGroup(
+      label: 'JSON',
+      mimeTypes: ['application/json'],
+      extensions: ['json'],
+    );
+
+    try {
+      final XFile? file =
+          await fileSelector.openFile(acceptedTypeGroups: [typeGroup]);
+      if (file != null) {
+        print('Selected file: ${file.path}');
+      }
+      return file;
+    } catch (e) {
+      print('Error in selecting file: $e');
+      return null;
+    }
+  }
 }

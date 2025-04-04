@@ -32,9 +32,10 @@ class _DashboardState extends State<Dashboard> {
     setState(() {
       _isLoading = true;
     });
-    
+
     try {
-      final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
+      final flowProvider =
+          Provider.of<FlowmanageProvider>(context, listen: false);
       // Initialize the provider first
       await flowProvider.initialize();
       // Then refresh the flow list
@@ -60,10 +61,12 @@ class _DashboardState extends State<Dashboard> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           title: Text(
             'Create Project',
-            style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+            style:
+                TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
@@ -128,20 +131,24 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> _createNewProject() async {
     try {
-      final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
+      final flowProvider =
+          Provider.of<FlowmanageProvider>(context, listen: false);
       String newFlowId = await flowProvider.addFlow();
-      
+
       if (context.mounted) {
         // Create a new instance of WorkspaceProvider just for this flow
-        final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
+        final workspaceProvider =
+            Provider.of<WorkspaceProvider>(context, listen: false);
         // Initialize the workspace with the new flow ID
         workspaceProvider.initializeWorkspace(newFlowId);
-        
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) => Workspace(flowId: newFlowId),
-          ),
-        ).then((_) => flowProvider.refreshFlowList());
+
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (context) => Workspace(flowId: newFlowId),
+              ),
+            )
+            .then((_) => flowProvider.refreshFlowList());
       }
     } catch (e) {
       if (context.mounted) {
@@ -153,74 +160,84 @@ class _DashboardState extends State<Dashboard> {
   }
 
   Future<void> _importExistingProject() async {
-  try {
-    // Show a loading indicator while preparing
-    setState(() {
-      _isLoading = true;
-    });
-    
-    // Use our new file service instead of FilePicker
-    final fileServices = FileServices();
-    final fileData = await fileServices.pickAndReadJsonFile();
-    
-    if (fileData == null) {
+    try {
+      // Show a loading indicator while preparing
+      setState(() {
+        _isLoading = true;
+      });
+
+      // Use our new file service instead of FilePicker
+      final fileServices = FileServices();
+      final fileData = await fileServices.importJsonFiles();
+      print(fileData!.name);
+
+      if (fileData == null) {
+        setState(() {
+          _isLoading = false;
+        });
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            // SnackBar(content: Text('No file selected or file could not be read')),
+            SnackBar(
+              content: Text('File not picked!!'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      final flowProvider =
+          Provider.of<FlowmanageProvider>(context, listen: false);
+
+      final fileBytes = await fileData.readAsBytes();
+
+      // Import the workspace
+      String newFlowId = await flowProvider.importWorkspace(
+        fileBytes,
+        fileData.name,
+      );
+
+      // Hide loading indicator
       setState(() {
         _isLoading = false;
       });
+
+      if (context.mounted) {
+        // Create a new instance of WorkspaceProvider just for this flow
+        final workspaceProvider =
+            Provider.of<WorkspaceProvider>(context, listen: false);
+        // Initialize the workspace with the new flow ID
+        workspaceProvider.initializeWorkspace(newFlowId);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Project imported successfully!')),
+        );
+
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (context) => Workspace(flowId: newFlowId),
+              ),
+            )
+            .then((_) => flowProvider.refreshFlowList());
+      }
+    } catch (e) {
+      // Hide loading indicator
+      setState(() {
+        _isLoading = false;
+      });
+
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          // SnackBar(content: Text('No file selected or file could not be read')),
-          SnackBar(content: Text('Feature coming soon!!'), backgroundColor: Colors.blue,),
+          SnackBar(
+            content: Text('Error importing project: $e'),
+            backgroundColor: Colors.red,
+          ),
         );
       }
-      return;
-    }
-    
-    final flowProvider = Provider.of<FlowmanageProvider>(context, listen: false);
-    
-    // Import the workspace
-    String newFlowId = await flowProvider.importWorkspace(
-      fileData['bytes'],
-      fileData['name'],
-    );
-    
-    // Hide loading indicator
-    setState(() {
-      _isLoading = false;
-    });
-    
-    if (context.mounted) {
-      // Create a new instance of WorkspaceProvider just for this flow
-      final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-      // Initialize the workspace with the new flow ID
-      workspaceProvider.initializeWorkspace(newFlowId);
-      
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Project imported successfully!')),
-      );
-      
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (context) => Workspace(flowId: newFlowId),
-        ),
-      ).then((_) => flowProvider.refreshFlowList());
-    }
-  } catch (e) {
-    // Hide loading indicator
-    setState(() {
-      _isLoading = false;
-    });
-    
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error importing project: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -233,7 +250,7 @@ class _DashboardState extends State<Dashboard> {
             ),
           );
         }
-        
+
         return Scaffold(
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
           body: LayoutBuilder(
@@ -279,22 +296,32 @@ class _DashboardState extends State<Dashboard> {
                                 itemBuilder: (context, index) {
                                   if (index == 0) {
                                     return AddProjectCard(
-                                      onTap: () => _showAddProjectOptions(context),
+                                      onTap: () =>
+                                          _showAddProjectOptions(context),
                                     );
                                   } else {
-                                    final flowId = flowProvider.flowList.keys.elementAt(index - 1);
+                                    final flowId = flowProvider.flowList.keys
+                                        .elementAt(index - 1);
                                     return ProjectCard(
                                       flowId: flowId,
                                       onTap: () {
                                         // Initialize the workspace with this flow ID
-                                        final workspaceProvider = Provider.of<WorkspaceProvider>(context, listen: false);
-                                        workspaceProvider.initializeWorkspace(flowId);
-                                        
-                                        Navigator.of(context).push(
-                                          MaterialPageRoute(
-                                            builder: (context) => Workspace(flowId: flowId),
-                                          ),
-                                        ).then((_) => flowProvider.refreshFlowList());
+                                        final workspaceProvider =
+                                            Provider.of<WorkspaceProvider>(
+                                                context,
+                                                listen: false);
+                                        workspaceProvider
+                                            .initializeWorkspace(flowId);
+
+                                        Navigator.of(context)
+                                            .push(
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    Workspace(flowId: flowId),
+                                              ),
+                                            )
+                                            .then((_) =>
+                                                flowProvider.refreshFlowList());
                                       },
                                     );
                                   }

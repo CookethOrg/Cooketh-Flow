@@ -73,6 +73,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                     autofocus: true,
                                     onSubmitted: (_) {
                                       pv.onSubmit();
+                                      print('onsubmit called');
                                     },
                                   )
                                 : pv.isOpen ? MouseRegion(

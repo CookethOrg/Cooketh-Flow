@@ -41,17 +41,16 @@ class FlowNode {
 
   FlowNode copy() {
     FlowNode newNode = FlowNode(
-      id: id,
-      type: type,
-      colour: colour,
-      position: Offset(position.dx, position.dy),
-      size: Size(size.width, size.height),
-      isSelected: isSelected,
-      isBold: isBold,
-      isItalic: isItalic,
-      isStrikeThrough: isStrikeThrough,
-      isUnderlined: isUnderlined
-    );
+        id: id,
+        type: type,
+        colour: colour,
+        position: Offset(position.dx, position.dy),
+        size: Size(size.width, size.height),
+        isSelected: isSelected,
+        isBold: isBold,
+        isItalic: isItalic,
+        isStrikeThrough: isStrikeThrough,
+        isUnderlined: isUnderlined);
     newNode.data.text = data.text;
     return newNode;
   }
@@ -96,13 +95,17 @@ class FlowNode {
       "type": type.index,
       "position": {"dx": position.dx, "dy": position.dy},
       "size": {"width": size.width, "height": size.height},
-      "colour": colour.toString(), // Stored as string
+      "colour": _colorToJsonString(colour), // Use our custom color serializer
       "connections": connectionsJson,
       "isBold": isBold,
       "isItalic": isItalic,
       "isStrikeThrough": isStrikeThrough,
       "isUnderlined": isUnderlined
     };
+  }
+
+  static String _colorToJsonString(Color color) {
+    return "Color(alpha: ${color.alpha / 255}, red: ${color.red / 255}, green: ${color.green / 255}, blue: ${color.blue / 255})";
   }
 
   // For deserialization
@@ -159,31 +162,42 @@ class FlowNode {
       // Extract the part inside "Color(...)"
       String values = colorString.substring(6, colorString.length - 1);
 
-      // Regular expressions to extract alpha, red, green, blue values
-      final alphaRegExp = RegExp(r'alpha: (\d\.\d+)');
-      final redRegExp = RegExp(r'red: (\d\.\d+)');
-      final greenRegExp = RegExp(r'green: (\d\.\d+)');
-      final blueRegExp = RegExp(r'blue: (\d\.\d+)');
+      // Split into components
+      final components = values.split(', ');
 
-      // Find matches
-      final alphaMatch = alphaRegExp.firstMatch(values);
-      final redMatch = redRegExp.firstMatch(values);
-      final greenMatch = greenRegExp.firstMatch(values);
-      final blueMatch = blueRegExp.firstMatch(values);
+      // Parse each component
+      double alpha = 1.0;
+      double red = 0.0;
+      double green = 0.0;
+      double blue = 0.0;
 
-      // Convert to int values (0-255 range)
-      int alpha =
-          ((double.tryParse(alphaMatch?.group(1) ?? '1.0') ?? 1.0) * 255)
-              .round();
-      int red =
-          ((double.tryParse(redMatch?.group(1) ?? '0.0') ?? 0.0) * 255).round();
-      int green =
-          ((double.tryParse(greenMatch?.group(1) ?? '0.0') ?? 0.0) * 255)
-              .round();
-      int blue = ((double.tryParse(blueMatch?.group(1) ?? '0.0') ?? 0.0) * 255)
-          .round();
+      for (var component in components) {
+        final parts = component.split(': ');
+        if (parts.length != 2) continue;
 
-      return Color.fromARGB(alpha, red, green, blue);
+        final value = double.tryParse(parts[1]) ?? 0.0;
+        switch (parts[0]) {
+          case 'alpha':
+            alpha = value;
+            break;
+          case 'red':
+            red = value;
+            break;
+          case 'green':
+            green = value;
+            break;
+          case 'blue':
+            blue = value;
+            break;
+        }
+      }
+
+      return Color.fromRGBO(
+        (red * 255).round(),
+        (green * 255).round(),
+        (blue * 255).round(),
+        alpha,
+      );
     } catch (e) {
       print("Error parsing color: $e");
       return null;

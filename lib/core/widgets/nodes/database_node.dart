@@ -9,49 +9,50 @@ class DatabaseNode extends StatelessWidget {
     required this.height,
     required this.width,
     required this.controller,
+    required this.id
   });
 
+  final String id;
   final double height;
   final double width;
   final TextEditingController controller;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WorkspaceProvider>(
-      builder: (context,pv,child) {
-        return Stack(
-          alignment: Alignment.center,
-          children: [
-            CustomPaint(
-              size: Size(width, height),
-              painter: CylinderPainter(color: pv.selectedColor ?? Colors.purple.shade200),
-            ),
-            Positioned(
-              top: height * 0.3, // Positioning text centrally
-              child: SizedBox(
-                width: width * 0.8, // Leave some padding
-                child: TextField(
-                  controller: controller,
-                  maxLines: null,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                  cursorColor: Colors.white,
-                  decoration: const InputDecoration(
-                    border: InputBorder.none,
-                    isDense: true,
-                    contentPadding: EdgeInsets.zero,
-                  ),
+    return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          CustomPaint(
+            size: Size(width, height),
+            painter: CylinderPainter(
+                color: pv.nodeList[id]!.colour),
+          ),
+          Positioned(
+            top: height * 0.3, // Positioning text centrally
+            child: SizedBox(
+              width: width * 0.8, // Leave some padding
+              child: TextField(
+                controller: controller,
+                maxLines: null,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                cursorColor: Colors.white,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  isDense: true,
+                  contentPadding: EdgeInsets.zero,
                 ),
               ),
             ),
-          ],
-        );
-      }
-    );
+          ),
+        ],
+      );
+    });
   }
 }
 

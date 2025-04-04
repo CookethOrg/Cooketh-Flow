@@ -492,7 +492,6 @@ class _WorkspaceState extends State<Workspace> {
                             child: Node(
                               id: id,
                               type: node.type,
-                              colour: node.colour,
                               onResize: (Size newSize) =>
                                   workProvider.onResize(id, newSize),
                               onDrag: (offset) =>

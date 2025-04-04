@@ -104,7 +104,7 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: _tempSelectedColor,
+              color: _tempSelectedColor!,
               shape: BoxShape.circle,
               border: Border.all(color: Colors.black, width: 1),
             ),

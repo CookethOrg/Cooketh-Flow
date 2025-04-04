@@ -1,5 +1,6 @@
 import 'package:cookethflow/models/connection.dart';
 import 'package:flutter/material.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 
 enum NodeType { rectangular, parallelogram, diamond, database }
 
@@ -8,7 +9,7 @@ class FlowNode {
   final TextEditingController data;
   NodeType type;
   final String id;
-  Color colour = Color(0xffFAD7A0);
+  Color colour;
   bool isSelected;
   final Map<ConnectionPoint, Set<Connection>> connections;
   Size size;
@@ -18,18 +19,18 @@ class FlowNode {
     this.isSelected = false,
     required this.type,
     required this.position,
-    this.size = const Size(150, 75), required Color colour
-  }) : connections = {
-        for (var point in ConnectionPoint.values) point: <Connection>{}
-      },
-      data = TextEditingController(text: 'Node $id');
+    this.colour = const Color(0xFFFFD8A8),
+    this.size = const Size(150, 75),
+  })  : connections = {
+          for (var point in ConnectionPoint.values) point: <Connection>{}
+        },
+        data = TextEditingController(text: 'Node $id');
 
   // Check if a connection point is available
   bool isConnectionPointAvailable(ConnectionPoint point) {
-    // You can implement custom logic here for maximum connections per point
     return connections[point]!.isEmpty; // Example: one connection per point
   }
-  
+
   FlowNode copy() {
     FlowNode newNode = FlowNode(
       id: id,
@@ -42,15 +43,14 @@ class FlowNode {
     newNode.data.text = data.text;
     return newNode;
   }
-  
+
   Rect get bounds {
-    // Add padding to account for the resize handles
     const padding = 20.0;
     return Rect.fromLTWH(
       position.dx - padding,
       position.dy - padding,
       size.width + (padding * 2),
-      size.height + (padding * 2)
+      size.height + (padding * 2),
     );
   }
 
@@ -73,64 +73,100 @@ class FlowNode {
   // For serialization
   Map<String, dynamic> toJson() {
     Map<String, dynamic> connectionsJson = {};
-    
     connections.forEach((point, conns) {
-      connectionsJson[point.index.toString()] = 
+      connectionsJson[point.index.toString()] =
           conns.map((conn) => conn.toJson()).toList();
     });
-    
+
     return {
       "id": id,
       "text": data.text,
       "type": type.index,
-      "position": {
-        "dx": position.dx, 
-        "dy": position.dy
-      },
-      "size": {
-        "width": size.width, 
-        "height": size.height
-      },
-      "connections": connectionsJson
+      "position": {"dx": position.dx, "dy": position.dy},
+      "size": {"width": size.width, "height": size.height},
+      "colour": colour.toString(), // Stored as string
+      "connections": connectionsJson,
     };
   }
-  
+
   // For deserialization
   factory FlowNode.fromJson(Map<String, dynamic> json) {
     FlowNode node = FlowNode(
       id: json["id"],
       type: NodeType.values[json["type"]],
       position: Offset(
-        json["position"]["dx"].toDouble(), 
-        json["position"]["dy"].toDouble()
+        json["position"]["dx"].toDouble(),
+        json["position"]["dy"].toDouble(),
       ),
       size: Size(
-        json["size"]["width"].toDouble(), 
-        json["size"]["height"].toDouble()
+        json["size"]["width"].toDouble(),
+        json["size"]["height"].toDouble(),
       ),
-      colour: Color(0xffFAD7A0), // Provide a default or desired color
+      // Parse the color string into a Color object
+      colour: _parseColor(json["colour"]) ??
+          const Color(0xFFFFD8A8), // Default color if parsing fails
     );
-    
+
     // Set text content
     if (json["text"] != null) {
       node.data.text = json["text"];
     }
-    
+
     // Add connections if available
     if (json["connections"] != null) {
       Map<String, dynamic> connsJson = json["connections"];
       connsJson.forEach((pointKey, connsData) {
         ConnectionPoint point = ConnectionPoint.values[int.parse(pointKey)];
         List<dynamic> connsList = connsData as List<dynamic>;
-        
+
         for (var connData in connsList) {
           Connection conn = Connection.fromJson(connData);
           node.connections[point]!.add(conn);
         }
       });
     }
-    
+
     return node;
   }
 
+  // Helper method to parse the color string
+  static Color? _parseColor(String? colorString) {
+    if (colorString == null || !colorString.startsWith("Color(")) {
+      return null;
+    }
+
+    try {
+      // Extract the part inside "Color(...)"
+      String values = colorString.substring(6, colorString.length - 1);
+
+      // Regular expressions to extract alpha, red, green, blue values
+      final alphaRegExp = RegExp(r'alpha: (\d\.\d+)');
+      final redRegExp = RegExp(r'red: (\d\.\d+)');
+      final greenRegExp = RegExp(r'green: (\d\.\d+)');
+      final blueRegExp = RegExp(r'blue: (\d\.\d+)');
+
+      // Find matches
+      final alphaMatch = alphaRegExp.firstMatch(values);
+      final redMatch = redRegExp.firstMatch(values);
+      final greenMatch = greenRegExp.firstMatch(values);
+      final blueMatch = blueRegExp.firstMatch(values);
+
+      // Convert to int values (0-255 range)
+      int alpha =
+          ((double.tryParse(alphaMatch?.group(1) ?? '1.0') ?? 1.0) * 255)
+              .round();
+      int red =
+          ((double.tryParse(redMatch?.group(1) ?? '0.0') ?? 0.0) * 255).round();
+      int green =
+          ((double.tryParse(greenMatch?.group(1) ?? '0.0') ?? 0.0) * 255)
+              .round();
+      int blue = ((double.tryParse(blueMatch?.group(1) ?? '0.0') ?? 0.0) * 255)
+          .round();
+
+      return Color.fromARGB(alpha, red, green, blue);
+    } catch (e) {
+      print("Error parsing color: $e");
+      return null;
+    }
+  }
 }

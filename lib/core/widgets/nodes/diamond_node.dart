@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -5,41 +7,48 @@ import 'package:provider/provider.dart';
 class DiamondNode extends StatelessWidget {
   const DiamondNode({
     super.key,
+    required this.id,
     required this.height,
     required this.width,
     required this.tcontroller,
   });
 
+  final String id;
   final double width;
   final double height;
   final TextEditingController tcontroller;
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<WorkspaceProvider>(
-      builder: (context, pv, child) {
-        return SizedBox(
-          width: width,
-          height: height,
-          child: Stack(
-            children: [
-              // Diamond shape with border
-              CustomPaint(
-                size: Size(width, height),
-                painter: DiamondPainter(
-                  fillColor: pv.selectedColor ?? Colors.lightGreen.shade200,
-                  borderColor: Colors.black,
-                  borderWidth: 1.0,
-                ),
+    // Get the smallest dimension to maintain symmetry
+    final double size = min(width, height);
+
+    // Calculate bounding box dimensions
+    final double boundingSize = size * sqrt(2);
+
+    return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          // Bounding Box (for visualization)
+          Container(
+            width: boundingSize,
+            height: boundingSize,
+          ),
+          // Rotated Diamond Node
+          Transform.rotate(
+            angle: pi / 4, // 45 degrees in radians
+            child: Container(
+              width: size,
+              height: size,
+              decoration: BoxDecoration(
+                color: pv.nodeList[id]!.colour,
+                border: Border.all(color: Colors.black, width: 1),
+                borderRadius: const BorderRadius.all(Radius.circular(12)),
               ),
-              
-              // Text field centered in the diamond
-              Center(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: width * 0.65,
-                    maxHeight: height * 0.65,
-                  ),
+              child: Transform.rotate(
+                angle: -pi / 4, // -45 degrees to keep text upright
+                child: Center(
                   child: TextField(
                     controller: tcontroller,
                     textAlign: TextAlign.center,
@@ -56,11 +65,11 @@ class DiamondNode extends StatelessWidget {
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        );
-      }
-    );
+        ],
+      );
+    });
   }
 }
 

@@ -158,6 +158,7 @@ class WorkspaceProvider extends StateHandler {
     switch (type) {
       case NodeType.diamond:
         nodeStruct = DiamondNode(
+          id: id,
           tcontroller: nodeList[id]!.data,
           height: getHeight(id),
           width: getWidth(id),
@@ -165,6 +166,7 @@ class WorkspaceProvider extends StateHandler {
         break;
       case NodeType.database:
         nodeStruct = DatabaseNode(
+          id: id,
           controller: nodeList[id]!.data,
           height: getHeight(id),
           width: getWidth(id),
@@ -172,6 +174,7 @@ class WorkspaceProvider extends StateHandler {
         break;
       case NodeType.parallelogram:
         nodeStruct = ParallelogramNode(
+          id: id,
           controller: nodeList[id]!.data,
           width: getWidth(id),
           height: getHeight(id),
@@ -183,7 +186,7 @@ class WorkspaceProvider extends StateHandler {
           height: getHeight(id),
           padding: const EdgeInsets.fromLTRB(15, 12, 15, 18),
           decoration: BoxDecoration(
-            color: selectedColor ?? nodeColors[0],
+            color: _nodeList[id]!.colour,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: nodeList[id]!.isSelected ? Colors.blue : Colors.black,
@@ -258,7 +261,7 @@ class WorkspaceProvider extends StateHandler {
       _nodeList.forEach((key, node) {
         node.isSelected = key == nodeId ? !node.isSelected : false;
       });
-      notifyListeners();
+      notifyListeners(); // This will trigger UI updates, and selectedColor will reflect the new node's color
     }
   }
 
@@ -323,8 +326,10 @@ class WorkspaceProvider extends StateHandler {
       id: newId,
       type: type,
       position: Offset(
-        ((canvasDimension/2)-100) + Random().nextDouble() * 300, //  49900 to 50200 range
-        ((canvasDimension/2)-100) + Random().nextDouble() * 300, // -49900 to 50200 range
+        ((canvasDimension / 2) - 100) +
+            Random().nextDouble() * 300, //  49900 to 50200 range
+        ((canvasDimension / 2) - 100) +
+            Random().nextDouble() * 300, // -49900 to 50200 range
       ),
       colour: Color(0xffFAD7A0),
     );
@@ -339,24 +344,24 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void dragNode(String id, Offset newPosition) {
-  if (_nodeList.containsKey(id)) {
-    final node = _nodeList[id]!;
-    final delta = newPosition - node.position;
-    node.position = newPosition;
+    if (_nodeList.containsKey(id)) {
+      final node = _nodeList[id]!;
+      final delta = newPosition - node.position;
+      node.position = newPosition;
 
-    // Force update connections by removing and re-adding them
-    final connectionsToUpdate = flowManager.connections.where(
-      (c) => c.sourceNodeId == id || c.targetNodeId == id
-    ).toList();
+      // Force update connections by removing and re-adding them
+      final connectionsToUpdate = flowManager.connections
+          .where((c) => c.sourceNodeId == id || c.targetNodeId == id)
+          .toList();
 
-    for (final connection in connectionsToUpdate) {
-      flowManager.connections.remove(connection);
-      flowManager.connections.add(connection.copy());
+      for (final connection in connectionsToUpdate) {
+        flowManager.connections.remove(connection);
+        flowManager.connections.add(connection.copy());
+      }
+
+      notifyListeners();
     }
-
-    notifyListeners();
   }
-}
 
   void removeSelectedNodes() {
     if (selectedNode == null) {
@@ -728,7 +733,20 @@ class WorkspaceProvider extends StateHandler {
     return nodeIcon;
   }
 
-  Color selectedColor = nodeColors[0];
+  // Color selectedColor = selectedNode!.colour ?? nodeColors[0];
+  Color get selectedColor =>
+      selectedNode == null ? nodeColors[0] : selectedNode!.colour;
+  set selectedColor(Color col) {
+    if (selectedColor != null) {
+      changeNodeColour(col, selectedNode!.id);
+    }
+    notifyListeners();
+  }
+
+  void selectColor(Color color) {
+    selectedColor = color; // This will update the node's color if a node is selected
+  }
+
   IconData selectedNodeIcon = PhosphorIconsRegular.square;
 
   bool isBold = false;
@@ -736,10 +754,11 @@ class WorkspaceProvider extends StateHandler {
   bool isUnderline = false;
   bool isStrikethrough = false;
 
-  void selectColor(Color color) {
-    selectedColor = color;
-    notifyListeners();
-  }
+  // void selectColor(Color color) {
+  //   selectedColor = color;
+  //   changeNodeColour(color, selectedNode!.id);
+  //   notifyListeners();
+  // }
 
   void selectNode(IconData node) {
     selectedNodeIcon = node;

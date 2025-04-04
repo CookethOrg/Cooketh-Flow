@@ -28,7 +28,8 @@ class DiamondNode extends StatelessWidget {
             CustomPaint(
               size: Size(width, height),
               painter: DiamondPainter(
-                fillColor: pv.nodeList[id]!.colour ?? Colors.lightGreen.shade200,
+                fillColor:
+                    pv.nodeList[id]!.colour ?? Colors.lightGreen.shade200,
                 borderColor: Colors.black,
                 borderWidth: 1.0,
               ),
@@ -44,9 +45,20 @@ class DiamondNode extends StatelessWidget {
                 child: TextField(
                   controller: tcontroller,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     color: Colors.black,
-                    fontWeight: FontWeight.bold,
+                    fontStyle: pv.nodeList[id]!.isItalic
+                        ? FontStyle.italic
+                        : FontStyle.normal,
+                    fontWeight: pv.nodeList[id]!.isBold
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    decoration: TextDecoration.combine([
+                          if (pv.nodeList[id]!.isUnderlined)
+                            TextDecoration.underline,
+                          if (pv.nodeList[id]!.isStrikeThrough)
+                            TextDecoration.lineThrough
+                        ]),
                     fontSize: 16,
                   ),
                   decoration: const InputDecoration(

@@ -13,6 +13,10 @@ class FlowNode {
   bool isSelected;
   final Map<ConnectionPoint, Set<Connection>> connections;
   Size size;
+  bool isBold;
+  bool isItalic;
+  bool isUnderlined;
+  bool isStrikeThrough;
 
   FlowNode({
     required this.id,
@@ -21,6 +25,10 @@ class FlowNode {
     required this.position,
     this.colour = const Color(0xFFFFD8A8),
     this.size = const Size(150, 75),
+    this.isBold = false,
+    this.isItalic = false,
+    this.isUnderlined = false,
+    this.isStrikeThrough = false,
   })  : connections = {
           for (var point in ConnectionPoint.values) point: <Connection>{}
         },
@@ -39,6 +47,10 @@ class FlowNode {
       position: Offset(position.dx, position.dy),
       size: Size(size.width, size.height),
       isSelected: isSelected,
+      isBold: isBold,
+      isItalic: isItalic,
+      isStrikeThrough: isStrikeThrough,
+      isUnderlined: isUnderlined
     );
     newNode.data.text = data.text;
     return newNode;
@@ -86,6 +98,10 @@ class FlowNode {
       "size": {"width": size.width, "height": size.height},
       "colour": colour.toString(), // Stored as string
       "connections": connectionsJson,
+      "isBold": isBold,
+      "isItalic": isItalic,
+      "isStrikeThrough": isStrikeThrough,
+      "isUnderlined": isUnderlined
     };
   }
 
@@ -105,6 +121,10 @@ class FlowNode {
       // Parse the color string into a Color object
       colour: _parseColor(json["colour"]) ??
           const Color(0xFFFFD8A8), // Default color if parsing fails
+      isBold: json["isBold"] ?? false,
+      isItalic: json["isItalic"] ?? false,
+      isUnderlined: json["isUnderlined"] ?? false,
+      isStrikeThrough: json["isUnderlined"] ?? false,
     );
 
     // Set text content

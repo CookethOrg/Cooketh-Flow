@@ -50,7 +50,18 @@ class ParallelogramNode extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.bold,
+                        fontStyle: pv.nodeList[id]!.isItalic
+                            ? FontStyle.italic
+                            : FontStyle.normal,
+                        fontWeight: pv.nodeList[id]!.isBold
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                        decoration: TextDecoration.combine([
+                          if (pv.nodeList[id]!.isUnderlined)
+                            TextDecoration.underline,
+                          if (pv.nodeList[id]!.isStrikeThrough)
+                            TextDecoration.lineThrough
+                        ]),
                         color: Colors.black,
                       ),
                       decoration: InputDecoration(

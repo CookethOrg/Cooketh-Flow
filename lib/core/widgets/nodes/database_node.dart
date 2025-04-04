@@ -4,13 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class DatabaseNode extends StatelessWidget {
-  const DatabaseNode({
-    super.key,
-    required this.height,
-    required this.width,
-    required this.controller,
-    required this.id
-  });
+  const DatabaseNode(
+      {super.key,
+      required this.height,
+      required this.width,
+      required this.controller,
+      required this.id});
 
   final String id;
   final double height;
@@ -25,8 +24,7 @@ class DatabaseNode extends StatelessWidget {
         children: [
           CustomPaint(
             size: Size(width, height),
-            painter: CylinderPainter(
-                color: pv.nodeList[id]!.colour),
+            painter: CylinderPainter(color: pv.nodeList[id]!.colour),
           ),
           Positioned(
             top: height * 0.3, // Positioning text centrally
@@ -36,9 +34,20 @@ class DatabaseNode extends StatelessWidget {
                 controller: controller,
                 maxLines: null,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
+                style: TextStyle(
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
+                  fontStyle: pv.nodeList[id]!.isItalic
+                      ? FontStyle.italic
+                      : FontStyle.normal,
+                  fontWeight: pv.nodeList[id]!.isBold
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  decoration: TextDecoration.combine([
+                          if (pv.nodeList[id]!.isUnderlined)
+                            TextDecoration.underline,
+                          if (pv.nodeList[id]!.isStrikeThrough)
+                            TextDecoration.lineThrough
+                        ]),
                   overflow: TextOverflow.ellipsis,
                 ),
                 cursorColor: Colors.white,

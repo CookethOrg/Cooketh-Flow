@@ -197,10 +197,15 @@ class WorkspaceProvider extends StateHandler {
           child: TextField(
             controller: nodeList[id]!.data,
             maxLines: null,
-            style: const TextStyle(
+            style: TextStyle(
               overflow: TextOverflow.ellipsis,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
+              fontStyle: nodeList[id]!.isItalic ? FontStyle.italic : FontStyle.normal,
+              fontWeight: nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
+              decoration: TextDecoration.combine([
+                if(nodeList[id]!.isUnderlined) TextDecoration.underline,
+                if(nodeList[id]!.isStrikeThrough) TextDecoration.lineThrough
+              ])
             ),
             cursorColor: Colors.white,
             decoration: const InputDecoration(
@@ -769,21 +774,41 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void toggleBold() {
-    isBold = !isBold;
+    if (selectedNode != null) {
+      selectedNode!.isBold = !selectedNode!.isBold;
+      updateFlowManager(); // Sync with FlowManager
+      saveChanges(); // Save to database
+    }
+    isBold = !isBold; // Update local UI state
     notifyListeners();
   }
 
   void toggleItalic() {
+    if (selectedNode != null) {
+      selectedNode!.isItalic = !selectedNode!.isItalic;
+      updateFlowManager();
+      saveChanges();
+    }
     isItalic = !isItalic;
     notifyListeners();
   }
 
   void toggleUnderline() {
+    if (selectedNode != null) {
+      selectedNode!.isUnderlined = !selectedNode!.isUnderlined;
+      updateFlowManager();
+      saveChanges();
+    }
     isUnderline = !isUnderline;
     notifyListeners();
   }
 
   void toggleStrikethrough() {
+    if (selectedNode != null) {
+      selectedNode!.isStrikeThrough = !selectedNode!.isStrikeThrough;
+      updateFlowManager();
+      saveChanges();
+    }
     isStrikethrough = !isStrikethrough;
     notifyListeners();
   }

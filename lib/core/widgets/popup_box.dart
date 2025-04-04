@@ -1,11 +1,14 @@
+import 'dart:io';
+
+import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/log_in.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-
 
 class ProfileDialog extends StatelessWidget {
   const ProfileDialog({super.key});
@@ -25,14 +28,14 @@ class ProfileDialog extends StatelessWidget {
             var user = snapshot.data;
             return Dialog(
               backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
+              shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16.0),
                 side: BorderSide(
                   color: Colors.black,
                   width: 2.0,
                   style: BorderStyle.solid,
                 ),
-                ),
+              ),
               child: SizedBox(
                 width: 800,
                 child: Padding(
@@ -46,14 +49,18 @@ class ProfileDialog extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           IconButton(
-                            icon: const Icon(PhosphorIconsRegular.xCircle, size: 40, color: Colors.black,),
+                            icon: const Icon(
+                              PhosphorIconsRegular.xCircle,
+                              size: 40,
+                              color: Colors.black,
+                            ),
                             padding: EdgeInsets.zero,
                             constraints: const BoxConstraints(),
                             onPressed: () => Navigator.pop(context),
                           ),
                         ],
                       ),
-                
+
                       // Username Section
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,8 +71,10 @@ class ProfileDialog extends StatelessWidget {
                             height: 150,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              image: const DecorationImage(
-                                  image: AssetImage('assets/Frame 268.png')),
+                              image: DecorationImage(
+                                  image: pv.userPfp != null
+                                      ? FileImage(File(pv.userPfp!.path))
+                                      : const AssetImage('assets/Frame 271.png') as ImageProvider),
                               border: Border.all(
                                 color: const Color.fromARGB(255, 0, 0, 0),
                                 width: 1.0,
@@ -80,19 +89,30 @@ class ProfileDialog extends StatelessWidget {
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       shape: BoxShape.circle,
-                                      border:
-                                          Border.all(color: const Color.fromARGB(255, 0, 0, 0)),
+                                      border: Border.all(
+                                          color: const Color.fromARGB(
+                                              255, 0, 0, 0)),
                                     ),
                                     padding: const EdgeInsets.all(2),
                                     child: IconButton(
                                         style: IconButton.styleFrom(
                                             backgroundColor: transparent,
                                             hoverColor: transparent),
-                                        onPressed: () {
-                                          // TODO: Implement profile picture change
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Profile picture change coming soon!'))
-                                          );
+                                        onPressed: () async {
+                                          try {
+                                            XFile? file = await FileServices()
+                                              .selectImages();
+                                          pv.setUserPfp(file);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(const SnackBar(
+                                                  content: Text(
+                                                      'Profile picture changed')));
+                                          } catch (e) {
+                                            ScaffoldMessenger.of(context)
+                                              .showSnackBar(SnackBar(
+                                                  content: Text(
+                                                      '$e')));
+                                          }
                                         },
                                         icon: const Icon(Icons.edit, size: 12)),
                                   ),
@@ -103,9 +123,9 @@ class ProfileDialog extends StatelessWidget {
                           const SizedBox(width: 16),
                         ],
                       ),
-                
+
                       const SizedBox(height: 24),
-                
+
                       // Username
                       const Text(
                         "User Name",
@@ -122,24 +142,22 @@ class ProfileDialog extends StatelessWidget {
                           const SizedBox(width: 8),
                           IconButton(
                             onPressed: () {
-                              showEditDialog(
-                                context, 
-                                'User Name', 
-                                user?['userName'] ?? "John Doe",
-                                (newValue) async {
-                                  final result = await pv.updateUserName(userName: newValue);
-                                  return result;
-                                }
-                              );
+                              showEditDialog(context, 'User Name',
+                                  user?['userName'] ?? "John Doe",
+                                  (newValue) async {
+                                final result =
+                                    await pv.updateUserName(userName: newValue);
+                                return result;
+                              });
                             },
                             icon: Icon(Icons.edit,
                                 size: 16, color: Colors.blue.shade400),
                           )
                         ],
                       ),
-                
+
                       const SizedBox(height: 24),
-                
+
                       // Email Address
                       const Text(
                         "Email Address",
@@ -157,17 +175,18 @@ class ProfileDialog extends StatelessWidget {
                           IconButton(
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Email update requires verification. Coming soon!'))
-                              );
+                                  const SnackBar(
+                                      content: Text(
+                                          'Email update requires verification. Coming soon!')));
                             },
                             icon: Icon(Icons.edit,
                                 size: 16, color: Colors.blue.shade400),
                           )
                         ],
                       ),
-                
+
                       const SizedBox(height: 24),
-                
+
                       // Password
                       const Text(
                         "Password",
@@ -189,9 +208,9 @@ class ProfileDialog extends StatelessWidget {
                               fontSize: 18, color: Colors.blue.shade400),
                         ),
                       ),
-                
+
                       const SizedBox(height: 24),
-                
+
                       // Delete Account Button (uncomment if needed)
                       // SizedBox(
                       //   height: 44,
@@ -219,7 +238,7 @@ class ProfileDialog extends StatelessWidget {
                       //           ],
                       //         ),
                       //       );
-                
+
                       //       if (confirmed == true) {
                       //         try {
                       //           // Show loading indicator
@@ -232,17 +251,17 @@ class ProfileDialog extends StatelessWidget {
                       //               ),
                       //             );
                       //           }
-                
+
                       //           // Delete account
                       //           await pv.deleteUserAccount();
-                
+
                       //           // Close the loading dialog and the profile dialog
                       //           if (context.mounted) {
                       //             Navigator.of(context, rootNavigator: true)
                       //                 .pop(); // Close loading
                       //             Navigator.of(context, rootNavigator: true)
                       //                 .pop(); // Close profile dialog
-                
+
                       //             // Navigate to login page
                       //             // Navigator.of(context, rootNavigator: true)
                       //             //     .pushAndRemoveUntil(
@@ -254,7 +273,7 @@ class ProfileDialog extends StatelessWidget {
                       //           // Close loading dialog
                       //           if (context.mounted) {
                       //             Navigator.of(context, rootNavigator: true).pop();
-                
+
                       //             // Show error
                       //             ScaffoldMessenger.of(context).showSnackBar(
                       //               SnackBar(
@@ -299,109 +318,110 @@ void showProfileDialog(BuildContext context) {
   );
 }
 
-void showEditDialog(
-  BuildContext context, 
-  String attribute, 
-  String currentValue,
-  Future<String> Function(String) onUpdate
-) {
-  final TextEditingController controller = TextEditingController(text: currentValue);
+void showEditDialog(BuildContext context, String attribute, String currentValue,
+    Future<String> Function(String) onUpdate) {
+  final TextEditingController controller =
+      TextEditingController(text: currentValue);
   bool isProcessing = false;
   String? errorMessage;
 
   showDialog(
     context: context,
     builder: (context) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          return AlertDialog(
-            title: Text('Update $attribute'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: controller,
-                  decoration: InputDecoration(
-                    hintText: 'Enter new $attribute',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(width: 1, color: Colors.black),
-                    ),
-                    errorText: errorMessage,
+      return StatefulBuilder(builder: (context, setState) {
+        return AlertDialog(
+          title: Text('Update $attribute'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: controller,
+                decoration: InputDecoration(
+                  hintText: 'Enter new $attribute',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(15),
+                    borderSide: const BorderSide(width: 1, color: Colors.black),
                   ),
-                  enabled: !isProcessing,
+                  errorText: errorMessage,
                 ),
-                if (isProcessing)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: isProcessing ? null : () => Navigator.pop(context),
-                child: const Text('Cancel'),
+                enabled: !isProcessing,
               ),
-              TextButton(
-                onPressed: isProcessing ? null : () async {
-                  final newValue = controller.text.trim();
-                  if (newValue.isEmpty) {
-                    setState(() {
-                      errorMessage = 'Value cannot be empty';
-                    });
-                    return;
-                  }
-
-                  if (newValue == currentValue) {
-                    Navigator.pop(context);
-                    return;
-                  }
-
-                  setState(() {
-                    isProcessing = true;
-                    errorMessage = null;
-                  });
-
-                  try {
-                    final result = await onUpdate(newValue);
-                    
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      
-                      // Show success message and refresh the parent dialog
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$attribute updated successfully')),
-                      );
-                      
-                      // Close and reopen profile dialog to refresh content
-                      Navigator.pop(context);
-                      showProfileDialog(context);
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      setState(() {
-                        isProcessing = false;
-                        errorMessage = 'Error: ${e.toString()}';
-                      });
-                    }
-                  }
-                },
-                child: const Text('Update'),
-              ),
+              if (isProcessing)
+                Padding(
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
             ],
-          );
-        }
-      );
+          ),
+          actions: [
+            TextButton(
+              onPressed: isProcessing ? null : () => Navigator.pop(context),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: isProcessing
+                  ? null
+                  : () async {
+                      final newValue = controller.text.trim();
+                      if (newValue.isEmpty) {
+                        setState(() {
+                          errorMessage = 'Value cannot be empty';
+                        });
+                        return;
+                      }
+
+                      if (newValue == currentValue) {
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      setState(() {
+                        isProcessing = true;
+                        errorMessage = null;
+                      });
+
+                      try {
+                        final result = await onUpdate(newValue);
+
+                        if (context.mounted) {
+                          Navigator.pop(context);
+
+                          // Show success message and refresh the parent dialog
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content:
+                                    Text('$attribute updated successfully')),
+                          );
+
+                          // Close and reopen profile dialog to refresh content
+                          Navigator.pop(context);
+                          showProfileDialog(context);
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          setState(() {
+                            isProcessing = false;
+                            errorMessage = 'Error: ${e.toString()}';
+                          });
+                        }
+                      }
+                    },
+              child: const Text('Update'),
+            ),
+          ],
+        );
+      });
     },
   );
 }
 
 void showPasswordChangeDialog(BuildContext context) {
-  final TextEditingController currentPasswordController = TextEditingController();
+  final TextEditingController currentPasswordController =
+      TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
-  final TextEditingController confirmPasswordController = TextEditingController();
-  
+  final TextEditingController confirmPasswordController =
+      TextEditingController();
+
   bool isProcessing = false;
   String? errorMessage;
   bool obscureCurrentPassword = true;
@@ -428,7 +448,9 @@ void showPasswordChangeDialog(BuildContext context) {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscureCurrentPassword ? Icons.visibility_off : Icons.visibility,
+                        obscureCurrentPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -450,7 +472,9 @@ void showPasswordChangeDialog(BuildContext context) {
                     ),
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscureNewPassword ? Icons.visibility_off : Icons.visibility,
+                        obscureNewPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -473,7 +497,9 @@ void showPasswordChangeDialog(BuildContext context) {
                     errorText: errorMessage,
                     suffixIcon: IconButton(
                       icon: Icon(
-                        obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                        obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
                       ),
                       onPressed: () {
                         setState(() {
@@ -497,59 +523,66 @@ void showPasswordChangeDialog(BuildContext context) {
                 child: const Text('Cancel'),
               ),
               TextButton(
-                onPressed: isProcessing ? null : () async {
-                  // Get the values
-                  final currentPassword = currentPasswordController.text;
-                  final newPassword = newPasswordController.text;
-                  final confirmPassword = confirmPasswordController.text;
-                  
-                  // Validate inputs
-                  if (currentPassword.isEmpty || newPassword.isEmpty || confirmPassword.isEmpty) {
-                    setState(() {
-                      errorMessage = 'All fields are required';
-                    });
-                    return;
-                  }
-                  
-                  if (newPassword != confirmPassword) {
-                    setState(() {
-                      errorMessage = 'New passwords do not match';
-                    });
-                    return;
-                  }
-                  
-                  if (newPassword.length < 6) {
-                    setState(() {
-                      errorMessage = 'Password must be at least 6 characters';
-                    });
-                    return;
-                  }
-                  
-                  setState(() {
-                    isProcessing = true;
-                    errorMessage = null;
-                  });
-                  
-                  try {
-                    // TODO: Implement password change functionality in SupabaseService
-                    // For now, we'll just show a success message
-                    await Future.delayed(const Duration(seconds: 1));
-                    
-                    if (context.mounted) {
-                      Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Password updated successfully')),
-                      );
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      setState(() {
-                        isProcessing = false;
-                        errorMessage = 'Error: ${e.toString()}';
-                      });
-                    }
-                  }
-                },
+                onPressed: isProcessing
+                    ? null
+                    : () async {
+                        // Get the values
+                        final currentPassword = currentPasswordController.text;
+                        final newPassword = newPasswordController.text;
+                        final confirmPassword = confirmPasswordController.text;
+
+                        // Validate inputs
+                        if (currentPassword.isEmpty ||
+                            newPassword.isEmpty ||
+                            confirmPassword.isEmpty) {
+                          setState(() {
+                            errorMessage = 'All fields are required';
+                          });
+                          return;
+                        }
+
+                        if (newPassword != confirmPassword) {
+                          setState(() {
+                            errorMessage = 'New passwords do not match';
+                          });
+                          return;
+                        }
+
+                        if (newPassword.length < 6) {
+                          setState(() {
+                            errorMessage =
+                                'Password must be at least 6 characters';
+                          });
+                          return;
+                        }
+
+                        setState(() {
+                          isProcessing = true;
+                          errorMessage = null;
+                        });
+
+                        try {
+                          // TODO: Implement password change functionality in SupabaseService
+                          // For now, we'll just show a success message
+                          await Future.delayed(const Duration(seconds: 1));
+
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content:
+                                      Text('Password updated successfully')),
+                            );
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            setState(() {
+                              isProcessing = false;
+                              errorMessage = 'Error: ${e.toString()}';
+                            });
+                          }
+                        }
+                      },
                 child: const Text('Update Password'),
               ),
             ],

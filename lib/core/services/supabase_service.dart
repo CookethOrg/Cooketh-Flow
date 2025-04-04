@@ -5,6 +5,7 @@ import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -13,13 +14,20 @@ class SupabaseService extends StateHandler {
   SupabaseService(this.supabase) : super();
   late AuthResponse _userData;
   bool _userDataSet = false;
+  late XFile? _userPfp = XFile('assets/Frame 271.png');
 
   AuthResponse get userData => _userData;
   bool get userDataSet => _userDataSet;
+  XFile? get userPfp => _userPfp;
 
   void setUserData(AuthResponse user) {
     _userData = user;
     _userDataSet = true;
+    notifyListeners();
+  }
+
+  void setUserPfp(XFile? val) {
+    _userPfp = val;
     notifyListeners();
   }
 
@@ -78,7 +86,7 @@ class SupabaseService extends StateHandler {
     FlowNode startNode = FlowNode(
       id: "node1",
       type: NodeType.rectangular,
-      position: Offset(cv + 100,cv +  100),
+      position: Offset(cv + 100, cv + 100),
       colour: Color(0xffFAD7A0),
     );
     // Set text for start node
@@ -87,7 +95,7 @@ class SupabaseService extends StateHandler {
     FlowNode decisionNode = FlowNode(
       id: "node2",
       type: NodeType.parallelogram,
-      position: Offset(cv + 300,cv +  150),
+      position: Offset(cv + 300, cv + 150),
       colour: Color(0xffFAD7A0),
     );
     // Set text for decision node
@@ -96,7 +104,7 @@ class SupabaseService extends StateHandler {
     FlowNode pageNode = FlowNode(
       id: "node3",
       type: NodeType.diamond,
-      position: Offset(cv + 500,cv +  150),
+      position: Offset(cv + 500, cv + 150),
       colour: Color(0xffFAD7A0),
     );
     // Set text for page node
@@ -105,7 +113,7 @@ class SupabaseService extends StateHandler {
     FlowNode dbNode = FlowNode(
       id: "node4",
       type: NodeType.database,
-      position: Offset(cv + 700,cv +  100),
+      position: Offset(cv + 700, cv + 100),
       colour: Color(0xffFAD7A0),
     );
     // Set text for database node
@@ -114,7 +122,7 @@ class SupabaseService extends StateHandler {
     FlowNode endNode = FlowNode(
       id: "node5",
       type: NodeType.rectangular,
-      position: Offset(cv + 900,cv +  150),
+      position: Offset(cv + 900, cv + 150),
       colour: Color(0xffFAD7A0),
     );
     // Set text for end node

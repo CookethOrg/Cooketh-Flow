@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -20,54 +18,47 @@ class DiamondNode extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Get the smallest dimension to maintain symmetry
-    final double size = min(width, height);
-
-    // Calculate bounding box dimensions
-    final double boundingSize = size * sqrt(2);
-
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
-      return Stack(
-        alignment: Alignment.center,
-        children: [
-          // Bounding Box (for visualization)
-          Container(
-            width: boundingSize,
-            height: boundingSize,
-          ),
-          // Rotated Diamond Node
-          Transform.rotate(
-            angle: pi / 4, // 45 degrees in radians
-            child: Container(
-              width: size,
-              height: size,
-              decoration: BoxDecoration(
-                color: pv.nodeList[id]!.colour,
-                border: Border.all(color: Colors.black, width: 1),
-                borderRadius: const BorderRadius.all(Radius.circular(12)),
+      return SizedBox(
+        width: width,
+        height: height,
+        child: Stack(
+          children: [
+            // Diamond shape with border
+            CustomPaint(
+              size: Size(width, height),
+              painter: DiamondPainter(
+                fillColor: pv.nodeList[id]!.colour ?? Colors.lightGreen.shade200,
+                borderColor: Colors.black,
+                borderWidth: 1.0,
               ),
-              child: Transform.rotate(
-                angle: -pi / 4, // -45 degrees to keep text upright
-                child: Center(
-                  child: TextField(
-                    controller: tcontroller,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                    decoration: const InputDecoration(
-                      border: InputBorder.none,
-                      isDense: true,
-                      contentPadding: EdgeInsets.symmetric(vertical: 8),
-                    ),
+            ),
+
+            // Text field centered in the diamond
+            Center(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: width * 0.65,
+                  maxHeight: height * 0.65,
+                ),
+                child: TextField(
+                  controller: tcontroller,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                  decoration: const InputDecoration(
+                    border: InputBorder.none,
+                    isDense: true,
+                    contentPadding: EdgeInsets.symmetric(vertical: 8),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       );
     });
   }
@@ -88,15 +79,15 @@ class DiamondPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final double width = size.width;
     final double height = size.height;
-    
+
     // Define the four points of the diamond based on current size
     final points = [
-      Offset(width / 2, 0),          // Top point
-      Offset(width, height / 2),     // Right point
-      Offset(width / 2, height),     // Bottom point
-      Offset(0, height / 2),         // Left point
+      Offset(width / 2, 0), // Top point
+      Offset(width, height / 2), // Right point
+      Offset(width / 2, height), // Bottom point
+      Offset(0, height / 2), // Left point
     ];
-    
+
     // Create the path
     final Path path = Path();
     path.moveTo(points[0].dx, points[0].dy);
@@ -104,18 +95,18 @@ class DiamondPainter extends CustomPainter {
     path.lineTo(points[2].dx, points[2].dy);
     path.lineTo(points[3].dx, points[3].dy);
     path.close();
-    
+
     // Fill paint
     final Paint fillPaint = Paint()
       ..color = fillColor
       ..style = PaintingStyle.fill;
-    
+
     // Border paint
     final Paint borderPaint = Paint()
       ..color = borderColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = borderWidth;
-    
+
     // Draw the diamond
     canvas.drawPath(path, fillPaint);
     canvas.drawPath(path, borderPaint);

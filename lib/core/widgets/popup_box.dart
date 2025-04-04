@@ -74,7 +74,8 @@ class ProfileDialog extends StatelessWidget {
                               image: DecorationImage(
                                   image: pv.userPfp != null
                                       ? FileImage(File(pv.userPfp!.path))
-                                      : const AssetImage('assets/Frame 271.png') as ImageProvider),
+                                      : const AssetImage('assets/Frame 268.png')
+                                          as ImageProvider),
                               border: Border.all(
                                 color: const Color.fromARGB(255, 0, 0, 0),
                                 width: 1.0,
@@ -101,17 +102,18 @@ class ProfileDialog extends StatelessWidget {
                                         onPressed: () async {
                                           try {
                                             XFile? file = await FileServices()
-                                              .selectImages();
-                                          pv.setUserPfp(file);
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(const SnackBar(
-                                                  content: Text(
-                                                      'Profile picture changed')));
+                                                .selectImages();
+                                            pv.setUserPfp(file);
+                                            pv.uploadUserProfilePicture(
+                                                file!);
+                                            ScaffoldMessenger.of(context)
+                                                .showSnackBar(const SnackBar(
+                                                    content: Text(
+                                                        'Profile picture changed')));
                                           } catch (e) {
                                             ScaffoldMessenger.of(context)
-                                              .showSnackBar(SnackBar(
-                                                  content: Text(
-                                                      '$e')));
+                                                .showSnackBar(SnackBar(
+                                                    content: Text('$e')));
                                           }
                                         },
                                         icon: const Icon(Icons.edit, size: 12)),

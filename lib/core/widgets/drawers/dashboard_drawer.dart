@@ -60,7 +60,7 @@ class DashboardDrawer extends StatelessWidget {
                                             ? FileImage(
                                                 File(auth.userPfp!.path))
                                             : const AssetImage(
-                                                    'assets/Frame 271.png')
+                                                    'assets/Frame 268.png')
                                                 as ImageProvider,
                                       ),
                                       SizedBox(

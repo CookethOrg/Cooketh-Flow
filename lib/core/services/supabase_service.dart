@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/models/flow_manager.dart';
@@ -7,6 +9,7 @@ import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService extends StateHandler {
@@ -241,6 +244,7 @@ class SupabaseService extends StateHandler {
 
         // ✅ Store user data for future use
         setUserData(authResponse);
+        fetchAndSetUserProfilePicture();
 
         res = 'Logged in successfully';
         print("✅ Login Successful! User ID: ${user.id}");
@@ -403,6 +407,133 @@ class SupabaseService extends StateHandler {
     } catch (e) {
       res = e.toString();
       throw Exception(res);
+    }
+  }
+
+  // Add these constants at the top of your file
+  final String _profileBucketName = 'profile';
+  final String _defaultPfpPath = 'assets/Frame 271.png';
+
+// Add these methods to your SupabaseService class
+
+  /// Uploads user profile picture to Supabase storage
+  Future<String> uploadUserProfilePicture(XFile imageFile) async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      // Get file bytes and extension
+      final bytes = await imageFile.readAsBytes();
+      final extension = imageFile.path.split('.').last.toLowerCase();
+      final mimeType = _getMimeTypeFromExtension(extension);
+
+      // Create storage path: userId/pfp.extension
+      final storagePath = '${user.id}/pfp.$extension';
+
+      // First try to remove existing pfp if any
+      try {
+        await supabase.storage
+            .from(_profileBucketName)
+            .remove(['${user.id}/pfp']);
+      } catch (e) {
+        print('No existing profile picture to remove');
+      }
+
+      // Upload to Supabase storage
+      final uploadResponse =
+          await supabase.storage.from(_profileBucketName).upload(
+                storagePath,
+                File(imageFile.path),
+                fileOptions: FileOptions(contentType: mimeType, upsert: true),
+              );
+
+      // Get public URL
+      final String publicUrl =
+          supabase.storage.from(_profileBucketName).getPublicUrl(storagePath);
+
+      // Update user data with the new pfp URL
+      await supabase
+          .from('User')
+          .update({'profile_picture_url': publicUrl}).eq('id', user.id);
+
+      // Update local state
+      setUserPfp(imageFile);
+
+      return publicUrl;
+    } catch (e) {
+      print('Error uploading profile picture: $e');
+      throw Exception('Failed to upload profile picture: ${e.toString()}');
+    }
+  }
+
+  /// Fetches and sets user profile picture on login
+  Future<void> fetchAndSetUserProfilePicture() async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) return;
+
+      // Get user data including profile picture URL
+      final userData = await supabase
+          .from('User')
+          .select('profile_picture_url')
+          .eq('id', user.id)
+          .single();
+
+      final String? pfpUrl = userData['profile_picture_url'];
+
+      if (pfpUrl != null && pfpUrl.isNotEmpty) {
+        // Extract file extension from URL
+        final uri = Uri.parse(pfpUrl);
+        final pathSegments = uri.pathSegments;
+        final fileName = pathSegments.last;
+        final fileExtension = fileName.split('.').last.toLowerCase();
+
+        // List of supported extensions
+        const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        if (supportedExtensions.contains(fileExtension)) {
+          try {
+            // Download the image with proper extension
+            final response = await supabase.storage
+                .from(_profileBucketName)
+                .download('${user.id}/pfp.$fileExtension');
+
+            // Create temporary file with proper extension
+            final tempDir = await getTemporaryDirectory();
+            final file = File('${tempDir.path}/pfp_${user.id}.$fileExtension');
+            await file.writeAsBytes(response);
+
+            // Set as XFile
+            setUserPfp(XFile(file.path));
+            return;
+          } catch (e) {
+            print('Error downloading profile picture: $e');
+          }
+        }
+      }
+
+      // Fallback to default if any step fails
+      setUserPfp(XFile(_defaultPfpPath));
+    } catch (e) {
+      print('Error fetching profile picture: $e');
+      setUserPfp(XFile(_defaultPfpPath));
+    }
+  }
+
+  /// Helper function to get MIME type from file extension
+  String _getMimeTypeFromExtension(String extension) {
+    switch (extension) {
+      case 'jpg':
+      case 'jpeg':
+        return 'image/jpeg';
+      case 'png':
+        return 'image/png';
+      case 'gif':
+        return 'image/gif';
+      case 'webp':
+        return 'image/webp';
+      default:
+        return 'application/octet-stream';
     }
   }
 }

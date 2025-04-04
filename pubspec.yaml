@@ -53,6 +53,7 @@ dependencies:
   package_info_plus: ^8.3.0
   file_selector: ^1.0.3
   file_selector_platform_interface: ^2.6.2
+  flutter_launcher_icons: ^0.14.3
 
 dev_dependencies:
   flutter_test:
@@ -98,6 +99,7 @@ flutter:
     - family: Frederik
       fonts:
         - asset: assets/fonts/Frederik-DemiBold-BF645d9bff7b6ff.otf
+        # - asset: assets/fonts/
     #     - asset: fonts/Schyler-Italic.ttf
     #       style: italic
     # - family: Trajan Pro
@@ -119,6 +121,7 @@ icons_launcher:
       enable: true
     linux:
       enable: true
+      image_path: 'assets/Frame 271.png'
     macos:
       enable: true
     web:

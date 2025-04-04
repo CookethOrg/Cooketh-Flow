@@ -1,8 +1,9 @@
 [Desktop Entry]
-Name=Flutter Linux App
+Name=CookethFlow
 Comment=Flutter Linux launcher icon
-Exec=app_icon
+Exec=cookethflow
 Icon=app_icon.png
 Terminal=false
 Type=Application
-Categories=Entertainment;
+Categories=Utility;
+StartupWMClass=cookethflow

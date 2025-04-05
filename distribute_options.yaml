@@ -1,0 +1,22 @@
+variables:
+  app_name: cookethflow
+  app_version: 0.1.0
+  build_name: 0.1.0
+  build_number: '1'
+  icon_path: assets/frame_271.png
+  linux_icon_path: assets/frame_271.png
+
+output: dist/
+
+releases:
+  - name: dev
+    jobs:
+      - name: release-dev-linux-deb
+        package:
+          platform: linux
+          target: deb  # Changed from 'targets' to 'target'
+          build_args:
+            dart-define:
+              APP_ENV: dev
+              FLUTTER_BUILD_NAME: "0.1.0"
+              FLUTTER_BUILD_NUMBER: "1"

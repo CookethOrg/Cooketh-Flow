@@ -18,8 +18,7 @@ set(CMAKE_INSTALL_RPATH "$ORIGIN/lib")
 
 # Install the icon
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/icons/hicolor/512x512/apps/com.example.cookethflow.png"
-        DESTINATION "${CMAKE_INSTALL_PREFIX}/share/icons/hicolor/512x512/apps"
-        RENAME "${FLUTTER_LIBRARY}.png")
+        DESTINATION "${CMAKE_BINARY_DIR}/dist/icons")
 # Root filesystem for cross-building.
 if(FLUTTER_TARGET_PLATFORM_SYSROOT)
   set(CMAKE_SYSROOT ${FLUTTER_TARGET_PLATFORM_SYSROOT})

@@ -1,0 +1,35 @@
+display_name: Cooketh Flow
+package_name: cookethflow
+maintainer:
+  name: Subroto Banerjee
+  email: subroto.2003@gmail.com
+co_authors:
+  - name: Antara Paul
+    email: paul.antara04@gmail.com
+priority: optional
+section: x11
+installed_size: 15700
+essential: false
+icon: assets/frame_271.png
+
+postinstall_scripts:
+  - echo "Installed Cooketh Flow"
+postuninstall_scripts:
+  - echo "You going? Whyyy ?"
+
+keywords:
+  - Cooketh
+  - Flow
+  - Test
+  - Application
+
+generic_name: Visual Thinking Application
+
+categories:
+  - Flow Chart
+  - Management
+
+startup_notify: true
+# You can also specify [metainfo](https://freedesktop.org/software/appstream/docs/chap-Quickstart.html) file
+# which contains metadata of the app.
+# metainfo: linux/packaging/myappid.appdata.xml

@@ -9,6 +9,9 @@ co_authors:
 priority: optional
 section: x11
 installed_size: 15700
+dependencies:
+  - libglib2.0-0
+  - libglib2.0-dev
 essential: false
 icon: assets/frame_271.png
 

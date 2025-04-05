@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=0.1.0
+Name=Cooketh Flow
+GenericName=Visual Thinking Tool
+Icon=cookethflow
+Exec=cookethflow %U
+Categories=Desktop;Flutter;
+Keywords=CookethOrg;Cooketh;cookethflow;Test;Application;
+StartupNotify=true

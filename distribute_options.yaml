@@ -20,3 +20,23 @@ releases:
               APP_ENV: dev
               FLUTTER_BUILD_NAME: "0.1.0"
               FLUTTER_BUILD_NUMBER: "1"
+      - name: release-dev-linux-rpm
+        package:
+          platform: linux
+          target: rpm
+          build_args:
+            dart-define:
+              APP_ENV: dev
+              FLUTTER_BUILD_NAME: "0.1.0"
+              FLUTTER_BUILD_NUMBER: "1"
+            enable-experiment: records
+      - name: release-dev-linux-appimage
+        package:
+          platform: linux
+          target: appimage
+          build_args:
+            dart-define:
+              APP_ENV: dev
+              FLUTTER_BUILD_NAME: "0.1.0"
+              FLUTTER_BUILD_NUMBER: "1"
+            enable-experiment: records

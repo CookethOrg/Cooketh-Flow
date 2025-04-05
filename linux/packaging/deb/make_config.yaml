@@ -14,9 +14,11 @@ section: x11
 installed_size: 15700
 
 depends:
-  - libglib2.0-0
-  - libgtk-3-0
-  - libc6
+  - libglib2.0-0 (>= 2.56.0)
+  - libgtk-3-0 (>= 3.22.0)
+  - libc6 (>= 2.27)
+  - libatk-bridge2.0-0
+  - libffi7 | libffi6
   - libstdc++6
   - libgcc-s1
 

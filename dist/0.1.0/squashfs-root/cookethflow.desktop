@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=Cooketh Flow
+GenericName=Visual Thinking Tool
+Exec=LD_LIBRARY_PATH=usr/lib cookethflow %u
+Icon=cookethflow
+Type=Application
+StartupNotify=true
+Categories=Utility
+Keywords=Cooketh;Flow;Visual Thinking;Productivity
+

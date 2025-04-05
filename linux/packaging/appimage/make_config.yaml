@@ -1,60 +1,56 @@
 display_name: Cooketh Flow
+package_name: cookethflow
+version: 0.1.0
+architecture: x86_64
 
 icon: assets/frame_271.png
 
 keywords:
   - Cooketh
   - Flow
-  - CookethOrg
-  - Flutter
   - Visual Thinking
   - Productivity
 
 generic_name: Visual Thinking Tool
-
-actions:
-  - name: Say Hi
-    label: say-hi
-    arguments:
-      - --say
-      - hi
-  - name: Say Bye
-    label: say-bye
-    arguments:
-      - --say
-      - bye
 
 categories:
   - Utility
 
 startup_notify: true
 
-# Only include runtime libraries (not development packages)
-include:
-  - libglib-2.0.so.0
-  - libgobject-2.0.so.0
-  - libstdc++.so.6
-  - libgcc_s.so.1
-
-# Optional: Specify library paths if they're in non-standard locations
+# Library configuration
 library_paths:
   - /usr/lib/x86_64-linux-gnu/
   - /lib/x86_64-linux-gnu/
 
+# Required libraries (simplified)
+include:
+  - libglib-2.0.so.0
+  - libgobject-2.0.so.0
+  - libffi.so.8  # Kali might use a newer version than libffi.so.6
+  - libgcc_s.so.1
+  - libstdc++.so.6
+  - libatspi.so.0  # Explicitly include this
+  - libatk-1.0.so.0  # Accessibility dependency
+
 # AppImage specific settings
 appimage:
-  # Exclude development files that might cause packaging errors
+  # Bundle these libs from your system into the AppImage
+  additional_libs:
+    - /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
+    - /usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0
+    - /usr/lib/x86_64-linux-gnu/libffi.so.8  # Check your system for the exact version
+    - /usr/lib/x86_64-linux-gnu/libatk-1.0.so.0
+    - /usr/lib/x86_64-linux-gnu/libatspi.so.0  # Bundle this explicitly
+
+  env:
+    LD_LIBRARY_PATH: "$APPDIR/usr/lib:$LD_LIBRARY_PATH"  # Prioritize bundled libs
+    G_DEBUG: "fatal-warnings"
+
+  # Exclude development files, but don’t exclude the libs we need
   exclude:
     - "*.a"
     - "*.la"
     - "*.dev"
     - "*.debug"
-    - "/usr/share/doc/*"
     - "/usr/include/*"
-  
-  # Include essential GTK libraries for Flutter Linux apps
-  additional_libs:
-    - libgtk-3.so.0
-    - libgdk-3.so.0
-    - libpangocairo-1.0.so.0
-    - libepoxy.so.0

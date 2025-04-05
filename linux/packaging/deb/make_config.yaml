@@ -1,38 +1,60 @@
 display_name: Cooketh Flow
 package_name: cookethflow
+version: 0.1.0
+architecture: amd64
+
 maintainer:
   name: Subroto Banerjee
   email: subroto.2003@gmail.com
-co_authors:
-  - name: Antara Paul
-    email: paul.antara04@gmail.com
+
+authors: "Subroto Banerjee <subroto.2003@gmail.com>, Antara Paul <paul.antara04@gmail.com>"
+
 priority: optional
 section: x11
 installed_size: 15700
-dependencies:
+
+depends:
   - libglib2.0-0
-  - libglib2.0-dev
+  - libgtk-3-0
+  - libc6
+  - libstdc++6
+  - libgcc-s1
+
+# Changed from string to boolean
 essential: false
+
 icon: assets/frame_271.png
 
-postinstall_scripts:
-  - echo "Installed Cooketh Flow"
-postuninstall_scripts:
-  - echo "You going? Whyyy ?"
+postinstall_script: |
+  echo "Installed Cooketh Flow"
+  update-desktop-database -q || true
+  gtk-update-icon-cache -qtf /usr/share/icons/hicolor || true
+
+postuninstall_script: |
+  echo "You going? Whyyy ?"
+  update-desktop-database -q || true
+  gtk-update-icon-cache -qtf /usr/share/icons/hicolor || true
 
 keywords:
   - Cooketh
   - Flow
-  - Test
-  - Application
+  - Visual Thinking
+  - Productivity
 
 generic_name: Visual Thinking Application
 
 categories:
-  - Flow Chart
-  - Management
+  - Office
+  - FlowChart
 
+# Changed from string to boolean
 startup_notify: true
-# You can also specify [metainfo](https://freedesktop.org/software/appstream/docs/chap-Quickstart.html) file
-# which contains metadata of the app.
-# metainfo: linux/packaging/myappid.appdata.xml
+
+startup_wm_class: cookethflow
+
+desktop_entry:
+  Exec: cookethflow
+  Icon: cookethflow
+  Type: Application
+  Categories: Office;FlowChart;
+  Terminal: false

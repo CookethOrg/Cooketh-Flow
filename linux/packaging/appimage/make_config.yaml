@@ -7,8 +7,8 @@ keywords:
   - Flow
   - CookethOrg
   - Flutter
-  - Test
-  - Application
+  - Visual Thinking
+  - Productivity
 
 generic_name: Visual Thinking Tool
 
@@ -29,19 +29,32 @@ categories:
 
 startup_notify: true
 
-# You can specify the shared libraries that you want to bundle with your app
-#
-# fastforge automatically detects the shared libraries that your app
-# depends on, but you can also specify them manually here.
-#
-# The following example shows how to bundle the libcurl library with your app.
-#
-# include:
-#   - libcurl.so.4
-include: [
-  libglib2.0-0,
-  libglib2.0-dev
-]
-# You can also specify [metainfo](https://www.freedesktop.org/software/appstream/metainfocreator/#/) file
-# which contains metadata of the app.
-# metainfo: linux/packaging/myappid.appdata.xml
+# Only include runtime libraries (not development packages)
+include:
+  - libglib-2.0.so.0
+  - libgobject-2.0.so.0
+  - libstdc++.so.6
+  - libgcc_s.so.1
+
+# Optional: Specify library paths if they're in non-standard locations
+library_paths:
+  - /usr/lib/x86_64-linux-gnu/
+  - /lib/x86_64-linux-gnu/
+
+# AppImage specific settings
+appimage:
+  # Exclude development files that might cause packaging errors
+  exclude:
+    - "*.a"
+    - "*.la"
+    - "*.dev"
+    - "*.debug"
+    - "/usr/share/doc/*"
+    - "/usr/include/*"
+  
+  # Include essential GTK libraries for Flutter Linux apps
+  additional_libs:
+    - libgtk-3.so.0
+    - libgdk-3.so.0
+    - libpangocairo-1.0.so.0
+    - libepoxy.so.0

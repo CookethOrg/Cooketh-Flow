@@ -40,3 +40,13 @@ releases:
               FLUTTER_BUILD_NAME: "0.1.0"
               FLUTTER_BUILD_NUMBER: "1"
             enable-experiment: records
+      - name: release-dev-windows-exe
+        package:
+          platform: windows
+          target: exe
+          build_args:
+            dart-define:
+              APP_ENV: dev
+              FLUTTER_BUILD_NAME: "0.1.0"
+              FLUTTER_BUILD_NUMBER: "1"
+            enable-experiment: records

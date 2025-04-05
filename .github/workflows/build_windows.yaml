@@ -1,0 +1,13 @@
+name: Build Windows
+on: push
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+      - run: flutter build windows --release
+      - uses: actions/upload-artifact@v3
+        with:
+          name: WindowsBuild
+          path: build/windows/runner/Release/

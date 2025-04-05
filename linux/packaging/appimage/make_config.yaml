@@ -22,32 +22,35 @@ startup_notify: true
 library_paths:
   - /usr/lib/x86_64-linux-gnu/
   - /lib/x86_64-linux-gnu/
+  - /home/teewrath/Music/glib_extracted/usr/lib/x86_64-linux-gnu/  # Add extracted paths here
+  - /home/teewrath/Music/atspi_extracted/usr/lib/x86_64-linux-gnu/
+  - /home/teewrath/Music/libffi6_extracted/usr/lib/x86_64-linux-gnu/
 
 # Required libraries (simplified)
 include:
   - libglib-2.0.so.0
   - libgobject-2.0.so.0
-  - libffi.so.8  # Kali might use a newer version than libffi.so.6
+  - libffi.so.6
+  - libffi.so.8
   - libgcc_s.so.1
   - libstdc++.so.6
-  - libatspi.so.0  # Explicitly include this
-  - libatk-1.0.so.0  # Accessibility dependency
+  - libatspi.so.0
+  - libatk-1.0.so.0
 
 # AppImage specific settings
 appimage:
-  # Bundle these libs from your system into the AppImage
   additional_libs:
-    - /usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
-    - /usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0
-    - /usr/lib/x86_64-linux-gnu/libffi.so.8  # Check your system for the exact version
+    - /home/teewrath/Music/glib_extracted/usr/lib/x86_64-linux-gnu/libglib-2.0.so.0
+    - /home/teewrath/Music/glib_extracted/usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0
+    - /home/teewrath/Music/libffi6_extracted/usr/lib/x86_64-linux-gnu/libffi.so.6
+    - /usr/lib/x86_64-linux-gnu/libffi.so.8
     - /usr/lib/x86_64-linux-gnu/libatk-1.0.so.0
-    - /usr/lib/x86_64-linux-gnu/libatspi.so.0  # Bundle this explicitly
+    - /home/teewrath/Music/atspi_extracted/usr/lib/x86_64-linux-gnu/libatspi.so.0
 
   env:
-    LD_LIBRARY_PATH: "$APPDIR/usr/lib:$LD_LIBRARY_PATH"  # Prioritize bundled libs
+    LD_LIBRARY_PATH: "$APPDIR/usr/lib"
     G_DEBUG: "fatal-warnings"
 
-  # Exclude development files, but don’t exclude the libs we need
   exclude:
     - "*.a"
     - "*.la"

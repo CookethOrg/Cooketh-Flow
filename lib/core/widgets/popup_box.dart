@@ -3,8 +3,6 @@ import 'dart:io';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/log_in.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -383,7 +381,7 @@ void showEditDialog(BuildContext context, String attribute, String currentValue,
                       });
 
                       try {
-                        final result = await onUpdate(newValue);
+                        // final result = await onUpdate(newValue);
 
                         if (context.mounted) {
                           Navigator.pop(context);

@@ -29,7 +29,7 @@ class DiamondNode extends StatelessWidget {
               size: Size(width, height),
               painter: DiamondPainter(
                 fillColor:
-                    pv.nodeList[id]!.colour ?? Colors.lightGreen.shade200,
+                    pv.nodeList[id]!.colour,
                 borderColor: Colors.black,
                 borderWidth: 1.0,
               ),

@@ -2,8 +2,6 @@ import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthenticationProvider extends StateHandler {
   bool _isLoading = false;

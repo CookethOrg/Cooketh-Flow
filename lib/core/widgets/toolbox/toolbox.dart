@@ -1,4 +1,3 @@
-import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -82,12 +81,6 @@ class CustomToolbar extends StatelessWidget {
     });
   }
 
-  Widget _toolbarButton(IconData icon, VoidCallback onPressed) {
-    return IconButton(
-      icon: Icon(icon, color: Colors.black),
-      onPressed: onPressed,
-    );
-  }
 
   Widget _toggleableButton({
     required bool isActive,

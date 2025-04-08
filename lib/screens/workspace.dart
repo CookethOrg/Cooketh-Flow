@@ -3,8 +3,6 @@ import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
-import 'package:cookethflow/models/connection.dart';
-import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
@@ -76,17 +74,17 @@ class _WorkspaceState extends State<Workspace> {
     });
   }
 
-  void _updateTransformationMatrix() {
-    final workspaceProvider =
-        Provider.of<WorkspaceProvider>(context, listen: false);
+  // void _updateTransformationMatrix() {
+  //   final workspaceProvider =
+  //       Provider.of<WorkspaceProvider>(context, listen: false);
 
-    // Create a new matrix based on the current scale and offset
-    Matrix4 matrix = Matrix4.identity()
-      ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
-      ..scale(workspaceProvider.scale);
+  //   // Create a new matrix based on the current scale and offset
+  //   Matrix4 matrix = Matrix4.identity()
+  //     ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
+  //     ..scale(workspaceProvider.scale);
 
-    _transformationController.value = matrix;
-  }
+  //   _transformationController.value = matrix;
+  // }
 
   // Connect the transformation controller to the workspace provider
   void _syncWithProvider() {
@@ -113,13 +111,13 @@ class _WorkspaceState extends State<Workspace> {
     workspaceProvider.updateFlowManager();
   }
 
-  bool _isHorizontal(ConnectionPoint point) {
-    return point == ConnectionPoint.left || point == ConnectionPoint.right;
-  }
+  // bool _isHorizontal(ConnectionPoint point) {
+  //   return point == ConnectionPoint.left || point == ConnectionPoint.right;
+  // }
 
-  bool _isVertical(ConnectionPoint point) {
-    return point == ConnectionPoint.top || point == ConnectionPoint.bottom;
-  }
+  // bool _isVertical(ConnectionPoint point) {
+  //   return point == ConnectionPoint.top || point == ConnectionPoint.bottom;
+  // }
 
   void _showDeleteWorkspaceDialog(BuildContext context) {
     showDialog(
@@ -149,8 +147,8 @@ class _WorkspaceState extends State<Workspace> {
                 Navigator.pop(context);
 
                 try {
-                  final workspaceProvider =
-                      Provider.of<WorkspaceProvider>(context, listen: false);
+                  // final workspaceProvider =
+                  //     Provider.of<WorkspaceProvider>(context, listen: false);
                   final flowProvider =
                       Provider.of<FlowmanageProvider>(context, listen: false);
 

@@ -58,8 +58,8 @@ class ConnectorPainter extends CustomPainter {
       ..strokeWidth = 2.0;
 
     final path = Path();
-    final radius = 4.0; // Radius for rounded corners
-    final arrowSize = size.width * 0.4; // Size of the arrow part
+    // final radius = 4.0; // Radius for rounded corners
+    // final arrowSize = size.width * 0.4; // Size of the arrow part
 
     switch (connectionPoint) {
       case ConnectionPoint.top:

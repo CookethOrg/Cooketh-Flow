@@ -5,7 +5,6 @@ import 'package:cookethflow/core/widgets/buttons/add_node_button.dart';
 import 'package:cookethflow/core/widgets/buttons/redo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/undo_button.dart';
 import 'package:cookethflow/core/widgets/buttons/delete_button.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class Toolbar extends StatelessWidget {
   final Function() onDelete;

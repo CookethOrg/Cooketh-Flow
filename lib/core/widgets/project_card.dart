@@ -1,10 +1,5 @@
-import 'dart:typed_data';
-import 'dart:ui';
-import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 class ProjectCard extends StatelessWidget {
@@ -15,9 +10,9 @@ class ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
-      Future<ByteData> getImg() async {
-        return await pv.createImg();
-      }
+      // Future<ByteData> getImg() async {
+      //   return await pv.createImg();
+      // }
 
       String getFlowNameInitials() {
         // return pv.flowManager.flowName.toUpperCase().substring(0,1);

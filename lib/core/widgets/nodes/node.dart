@@ -1,7 +1,4 @@
 import 'package:cookethflow/core/widgets/buttons/connector.dart';
-import 'package:cookethflow/core/widgets/nodes/database_node.dart';
-import 'package:cookethflow/core/widgets/nodes/diamond_node.dart';
-import 'package:cookethflow/core/widgets/nodes/parallelogram_node.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';

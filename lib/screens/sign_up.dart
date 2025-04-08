@@ -1,8 +1,6 @@
 import 'package:cookethflow/core/widgets/forms/signup_form.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/screens/loading.dart';
-import 'package:cookethflow/screens/log_in.dart';
 import 'package:cookethflow/screens/slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

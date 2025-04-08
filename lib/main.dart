@@ -1,22 +1,15 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
-import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/loading.dart';
-import 'package:cookethflow/screens/log_in.dart';
-import 'package:cookethflow/screens/sign_up.dart';
-import 'package:cookethflow/screens/workspace.dart';
+import 'package:cookethflow/screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:file_picker/file_picker.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -93,7 +86,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignupPage(),
+      home: SplashScreen(),
     );
   }
 }

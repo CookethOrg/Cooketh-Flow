@@ -5,8 +5,6 @@ import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/models/connection.dart';
-import 'package:cookethflow/providers/flowmanage_provider.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
@@ -404,9 +402,6 @@ class SupabaseService extends StateHandler {
     } catch (AuthException) {
       res = 'Current password is incorrect';
       throw Exception(res);
-    } catch (e) {
-      res = e.toString();
-      throw Exception(res);
     }
   }
 
@@ -423,7 +418,7 @@ class SupabaseService extends StateHandler {
       if (user == null) throw Exception('User not authenticated');
 
       // Get file bytes and extension
-      final bytes = await imageFile.readAsBytes();
+      // final bytes = await imageFile.readAsBytes();
       final extension = imageFile.path.split('.').last.toLowerCase();
       final mimeType = _getMimeTypeFromExtension(extension);
 
@@ -440,7 +435,7 @@ class SupabaseService extends StateHandler {
       }
 
       // Upload to Supabase storage
-      final uploadResponse =
+      // final uploadResponse =
           await supabase.storage.from(_profileBucketName).upload(
                 storagePath,
                 File(imageFile.path),

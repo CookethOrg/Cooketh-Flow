@@ -351,7 +351,7 @@ class WorkspaceProvider extends StateHandler {
   void dragNode(String id, Offset newPosition) {
     if (_nodeList.containsKey(id)) {
       final node = _nodeList[id]!;
-      final delta = newPosition - node.position;
+      // final delta = newPosition - node.position;
       node.position = newPosition;
 
       // Force update connections by removing and re-adding them
@@ -742,9 +742,7 @@ class WorkspaceProvider extends StateHandler {
   Color get selectedColor =>
       selectedNode == null ? nodeColors[0] : selectedNode!.colour;
   set selectedColor(Color col) {
-    if (selectedColor != null) {
       changeNodeColour(col, selectedNode!.id);
-    }
     notifyListeners();
   }
 

@@ -1,8 +1,6 @@
 import 'dart:io';
 
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/core/widgets/popup_box.dart';
 import 'package:cookethflow/screens/log_in.dart';
 import 'package:cookethflow/screens/sign_up.dart';

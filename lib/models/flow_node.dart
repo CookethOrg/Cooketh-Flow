@@ -1,6 +1,5 @@
 import 'package:cookethflow/models/connection.dart';
 import 'package:flutter/material.dart';
-import 'package:cookethflow/core/theme/colors.dart';
 
 enum NodeType { rectangular, parallelogram, diamond, database }
 

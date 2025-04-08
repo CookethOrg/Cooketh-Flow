@@ -192,95 +192,97 @@ class _WorkspaceState extends State<Workspace> {
             ),
           ),
           backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          body: RepaintBoundary(
-            key: workProvider.repaintBoundaryKey,
-            child: Stack(
+          body: Stack(
               children: [
                 // The infinite canvas
-                InteractiveViewer(
-                  transformationController:
-                      workProvider.transformationController,
-                  minScale: 0.1, // Allow zoom out to 10%
-                  maxScale: 5.0,
-                  constrained:
-                      false, // This is critical - don't constrain the canvas
-                  boundaryMargin:
-                      EdgeInsets.all(double.infinity), // Allow infinite panning
-                  onInteractionStart: (details) {
-                    workProvider.updatePanning(true);
-                  },
-                  onInteractionUpdate: (details) {
-                    // Update provider with current scale and position for node dragging calculations
-                    final Matrix4 matrix =
-                        workProvider.transformationController.value;
-
-                    // Extract scale from the transformation matrix
-                    final scaleX = math.sqrt(
-                        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-                            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
-
-                    final translation = Offset(
-                        matrix.getTranslation().x, matrix.getTranslation().y);
-
-                    workProvider.updateScale(scaleX);
-                    workProvider.updatePosition(translation);
-                  },
-                  onInteractionEnd: (details) {
-                    // Sync final state with provider
-                    _syncWithProvider();
-                    workProvider.updatePanning(false);
-                  },
-                  child: SizedBox(
-                    // Huge size for effectively infinite canvas
-                    width: canvasDimension,
-                    height: canvasDimension,
-                    child: Stack(
-                      children: [
-                        // Background grid for better visual orientation
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: GridPainter(),
+                RepaintBoundary(
+                  key: workProvider.repaintBoundaryKey,
+                  child: InteractiveViewer(
+                    transformationController:
+                        workProvider.transformationController,
+                    minScale: 0.1, // Allow zoom out to 10%
+                    maxScale: 5.0,
+                    constrained:
+                        false, // This is critical - don't constrain the canvas
+                    boundaryMargin:
+                        EdgeInsets.all(double.infinity), // Allow infinite panning
+                    onInteractionStart: (details) {
+                      workProvider.updatePanning(true);
+                    },
+                    onInteractionUpdate: (details) {
+                      // Update provider with current scale and position for node dragging calculations
+                      final Matrix4 matrix =
+                          workProvider.transformationController.value;
+                  
+                      // Extract scale from the transformation matrix
+                      final scaleX = math.sqrt(
+                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+                              matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+                  
+                      final translation = Offset(
+                          matrix.getTranslation().x, matrix.getTranslation().y);
+                  
+                      workProvider.updateScale(scaleX);
+                      workProvider.updatePosition(translation);
+                    },
+                    onInteractionEnd: (details) {
+                      // Sync final state with provider
+                      _syncWithProvider();
+                      workProvider.updatePanning(false);
+                    },
+                    child: SizedBox(
+                      // Huge size for effectively infinite canvas
+                      width: canvasDimension,
+                      height: canvasDimension,
+                      child: Stack(
+                        children: [
+                          // Background grid for better visual orientation
+                          Positioned.fill(
+                            child: CustomPaint(
+                              painter: GridPainter(),
+                            ),
                           ),
-                        ),
-
-                        // Draw connections
-                        ...workProvider.connections.map((connection) {
-                          return CustomPaint(
-                            size: Size.infinite,
-                            painter: LinePainter(
-                              start: workProvider
-                                  .nodeList[connection.sourceNodeId]!.position,
-                              end: workProvider
-                                  .nodeList[connection.targetNodeId]!.position,
-                              sourceNodeId: connection.sourceNodeId,
-                              startPoint: connection.sourcePoint,
-                              targetNodeId: connection.targetNodeId,
-                              endPoint: connection.targetPoint,
-                              scale: workProvider.scale,
-                              connection: connection,
-                            ),
-                          );
-                        }),
-
-                        // Draw nodes
-                        ...workProvider.nodeList.entries.map((entry) {
-                          var id = entry.key;
-                          var node = entry.value;
-                          return Positioned(
-                            left: node.position.dx,
-                            top: node.position.dy,
-                            child: Node(
-                              id: id,
-                              type: node.type,
-                              onResize: (Size newSize) =>
-                                  workProvider.onResize(id, newSize),
-                              onDrag: (offset) =>
-                                  workProvider.dragNode(id, offset),
-                              position: node.position,
-                            ),
-                          );
-                        }),
-                      ],
+                  
+                          // Draw connections
+                          ...workProvider.connections.map((connection) {
+                            return CustomPaint(
+                              size: Size.infinite,
+                              painter: LinePainter(
+                                start: workProvider
+                                    .nodeList[connection.sourceNodeId]!.position,
+                                end: workProvider
+                                    .nodeList[connection.targetNodeId]!.position,
+                                sourceNodeId: connection.sourceNodeId,
+                                startPoint: connection.sourcePoint,
+                                targetNodeId: connection.targetNodeId,
+                                endPoint: connection.targetPoint,
+                                scale: workProvider.scale,
+                                connection: connection,
+                              ),
+                            );
+                          }),
+                  
+                          // Draw nodes
+                          ...workProvider.nodeList.entries.map((entry) {
+                            var id = entry.key;
+                            var node = entry.value;
+                            return Positioned(
+                              left: node.position.dx,
+                              top: node.position.dy,
+                              child: Node(
+                                id: id,
+                                type: node.type,
+                                onResize: (Size newSize) =>
+                                    workProvider.onResize(id, newSize),
+                                onDrag: (offset) =>
+                                    workProvider.dragNode(id, offset),
+                                position: node.position,
+                              ),
+                            );
+                          }
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -346,7 +348,6 @@ class _WorkspaceState extends State<Workspace> {
                 ),
               ],
             ),
-          ),
         );
       },
     );

@@ -42,9 +42,13 @@ class WorkspaceProvider extends StateHandler {
   double minScale = 0.1;
   double maxScale = 5.0;
   bool _isPanning = false;
+  final TransformationController _transformationController =
+      TransformationController();
 
   // Getters
   String get currentFlowId => _currentFlowId;
+  TransformationController get transformationController =>
+      _transformationController;
   bool get isHovered => _isHovered;
   Map<String, FlowNode> get nodeList => _nodeList;
   bool get hasSelectedNode => nodeList.values.any((node) => node.isSelected);
@@ -71,6 +75,13 @@ class WorkspaceProvider extends StateHandler {
   void updatePanning(bool val) {
     _isPanning = val;
     notifyListeners();
+  }
+
+  void setInitialize(bool val) {
+    if (_isInitialized != val) {
+      _isInitialized = val;
+      notifyListeners();
+    }
   }
 
   // Initialize the workspace with a specific flow ID
@@ -198,15 +209,17 @@ class WorkspaceProvider extends StateHandler {
             controller: nodeList[id]!.data,
             maxLines: null,
             style: TextStyle(
-              overflow: TextOverflow.ellipsis,
-              color: Colors.black,
-              fontStyle: nodeList[id]!.isItalic ? FontStyle.italic : FontStyle.normal,
-              fontWeight: nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
-              decoration: TextDecoration.combine([
-                if(nodeList[id]!.isUnderlined) TextDecoration.underline,
-                if(nodeList[id]!.isStrikeThrough) TextDecoration.lineThrough
-              ])
-            ),
+                overflow: TextOverflow.ellipsis,
+                color: Colors.black,
+                fontStyle: nodeList[id]!.isItalic
+                    ? FontStyle.italic
+                    : FontStyle.normal,
+                fontWeight:
+                    nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
+                decoration: TextDecoration.combine([
+                  if (nodeList[id]!.isUnderlined) TextDecoration.underline,
+                  if (nodeList[id]!.isStrikeThrough) TextDecoration.lineThrough
+                ])),
             cursorColor: Colors.white,
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -556,7 +569,8 @@ class WorkspaceProvider extends StateHandler {
       final text = node.data.text;
 
       String nodeShape;
-      String fill;
+      // ignore: unused_local_variable
+      String fill = '';
 
       switch (node.type) {
         case NodeType.rectangular:
@@ -742,12 +756,13 @@ class WorkspaceProvider extends StateHandler {
   Color get selectedColor =>
       selectedNode == null ? nodeColors[0] : selectedNode!.colour;
   set selectedColor(Color col) {
-      changeNodeColour(col, selectedNode!.id);
+    changeNodeColour(col, selectedNode!.id);
     notifyListeners();
   }
 
   void selectColor(Color color) {
-    selectedColor = color; // This will update the node's color if a node is selected
+    selectedColor =
+        color; // This will update the node's color if a node is selected
   }
 
   IconData selectedNodeIcon = PhosphorIconsRegular.square;
@@ -840,5 +855,11 @@ class WorkspaceProvider extends StateHandler {
         );
       },
     );
+  }
+
+  @override
+  void dispose() {
+    _transformationController.dispose();
+    super.dispose();
   }
 }

@@ -1,9 +1,11 @@
 import 'package:cookethflow/core/utils/ui_helper.dart';
+import 'package:cookethflow/core/widgets/alert_dialogues/delete_workspace.dart';
+import 'package:cookethflow/core/widgets/alert_dialogues/export_options.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
+import 'package:cookethflow/core/widgets/grid_painter.dart';
 import 'package:cookethflow/core/widgets/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbar.dart';
-import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
@@ -20,9 +22,6 @@ class Workspace extends StatefulWidget {
 }
 
 class _WorkspaceState extends State<Workspace> {
-  bool _isInitialized = false;
-  final TransformationController _transformationController =
-      TransformationController();
   // bool _isPanning = false;
 
   @override
@@ -31,12 +30,6 @@ class _WorkspaceState extends State<Workspace> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initializeWorkspace();
     });
-  }
-
-  @override
-  void dispose() {
-    _transformationController.dispose();
-    super.dispose();
   }
 
   void _initializeWorkspace() {
@@ -54,37 +47,23 @@ class _WorkspaceState extends State<Workspace> {
     // Calculate the initial offset to center the view
     // Canvas size is 100000x100000, so center is (50000, 50000)
     // Adjust the offset to center it relative to the screen size
-    final double centerX = (canvasDimension/2) - (screenSize.width / 2);
-    final double centerY = (canvasDimension/2) - (screenSize.height / 2);
+    final double centerX = (canvasDimension / 2) - (screenSize.width / 2);
+    final double centerY = (canvasDimension / 2) - (screenSize.height / 2);
 
     // Set the initial transformation matrix to center the view
     Matrix4 matrix = Matrix4.identity()
       ..translate(-centerX,
           -centerY); // Negative because we move the canvas opposite to center it
 
-    _transformationController.value = matrix;
+    workspaceProvider.transformationController.value = matrix;
 
     // Sync initial state with provider
     workspaceProvider.updatePosition(Offset(-centerX, -centerY));
     workspaceProvider.updateScale(1.0); // Default scale
     workspaceProvider.updateFlowManager();
 
-    setState(() {
-      _isInitialized = true;
-    });
+    workspaceProvider.setInitialize(true);
   }
-
-  // void _updateTransformationMatrix() {
-  //   final workspaceProvider =
-  //       Provider.of<WorkspaceProvider>(context, listen: false);
-
-  //   // Create a new matrix based on the current scale and offset
-  //   Matrix4 matrix = Matrix4.identity()
-  //     ..translate(workspaceProvider.position.dx, workspaceProvider.position.dy)
-  //     ..scale(workspaceProvider.scale);
-
-  //   _transformationController.value = matrix;
-  // }
 
   // Connect the transformation controller to the workspace provider
   void _syncWithProvider() {
@@ -92,7 +71,7 @@ class _WorkspaceState extends State<Workspace> {
         Provider.of<WorkspaceProvider>(context, listen: false);
 
     // Extract matrix values
-    final Matrix4 matrix = _transformationController.value;
+    final Matrix4 matrix = workspaceProvider.transformationController.value;
 
     // Extract scale (using proper mathematical approach to extract scale)
     final double scaleX = math.sqrt(
@@ -111,196 +90,11 @@ class _WorkspaceState extends State<Workspace> {
     workspaceProvider.updateFlowManager();
   }
 
-  // bool _isHorizontal(ConnectionPoint point) {
-  //   return point == ConnectionPoint.left || point == ConnectionPoint.right;
-  // }
-
-  // bool _isVertical(ConnectionPoint point) {
-  //   return point == ConnectionPoint.top || point == ConnectionPoint.bottom;
-  // }
-
-  void _showDeleteWorkspaceDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(
-            'Delete Workspace',
-            style:
-                TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
-          ),
-          content: Text(
-            'Are you sure you want to delete this workspace? This action cannot be undone.',
-            style: TextStyle(fontFamily: 'Frederik'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-
-                try {
-                  // final workspaceProvider =
-                  //     Provider.of<WorkspaceProvider>(context, listen: false);
-                  final flowProvider =
-                      Provider.of<FlowmanageProvider>(context, listen: false);
-
-                  await flowProvider.deleteWorkspace(widget.flowId);
-
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text('Workspace deleted successfully')));
-
-                  Navigator.of(context).pop(); // Return to dashboard
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Error deleting workspace: ${e.toString()}'),
-                    backgroundColor: Colors.red,
-                  ));
-                }
-              },
-              child: Text('Delete', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showExportOptions(
-      BuildContext context, WorkspaceProvider workProvider) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(
-            'Export Workspace',
-            style:
-                TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildExportOption(
-                context: context,
-                icon: PhosphorIconsRegular.fileCode,
-                label: 'Export as JSON',
-                onTap: () async {
-                  Navigator.pop(context);
-                  try {
-                    await workProvider.exportWorkspace(
-                        exportType: ExportType.json);
-                    _showSuccessSnackbar('JSON file exported successfully!');
-                  } catch (e) {
-                    _showErrorSnackbar('Error exporting JSON: ${e.toString()}');
-                  }
-                },
-              ),
-              SizedBox(height: 8),
-              _buildExportOption(
-                context: context,
-                icon: PhosphorIconsRegular.fileImage,
-                label: 'Export as PNG',
-                onTap: () async {
-                  Navigator.pop(context);
-                  try {
-                    await workProvider.exportWorkspace(
-                        exportType: ExportType.png);
-                    _showSuccessSnackbar('PNG file exported successfully!');
-                  } catch (e) {
-                    _showErrorSnackbar('Error exporting PNG: ${e.toString()}');
-                  }
-                },
-              ),
-              SizedBox(height: 8),
-              _buildExportOption(
-                context: context,
-                icon: PhosphorIconsRegular.fileSvg,
-                label: 'Export as SVG',
-                onTap: () async {
-                  Navigator.pop(context);
-                  try {
-                    await workProvider.exportWorkspace(
-                        exportType: ExportType.svg);
-                    _showSuccessSnackbar('SVG file exported successfully!');
-                  } catch (e) {
-                    _showErrorSnackbar('Error exporting SVG: ${e.toString()}');
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildExportOption({
-    required BuildContext context,
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      hoverColor: Colors.orange.withOpacity(0.1),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 24),
-            SizedBox(width: 12),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Frederik',
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showSuccessSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.green,
-        duration: Duration(seconds: 3),
-      ),
-    );
-  }
-
-  void _showErrorSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.red,
-        duration: Duration(seconds: 5),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(
       builder: (context, workProvider, child) {
-        if (!_isInitialized) {
+        if (!workProvider.isInitialized) {
           return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
@@ -351,7 +145,7 @@ class _WorkspaceState extends State<Workspace> {
                       hoverColor: Colors.red.withOpacity(0.1),
                       icon: Icon(PhosphorIconsRegular.trash, color: Colors.red),
                       tooltip: 'Delete Workspace',
-                      onPressed: () => _showDeleteWorkspaceDialog(context),
+                      onPressed: () => showDialog(context: context, builder: (context) => DeleteWorkspace(flowId: widget.flowId),),
                     ),
                   ),
                   Container(
@@ -360,7 +154,7 @@ class _WorkspaceState extends State<Workspace> {
                         horizontal: 16.0, vertical: 8.0),
                     child: ElevatedButton.icon(
                       onPressed: () =>
-                          _showExportOptions(context, workProvider),
+                          showDialog(context: context, builder: (context) => ExportOptions(),),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white,
                         elevation: 0,
@@ -404,7 +198,8 @@ class _WorkspaceState extends State<Workspace> {
               children: [
                 // The infinite canvas
                 InteractiveViewer(
-                  transformationController: _transformationController,
+                  transformationController:
+                      workProvider.transformationController,
                   minScale: 0.1, // Allow zoom out to 10%
                   maxScale: 5.0,
                   constrained:
@@ -416,7 +211,8 @@ class _WorkspaceState extends State<Workspace> {
                   },
                   onInteractionUpdate: (details) {
                     // Update provider with current scale and position for node dragging calculations
-                    final Matrix4 matrix = _transformationController.value;
+                    final Matrix4 matrix =
+                        workProvider.transformationController.value;
 
                     // Extract scale from the transformation matrix
                     final scaleX = math.sqrt(
@@ -446,20 +242,6 @@ class _WorkspaceState extends State<Workspace> {
                             painter: GridPainter(),
                           ),
                         ),
-
-                        // Center point indicator
-                        // Positioned(
-                        //   left: 10000,
-                        //   top: 10000,
-                        //   child: Container(
-                        //     width: 10,
-                        //     height: 10,
-                        //     decoration: BoxDecoration(
-                        //       color: Colors.red.withOpacity(0.5),
-                        //       shape: BoxShape.circle,
-                        //     ),
-                        //   ),
-                        // ),
 
                         // Draw connections
                         ...workProvider.connections.map((connection) {
@@ -543,7 +325,8 @@ class _WorkspaceState extends State<Workspace> {
                     ),
                     child: Builder(builder: (context) {
                       // Get the current matrix
-                      final matrix = _transformationController.value;
+                      final matrix =
+                          workProvider.transformationController.value;
 
                       // Extract the scale value accurately
                       final scale = math.sqrt(
@@ -568,28 +351,4 @@ class _WorkspaceState extends State<Workspace> {
       },
     );
   }
-}
-
-// Grid painter to add visual orientation to the canvas
-class GridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.grey.withOpacity(0.1)
-      // ..color = Colors.red
-      ..strokeWidth = 1;
-
-    // Draw grid lines every 100 pixels
-    const spacing = 100.0;
-    for (double i = 0; i < size.width; i += spacing) {
-      canvas.drawLine(Offset(i, 0), Offset(i, size.height), paint);
-    }
-
-    for (double i = 0; i < size.height; i += spacing) {
-      canvas.drawLine(Offset(0, i), Offset(size.width, i), paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

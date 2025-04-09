@@ -37,7 +37,7 @@ jobs:
       - name: Package using Fastforge
         run: |
           fastforge package --platform windows --targets exe
-        working-directory: build/windows/x64/release  # Adjust based on your Flutter output
+        working-directory: build/windows/x64/runner/Release  # Adjust based on your Flutter output
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4

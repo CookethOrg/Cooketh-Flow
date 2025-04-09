@@ -1,38 +1,53 @@
-name: Build Linux
+name: Linux Multi-Distro Build
 
-on: [push, workflow_dispatch]
+on: [push, pull_request]
 
 jobs:
-  build-linux:
-    runs-on: linux
+  linux-build:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        include:
+          - distro: ubuntu22.04
+            arch: x86_64
+          - distro: ubuntu20.04
+            arch: x86_64
+          - distro: debian-bookworm
+            arch: x86_64
+          - distro: fedora-latest
+            arch: x86_64
+          - distro: alpine-latest
+            arch: x86_64
+          - distro: centos-stream
+            arch: x86_64
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
-      - name: Create .env file
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
-          type .env  # For debugging (optional)
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: Build on ${{ matrix.distro }} (${{ matrix.arch }})
+        uses: uraimo/run-on-arch-action@v3
         with:
-          channel: stable
-          cache: true
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Build Windows EXE
-        run: flutter build windows --release
-      
-      - name: Package using Fastforge
-        run: fastforge package --platform windows --targets exe
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: WindowsExecutable
-          path: dist\0.1.0\cookethflow-0.1.0-windows-setup.exe
-          retention-days: 7  # Optional: Set artifact retention period
+          distro: ${{ matrix.distro }}
+          arch: ${{ matrix.arch }}
+          githubToken: ${{ github.token }}
+          setup: |
+            sudo apt-get update || true
+            sudo yum check-update || true
+            sudo apk update || true
+            
+          run: |
+            # Install build dependencies
+            if [ -f /etc/debian_version ]; then
+              sudo apt-get install -y build-essential
+            elif [ -f /etc/redhat-release ]; then
+              sudo yum install -y gcc-c++ make
+            elif [ -f /etc/alpine-release ]; then
+              sudo apk add build-base
+            fi
+            
+            # Your build commands here
+            mkdir build
+            cd build
+            cmake ..
+            make -j$(nproc)

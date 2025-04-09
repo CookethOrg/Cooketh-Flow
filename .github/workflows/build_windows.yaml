@@ -27,6 +27,9 @@ jobs:
       - name: Build Windows EXE
         run: flutter build windows --release
       
+      - name: Activate Fastforge
+        run: dart pub global activate fastforge
+      
       - name: Package using Fastforge
         run: fastforge package --platform windows --targets exe
 

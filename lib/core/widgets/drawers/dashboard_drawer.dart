@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/core/widgets/popup_box.dart';
-import 'package:cookethflow/screens/log_in.dart';
-import 'package:cookethflow/screens/sign_up.dart';
+import 'package:cookethflow/core/widgets/alert_dialogues/popup_box.dart';
+import 'package:cookethflow/screens/auth_screens/log_in.dart';
+import 'package:cookethflow/screens/auth_screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';

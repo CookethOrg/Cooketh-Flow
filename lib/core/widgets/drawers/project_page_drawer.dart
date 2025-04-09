@@ -13,15 +13,6 @@ class FloatingDrawer extends StatefulWidget {
 }
 
 class _FloatingDrawerState extends State<FloatingDrawer> {
-  bool _isHovered = false;
-
-  void setHovered(bool val) {
-    if (_isHovered != val) {
-      setState(() {
-        _isHovered = val;
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,8 +69,8 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                 : pv.isOpen
                                     ? MouseRegion(
                                         cursor: SystemMouseCursors.text,
-                                        onEnter: (event) => setHovered(true),
-                                        onExit: (event) => setHovered(false),
+                                        onEnter: (event) => pv.setHovered(true),
+                                        onExit: (event) => pv.setHovered(false),
                                         child: GestureDetector(
                                           onDoubleTap: () {
                                             if (pv.isOpen) {
@@ -96,7 +87,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                                 fontFamily: 'Frederik',
                                                 fontSize: 20,
                                                 fontWeight: FontWeight.bold,
-                                                color: _isHovered
+                                                color: pv.isHovered
                                                     ? const Color.fromARGB(
                                                         255, 81, 81, 81)
                                                     : Colors.black,
@@ -121,7 +112,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                               fontFamily: 'Frederik',
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold,
-                                              color: _isHovered
+                                              color: pv.isHovered
                                                   ? const Color.fromARGB(
                                                       255, 61, 61, 61)
                                                   : Colors.black,

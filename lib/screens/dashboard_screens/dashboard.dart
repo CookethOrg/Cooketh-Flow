@@ -1,10 +1,10 @@
 import 'package:cookethflow/core/widgets/alert_dialogues/add_project.dart';
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
-import 'package:cookethflow/core/widgets/project_card.dart';
-import 'package:cookethflow/core/widgets/add_project_card.dart';
+import 'package:cookethflow/core/widgets/cards/project_card.dart';
+import 'package:cookethflow/core/widgets/cards/add_project_card.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
-import 'package:cookethflow/screens/workspace.dart';
+import 'package:cookethflow/screens/workspace_screens/workspace.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

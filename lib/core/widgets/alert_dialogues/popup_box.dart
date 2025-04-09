@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/core/theme/colors.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

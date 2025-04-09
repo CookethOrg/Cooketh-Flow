@@ -84,6 +84,12 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+   void setHovered(bool val) {
+    if (_isHovered != val) {
+        _isHovered = val;
+    }
+  }
+
   // Initialize the workspace with a specific flow ID
   void initializeWorkspace(String flowId) {
     _currentFlowId = flowId;

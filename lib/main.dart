@@ -1,11 +1,10 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/splash_screen.dart';
+import 'package:cookethflow/screens/auth_screens/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';

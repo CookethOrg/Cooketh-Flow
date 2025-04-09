@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class LinkInsertButton extends StatelessWidget {
-  const LinkInsertButton({Key? key}) : super(key: key);
+  const LinkInsertButton({super.key});
 
   void _showCompactLinkDialog(BuildContext context) {
-    TextEditingController _linkController = TextEditingController();
+    TextEditingController linkController = TextEditingController();
 
     showDialog(
       context: context,
@@ -19,7 +19,7 @@ class LinkInsertButton extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextField(
-                    controller: _linkController,
+                    controller: linkController,
                     decoration: const InputDecoration(
                       hintText: "Paste URL",
                       border: InputBorder.none,

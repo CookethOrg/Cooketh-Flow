@@ -1,7 +1,7 @@
 import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/dashboard.dart';
-import 'package:cookethflow/screens/sign_up.dart';
+import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
+import 'package:cookethflow/screens/auth_screens/sign_up.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

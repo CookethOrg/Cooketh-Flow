@@ -398,6 +398,7 @@ class SupabaseService extends StateHandler {
           .from('User')
           .update({'profile_picture_url': publicUrl}).eq('id', user.id);
       setUserPfp(imageFile);
+      notifyListeners();
       return publicUrl;
     } catch (e) {
       print('Error uploading profile picture: $e');
@@ -433,6 +434,7 @@ class SupabaseService extends StateHandler {
             final file = File('${tempDir.path}/pfp_${user.id}.$fileExtension');
             await file.writeAsBytes(response);
             setUserPfp(XFile(file.path));
+            notifyListeners();
             return;
           } catch (e) {
             print('Error downloading profile picture: $e');

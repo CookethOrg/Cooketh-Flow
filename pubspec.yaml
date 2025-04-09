@@ -54,6 +54,10 @@ dependencies:
   file_selector: ^1.0.3
   file_selector_platform_interface: ^2.6.2
   flutter_launcher_icons: ^0.14.3
+  fastforge_workspace:
+    git:
+      url: https://github.com/TeeWrath/fastforge.git
+      ref: main
 
 dev_dependencies:
   flutter_test:

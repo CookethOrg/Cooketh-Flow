@@ -59,28 +59,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final UpdateManager _updateManager = UpdateManager();
-  bool _hasCheckedForUpdates = false;
+  // final UpdateManager _updateManager = UpdateManager();
+  // bool _hasCheckedForUpdates = false;
 
-  @override
-  void initState() {
-    super.initState();
-    // Use a post-frame callback to ensure the context is available
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkForUpdates();
-    });
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Use a post-frame callback to ensure the context is available
+  //   WidgetsBinding.instance.addPostFrameCallback((_) {
+  //     _checkForUpdates();
+  //   });
+  // }
   
-  Future<void> _checkForUpdates() async {
-    if (!_hasCheckedForUpdates) {
-      _hasCheckedForUpdates = true;
-      // Wait a short time to let the app finish initializing
-      await Future.delayed(const Duration(seconds: 3));
-      if (mounted) {
-        await _updateManager.checkAndPromptForUpdate(context);
-      }
-    }
-  }
+  // Future<void> _checkForUpdates() async {
+  //   if (!_hasCheckedForUpdates) {
+  //     _hasCheckedForUpdates = true;
+  //     // Wait a short time to let the app finish initializing
+  //     await Future.delayed(const Duration(seconds: 3));
+  //     if (mounted) {
+  //       await _updateManager.checkAndPromptForUpdate(context);
+  //     }
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {

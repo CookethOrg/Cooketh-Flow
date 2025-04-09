@@ -12,14 +12,21 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService extends StateHandler {
   late final SupabaseClient supabase;
-  SupabaseService(this.supabase) : super();
+  SupabaseService(this.supabase) {
+    _initializeUserData();
+  }
+
   late AuthResponse _userData;
   bool _userDataSet = false;
-  late XFile? _userPfp = XFile('assets/Frame 271.png');
+  XFile? _userPfp = XFile('assets/Frame 271.png');
+  String? _userName;
+  String? _email;
 
   AuthResponse get userData => _userData;
   bool get userDataSet => _userDataSet;
   XFile? get userPfp => _userPfp;
+  String? get userName => _userName;
+  String? get email => _email;
 
   void setUserData(AuthResponse user) {
     _userData = user;
@@ -30,6 +37,25 @@ class SupabaseService extends StateHandler {
   void setUserPfp(XFile? val) {
     _userPfp = val;
     notifyListeners();
+  }
+
+  void setUserName(String? name) {
+    _userName = name;
+    notifyListeners();
+  }
+
+  void setEmail(String? email) {
+    _email = email;
+    notifyListeners();
+  }
+
+  // Initialize user data on service creation
+  Future<void> _initializeUserData() async {
+    final user = supabase.auth.currentUser;
+    if (user != null) {
+      await fetchCurrentUserDetails();
+      await fetchAndSetUserProfilePicture();
+    }
   }
 
   Future<Map<String, dynamic>?> fetchCurrentUserName() async {
@@ -44,8 +70,7 @@ class SupabaseService extends StateHandler {
           .select('userName')
           .eq('id', user.id)
           .single();
-
-      print("Fetched user name: $response");
+      setUserName(response['userName']);
       return response;
     } catch (e) {
       print("Error fetching user name: $e");
@@ -55,7 +80,6 @@ class SupabaseService extends StateHandler {
 
   Future<Map<String, dynamic>?> fetchCurrentUserDetails() async {
     final user = supabase.auth.currentUser;
-
     if (user == null) {
       return null;
     }
@@ -63,8 +87,8 @@ class SupabaseService extends StateHandler {
     try {
       final response =
           await supabase.from('User').select().eq('id', user.id).single();
-
-      print("Fetched user details: $response");
+      setUserName(response['userName']);
+      setEmail(response['email']);
       return response;
     } catch (e) {
       print("Error fetching user details: $e");
@@ -72,71 +96,61 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  // Creates a template workspace with predefined nodes
   FlowManager createTemplateWorkspace() {
     double cv = (canvasDimension / 2) - 100;
     String flowId = DateTime.now().millisecondsSinceEpoch.toString();
 
-    // Create flow manager
     FlowManager flowManager = FlowManager(
       flowId: flowId,
       flowName: "Get Started with Cooketh Flow",
     );
 
-    // Create the nodes with correct text and positions
     FlowNode startNode = FlowNode(
       id: "node1",
       type: NodeType.rectangular,
       position: Offset(cv + 100, cv + 100),
-      colour: Color(0xffFAD7A0),
+      colour: const Color(0xffFAD7A0),
     );
-    // Set text for start node
     startNode.data.text = "start";
 
     FlowNode decisionNode = FlowNode(
       id: "node2",
       type: NodeType.parallelogram,
       position: Offset(cv + 300, cv + 150),
-      colour: Color(0xffFAD7A0),
+      colour: const Color(0xffFAD7A0),
     );
-    // Set text for decision node
     decisionNode.data.text = "decision node";
 
     FlowNode pageNode = FlowNode(
       id: "node3",
       type: NodeType.diamond,
       position: Offset(cv + 500, cv + 150),
-      colour: Color(0xffFAD7A0),
+      colour: const Color(0xffFAD7A0),
     );
-    // Set text for page node
     pageNode.data.text = "some page";
 
     FlowNode dbNode = FlowNode(
       id: "node4",
       type: NodeType.database,
       position: Offset(cv + 700, cv + 100),
-      colour: Color(0xffFAD7A0),
+      colour: const Color(0xffFAD7A0),
     );
-    // Set text for database node
     dbNode.data.text = "database details";
 
     FlowNode endNode = FlowNode(
       id: "node5",
       type: NodeType.rectangular,
       position: Offset(cv + 900, cv + 150),
-      colour: Color(0xffFAD7A0),
+      colour: const Color(0xffFAD7A0),
     );
-    // Set text for end node
     endNode.data.text = "end";
 
-    // Add nodes to flow manager
     flowManager.addNode(startNode);
     flowManager.addNode(decisionNode);
     flowManager.addNode(pageNode);
     flowManager.addNode(dbNode);
     flowManager.addNode(endNode);
 
-    // Create connections between nodes
     flowManager.connectNodes(
       sourceNodeId: "node1",
       targetNodeId: "node2",
@@ -174,29 +188,19 @@ class SupabaseService extends StateHandler {
     required String password,
   }) async {
     String res = "Some error occurred";
-
     try {
       if (email.isNotEmpty && userName.isNotEmpty && password.isNotEmpty) {
-        // Sign up user
         final AuthResponse authResponse = await supabase.auth.signUp(
             email: email,
             password: password,
-            emailRedirectTo: null, // Disable email verification redirect
-            data: {'userName': userName} // Store username in metadata
-            );
-
+            emailRedirectTo: null,
+            data: {'userName': userName});
         final user = authResponse.user;
         setUserData(authResponse);
-
         if (user == null) throw Exception("User signup failed.");
 
-        // Create template workspace for the new user
         FlowManager templateWorkspace = createTemplateWorkspace();
-
-        // Export the flow to JSON
         Map<String, dynamic> flowData = templateWorkspace.exportFlow();
-
-        // Create flowList with the template workspace
         Map<String, dynamic> flowListMap = {
           templateWorkspace.flowId: {
             ...flowData,
@@ -204,7 +208,6 @@ class SupabaseService extends StateHandler {
           }
         };
 
-        // Insert user data with the template workspace
         await supabase.from('User').insert({
           'id': user.id,
           'userName': userName,
@@ -212,37 +215,32 @@ class SupabaseService extends StateHandler {
           'flowList': flowListMap
         });
 
+        setUserName(userName);
+        setEmail(email);
         res = "Signed Up Successfully";
       }
     } catch (e) {
       res = e.toString();
     }
-
     return res;
   }
 
   Future<String> loginUser(
       {required String email, required String password}) async {
     String res = 'Some error occurred';
-
     try {
       if (email.isNotEmpty && password.isNotEmpty) {
-        // 🛠 Attempt login
         final AuthResponse authResponse =
             await supabase.auth.signInWithPassword(
           email: email,
           password: password,
         );
-
         final user = authResponse.user;
+        if (user == null) throw Exception('Login failed: User not found.');
 
-        if (user == null) {
-          throw Exception('Login failed: User not found.');
-        }
-
-        // ✅ Store user data for future use
         setUserData(authResponse);
-        fetchAndSetUserProfilePicture();
+        await fetchCurrentUserDetails();
+        await fetchAndSetUserProfilePicture();
 
         res = 'Logged in successfully';
         print("✅ Login Successful! User ID: ${user.id}");
@@ -259,13 +257,17 @@ class SupabaseService extends StateHandler {
       res = 'Unexpected error: ${e.toString()}';
       print("❌ Unexpected error: ${e.toString()}");
     }
-
     return res;
   }
 
   Future<void> logout() async {
     try {
       await supabase.auth.signOut();
+      _userName = null;
+      _email = null;
+      _userPfp = XFile('assets/Frame 271.png');
+      _userDataSet = false;
+      notifyListeners();
     } catch (e) {
       throw Exception('Error logging out: ${e.toString()}');
     }
@@ -274,56 +276,44 @@ class SupabaseService extends StateHandler {
   Future<void> deleteUserAccount() async {
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('No authenticated user found');
-      }
+      if (user == null) throw Exception('No authenticated user found');
 
-      // Delete user data from database first
       await supabase.from('User').delete().eq('id', user.id);
-
-      // Then delete the auth account
-      // await supabase.auth.admin.deleteUser(user.id);
-
-      // Sign out
       await supabase.auth.signOut();
+      _userName = null;
+      _email = null;
+      _userPfp = XFile('assets/Frame 271.png');
+      _userDataSet = false;
+      notifyListeners();
     } catch (e) {
       print("Error deleting account: $e");
       throw Exception('Error deleting account: ${e.toString()}');
     }
   }
 
-  // Check if the user is already logged in
   Future<bool> checkUserSession() async {
     final user = supabase.auth.currentUser;
+    if (user != null && !_userDataSet) {
+      await fetchCurrentUserDetails();
+      await fetchAndSetUserProfilePicture();
+    }
     return user != null;
   }
 
-  // Update user name in both Auth and User table
   Future<String> updateUserName({required String userName}) async {
     String res = 'Some error occurred';
-
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('No authenticated user found');
-      }
+      if (user == null) throw Exception('No authenticated user found');
+      if (userName.trim().isEmpty) throw Exception('Username cannot be empty');
 
-      // Input validation
-      if (userName.trim().isEmpty) {
-        throw Exception('Username cannot be empty');
-      }
-
-      // Update username in Auth metadata
       await supabase.auth
           .updateUser(UserAttributes(data: {'userName': userName}));
-
-      // Also update username in User table
       await supabase
           .from('User')
           .update({'userName': userName}).eq('id', user.id);
-
+      setUserName(userName);
       res = 'Username updated successfully';
-      notifyListeners(); // Notify listeners of the change
       return res;
     } catch (e) {
       res = e.toString();
@@ -331,36 +321,21 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  // Update user email (would typically require email verification)
   Future<String> updateUserEmail({required String email}) async {
     String res = 'Some error occurred';
-
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('No authenticated user found');
-      }
-
-      // Input validation
-      if (email.trim().isEmpty) {
-        throw Exception('Email cannot be empty');
-      }
-
-      // Basic email validation regex
+      if (user == null) throw Exception('No authenticated user found');
+      if (email.trim().isEmpty) throw Exception('Email cannot be empty');
       final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
       if (!emailRegex.hasMatch(email)) {
         throw Exception('Please enter a valid email address');
       }
 
-      // Update email in Auth
-      // Note: This would typically send a confirmation email
       await supabase.auth.updateUser(UserAttributes(email: email));
-
-      // Also update email in User table
       await supabase.from('User').update({'email': email}).eq('id', user.id);
-
+      setEmail(email);
       res = 'Email update requested. Please check your inbox to confirm.';
-      notifyListeners();
       return res;
     } catch (e) {
       res = e.toString();
@@ -368,35 +343,23 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  // Update user password
   Future<String> updateUserPassword({
     required String currentPassword,
     required String newPassword,
   }) async {
     String res = 'Some error occurred';
-
     try {
       final user = supabase.auth.currentUser;
-      if (user == null) {
-        throw Exception('No authenticated user found');
-      }
-
-      // Input validation
+      if (user == null) throw Exception('No authenticated user found');
       if (newPassword.length < 6) {
         throw Exception('Password must be at least 6 characters');
       }
 
-      // Verify current password by attempting to sign in
       await supabase.auth.signInWithPassword(
         email: user.email!,
         password: currentPassword,
       );
-
-      // Update the password
-      await supabase.auth.updateUser(
-        UserAttributes(password: newPassword),
-      );
-
+      await supabase.auth.updateUser(UserAttributes(password: newPassword));
       res = 'Password updated successfully';
       return res;
     } catch (AuthException) {
@@ -405,27 +368,17 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  // Add these constants at the top of your file
   final String _profileBucketName = 'profile';
   final String _defaultPfpPath = 'assets/Frame 271.png';
 
-// Add these methods to your SupabaseService class
-
-  /// Uploads user profile picture to Supabase storage
   Future<String> uploadUserProfilePicture(XFile imageFile) async {
     try {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('User not authenticated');
-
-      // Get file bytes and extension
-      // final bytes = await imageFile.readAsBytes();
       final extension = imageFile.path.split('.').last.toLowerCase();
       final mimeType = _getMimeTypeFromExtension(extension);
-
-      // Create storage path: userId/pfp.extension
       final storagePath = '${user.id}/pfp.$extension';
 
-      // First try to remove existing pfp if any
       try {
         await supabase.storage
             .from(_profileBucketName)
@@ -434,26 +387,17 @@ class SupabaseService extends StateHandler {
         print('No existing profile picture to remove');
       }
 
-      // Upload to Supabase storage
-      // final uploadResponse =
-          await supabase.storage.from(_profileBucketName).upload(
-                storagePath,
-                File(imageFile.path),
-                fileOptions: FileOptions(contentType: mimeType, upsert: true),
-              );
-
-      // Get public URL
+      await supabase.storage.from(_profileBucketName).upload(
+            storagePath,
+            File(imageFile.path),
+            fileOptions: FileOptions(contentType: mimeType, upsert: true),
+          );
       final String publicUrl =
           supabase.storage.from(_profileBucketName).getPublicUrl(storagePath);
-
-      // Update user data with the new pfp URL
       await supabase
           .from('User')
           .update({'profile_picture_url': publicUrl}).eq('id', user.id);
-
-      // Update local state
       setUserPfp(imageFile);
-
       return publicUrl;
     } catch (e) {
       print('Error uploading profile picture: $e');
@@ -461,44 +405,33 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  /// Fetches and sets user profile picture on login
   Future<void> fetchAndSetUserProfilePicture() async {
     try {
       final user = supabase.auth.currentUser;
       if (user == null) return;
 
-      // Get user data including profile picture URL
       final userData = await supabase
           .from('User')
           .select('profile_picture_url')
           .eq('id', user.id)
           .single();
-
       final String? pfpUrl = userData['profile_picture_url'];
 
       if (pfpUrl != null && pfpUrl.isNotEmpty) {
-        // Extract file extension from URL
         final uri = Uri.parse(pfpUrl);
         final pathSegments = uri.pathSegments;
         final fileName = pathSegments.last;
         final fileExtension = fileName.split('.').last.toLowerCase();
-
-        // List of supported extensions
         const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
         if (supportedExtensions.contains(fileExtension)) {
           try {
-            // Download the image with proper extension
             final response = await supabase.storage
                 .from(_profileBucketName)
                 .download('${user.id}/pfp.$fileExtension');
-
-            // Create temporary file with proper extension
             final tempDir = await getTemporaryDirectory();
             final file = File('${tempDir.path}/pfp_${user.id}.$fileExtension');
             await file.writeAsBytes(response);
-
-            // Set as XFile
             setUserPfp(XFile(file.path));
             return;
           } catch (e) {
@@ -506,8 +439,6 @@ class SupabaseService extends StateHandler {
           }
         }
       }
-
-      // Fallback to default if any step fails
       setUserPfp(XFile(_defaultPfpPath));
     } catch (e) {
       print('Error fetching profile picture: $e');
@@ -515,7 +446,6 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  /// Helper function to get MIME type from file extension
   String _getMimeTypeFromExtension(String extension) {
     switch (extension) {
       case 'jpg':

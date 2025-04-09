@@ -15,254 +15,184 @@ class DashboardDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<SupabaseService>(
       builder: (context, auth, child) {
-        return FutureBuilder(
-            future: auth.fetchCurrentUserName(),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return SizedBox();
-              } else if (snapshot.hasError) {
-                return Center(child: Text("Error: ${snapshot.error}"));
-              }
-              var user = snapshot.data;
-              return Stack(
-                children: [
-                  // Main Floating Drawer
-                  Positioned(
-                    top: 24,
-                    left: 24,
-                    child: Material(
-                      borderRadius: BorderRadius.circular(12),
-                      child: Container(
-                        width: 350,
-                        height: MediaQuery.of(context).size.height * 0.95,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.black, width: 1),
-                        ),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        return Stack(
+          children: [
+            Positioned(
+              top: 24,
+              left: 24,
+              child: Material(
+                borderRadius: BorderRadius.circular(12),
+                child: Container(
+                  width: 350,
+                  height: MediaQuery.of(context).size.height * 0.95,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.black, width: 1),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 32),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 24, vertical: 32),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceBetween, // Distributes space evenly
-                                children: [
-                                  Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: auth.userPfp != null
-                                            ? FileImage(
-                                                File(auth.userPfp!.path))
-                                            : const AssetImage(
-                                                    'assets/Frame 268.png')
-                                                as ImageProvider,
-                                      ),
-                                      SizedBox(
-                                          width:
-                                              12), // Slightly increased spacing
-                                      Text(
-                                        user?['userName'] ?? "UserName",
-                                        style: TextStyle(
-                                            fontFamily: 'Frederik',
-                                            fontSize: 20),
-                                      ),
-                                      IconButton(
-                                        onPressed: () {
-                                          // Show the ProfileDialog
-                                          showDialog(
-                                            context: context,
-                                            builder: (BuildContext context) {
-                                              return const ProfileDialog();
-                                            },
-                                          );
-                                        },
-                                        icon: Icon(
-                                          PhosphorIconsBold.caretDown,
-                                          size: 20,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  // IconButton(
-                                  //   onPressed: () {},
-                                  //   iconSize: 30,
-                                  //   icon: Icon(
-                                  //     PhosphorIconsRegular.bell,
-                                  //     color: Colors.black,
-                                  //     size: 24,
-                                  //   ),
-                                  // ),
-                                ],
-                              ),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      20), // Consistent horizontal padding
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  await auth.logout();
-                                  Navigator.of(context)
-                                      .pushReplacement(MaterialPageRoute(
-                                    builder: (context) => SignupPage(),
-                                  ));
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  fixedSize: Size(200, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  backgroundImage: auth.userPfp != null
+                                      ? FileImage(File(auth.userPfp!.path))
+                                      : const AssetImage('assets/Frame 268.png')
+                                          as ImageProvider,
+                                ),
+                                const SizedBox(width: 12),
+                                Text(
+                                  auth.userName ?? "UserName",
+                                  style: const TextStyle(
+                                      fontFamily: 'Frederik', fontSize: 20),
+                                ),
+                                IconButton(
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return const ProfileDialog();
+                                      },
+                                    );
+                                  },
+                                  icon: const Icon(
+                                    PhosphorIconsBold.caretDown,
+                                    size: 20,
                                   ),
                                 ),
-                                icon: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ),
-                                label: Text(
-                                  'Add another account',
-                                  style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                                height:
-                                    40), // Slightly increased for better spacing
-                            // Padding(
-                            //   padding: const EdgeInsets.symmetric(
-                            //       horizontal:
-                            //           20), // Consistent horizontal padding
-                            //   child: TextButton.icon(
-                            //     onPressed: () {},
-                            //     icon: Icon(
-                            //       PhosphorIconsRegular.file,
-                            //       color: Colors.black,
-                            //       size: 24,
-                            //     ),
-                            //     label: Text(
-                            //       'Drafts',
-                            //       style: TextStyle(
-                            //           fontFamily: 'Frederik',
-                            //           fontSize: 16,
-                            //           color: Colors.black),
-                            //     ),
-                            //   ),
-                            // ),
-                            // SizedBox(
-                            //     height: 16), // Increased spacing between items
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      20), // Consistent horizontal padding
-                              child: TextButton.icon(
-                                onPressed: () {},
-                                icon: Icon(
-                                  PhosphorIconsRegular.trash,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
-                                label: Text(
-                                  'Trash',
-                                  style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 16), // Increased spacing
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      20), // Consistent horizontal padding
-                              child: TextButton.icon(
-                                onPressed: () {},
-                                icon: Icon(
-                                  PhosphorIconsRegular.star,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
-                                label: Text(
-                                  'Starred',
-                                  style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ),
-                            SizedBox(height: 16), // Increased spacing
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal:
-                                      20), // Consistent horizontal padding
-                              child: TextButton.icon(
-                                onPressed: () {},
-                                icon: Icon(
-                                  PhosphorIconsRegular.gear,
-                                  color: Colors.black,
-                                  size: 24,
-                                ),
-                                label: Text(
-                                  'Settings',
-                                  style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 16,
-                                      color: Colors.black),
-                                ),
-                              ),
-                            ),
-                            Spacer(),
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 24), // Increased vertical padding
-                              child: ElevatedButton.icon(
-                                onPressed: () async {
-                                  await auth.logout();
-                                  Navigator.of(context)
-                                      .pushReplacement(MaterialPageRoute(
-                                    builder: (context) {
-                                      return LoginPage();
-                                    },
-                                  ));
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.black,
-                                  fixedSize: Size(120, 50),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                ),
-                                icon: Icon(
-                                  Icons.logout,
-                                  color: Colors.white,
-                                ),
-                                label: Text(
-                                  'Log Out',
-                                  style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: Colors.white),
-                                ),
-                              ),
+                              ],
                             ),
                           ],
                         ),
                       ),
-                    ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            await auth.logout();
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => const SignupPage()));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            fixedSize: const Size(200, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.add, color: Colors.white),
+                          label: const Text(
+                            'Add another account',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 40),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            PhosphorIconsRegular.trash,
+                            color: Colors.black,
+                            size: 24,
+                          ),
+                          label: const Text(
+                            'Trash',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            PhosphorIconsRegular.star,
+                            color: Colors.black,
+                            size: 24,
+                          ),
+                          label: const Text(
+                            'Starred',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: TextButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(
+                            PhosphorIconsRegular.gear,
+                            color: Colors.black,
+                            size: 24,
+                          ),
+                          label: const Text(
+                            'Settings',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 16,
+                                color: Colors.black),
+                          ),
+                        ),
+                      ),
+                      const Spacer(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 24),
+                        child: ElevatedButton.icon(
+                          onPressed: () async {
+                            await auth.logout();
+                            Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                    builder: (context) => const LoginPage()));
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            fixedSize: const Size(120, 50),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          icon: const Icon(Icons.logout, color: Colors.white),
+                          label: const Text(
+                            'Log Out',
+                            style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              );
-            });
+                ),
+              ),
+            ),
+          ],
+        );
       },
     );
   }

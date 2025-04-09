@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard.dart';
 import 'package:cookethflow/screens/sign_up.dart';
@@ -12,13 +13,27 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  final UpdateManager _updateManager = UpdateManager();
+  bool _hasCheckedForUpdates = false;
   @override
   void initState() {
     super.initState();
     // Use a post-frame callback to ensure the widget tree is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkUserSession();
+      _checkForUpdates();
     });
+  }
+
+  Future<void> _checkForUpdates() async {
+    if (!_hasCheckedForUpdates) {
+      _hasCheckedForUpdates = true;
+      // Wait a short time to let the app finish initializing
+      await Future.delayed(const Duration(seconds: 3));
+      if (mounted) {
+        await _updateManager.checkAndPromptForUpdate(context);
+      }
+    }
   }
 
   Future<void> _checkUserSession() async {

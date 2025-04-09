@@ -37,5 +37,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: WindowsExecutable
-          path: build/windows/x64/runner/Release
+          path: dist/0.1.0/cookethflow-0.1.0-windows-setup.exe
           retention-days: 7  # Optional: Set artifact retention period

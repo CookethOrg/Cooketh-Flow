@@ -10,23 +10,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Create .env file and display values
+      - name: Create .env file
         run: |
-          # Define variables manually, handling potential secret masking
-          $SUPABASE_URL = "${{ vars.SUPABASE_URL }}"
-          if (-not $SUPABASE_URL) { $SUPABASE_URL = "default_url" }  # Fallback for debugging
-          
-          $SUPABASE_KEY = "${{ vars.SUPABASE_KEY }}"
-          if (-not $SUPABASE_KEY) { $SUPABASE_KEY = "default_key" }  # Fallback for debugging
-          
-          # Write to .env file
-          Add-Content -Path .env -Value "SUPABASE_URL=$SUPABASE_URL"
-          Add-Content -Path .env -Value "SUPABASE_KEY=$SUPABASE_KEY"
-          
-          # Show .env file contents
-          type .env
+          echo "SUPABASE_URL=${{ vars.SUPABASE_URL }}" > .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
+          type .env  # For debugging, shows the file contents in logs
 
-      # Uncomment and adjust the remaining steps as needed
       # - name: Setup Flutter
       #   uses: subosito/flutter-action@v2
       #   with:
@@ -50,4 +39,4 @@ jobs:
       #   with:
       #     name: WindowsExecutable
       #     path: dist/0.1.0/cookethflow-0.1.0-windows-setup.exe
-      #     retention-days: 7
+      #     retention-days: 7 

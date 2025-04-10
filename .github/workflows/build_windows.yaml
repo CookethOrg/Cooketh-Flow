@@ -5,17 +5,10 @@ on: [push, workflow_dispatch]
 jobs:
   build-windows:
     runs-on: windows-latest
-    environment: .env
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Create .env file
-        run: |
-          echo "SUPABASE_URL=${{ vars.SUPABASE_URL }}" > .env
-          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
-          type .env  # For debugging, shows the file contents in logs
-
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
@@ -26,6 +19,9 @@ jobs:
         run: flutter pub get
 
       - name: Build Windows EXE
+        env:
+          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
         run: flutter build windows --release
       
       - name: Activate Fastforge
@@ -39,4 +35,4 @@ jobs:
         with:
           name: WindowsExecutable
           path: dist/0.1.0/cookethflow-0.1.0-windows-setup.exe
-          retention-days: 7 
+          retention-days: 7

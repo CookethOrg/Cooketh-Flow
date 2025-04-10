@@ -12,15 +12,18 @@ jobs:
       
       - name: Create .env file and display values
         run: |
-          # Define variables manually for debugging (replace with actual values)
+          # Define variables manually, handling potential secret masking
           $SUPABASE_URL = "${{ vars.SUPABASE_URL }}"
+          if (-not $SUPABASE_URL) { $SUPABASE_URL = "default_url" }  # Fallback for debugging
+          
           $SUPABASE_KEY = "${{ vars.SUPABASE_KEY }}"
+          if (-not $SUPABASE_KEY) { $SUPABASE_KEY = "default_key" }  # Fallback for debugging
           
           # Write to .env file
-          echo "SUPABASE_URL=$SUPABASE_URL" > .env
-          echo "SUPABASE_KEY=$SUPABASE_KEY" >> .env
+          Add-Content -Path .env -Value "SUPABASE_URL=$SUPABASE_URL"
+          Add-Content -Path .env -Value "SUPABASE_KEY=$SUPABASE_KEY"
           
-          # Display values in logs (bypassing secret masking)
+          # Display values in logs
           Write-Output "Debug: SUPABASE_URL is $SUPABASE_URL"
           Write-Output "Debug: SUPABASE_KEY is $SUPABASE_KEY"
           

@@ -5,9 +5,16 @@ on: [push, workflow_dispatch]
 jobs:
   build-windows:
     runs-on: windows-latest
+    environment: .env  # Link to the '.env' repository environment
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=${{ env.SUPABASE_URL }}" > .env
+          echo "SUPABASE_KEY=${{ env.SUPABASE_KEY }}" >> .env
+          type .env  # For debugging, shows the file contents in logs
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
@@ -18,26 +25,14 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create .env file
-        run: |
-          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" > .env
-          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
-          type .env  # For debugging (optional)
-
       - name: Build Windows EXE
-        run: |
-          flutter build windows --release
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
-
+        run: flutter build windows --release
+      
       - name: Activate Fastforge
         run: dart pub global activate fastforge
-
+      
       - name: Package using Fastforge
-        run: |
-          fastforge package --platform windows --targets exe
-        working-directory: build/windows/x64/runner/Release  # Adjust based on your Flutter output
+        run: fastforge package --platform windows --targets exe
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
@@ -45,10 +40,3 @@ jobs:
           name: WindowsExecutable
           path: dist/0.1.0/cookethflow-0.1.0-windows-setup.exe
           retention-days: 7  # Optional: Set artifact retention period
-      - name: Debug Environment
-        run: |
-          echo SUPABASE_URL=$SUPABASE_URL
-          echo SUPABASE_KEY=$SUPABASE_KEY
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}

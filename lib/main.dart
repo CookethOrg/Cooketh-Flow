@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
@@ -13,8 +15,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  String supabaseUrl = dotenv.env["SUPABASE_URL"] ?? "Url";
-  String supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? "your_api_key";
+  String supabaseUrl = dotenv.env["SUPABASE_URL"] ?? Platform.environment["SUPABASE_URL"] ?? "Url";
+  String supabaseApiKey = dotenv.env["SUPABASE_KEY"] ?? Platform.environment["SUPABASE_KEY"] ?? "your_api_key";
 
   final instance = await Supabase.initialize(
     url: supabaseUrl,

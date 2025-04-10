@@ -23,10 +23,6 @@ jobs:
           Add-Content -Path .env -Value "SUPABASE_URL=$SUPABASE_URL"
           Add-Content -Path .env -Value "SUPABASE_KEY=$SUPABASE_KEY"
           
-          # Display values in logs
-          Write-Output "Debug: SUPABASE_URL is $SUPABASE_URL"
-          Write-Output "Debug: SUPABASE_KEY is $SUPABASE_KEY"
-          
           # Show .env file contents
           type .env
 

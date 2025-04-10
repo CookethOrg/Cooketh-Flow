@@ -14,7 +14,7 @@ jobs:
         run: |
           echo "SUPABASE_URL=${{ vars.SUPABASE_URL }}" > .env
           echo "SUPABASE_KEY=${{ vars.SUPABASE_KEY }}" >> .env
-          type vars  # For debugging, shows the file contents in logs
+          type .env  # For debugging, shows the file contents in logs
 
       # - name: Setup Flutter
       #   uses: subosito/flutter-action@v2

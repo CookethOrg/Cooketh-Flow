@@ -16,27 +16,27 @@ jobs:
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" >> .env
           type .env  # For debugging, shows the file contents in logs
 
-      # - name: Setup Flutter
-      #   uses: subosito/flutter-action@v2
-      #   with:
-      #     channel: stable
-      #     cache: true
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
 
-      # - name: Install dependencies
-      #   run: flutter pub get
+      - name: Install dependencies
+        run: flutter pub get
 
-      # - name: Build Windows EXE
-      #   run: flutter build windows --release
+      - name: Build Windows EXE
+        run: flutter build windows --release
       
-      # - name: Activate Fastforge
-      #   run: dart pub global activate fastforge
+      - name: Activate Fastforge
+        run: dart pub global activate fastforge
       
-      # - name: Package using Fastforge
-      #   run: fastforge package --platform windows --targets exe
+      - name: Package using Fastforge
+        run: fastforge package --platform windows --targets exe
 
-      # - name: Upload Artifact
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: WindowsExecutable
-      #     path: dist/0.1.0/cookethflow-0.1.0-windows-setup.exe
-      #     retention-days: 7 
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: WindowsExecutable
+          path: dist/0.1.0/cookethflow-0.1.0-windows-setup.exe
+          retention-days: 7 

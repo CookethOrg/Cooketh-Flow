@@ -5,7 +5,7 @@ on: [push, workflow_dispatch]
 jobs:
   build-windows:
     runs-on: windows-latest
-    environment: .env  # Link to the '.env' repository environment
+    environment: .env
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

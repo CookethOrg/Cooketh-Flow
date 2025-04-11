@@ -50,7 +50,8 @@ class DashboardDrawer extends StatelessWidget {
                                 ),
                                 const SizedBox(width: 12),
                                 Text(
-                                  auth.userName ?? "UserName",
+                                  auth.getTruncatedText(auth.userName ?? "UserName"),
+                                  // auth.userName ?? "something",
                                   style: const TextStyle(
                                       fontFamily: 'Frederik', fontSize: 20),
                                 ),

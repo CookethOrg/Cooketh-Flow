@@ -142,10 +142,12 @@ class _ProfileDialogState extends State<ProfileDialog> {
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      Text(
-                        pv.userName ?? "John Doe",
-                        style: const TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w500),
+                      Flexible(
+                        child: Text(
+                          pv.userName ?? "John Doe",
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.w500),
+                        ),
                       ),
                       const SizedBox(width: 8),
                       IconButton(

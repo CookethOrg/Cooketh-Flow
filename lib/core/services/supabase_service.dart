@@ -49,6 +49,10 @@ class SupabaseService extends StateHandler {
     notifyListeners();
   }
 
+  String getTruncatedText(String text) {
+    return text.length > 12 ? '${text.substring(0, 12)}...' : text;
+  }
+
   // Initialize user data on service creation
   Future<void> _initializeUserData() async {
     final user = supabase.auth.currentUser;

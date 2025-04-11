@@ -4,13 +4,12 @@ import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class Node extends StatefulWidget {
+class Node extends StatelessWidget {
   const Node({
     super.key,
     required this.id,
     required this.type,
     required this.onDrag,
-    required this.position,
     required this.onResize,
   });
 
@@ -18,28 +17,6 @@ class Node extends StatefulWidget {
   final NodeType type;
   final Function(Offset) onDrag;
   final Function(Size) onResize;
-  final Offset position;
-
-  @override
-  State<Node> createState() => _NodeState();
-}
-
-class _NodeState extends State<Node> {
-  late Offset _currentPosition;
-
-  @override
-  void initState() {
-    super.initState();
-    _currentPosition = widget.position;
-  }
-
-  @override
-  void didUpdateWidget(Node oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.position != widget.position) {
-      _currentPosition = widget.position;
-    }
-  }
 
   Widget _buildResizeHandle(
       BuildContext context, ResizeHandle handle, WorkspaceProvider wp) {
@@ -47,8 +24,8 @@ class _NodeState extends State<Node> {
     final containerPadding = 20.0;
     late double left, top;
 
-    final totalWidth = wp.getWidth(widget.id) + (containerPadding * 2);
-    final totalHeight = wp.getHeight(widget.id) + (containerPadding * 2);
+    final totalWidth = wp.getWidth(id) + (containerPadding * 2);
+    final totalHeight = wp.getHeight(id) + (containerPadding * 2);
 
     switch (handle) {
       case ResizeHandle.topLeft:
@@ -77,9 +54,9 @@ class _NodeState extends State<Node> {
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onPanUpdate: (details) {
-            double newWidth = wp.getWidth(widget.id);
-            double newHeight = wp.getHeight(widget.id);
-            Offset newPosition = _currentPosition;
+            double newWidth = wp.getWidth(id);
+            double newHeight = wp.getHeight(id);
+            Offset currentPosition = wp.nodeList[id]!.position;
 
             final scaleFactor = wp.scale;
             final adjustedDeltaX = details.delta.dx / scaleFactor;
@@ -87,56 +64,50 @@ class _NodeState extends State<Node> {
 
             switch (handle) {
               case ResizeHandle.topLeft:
-                newWidth = wp.getWidth(widget.id) - adjustedDeltaX;
-                newHeight = wp.getHeight(widget.id) - adjustedDeltaY;
+                newWidth = wp.getWidth(id) - adjustedDeltaX;
+                newHeight = wp.getHeight(id) - adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  newPosition = Offset(
-                    _currentPosition.dx + adjustedDeltaX,
-                    _currentPosition.dy + adjustedDeltaY,
+                  currentPosition = Offset(
+                    currentPosition.dx + adjustedDeltaX,
+                    currentPosition.dy + adjustedDeltaY,
                   );
-                  widget.onResize(Size(newWidth, newHeight));
-                  setState(() {
-                    _currentPosition = newPosition;
-                  });
+                  wp.onResize(id, Size(newWidth, newHeight));
+                  wp.dragNode(id, currentPosition);
                 }
                 break;
               case ResizeHandle.topRight:
-                newWidth = wp.getWidth(widget.id) + adjustedDeltaX;
-                newHeight = wp.getHeight(widget.id) - adjustedDeltaY;
+                newWidth = wp.getWidth(id) + adjustedDeltaX;
+                newHeight = wp.getHeight(id) - adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  newPosition = Offset(
-                    _currentPosition.dx,
-                    _currentPosition.dy + adjustedDeltaY,
+                  currentPosition = Offset(
+                    currentPosition.dx,
+                    currentPosition.dy + adjustedDeltaY,
                   );
-                  widget.onResize(Size(newWidth, newHeight));
-                  setState(() {
-                    _currentPosition = newPosition;
-                  });
+                  wp.onResize(id, Size(newWidth, newHeight));
+                  wp.dragNode(id, currentPosition);
                 }
                 break;
               case ResizeHandle.bottomLeft:
-                newWidth = wp.getWidth(widget.id) - adjustedDeltaX;
-                newHeight = wp.getHeight(widget.id) + adjustedDeltaY;
+                newWidth = wp.getWidth(id) - adjustedDeltaX;
+                newHeight = wp.getHeight(id) + adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  newPosition = Offset(
-                    _currentPosition.dx + adjustedDeltaX,
-                    _currentPosition.dy,
+                  currentPosition = Offset(
+                    currentPosition.dx + adjustedDeltaX,
+                    currentPosition.dy,
                   );
-                  widget.onResize(Size(newWidth, newHeight));
-                  setState(() {
-                    _currentPosition = newPosition;
-                  });
+                  wp.onResize(id, Size(newWidth, newHeight));
+                  wp.dragNode(id, currentPosition);
                 }
                 break;
               case ResizeHandle.bottomRight:
-                newWidth = wp.getWidth(widget.id) + adjustedDeltaX;
-                newHeight = wp.getHeight(widget.id) + adjustedDeltaY;
+                newWidth = wp.getWidth(id) + adjustedDeltaX;
+                newHeight = wp.getHeight(id) + adjustedDeltaY;
                 if (newWidth >= 150 && newHeight >= 75) {
-                  widget.onResize(Size(newWidth, newHeight));
+                  wp.onResize(id, Size(newWidth, newHeight));
                 }
                 break;
             }
-            widget.onDrag(newPosition);
+            onDrag(currentPosition);
           },
           child: Container(
             width: handleSize,
@@ -164,8 +135,8 @@ class _NodeState extends State<Node> {
     }
   }
 
-  Widget _buildConnectionPoints(BuildContext context, ConnectionPoint point,
-      String id, WorkspaceProvider wp) {
+  Widget _buildConnectionPoints(
+      BuildContext context, ConnectionPoint point, String id, WorkspaceProvider wp) {
     if (!wp.nodeList[id]!.isConnectionPointAvailable(point)) {
       return const SizedBox.shrink();
     }
@@ -236,48 +207,47 @@ class _NodeState extends State<Node> {
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(
       builder: (context, wp, child) {
-        return GestureDetector(
-          onTap: () => wp.changeSelected(widget.id),
-          onPanStart: (details) {
-            if (!wp.nodeList[widget.id]!.isSelected) {
-              wp.changeSelected(widget.id);
-            }
-          },
-          onPanUpdate: (details) {
-            if (!wp.nodeList[widget.id]!.isSelected || wp.isPanning) return;
-        
-            final scaleFactor = wp.scale;
-            final adjustedDelta = details.delta / scaleFactor;
-            setState(() {
-              _currentPosition += adjustedDelta;
-            });
-            wp.dragNode(widget.id, _currentPosition);
-          },
-          onPanEnd: (details) {
-            widget.onDrag(_currentPosition);
-          },
-          child: Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: wp.buildNode(widget.id, widget.type),
-              ),
-              if (wp.nodeList[widget.id]!.isSelected) ...[
-                _buildResizeHandle(context, ResizeHandle.topLeft, wp),
-                _buildResizeHandle(context, ResizeHandle.topRight, wp),
-                _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
-                _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
-                _buildConnectionPoints(
-                    context, ConnectionPoint.top, widget.id, wp),
-                _buildConnectionPoints(
-                    context, ConnectionPoint.right, widget.id, wp),
-                _buildConnectionPoints(
-                    context, ConnectionPoint.bottom, widget.id, wp),
-                _buildConnectionPoints(
-                    context, ConnectionPoint.left, widget.id, wp),
-              ]
-            ],
+        final nodePosition = wp.nodeList[id]?.position ?? Offset.zero;
+        return Positioned(
+          left: nodePosition.dx,
+          top: nodePosition.dy,
+          child: GestureDetector(
+            onTap: () => wp.changeSelected(id),
+            onPanStart: (details) {
+              if (!wp.nodeList[id]!.isSelected) {
+                wp.changeSelected(id);
+              }
+            },
+            onPanUpdate: (details) {
+              if (!wp.nodeList[id]!.isSelected || wp.isPanning) return;
+
+              final scaleFactor = wp.scale;
+              final adjustedDelta = details.delta / scaleFactor;
+              final newPosition = nodePosition + adjustedDelta;
+              wp.dragNode(id, newPosition);
+            },
+            onPanEnd: (details) {
+              onDrag(nodePosition);
+            },
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: wp.buildNode(id, type),
+                ),
+                if (wp.nodeList[id]!.isSelected) ...[
+                  _buildResizeHandle(context, ResizeHandle.topLeft, wp),
+                  _buildResizeHandle(context, ResizeHandle.topRight, wp),
+                  _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
+                  _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
+                  _buildConnectionPoints(context, ConnectionPoint.top, id, wp),
+                  _buildConnectionPoints(context, ConnectionPoint.right, id, wp),
+                  _buildConnectionPoints(context, ConnectionPoint.bottom, id, wp),
+                  _buildConnectionPoints(context, ConnectionPoint.left, id, wp),
+                ]
+              ],
+            ),
           ),
         );
       },

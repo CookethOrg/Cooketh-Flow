@@ -276,7 +276,7 @@ class _WorkspaceState extends State<Workspace> {
                                     workProvider.onResize(id, newSize),
                                 onDrag: (offset) =>
                                     workProvider.dragNode(id, offset),
-                                position: node.position,
+                                // position: node.position,
                               ),
                             );
                           }

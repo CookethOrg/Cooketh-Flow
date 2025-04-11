@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
-// import 'dart:ui';
 import 'package:collection/collection.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -21,11 +20,8 @@ import 'dart:ui' as ui;
 
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-
 class WorkspaceProvider extends StateHandler {
-  // Reference to the FlowmanageProvider
   late final FlowmanageProvider fl;
-  // Reference to the current FlowManager
   late FlowManager flowManager;
   Map<String, FlowNode> _nodeList = {};
   ConnectionPointSelection? selectedConnection;
@@ -36,7 +32,7 @@ class WorkspaceProvider extends StateHandler {
   bool _isInitialized = false;
   String _currentFlowId = "";
   final GlobalKey _repaintBoundaryKey = GlobalKey();
-  double _scale = 1.0; // scaling and zoom in out
+  double _scale = 1.0;
   Offset _position = Offset.zero;
   double minScale = 0.1;
   double maxScale = 5.0;
@@ -44,7 +40,6 @@ class WorkspaceProvider extends StateHandler {
   final TransformationController _transformationController =
       TransformationController();
 
-  // Getters
   String get currentFlowId => _currentFlowId;
   TransformationController get transformationController =>
       _transformationController;
@@ -64,13 +59,11 @@ class WorkspaceProvider extends StateHandler {
   bool get isPanning => _isPanning;
 
   WorkspaceProvider(this.fl) : super() {
-    print("WorkspaceProvider initialized with flow ID: ${fl.newFlowId}");
     if (fl.newFlowId.isNotEmpty) {
       initializeWorkspace(fl.newFlowId);
     }
   }
 
-  // update panning
   void updatePanning(bool val) {
     _isPanning = val;
     notifyListeners();
@@ -83,48 +76,34 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-   void setHovered(bool val) {
+  void setHovered(bool val) {
     if (_isHovered != val) {
-        _isHovered = val;
+      _isHovered = val;
+      notifyListeners();
     }
   }
 
-  // Initialize the workspace with a specific flow ID
   void initializeWorkspace(String flowId) {
     _currentFlowId = flowId;
 
-    // Get the FlowManager for this flow ID
     if (fl.flowList.containsKey(flowId)) {
       flowManager = fl.flowList[flowId]!;
-
-      // Copy nodes from FlowManager to local _nodeList
       _nodeList = {};
       flowManager.nodes.forEach((id, node) {
         _nodeList[id] = node.copy();
       });
-
-      // Set the flow name in the controller
       flowNameController.text = flowManager.flowName;
-
-      // Restore saved scale and position
       _scale = flowManager.scale ?? 1.0;
-      _scale = _scale.clamp(0.1, 5.0); // Ensure it's within valid range
-
-      // Set initial position to center of canvas
-      // If no position is saved, default to the center (0,0 in our coordinate system)
+      _scale = _scale.clamp(0.1, 5.0);
       _position = flowManager.position ?? Offset.zero;
-
       _isInitialized = true;
       notifyListeners();
     } else {
-      print("Error: Flow ID $flowId not found in flow list");
-      // Create an empty flow if not found
       flowManager = FlowManager(flowId: flowId);
       _nodeList = {};
       flowNameController.text = "New Project";
       _scale = 1.0;
       _position = Offset.zero;
-
       _isInitialized = false;
       notifyListeners();
     }
@@ -136,12 +115,10 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void updateScale(double newScale) {
-    // Ensure scale is clamped between 0.1 (10%) and 5.0 (500%)
     _scale = newScale.clamp(0.1, 5.0);
     notifyListeners();
   }
 
-  // Set currently selected node
   set selectedNode(FlowNode? node) {
     if (node != null) {
       nodeList.forEach((key, n) {
@@ -152,12 +129,6 @@ class WorkspaceProvider extends StateHandler {
         n.isSelected = false;
       });
     }
-    notifyListeners();
-  }
-
-  // Functions ->
-  void setHover(bool val) {
-    _isHovered = val;
     notifyListeners();
   }
 
@@ -241,12 +212,9 @@ class WorkspaceProvider extends StateHandler {
 
   void selectConnection(String nodeId, ConnectionPoint connectionPoint) {
     if (selectedConnection == null) {
-      // First selection
       selectedConnection = ConnectionPointSelection(nodeId, connectionPoint);
-      print("First connection selected: Node $nodeId, Point $connectionPoint");
       notifyListeners();
     } else {
-      // Prevent connecting to the same node
       if (selectedConnection!.nodeId != nodeId) {
         bool connected = flowManager.connectNodes(
           sourceNodeId: selectedConnection!.nodeId,
@@ -256,10 +224,7 @@ class WorkspaceProvider extends StateHandler {
         );
 
         if (connected) {
-          print("Connection created between nodes");
           updateFlowManager();
-        } else {
-          print("Connection failed - points might be already in use");
         }
       }
       selectedConnection = null;
@@ -269,10 +234,10 @@ class WorkspaceProvider extends StateHandler {
 
   void onResize(String id, Size newSize) {
     if (nodeList.containsKey(id)) {
-      // Apply minimum size constraints
-      double width = newSize.width.clamp(100.0, double.infinity);
-      double height = newSize.height.clamp(50.0, double.infinity);
+      double width = newSize.width.clamp(150.0, double.infinity);
+      double height = newSize.height.clamp(75.0, double.infinity);
 
+      _saveStateForUndo();
       nodeList[id]!.size = Size(width, height);
       updateFlowManager();
       notifyListeners();
@@ -284,7 +249,7 @@ class WorkspaceProvider extends StateHandler {
       _nodeList.forEach((key, node) {
         node.isSelected = key == nodeId ? !node.isSelected : false;
       });
-      notifyListeners(); // This will trigger UI updates, and selectedColor will reflect the new node's color
+      notifyListeners();
     }
   }
 
@@ -301,78 +266,58 @@ class WorkspaceProvider extends StateHandler {
       (key, node) => MapEntry(key, node.copy()),
     )));
 
-    // Limit the undo stack size to prevent memory issues
     if (_undoStack.length > 20) {
       _undoStack.removeAt(0);
     }
   }
 
-  // Sync local _nodeList to flowManager
   void updateFlowManager() {
-    // Update nodes in the FlowManager
     flowManager.nodes.clear();
     _nodeList.forEach((id, node) {
       flowManager.nodes[id] = node.copy();
     });
-
-    // Save the current view state
     flowManager.scale = _scale;
     flowManager.position = _position;
-
-    // Save to database
     saveChanges();
   }
 
-  // Save changes to database via FlowmanageProvider
   Future<void> saveChanges() async {
     try {
       await fl.updateFlowList();
-      print("Workspace changes saved to database");
     } catch (e) {
       print("Error saving workspace changes: $e");
     }
   }
 
-  // Add a new node to the workspace
   void addNode({NodeType type = NodeType.rectangular}) {
     _saveStateForUndo();
 
-    // Generate a new unique ID
     String newId = (_nodeList.length + 1).toString();
     while (_nodeList.containsKey(newId)) {
       newId = (int.parse(newId) + 1).toString();
     }
 
-    // Create a new node with coordinates relative to center
-    // We'll use a more random distribution around the center
     FlowNode node = FlowNode(
       id: newId,
       type: type,
       position: Offset(
-        ((canvasDimension / 2) - 100) +
-            Random().nextDouble() * 300, //  49900 to 50200 range
-        ((canvasDimension / 2) - 100) +
-            Random().nextDouble() * 300, // -49900 to 50200 range
+        ((canvasDimension / 2) - 100) + Random().nextDouble() * 300,
+        ((canvasDimension / 2) - 100) + Random().nextDouble() * 300,
       ),
       colour: Color(0xffFAD7A0),
     );
 
-    // Add to local node list
     _nodeList[newId] = node;
-
-    // Update the FlowManager and save changes
     updateFlowManager();
-
     notifyListeners();
   }
 
   void dragNode(String id, Offset newPosition) {
     if (_nodeList.containsKey(id)) {
+      _saveStateForUndo();
       final node = _nodeList[id]!;
-      // final delta = newPosition - node.position;
       node.position = newPosition;
 
-      // Force update connections by removing and re-adding them
       final connectionsToUpdate = flowManager.connections
           .where((c) => c.sourceNodeId == id || c.targetNodeId == id)
           .toList();
@@ -382,39 +327,33 @@ class WorkspaceProvider extends StateHandler {
         flowManager.connections.add(connection.copy());
       }
 
+      updateFlowManager();
       notifyListeners();
     }
   }
 
   void removeSelectedNodes() {
     if (selectedNode == null) {
-      print("No node selected for removal.");
       return;
     }
 
     String nodeId = selectedNode!.id;
 
     if (!_nodeList.containsKey(nodeId)) {
-      print("Error: Node with ID $nodeId not found.");
       return;
     }
 
-    _saveStateForUndo(); // Save state before removal
+    _saveStateForUndo();
 
-    // Get all connections involving this node
     List<Connection> connectionsToRemove = [];
     for (var connection in flowManager.connections) {
-      if (connection.sourceNodeId == nodeId ||
-          connection.targetNodeId == nodeId) {
+      if (connection.sourceNodeId == nodeId || connection.targetNodeId == nodeId) {
         connectionsToRemove.add(connection);
       }
     }
 
-    // Remove each connection
     for (var connection in connectionsToRemove) {
       flowManager.connections.remove(connection);
-
-      // Clean up connection from the other node too
       String otherNodeId = connection.sourceNodeId == nodeId
           ? connection.targetNodeId
           : connection.sourceNodeId;
@@ -424,27 +363,18 @@ class WorkspaceProvider extends StateHandler {
       }
     }
 
-    // Remove the node from local list
     _nodeList.remove(nodeId);
-
-    // Remove the node from FlowManager
     flowManager.removeNode(nodeId);
-
-    // Clear selection
     selectedNode = null;
-
-    // Update the database
-    saveChanges();
+    updateFlowManager();
     notifyListeners();
-
-    print("Node and its connections removed successfully.");
   }
 
   void undo() {
     if (_undoStack.isNotEmpty) {
       _redoStack.add(Map<String, FlowNode>.from(_nodeList.map(
         (key, node) => MapEntry(key, node.copy()),
-      ))); // Save current state before undoing
+      )));
 
       _nodeList = _undoStack.removeLast();
       updateFlowManager();
@@ -468,7 +398,7 @@ class WorkspaceProvider extends StateHandler {
   bool isEditing = false;
 
   void toggleDrawer() {
-    if (!isOpen) isEditing = false; // Prevent editing when closed
+    if (!isOpen) isEditing = false;
     isOpen = !isOpen;
     notifyListeners();
   }
@@ -534,15 +464,11 @@ class WorkspaceProvider extends StateHandler {
               .exportSVG(defaultName: fileName, svgString: svgString);
           break;
       }
-
-      print("$res $fileName exported as ${exportType.toString()}");
     } catch (e) {
-      print("Error exporting workspace: $e");
       rethrow;
     }
   }
 
-// create workspace image for workspace card
   Future<dynamic> createImg() async {
     final boundary = _repaintBoundaryKey.currentContext!.findRenderObject()
         as RenderRepaintBoundary;
@@ -552,19 +478,15 @@ class WorkspaceProvider extends StateHandler {
     return byteData;
   }
 
-// SVG generation method
   String _generateSVG() {
-    // Canvas dimensions
     int width = 1000;
     int height = 800;
 
-    // SVG Header
     String svg = '''
   <svg xmlns="http://www.w3.org/2000/svg" width="$width" height="$height" viewBox="0 0 $width $height">
   <rect width="$width" height="$height" fill="white"/>
   ''';
 
-    // Add nodes to SVG
     for (var entry in nodeList.entries) {
       final node = entry.value;
       final x = node.position.dx;
@@ -574,7 +496,6 @@ class WorkspaceProvider extends StateHandler {
       final text = node.data.text;
 
       String nodeShape;
-      // ignore: unused_local_variable
       String fill = '';
 
       switch (node.type) {
@@ -584,7 +505,6 @@ class WorkspaceProvider extends StateHandler {
           fill = '#FFD8A8';
           break;
         case NodeType.diamond:
-          // Calculate diamond points
           final centerX = x + w / 2;
           final centerY = y + h / 2;
           final points =
@@ -611,31 +531,22 @@ class WorkspaceProvider extends StateHandler {
           break;
       }
 
-      // Add the node shape
       svg += nodeShape;
-
-      // Add text
       svg +=
           '<text x="${x + w / 2}" y="${y + h / 2}" font-family="Arial" font-size="14" text-anchor="middle" dominant-baseline="middle" fill="black">${_escapeXml(text)}</text>';
     }
 
-    // Add connections
     for (var connection in flowManager.connections) {
       final sourceNode = nodeList[connection.sourceNodeId]!;
       final targetNode = nodeList[connection.targetNodeId]!;
-
-      // Calculate connection points
       final sourcePoint =
           _getConnectionPointCoordinates(sourceNode, connection.sourcePoint);
       final targetPoint =
           _getConnectionPointCoordinates(targetNode, connection.targetPoint);
-
-      // Draw the connection line
       svg +=
           '<path d="M${sourcePoint.dx},${sourcePoint.dy} C${sourcePoint.dx + 50},${sourcePoint.dy} ${targetPoint.dx - 50},${targetPoint.dy} ${targetPoint.dx},${targetPoint.dy}" stroke="black" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>';
     }
 
-    // Add arrowhead marker definition
     svg += '''
   <defs>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
@@ -644,13 +555,11 @@ class WorkspaceProvider extends StateHandler {
   </defs>
   ''';
 
-    // Close SVG
     svg += '</svg>';
 
     return svg;
   }
 
-// Helper function to escape XML special characters
   String _escapeXml(String text) {
     return text
         .replaceAll('&', '&amp;')
@@ -660,7 +569,6 @@ class WorkspaceProvider extends StateHandler {
         .replaceAll("'", '&apos;');
   }
 
-// Helper to get connection point coordinates
   Offset _getConnectionPointCoordinates(FlowNode node, ConnectionPoint point) {
     final centerX = node.position.dx + (node.size.width / 2);
     final centerY = node.position.dy + (node.size.height / 2);
@@ -680,7 +588,6 @@ class WorkspaceProvider extends StateHandler {
   void removeConnection(Connection connection) {
     _saveStateForUndo();
 
-    // Remove the connection from the nodes
     if (_nodeList.containsKey(connection.sourceNodeId)) {
       _nodeList[connection.sourceNodeId]!.removeConnection(connection);
     }
@@ -688,11 +595,8 @@ class WorkspaceProvider extends StateHandler {
       _nodeList[connection.targetNodeId]!.removeConnection(connection);
     }
 
-    // Remove from the flowManager
     flowManager.connections.remove(connection);
-
-    // Update database
-    saveChanges();
+    updateFlowManager();
     notifyListeners();
   }
 
@@ -701,7 +605,6 @@ class WorkspaceProvider extends StateHandler {
     flowManager.nodes[nodeId]?.type = type;
     updateFlowManager();
     _saveStateForUndo();
-    saveChanges();
     notifyListeners();
   }
 
@@ -711,13 +614,12 @@ class WorkspaceProvider extends StateHandler {
       flowManager.nodes[nodeId]?.colour = newColour;
       updateFlowManager();
       _saveStateForUndo();
-      saveChanges();
       notifyListeners();
     }
   }
 
   NodeType getNodeTypeFromIcon(IconData nodeIcon) {
-    NodeType nodeType = NodeType.rectangular; // Default value
+    NodeType nodeType = NodeType.rectangular;
 
     switch (nodeIcon) {
       case PhosphorIconsRegular.square:
@@ -757,7 +659,6 @@ class WorkspaceProvider extends StateHandler {
     return nodeIcon;
   }
 
-  // Color selectedColor = selectedNode!.colour ?? nodeColors[0];
   Color get selectedColor =>
       selectedNode == null ? nodeColors[0] : selectedNode!.colour;
   set selectedColor(Color col) {
@@ -766,8 +667,7 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void selectColor(Color color) {
-    selectedColor =
-        color; // This will update the node's color if a node is selected
+    selectedColor = color;
   }
 
   IconData selectedNodeIcon = PhosphorIconsRegular.square;
@@ -776,12 +676,6 @@ class WorkspaceProvider extends StateHandler {
   bool isItalic = false;
   bool isUnderline = false;
   bool isStrikethrough = false;
-
-  // void selectColor(Color color) {
-  //   selectedColor = color;
-  //   changeNodeColour(color, selectedNode!.id);
-  //   notifyListeners();
-  // }
 
   void selectNode(IconData node) {
     selectedNodeIcon = node;
@@ -794,10 +688,10 @@ class WorkspaceProvider extends StateHandler {
   void toggleBold() {
     if (selectedNode != null) {
       selectedNode!.isBold = !selectedNode!.isBold;
-      updateFlowManager(); // Sync with FlowManager
-      saveChanges(); // Save to database
+      updateFlowManager();
+      saveChanges();
     }
-    isBold = !isBold; // Update local UI state
+    isBold = !isBold;
     notifyListeners();
   }
 

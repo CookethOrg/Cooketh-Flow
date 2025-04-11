@@ -1,4 +1,4 @@
-import 'package:cookethflow/models/connection.dart';
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:flutter/material.dart';
 
 class ConnectorPainter extends CustomPainter {

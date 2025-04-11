@@ -1,5 +1,5 @@
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/widgets/painters/connector_painter.dart';
-import 'package:cookethflow/models/connection.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -1,8 +1,8 @@
 import "dart:io";
 
+import "package:cookethflow/core/utils/enums.dart";
 import "package:flutter/material.dart";
 
-enum ProviderState { inital, empty, loading, loaded, success, error }
 
 class StateHandler extends ChangeNotifier {
   ProviderState state = ProviderState.inital;

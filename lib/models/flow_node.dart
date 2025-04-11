@@ -1,7 +1,6 @@
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:flutter/material.dart';
-
-enum NodeType { rectangular, parallelogram, diamond, database }
 
 class FlowNode {
   Offset position;

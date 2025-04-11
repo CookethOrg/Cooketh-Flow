@@ -1,4 +1,4 @@
-import 'package:cookethflow/models/flow_node.dart';
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';

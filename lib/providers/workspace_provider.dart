@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:collection/collection.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/core/widgets/nodes/database_node.dart';
@@ -20,8 +21,6 @@ import 'dart:ui' as ui;
 
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-// Add this enum to the file
-enum ExportType { json, png, svg }
 
 class WorkspaceProvider extends StateHandler {
   // Reference to the FlowmanageProvider

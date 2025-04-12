@@ -7,6 +7,7 @@ import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/auth_screens/splash_screen.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
@@ -20,15 +21,16 @@ Future<void> main() async {
   String supabaseApiKey;
 
   // Check if running in a production build (e.g., GitHub Actions) with environment variables
-  if (Platform.environment.containsKey('SUPABASE_URL') &&
-      Platform.environment.containsKey('SUPABASE_KEY')) {
-    supabaseUrl = Platform.environment['SUPABASE_URL']!;
-    supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
-  } else {
-    // Fallback to .env file for local development
+  if(kIsWeb || !(Platform.environment.containsKey('SUPABASE_URL') &&
+      Platform.environment.containsKey('SUPABASE_KEY'))){
+        // Fallback to .env file for local development
     await dotenv.load(fileName: '.env');
     supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
     supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
+  }
+  else {
+    supabaseUrl = Platform.environment['SUPABASE_URL']!;
+    supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
   }
 
   final instance = await Supabase.initialize(

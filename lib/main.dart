@@ -20,17 +20,19 @@ Future<void> main() async {
   String supabaseUrl;
   String supabaseApiKey;
 
-  // Check if running in a production build (e.g., GitHub Actions) with environment variables
-  if(kIsWeb || !(Platform.environment.containsKey('SUPABASE_URL') &&
-      Platform.environment.containsKey('SUPABASE_KEY'))){
-        // Fallback to .env file for local development
-    await dotenv.load(fileName: '.env');
+  if(kIsWeb){
+    await dotenv.load(fileName: './dotenv');
     supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
     supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
   }
-  else {
+  else if(Platform.environment.containsKey('SUPABASE_URL') &&
+      Platform.environment.containsKey('SUPABASE_KEY')) {
     supabaseUrl = Platform.environment['SUPABASE_URL']!;
     supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
+  }else{
+    await dotenv.load(fileName: '.env');
+    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
+    supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
   }
 
   final instance = await Supabase.initialize(

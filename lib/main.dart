@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/providers/dashboard_provider.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
@@ -61,8 +60,6 @@ Future<void> main() async {
         update: (context, flowManage, previousWorkspace) =>
             previousWorkspace ?? WorkspaceProvider(flowManage),
       ),
-      ChangeNotifierProvider<DashboardProvider>(
-          create: (_) => DashboardProvider()),
       ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
     ],
     child: const MyApp(),

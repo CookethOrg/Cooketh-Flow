@@ -1,9 +1,10 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/popup_box.dart';
 import 'package:cookethflow/screens/auth_screens/log_in.dart';
 import 'package:cookethflow/screens/auth_screens/sign_up.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -42,16 +43,52 @@ class DashboardDrawer extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                CircleAvatar(
-                                  backgroundImage: auth.userPfp != null
-                                      ? FileImage(File(auth.userPfp!.path))
-                                      : const AssetImage('assets/Frame 268.png')
-                                          as ImageProvider,
+                                ClipOval(
+                                  child: SizedBox(
+                                    width: 40,
+                                    height: 40,
+                                    child: auth.userPfp != null &&
+                                            auth.userPfp!.path !=
+                                                auth.defaultPfpPath
+                                        ? kIsWeb
+                                            ? FutureBuilder<Uint8List>(
+                                                future:
+                                                    auth.userPfp!.readAsBytes(),
+                                                builder: (context, snapshot) {
+                                                  if (snapshot.hasData) {
+                                                    return Image.memory(
+                                                      snapshot.data!,
+                                                      fit: BoxFit.cover,
+                                                      width: 40,
+                                                      height: 40,
+                                                    );
+                                                  }
+                                                  return Image.asset(
+                                                    'assets/Frame 268.png',
+                                                    fit: BoxFit.cover,
+                                                    width: 40,
+                                                    height: 40,
+                                                  );
+                                                },
+                                              )
+                                            : Image.file(
+                                                File(auth.userPfp!.path),
+                                                fit: BoxFit.cover,
+                                                width: 40,
+                                                height: 40,
+                                              )
+                                        : Image.asset(
+                                            'assets/Frame 268.png',
+                                            fit: BoxFit.cover,
+                                            width: 40,
+                                            height: 40,
+                                          ),
+                                  ),
                                 ),
                                 const SizedBox(width: 12),
                                 Text(
-                                  auth.getTruncatedText(auth.userName ?? "UserName"),
-                                  // auth.userName ?? "something",
+                                  auth.getTruncatedText(
+                                      auth.userName ?? "UserName"),
                                   style: const TextStyle(
                                       fontFamily: 'Frederik', fontSize: 20),
                                 ),

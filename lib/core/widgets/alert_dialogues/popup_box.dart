@@ -1,8 +1,9 @@
-import 'dart:io';
+import 'dart:io' show File;
 
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -79,11 +80,6 @@ class _ProfileDialogState extends State<ProfileDialog> {
                         height: 150,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          image: DecorationImage(
-                              image: pv.userPfp != null
-                                  ? FileImage(File(pv.userPfp!.path))
-                                  : const AssetImage('assets/Frame 268.png')
-                                      as ImageProvider),
                           border: Border.all(
                             color: const Color.fromARGB(255, 0, 0, 0),
                             width: 1.0,
@@ -91,6 +87,42 @@ class _ProfileDialogState extends State<ProfileDialog> {
                         ),
                         child: Stack(
                           children: [
+                            ClipOval(
+                              child: pv.userPfp != null &&
+                                      pv.userPfp!.path != pv.defaultPfpPath
+                                  ? kIsWeb
+                                      ? FutureBuilder<Uint8List>(
+                                          future: pv.userPfp!.readAsBytes(),
+                                          builder: (context, snapshot) {
+                                            if (snapshot.hasData) {
+                                              return Image.memory(
+                                                snapshot.data!,
+                                                fit: BoxFit.cover,
+                                                width: 150,
+                                                height: 150,
+                                              );
+                                            }
+                                            return Image.asset(
+                                              'assets/Frame 268.png',
+                                              fit: BoxFit.cover,
+                                              width: 150,
+                                              height: 150,
+                                            );
+                                          },
+                                        )
+                                      : Image.file(
+                                          File(pv.userPfp!.path),
+                                          fit: BoxFit.cover,
+                                          width: 150,
+                                          height: 150,
+                                        )
+                                  : Image.asset(
+                                      'assets/Frame 268.png',
+                                      fit: BoxFit.cover,
+                                      width: 150,
+                                      height: 150,
+                                    ),
+                            ),
                             Positioned(
                               right: 0,
                               bottom: 0,

@@ -7,6 +7,7 @@ import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -27,6 +28,7 @@ class SupabaseService extends StateHandler {
   XFile? get userPfp => _userPfp;
   String? get userName => _userName;
   String? get email => _email;
+  String get defaultPfpPath => _defaultPfpPath;
 
   void setUserData(AuthResponse user) {
     _userData = user;
@@ -36,6 +38,7 @@ class SupabaseService extends StateHandler {
 
   void setUserPfp(XFile? val) {
     _userPfp = val;
+    print('Updated userPfp: ${val?.name}');
     notifyListeners();
   }
 
@@ -379,28 +382,41 @@ class SupabaseService extends StateHandler {
     try {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('User not authenticated');
-      final extension = imageFile.path.split('.').last.toLowerCase();
+
+      // Get file extension and MIME type
+      final extension = imageFile.name.split('.').last.toLowerCase();
       final mimeType = _getMimeTypeFromExtension(extension);
       final storagePath = '${user.id}/pfp.$extension';
 
+      // Remove existing profile picture if it exists
       try {
         await supabase.storage
             .from(_profileBucketName)
             .remove(['${user.id}/pfp']);
       } catch (e) {
-        print('No existing profile picture to remove');
+        print('No existing profile picture to remove: $e');
       }
 
-      await supabase.storage.from(_profileBucketName).upload(
+      // Read file bytes for web compatibility
+      final bytes = await imageFile.readAsBytes();
+
+      // Upload to Supabase
+      await supabase.storage.from(_profileBucketName).uploadBinary(
             storagePath,
-            File(imageFile.path),
+            bytes,
             fileOptions: FileOptions(contentType: mimeType, upsert: true),
           );
+
+      // Get public URL
       final String publicUrl =
           supabase.storage.from(_profileBucketName).getPublicUrl(storagePath);
+
+      // Update user table with new URL
       await supabase
           .from('User')
           .update({'profile_picture_url': publicUrl}).eq('id', user.id);
+
+      // Update local state
       setUserPfp(imageFile);
       notifyListeners();
       return publicUrl;
@@ -430,25 +446,23 @@ class SupabaseService extends StateHandler {
         const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
         if (supportedExtensions.contains(fileExtension)) {
-          try {
-            final response = await supabase.storage
-                .from(_profileBucketName)
-                .download('${user.id}/pfp.$fileExtension');
-            final tempDir = await getTemporaryDirectory();
-            final file = File('${tempDir.path}/pfp_${user.id}.$fileExtension');
-            await file.writeAsBytes(response);
-            setUserPfp(XFile(file.path));
-            notifyListeners();
-            return;
-          } catch (e) {
-            print('Error downloading profile picture: $e');
-          }
+          // For web, store the URL directly instead of downloading
+          setUserPfp(XFile.fromData(
+            await http.get(Uri.parse(pfpUrl)).then((res) => res.bodyBytes),
+            name: 'pfp.$fileExtension',
+            mimeType: _getMimeTypeFromExtension(fileExtension),
+          ));
+          notifyListeners();
+          return;
         }
       }
+      // Fallback to default image
       setUserPfp(XFile(_defaultPfpPath));
+      notifyListeners();
     } catch (e) {
       print('Error fetching profile picture: $e');
       setUserPfp(XFile(_defaultPfpPath));
+      notifyListeners();
     }
   }
 

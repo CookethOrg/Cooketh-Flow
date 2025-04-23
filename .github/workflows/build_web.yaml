@@ -19,11 +19,19 @@ jobs:
           flutter-version: '3.29.2'
           channel: 'stable'
 
+      - name: Enable web support
+        run: flutter config --enable-web
+
       - name: Install dependencies
         run: flutter pub get
 
       - name: Build web
-        run: flutter build web --release
+        run: flutter build web --release --web-renderer html
+
+      - name: Debug build output
+        run: |
+          ls -la
+          ls -la build/web || echo "build/web directory not found"
 
       - name: Create or update web branch
         run: |

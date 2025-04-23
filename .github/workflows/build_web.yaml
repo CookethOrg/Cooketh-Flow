@@ -5,6 +5,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -57,18 +60,23 @@ jobs:
           mkdir -p /tmp/web-build
           cp -r build/web/* /tmp/web-build/
 
-      - name: Create or update web branch
+      - name: Debug temporary directory
+        run: |
+          echo "Temporary directory contents:"
+          ls -la /tmp/web-build/
+
+      - name: Create or update gh-pages branch
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git checkout -B web
+          git checkout -B gh-pages
           rm -rf ./*
           cp -r /tmp/web-build/* .
           git add .
-          git commit -m "Deploy web build" || echo "No changes to commit"
-          git push origin web --force
+          git commit -m "Deploy web build to gh-pages" || echo "No changes to commit"
+          git push origin gh-pages --force
 
-      - name: Debug web branch contents
+      - name: Debug gh-pages branch contents
         run: |
-          echo "Web branch contents after deployment:"
+          echo "gh-pages branch contents after deployment:"
           ls -la

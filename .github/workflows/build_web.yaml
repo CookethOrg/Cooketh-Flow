@@ -22,16 +22,40 @@ jobs:
       - name: Enable web support
         run: flutter config --enable-web
 
+      - name: Check Flutter setup
+        run: flutter doctor
+
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Verify web configuration
+        run: |
+          if [ -f "web/index.html" ]; then
+            echo "Web configuration found"
+          else
+            echo "Error: web/index.html not found. Ensure web support is enabled in your project."
+            exit 1
+          fi
+
       - name: Build web
-        run: flutter build web --release
+        run: flutter build web --release --web-renderer canvaskit
 
       - name: Debug build output
         run: |
+          echo "Current directory: $(pwd)"
           ls -la
-          ls -la build/web || echo "build/web directory not found"
+          if [ -d "build/web" ]; then
+            echo "build/web exists"
+            ls -la build/web
+          else
+            echo "Error: build/web directory not found"
+            exit 1
+          fi
+
+      - name: Copy build to temporary directory
+        run: |
+          mkdir -p /tmp/web-build
+          cp -r build/web/* /tmp/web-build/
 
       - name: Create or update web branch
         run: |
@@ -39,7 +63,12 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git checkout -B web
           rm -rf ./*
-          cp -r build/web/* .
+          cp -r /tmp/web-build/* .
           git add .
           git commit -m "Deploy web build" || echo "No changes to commit"
           git push origin web --force
+
+      - name: Debug web branch contents
+        run: |
+          echo "Web branch contents after deployment:"
+          ls -la

@@ -10,7 +10,6 @@
 .history
 .svn/
 .swiftpm/
-.env
 migrate_working_dir/
 
 # IntelliJ related
@@ -45,4 +44,3 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 /dist/
-dotenv

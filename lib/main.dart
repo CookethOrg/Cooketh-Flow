@@ -15,24 +15,23 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load .env file only in development (when environment variables are not set)
-  String supabaseUrl;
-  String supabaseApiKey;
+  String supabaseUrl = 'https://dowultdujeltbsocghrt.supabase.co';
+  // below is the public api key.
+  String supabaseApiKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImRvd3VsdGR1amVsdGJzb2NnaHJ0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzk2MjkyNzAsImV4cCI6MjA1NTIwNTI3MH0.tvkdm5klmbB4JvNPfZTcP5Z1AOtwpp1QGGvsnqwM2dk";
 
-  if(kIsWeb){
-    await dotenv.load(fileName: './dotenv');
-    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
-    supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
-  }
-  else if(Platform.environment.containsKey('SUPABASE_URL') &&
-      Platform.environment.containsKey('SUPABASE_KEY')) {
-    supabaseUrl = Platform.environment['SUPABASE_URL']!;
-    supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
-  }else{
-    await dotenv.load(fileName: '.env');
-    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
-    supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
-  }
+  // if (kIsWeb) {
+  //   await dotenv.load(fileName: './dotenv');
+  //   supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
+  //   supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
+  // } else if (Platform.environment.containsKey('SUPABASE_URL') &&
+  //     Platform.environment.containsKey('SUPABASE_KEY')) {
+  //   supabaseUrl = Platform.environment['SUPABASE_URL']!;
+  //   supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
+  // } else {
+  //   await dotenv.load(fileName: '.env');
+  //   supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
+  //   supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
+  // }
 
   final instance = await Supabase.initialize(
     url: supabaseUrl,

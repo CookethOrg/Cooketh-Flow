@@ -3,7 +3,7 @@ name: Deploy Cooketh Flow Web
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:

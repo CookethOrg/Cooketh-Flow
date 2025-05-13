@@ -9,48 +9,45 @@ class DeleteWorkspace extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Consumer<FlowmanageProvider>(
-      builder: (context, flowProvider,child) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          title: Text(
-            'Delete Workspace',
-            style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+        builder: (context, flowProvider, child) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(
+          'Delete Workspace',
+          style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+        ),
+        content: Text(
+          'Are you sure you want to delete this workspace? This action cannot be undone.',
+          style: TextStyle(fontFamily: 'Frederik'),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            child: Text('Cancel'),
           ),
-          content: Text(
-            'Are you sure you want to delete this workspace? This action cannot be undone.',
-            style: TextStyle(fontFamily: 'Frederik'),
+          TextButton(
+            onPressed: () async {
+              try {
+                await flowProvider.deleteWorkspace(flowId);
+
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Workspace deleted successfully')));
+
+                Navigator.pop(context); // Return to dashboard
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                  content: Text('Error deleting workspace: ${e.toString()}'),
+                  backgroundColor: Colors.red,
+                ));
+              }
+              Navigator.pop(context);
+            },
+            child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                Navigator.pop(context);
-        
-                try {
-        
-                  await flowProvider.deleteWorkspace(flowId);
-        
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Workspace deleted successfully')));
-        
-                  Navigator.of(context).pop(); // Return to dashboard
-                } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Error deleting workspace: ${e.toString()}'),
-                    backgroundColor: Colors.red,
-                  ));
-                }
-              },
-              child: Text('Delete', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      }
-    );
+        ],
+      );
+    });
   }
 }

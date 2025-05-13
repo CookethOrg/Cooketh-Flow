@@ -14,6 +14,8 @@ class SliderStart extends StatelessWidget {
     "assets/Group 50.png"
   ];
 
+  SliderStart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -25,7 +27,7 @@ class SliderStart extends StatelessWidget {
             options: CarouselOptions(
               height: MediaQuery.of(context).size.height,
               autoPlay: true,
-              autoPlayInterval: Duration(seconds: 3),
+              autoPlayInterval: Duration(milliseconds: 2500),
               viewportFraction: 1.0,
               enableInfiniteScroll: true,
               scrollPhysics: NeverScrollableScrollPhysics(),

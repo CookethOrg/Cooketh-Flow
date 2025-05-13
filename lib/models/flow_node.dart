@@ -103,7 +103,7 @@ class FlowNode {
   }
 
   static String _colorToJsonString(Color color) {
-    return "Color(alpha: ${color.alpha / 255}, red: ${color.red / 255}, green: ${color.green / 255}, blue: ${color.blue / 255})";
+    return "Color(alpha: ${color.a / 255}, red: ${color.r / 255}, green: ${color.g / 255}, blue: ${color.b / 255})";
   }
 
   // For deserialization

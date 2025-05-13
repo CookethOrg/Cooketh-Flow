@@ -1,11 +1,11 @@
 import 'dart:io';
-
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:file_selector/file_selector.dart';
+import 'package:flutter/foundation.dart'; // For kIsWeb
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
@@ -19,7 +19,7 @@ class SupabaseService extends StateHandler {
 
   late AuthResponse _userData;
   bool _userDataSet = false;
-  XFile? _userPfp = XFile('assets/Frame 271.png');
+  XFile? _userPfp;
   String? _userName;
   String? _email;
 
@@ -38,7 +38,7 @@ class SupabaseService extends StateHandler {
 
   void setUserPfp(XFile? val) {
     _userPfp = val;
-    print('Updated userPfp: ${val?.name}');
+    print('Updated userPfp: ${val?.path}');
     notifyListeners();
   }
 
@@ -56,7 +56,6 @@ class SupabaseService extends StateHandler {
     return text.length > 12 ? '${text.substring(0, 12)}...' : text;
   }
 
-  // Initialize user data on service creation
   Future<void> _initializeUserData() async {
     final user = supabase.auth.currentUser;
     if (user != null) {
@@ -67,9 +66,7 @@ class SupabaseService extends StateHandler {
 
   Future<Map<String, dynamic>?> fetchCurrentUserName() async {
     final user = supabase.auth.currentUser;
-    if (user == null) {
-      return null;
-    }
+    if (user == null) return null;
 
     try {
       final response = await supabase
@@ -87,9 +84,7 @@ class SupabaseService extends StateHandler {
 
   Future<Map<String, dynamic>?> fetchCurrentUserDetails() async {
     final user = supabase.auth.currentUser;
-    if (user == null) {
-      return null;
-    }
+    if (user == null) return null;
 
     try {
       final response =
@@ -272,7 +267,7 @@ class SupabaseService extends StateHandler {
       await supabase.auth.signOut();
       _userName = null;
       _email = null;
-      _userPfp = XFile('assets/Frame 271.png');
+      _userPfp = null; // Set to null to use asset in UI
       _userDataSet = false;
       notifyListeners();
     } catch (e) {
@@ -289,7 +284,7 @@ class SupabaseService extends StateHandler {
       await supabase.auth.signOut();
       _userName = null;
       _email = null;
-      _userPfp = XFile('assets/Frame 271.png');
+      _userPfp = null; // Set to null to use asset in UI
       _userDataSet = false;
       notifyListeners();
     } catch (e) {
@@ -383,12 +378,10 @@ class SupabaseService extends StateHandler {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('User not authenticated');
 
-      // Get file extension and MIME type
       final extension = imageFile.name.split('.').last.toLowerCase();
       final mimeType = _getMimeTypeFromExtension(extension);
       final storagePath = '${user.id}/pfp.$extension';
 
-      // Remove existing profile picture if it exists
       try {
         await supabase.storage
             .from(_profileBucketName)
@@ -397,28 +390,22 @@ class SupabaseService extends StateHandler {
         print('No existing profile picture to remove: $e');
       }
 
-      // Read file bytes for web compatibility
       final bytes = await imageFile.readAsBytes();
 
-      // Upload to Supabase
       await supabase.storage.from(_profileBucketName).uploadBinary(
             storagePath,
             bytes,
             fileOptions: FileOptions(contentType: mimeType, upsert: true),
           );
 
-      // Get public URL
       final String publicUrl =
           supabase.storage.from(_profileBucketName).getPublicUrl(storagePath);
 
-      // Update user table with new URL
       await supabase
           .from('User')
           .update({'profile_picture_url': publicUrl}).eq('id', user.id);
 
-      // Update local state
-      setUserPfp(imageFile);
-      notifyListeners();
+      setUserPfp(imageFile); // Use the uploaded file directly
       return publicUrl;
     } catch (e) {
       print('Error uploading profile picture: $e');
@@ -446,22 +433,32 @@ class SupabaseService extends StateHandler {
         const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
         if (supportedExtensions.contains(fileExtension)) {
-          // For web, store the URL directly instead of downloading
-          setUserPfp(XFile.fromData(
-            await http.get(Uri.parse(pfpUrl)).then((res) => res.bodyBytes),
-            name: 'pfp.$fileExtension',
-            mimeType: _getMimeTypeFromExtension(fileExtension),
-          ));
+          if (kIsWeb) {
+            // Web: Use XFile.fromData for in-memory bytes
+            final bytes = await http.get(uri).then((res) => res.bodyBytes);
+            setUserPfp(XFile.fromData(
+              bytes,
+              name: 'pfp.$fileExtension',
+              mimeType: _getMimeTypeFromExtension(fileExtension),
+            ));
+          } else {
+            // Desktop: Save to temporary file
+            final tempDir = await getTemporaryDirectory();
+            final tempFile = File('${tempDir.path}/pfp.$fileExtension');
+            final bytes = await http.get(uri).then((res) => res.bodyBytes);
+            await tempFile.writeAsBytes(bytes);
+            setUserPfp(XFile(tempFile.path));
+          }
           notifyListeners();
           return;
         }
       }
-      // Fallback to default image
-      setUserPfp(XFile(_defaultPfpPath));
+      // Fallback to null (UI should use Image.asset for default)
+      setUserPfp(null);
       notifyListeners();
     } catch (e) {
       print('Error fetching profile picture: $e');
-      setUserPfp(XFile(_defaultPfpPath));
+      setUserPfp(null);
       notifyListeners();
     }
   }

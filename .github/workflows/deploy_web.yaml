@@ -1,0 +1,90 @@
+name: Deploy Cooketh Flow Web
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.29.2'
+          channel: 'stable'
+
+      - name: Enable web support
+        run: flutter config --enable-web
+
+      - name: Check Flutter setup
+        run: flutter doctor
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create .env file for build
+        run: |
+          echo "SUPABASE_URL=$SUPABASE_URL" > .env
+          echo "SUPABASE_KEY=$SUPABASE_KEY" >> .env
+
+      - name: Verify web configuration
+        run: |
+          if [ -f "web/index.html" ]; then
+            echo "Web configuration found"
+          else
+            echo "Error: web/index.html not found. Ensure web support is enabled in your project."
+            exit 1
+          fi
+
+      - name: Build web
+        run: flutter build web --release
+
+      - name: Debug build output
+        run: |
+          echo "Current directory: $(pwd)"
+          ls -la
+          if [ -d "build/web" ]; then
+            echo "build/web exists"
+            ls -la build/web
+          else
+            echo "Error: build/web directory not found"
+            exit 1
+          fi
+
+      - name: Copy build to temporary directory
+        run: |
+          mkdir -p /tmp/web-build
+          cp -r build/web/* /tmp/web-build/
+
+      - name: Debug temporary directory
+        run: |
+          echo "Temporary directory contents:"
+          ls -la /tmp/web-build/
+
+      - name: Create or update gh-pages branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git checkout -B gh-pages
+          rm -rf ./*
+          cp -r /tmp/web-build/* .
+          git add .
+          git commit -m "Deploy web build to gh-pages" || echo "No changes to commit"
+          git push origin gh-pages --force
+
+      - name: Debug gh-pages branch contents
+        run: |
+          echo "gh-pages branch contents after deployment:"
+          ls -la

@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
@@ -15,23 +13,20 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Load .env file only in development (when environment variables are not set)
-  String supabaseUrl;
-  String supabaseApiKey;
+  late String supabaseUrl;
+  late String supabaseApiKey;
 
-  if(kIsWeb){
-    await dotenv.load(fileName: './dotenv');
-    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
-    supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
-  }
-  else if(Platform.environment.containsKey('SUPABASE_URL') &&
-      Platform.environment.containsKey('SUPABASE_KEY')) {
-    supabaseUrl = Platform.environment['SUPABASE_URL']!;
-    supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
-  }else{
+  // Load environment variables
+  if (kIsWeb || !kIsWeb) {
+    // For web and local dev, load from .env file
     await dotenv.load(fileName: '.env');
-    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'Url';
-    supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? 'your_api_key';
+    supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
+    supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? '';
+  }
+
+  // Validate environment variables
+  if (supabaseUrl.isEmpty || supabaseApiKey.isEmpty) {
+    throw Exception('SUPABASE_URL and SUPABASE_KEY must be provided in .env file');
   }
 
   final instance = await Supabase.initialize(
@@ -78,7 +73,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      home: const SplashScreen(),
     );
   }
 }

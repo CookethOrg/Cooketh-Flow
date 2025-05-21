@@ -432,12 +432,16 @@ class WorkspaceProvider extends StateHandler {
 
   Future<void> exportWorkspace({required ExportType exportType}) async {
     try {
+      // Sanitize workspace name
       String safeName = flowManager.flowName
           .replaceAll(RegExp(r'[^\w\s-]'), '')
           .replaceAll(RegExp(r'\s+'), '_');
 
       if (safeName.isEmpty) safeName = "workspace";
-      String fileName = "${safeName}_${DateTime.now().millisecondsSinceEpoch}";
+
+      // Include timestamp in file name
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      String fileName = "${safeName}_$timestamp";
 
       String res = "";
 
@@ -446,8 +450,10 @@ class WorkspaceProvider extends StateHandler {
           final Map<String, dynamic> workspaceData = flowManager.exportFlow();
           final String jsonString =
               JsonEncoder.withIndent('  ').convert(workspaceData);
-          res = await FileServices()
-              .exportFile(defaultName: fileName, jsonString: jsonString);
+          res = await FileServices().exportFile(
+            defaultName: fileName,
+            jsonString: jsonString,
+          );
           break;
 
         case ExportType.png:
@@ -459,8 +465,10 @@ class WorkspaceProvider extends StateHandler {
 
           if (byteData != null) {
             final Uint8List pngBytes = byteData.buffer.asUint8List();
-            res = await FileServices()
-                .exportPNG(defaultName: fileName, pngBytes: pngBytes);
+            res = await FileServices().exportPNG(
+              defaultName: fileName,
+              pngBytes: pngBytes,
+            );
           } else {
             throw Exception("Failed to generate PNG data");
           }
@@ -468,11 +476,18 @@ class WorkspaceProvider extends StateHandler {
 
         case ExportType.svg:
           final svgString = _generateSVG();
-          res = await FileServices()
-              .exportSVG(defaultName: fileName, svgString: svgString);
+          res = await FileServices().exportSVG(
+            defaultName: fileName,
+            svgString: svgString,
+          );
           break;
       }
+
+      if (res != 'success') {
+        throw Exception("Export failed: $res");
+      }
     } catch (e) {
+      print("Export error: $e");
       rethrow;
     }
   }
@@ -567,11 +582,11 @@ class WorkspaceProvider extends StateHandler {
 
   String _escapeXml(String text) {
     return text
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&apos;');
+        .replaceAll('&', '&')
+        .replaceAll('<', '<')
+        .replaceAll('>', '>')
+        .replaceAll('"', '"')
+        .replaceAll("'", "'");
   }
 
   Offset _getConnectionPointCoordinates(FlowNode node, ConnectionPoint point) {

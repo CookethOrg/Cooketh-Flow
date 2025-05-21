@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:cookethflow/core/services/platform_file_service.dart';
+import 'package:flutter/foundation.dart';
+import 'package:universal_html/html.dart' as html;
 
 class FileServices {
   final FileSelectorPlatform fileSelector = FileSelectorPlatform.instance;
@@ -11,38 +13,51 @@ class FileServices {
     required String jsonString,
   }) async {
     try {
-      const XTypeGroup typeGroup = XTypeGroup(
-        label: 'JSON',
-        extensions: ['json'],
-        mimeTypes: ['application/json'],
-      );
-
       // Ensure the default name ends with .json
-      if (!defaultName.toLowerCase().endsWith('.json')) {
-        defaultName = '$defaultName.json';
+      final sanitizedName = defaultName.toLowerCase().endsWith('.json')
+          ? defaultName
+          : '$defaultName.json';
+
+      if (kIsWeb) {
+        // Web: Use browser download API
+        final bytes = Uint8List.fromList(utf8.encode(jsonString));
+        final blob = html.Blob([bytes], 'application/json');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', sanitizedName)
+          ..click();
+        html.Url.revokeObjectUrl(url);
+        return 'success';
+      } else {
+        // Desktop: Use file_selector
+        const XTypeGroup typeGroup = XTypeGroup(
+          label: 'JSON',
+          extensions: ['json'],
+          mimeTypes: ['application/json'],
+        );
+
+        final String? path = await fileSelector.getSavePath(
+          acceptedTypeGroups: [typeGroup],
+          suggestedName: sanitizedName,
+        );
+
+        if (path == null) {
+          return 'Save operation cancelled';
+        }
+
+        // Ensure the selected path ends with .json
+        final String savePath =
+            path.toLowerCase().endsWith('.json') ? path : '$path.json';
+
+        final XFile file = XFile.fromData(
+          Uint8List.fromList(utf8.encode(jsonString)),
+          mimeType: 'application/json',
+          name: savePath.split('/').last,
+        );
+
+        await file.saveTo(savePath);
+        return 'success';
       }
-
-      final String? path = await fileSelector.getSavePath(
-        acceptedTypeGroups: [typeGroup],
-        suggestedName: defaultName,
-      );
-
-      if (path == null) {
-        return 'Save operation cancelled';
-      }
-
-      // Ensure the selected path ends with .json
-      final String savePath =
-          path.toLowerCase().endsWith('.json') ? path : '$path.json';
-
-      final XFile file = XFile.fromData(
-        Uint8List.fromList(utf8.encode(jsonString)),
-        mimeType: 'application/json',
-        name: savePath.split('/').last,
-      );
-
-      await file.saveTo(savePath);
-      return 'success';
     } catch (e) {
       return e.toString();
     }
@@ -53,30 +68,50 @@ class FileServices {
     required Uint8List pngBytes,
   }) async {
     try {
-      const XTypeGroup typeGroup = XTypeGroup(
-        label: 'PNG Images',
-        extensions: ['png'],
-        mimeTypes: ['image/png'],
-      );
+      // Ensure the default name ends with .png
+      final sanitizedName = defaultName.toLowerCase().endsWith('.png')
+          ? defaultName
+          : '$defaultName.png';
 
-      final String? path = await fileSelector.getSavePath(
-        acceptedTypeGroups: [typeGroup],
-        suggestedName: defaultName,
-      );
+      if (kIsWeb) {
+        // Web: Use browser download API
+        final blob = html.Blob([pngBytes], 'image/png');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', sanitizedName)
+          ..click();
+        html.Url.revokeObjectUrl(url);
+        return 'success';
+      } else {
+        // Desktop: Use file_selector
+        const XTypeGroup typeGroup = XTypeGroup(
+          label: 'PNG Images',
+          extensions: ['png'],
+          mimeTypes: ['image/png'],
+        );
 
-      if (path == null) {
-        return 'Save operation cancelled';
+        final String? path = await fileSelector.getSavePath(
+          acceptedTypeGroups: [typeGroup],
+          suggestedName: sanitizedName,
+        );
+
+        if (path == null) {
+          return 'Save operation cancelled';
+        }
+
+        // Ensure the selected path ends with .png
+        final String savePath =
+            path.toLowerCase().endsWith('.png') ? path : '$path.png';
+
+        final XFile file = XFile.fromData(
+          pngBytes,
+          mimeType: 'image/png',
+          name: savePath.split('/').last,
+        );
+
+        await file.saveTo(savePath);
+        return 'success';
       }
-
-      final XFile file = XFile.fromData(
-        pngBytes,
-        mimeType: 'image/png',
-        name: path.split('/').last,
-        path: path,
-      );
-
-      await file.saveTo(path);
-      return 'success';
     } catch (e) {
       return e.toString();
     }
@@ -87,30 +122,51 @@ class FileServices {
     required String svgString,
   }) async {
     try {
-      const XTypeGroup typeGroup = XTypeGroup(
-        label: 'SVG Images',
-        extensions: ['svg'],
-        mimeTypes: ['image/svg+xml'],
-      );
+      // Ensure the default name ends with .svg
+      final sanitizedName = defaultName.toLowerCase().endsWith('.svg')
+          ? defaultName
+          : '$defaultName.svg';
 
-      final String? path = await fileSelector.getSavePath(
-        acceptedTypeGroups: [typeGroup],
-        suggestedName: defaultName,
-      );
+      if (kIsWeb) {
+        // Web: Use browser download API
+        final bytes = Uint8List.fromList(utf8.encode(svgString));
+        final blob = html.Blob([bytes], 'image/svg+xml');
+        final url = html.Url.createObjectUrlFromBlob(blob);
+        final anchor = html.AnchorElement(href: url)
+          ..setAttribute('download', sanitizedName)
+          ..click();
+        html.Url.revokeObjectUrl(url);
+        return 'success';
+      } else {
+        // Desktop: Use file_selector
+        const XTypeGroup typeGroup = XTypeGroup(
+          label: 'SVG Images',
+          extensions: ['svg'],
+          mimeTypes: ['image/svg+xml'],
+        );
 
-      if (path == null) {
-        return 'Save operation cancelled';
+        final String? path = await fileSelector.getSavePath(
+          acceptedTypeGroups: [typeGroup],
+          suggestedName: sanitizedName,
+        );
+
+        if (path == null) {
+          return 'Save operation cancelled';
+        }
+
+        // Ensure the selected path ends with .svg
+        final String savePath =
+            path.toLowerCase().endsWith('.svg') ? path : '$path.svg';
+
+        final XFile file = XFile.fromData(
+          Uint8List.fromList(utf8.encode(svgString)),
+          mimeType: 'image/svg+xml',
+          name: savePath.split('/').last,
+        );
+
+        await file.saveTo(savePath);
+        return 'success';
       }
-
-      final XFile file = XFile.fromData(
-        Uint8List.fromList(utf8.encode(svgString)),
-        mimeType: 'image/svg+xml',
-        name: path.split('/').last,
-        path: path,
-      );
-
-      await file.saveTo(path);
-      return 'success';
     } catch (e) {
       return e.toString();
     }
@@ -126,13 +182,9 @@ class FileServices {
   }
 
   Future<XFile?> selectImages() async {
-    // For Linux, you can specify the MIME types or extensions
-    // final fileSelector = FileSelectorPlatform.instance;
     const XTypeGroup typeGroup = XTypeGroup(
       label: 'Images',
-      mimeTypes: ['image/*'], // All image types
-      // Alternatively, you can specify extensions:
-      // extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
+      mimeTypes: ['image/*'],
     );
 
     try {
@@ -141,8 +193,6 @@ class FileServices {
 
       if (file != null) {
         print('Selected file: ${file.path}');
-        // You can now read the file or display the image
-        // For example, with Image.file(File(file.path))
       }
       return file;
     } catch (e) {
@@ -152,7 +202,6 @@ class FileServices {
   }
 
   Future<XFile?> importJsonFiles() async {
-    // final fileSelector = FileSelectorPlatform.instance;
     const XTypeGroup typeGroup = XTypeGroup(
       label: 'JSON',
       mimeTypes: ['application/json'],

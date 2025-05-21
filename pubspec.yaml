@@ -61,6 +61,7 @@ dependencies:
       url: https://github.com/TeeWrath/fastforge.git
       ref: main
   go_router: ^15.1.2
+  universal_html: ^2.2.4
 
 dev_dependencies:
   flutter_test:

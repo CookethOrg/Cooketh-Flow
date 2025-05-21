@@ -1,47 +1,39 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:async';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
+import 'package:universal_html/html.dart' as html;
 
 class PlatformFileService {
   static Future<Map<String, dynamic>?> pickJSONFile() async {
     try {
       if (kIsWeb) {
-        // For web platform, we'll use a custom approach
-        // This requires the 'universal_html' package
-        return _pickFileWeb();
+        return await _pickFileWeb();
       } else {
-        // For non-web platforms
-        return _pickFileNative();
+        return await _pickFileNative();
       }
     } catch (e) {
       print("Error picking file: $e");
       return null;
     }
   }
-  
+
   static Future<Map<String, dynamic>?> _pickFileNative() async {
     try {
-      // Use flutter_document_picker which has better platform compatibility
       final path = await FlutterDocumentPicker.openDocument(
         params: FlutterDocumentPickerParams(
           allowedFileExtensions: ['json'],
-          invalidFileNameSymbols: ['/']
+          invalidFileNameSymbols: ['/'],
         ),
       );
-      
+
       if (path == null) return null;
-      
-      // Get file name from path
+
       final fileName = path.split('/').last;
-      
-      // Read file content
       final File file = File(path);
       final bytes = await file.readAsBytes();
-      
+
       return {
         'name': fileName,
         'bytes': bytes,
@@ -51,14 +43,34 @@ class PlatformFileService {
       return null;
     }
   }
-  
+
   static Future<Map<String, dynamic>?> _pickFileWeb() async {
-    // Implementation for web platforms would go here
-    // For simplicity, we'll just return a placeholder message
-    // A real implementation would use HTML FileReader API
-    throw Exception("Web file picking not implemented in this version. Please use a desktop app for file import.");
+    try {
+      final input = html.FileUploadInputElement()..accept = '.json';
+      input.click();
+
+      await input.onChange.first;
+      final files = input.files;
+      if (files == null || files.isEmpty) return null;
+
+      final file = files[0];
+      final reader = html.FileReader();
+      reader.readAsArrayBuffer(file);
+
+      await reader.onLoad.first;
+      final bytes = Uint8List.fromList(reader.result as List<int>);
+      final fileName = file.name;
+
+      return {
+        'name': fileName,
+        'bytes': bytes,
+      };
+    } catch (e) {
+      print("Web file picking error: $e");
+      return null;
+    }
   }
-  
+
   static Future<Map<String, dynamic>?> parseJSONFile(Uint8List bytes) async {
     try {
       final String content = utf8.decode(bytes);

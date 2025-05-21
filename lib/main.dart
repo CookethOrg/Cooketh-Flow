@@ -19,18 +19,10 @@ Future<void> main() async {
   // Load environment variables
   if (kIsWeb) {
     // For web, use --dart-define values
-    supabaseUrl =
-        const String.fromEnvironment('SUPABASE_URL', defaultValue: '');
-    supabaseApiKey =
-        const String.fromEnvironment('SUPABASE_KEY', defaultValue: '');
-
-    if (supabaseUrl == '' && supabaseApiKey == '') {
-      await dotenv.load(fileName: '.env');
-      supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
-      supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? '';
-    }
+    supabaseUrl = const String.fromEnvironment('SUPABASE_URL', defaultValue: '');
+    supabaseApiKey = const String.fromEnvironment('SUPABASE_KEY', defaultValue: '');
   } else {
-    // For non-web (local dev), load from .env
+    // For non-web platforms, load from .env
     await dotenv.load(fileName: '.env');
     supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
     supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? '';

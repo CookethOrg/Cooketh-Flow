@@ -141,8 +141,8 @@ class DashboardDrawer extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 40),
-                      ThemeToggle(),
-                      SizedBox(height: 16,),
+                      // ThemeToggle(),
+                      // SizedBox(height: 16,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextButton.icon(

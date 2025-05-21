@@ -22,13 +22,22 @@ class SupabaseService extends StateHandler {
   XFile? _userPfp;
   String? _userName;
   String? _email;
+  bool _isDark = false;
 
+  bool get isDark => _isDark;
   AuthResponse get userData => _userData;
   bool get userDataSet => _userDataSet;
   XFile? get userPfp => _userPfp;
   String? get userName => _userName;
   String? get email => _email;
   String get defaultPfpPath => _defaultPfpPath;
+
+  void setTheme(bool val) {
+    if (_isDark != val) {
+      _isDark = val;
+      notifyListeners();
+    }
+  }
 
   void setUserData(AuthResponse user) {
     _userData = user;

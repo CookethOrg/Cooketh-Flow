@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -30,7 +31,7 @@ class DiamondNode extends StatelessWidget {
               painter: DiamondPainter(
                 fillColor:
                     pv.nodeList[id]!.colour,
-                borderColor: Colors.black,
+                borderColor: textColor,
                 borderWidth: 1.0,
               ),
             ),
@@ -46,7 +47,7 @@ class DiamondNode extends StatelessWidget {
                   controller: tcontroller,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    color: Colors.black,
+                    color: textColor,
                     fontStyle: pv.nodeList[id]!.isItalic
                         ? FontStyle.italic
                         : FontStyle.normal,

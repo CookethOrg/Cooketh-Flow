@@ -2,6 +2,7 @@ import 'dart:io' show File;
 
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -41,11 +42,11 @@ class _ProfileDialogState extends State<ProfileDialog> {
           return const Center(child: CircularProgressIndicator());
         }
         return Dialog(
-          backgroundColor: Colors.white,
+          backgroundColor: white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16.0),
             side: const BorderSide(
-              color: Colors.black,
+              color: textColor,
               width: 2.0,
               style: BorderStyle.solid,
             ),
@@ -65,7 +66,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
                         icon: const Icon(
                           PhosphorIconsRegular.xCircle,
                           size: 40,
-                          color: Colors.black,
+                          color: textColor,
                         ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
@@ -129,7 +130,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
                               bottom: 0,
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: white,
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                       color:
@@ -284,7 +285,7 @@ void showEditDialog(BuildContext context, String attribute, String currentValue,
                   hintText: 'Enter new $attribute',
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(15),
-                    borderSide: const BorderSide(width: 1, color: Colors.black),
+                    borderSide: const BorderSide(width: 1, color: textColor),
                   ),
                   errorText: errorMessage,
                 ),

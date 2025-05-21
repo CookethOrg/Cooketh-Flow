@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/widgets/buttons/connector.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
@@ -113,7 +114,7 @@ class Node extends StatelessWidget {
             width: handleSize,
             height: handleSize,
             decoration: BoxDecoration(
-              color: Colors.blue,
+              color: selectedItems,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/routes/app_route_const.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
@@ -61,7 +62,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: white,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

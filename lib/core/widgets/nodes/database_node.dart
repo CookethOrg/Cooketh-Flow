@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -34,7 +35,7 @@ class DatabaseNode extends StatelessWidget {
                 maxLines: null,
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: Colors.black,
+                  color: textColor,
                   fontStyle: pv.nodeList[id]!.isItalic
                       ? FontStyle.italic
                       : FontStyle.normal,
@@ -49,7 +50,7 @@ class DatabaseNode extends StatelessWidget {
                         ]),
                   overflow: TextOverflow.ellipsis,
                 ),
-                cursorColor: Colors.white,
+                cursorColor: white,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   isDense: true,
@@ -74,7 +75,7 @@ class CylinderPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     final Paint outline = Paint()
-      ..color = Colors.black
+      ..color = textColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
 

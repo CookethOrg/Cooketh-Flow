@@ -2,7 +2,9 @@ import 'dart:io' show File;
 
 import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/popup_box.dart';
+import 'package:cookethflow/core/widgets/toggle/theme_toggle.dart';
 import 'package:cookethflow/screens/auth_screens/log_in.dart';
 import 'package:cookethflow/screens/auth_screens/sign_up.dart';
 import 'package:flutter/foundation.dart';
@@ -29,9 +31,9 @@ class DashboardDrawer extends StatelessWidget {
                   width: 350,
                   height: MediaQuery.of(context).size.height * 0.95,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: white,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.black, width: 1),
+                    border: Border.all(color: textColor, width: 1),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
@@ -121,31 +123,33 @@ class DashboardDrawer extends StatelessWidget {
                             context.pushReplacement(RoutesPath.signUpScreen);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
+                            backgroundColor: textColor,
                             fixedSize: const Size(200, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          icon: const Icon(Icons.add, color: Colors.white),
+                          icon: const Icon(Icons.add, color: white),
                           label: const Text(
                             'Add another account',
                             style: TextStyle(
                                 fontFamily: 'Frederik',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white),
+                                color: white),
                           ),
                         ),
                       ),
                       const SizedBox(height: 40),
+                      ThemeToggle(),
+                      SizedBox(height: 16,),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: TextButton.icon(
                           onPressed: () {},
                           icon: const Icon(
                             PhosphorIconsRegular.trash,
-                            color: Colors.black,
+                            color: textColor,
                             size: 24,
                           ),
                           label: const Text(
@@ -153,7 +157,7 @@ class DashboardDrawer extends StatelessWidget {
                             style: TextStyle(
                                 fontFamily: 'Frederik',
                                 fontSize: 16,
-                                color: Colors.black),
+                                color: textColor),
                           ),
                         ),
                       ),
@@ -164,7 +168,7 @@ class DashboardDrawer extends StatelessWidget {
                           onPressed: () {},
                           icon: const Icon(
                             PhosphorIconsRegular.star,
-                            color: Colors.black,
+                            color: textColor,
                             size: 24,
                           ),
                           label: const Text(
@@ -172,7 +176,7 @@ class DashboardDrawer extends StatelessWidget {
                             style: TextStyle(
                                 fontFamily: 'Frederik',
                                 fontSize: 16,
-                                color: Colors.black),
+                                color: textColor),
                           ),
                         ),
                       ),
@@ -183,7 +187,7 @@ class DashboardDrawer extends StatelessWidget {
                           onPressed: () {},
                           icon: const Icon(
                             PhosphorIconsRegular.gear,
-                            color: Colors.black,
+                            color: textColor,
                             size: 24,
                           ),
                           label: const Text(
@@ -191,7 +195,7 @@ class DashboardDrawer extends StatelessWidget {
                             style: TextStyle(
                                 fontFamily: 'Frederik',
                                 fontSize: 16,
-                                color: Colors.black),
+                                color: textColor),
                           ),
                         ),
                       ),
@@ -205,20 +209,20 @@ class DashboardDrawer extends StatelessWidget {
                             context.pushReplacement(RoutesPath.loginScreen);
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.black,
+                            backgroundColor: textColor,
                             fixedSize: const Size(120, 50),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          icon: const Icon(Icons.logout, color: Colors.white),
+                          icon: const Icon(Icons.logout, color: white),
                           label: const Text(
                             'Log Out',
                             style: TextStyle(
                                 fontFamily: 'Frederik',
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: Colors.white),
+                                color: white),
                           ),
                         ),
                       ),

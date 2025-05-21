@@ -1,4 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class SliderStart extends StatelessWidget {
@@ -21,7 +22,7 @@ class SliderStart extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xFFE0EFFF),
+        backgroundColor: backgroundColor,
         body: Center(
           child: CarouselSlider(
             options: CarouselOptions(
@@ -48,7 +49,7 @@ class SliderStart extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: textColor,
                       fontFamily: 'Frederik',
                     ),
                     textAlign: TextAlign.center,

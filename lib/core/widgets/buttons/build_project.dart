@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class BuildProject extends StatelessWidget {
@@ -19,7 +20,7 @@ class BuildProject extends StatelessWidget {
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1),
+          border: Border.all(color: textColor, width: 1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(

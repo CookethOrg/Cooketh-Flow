@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/routes/app_route_const.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
 import 'package:cookethflow/screens/auth_screens/log_in.dart';
@@ -35,7 +36,7 @@ class SignupForm extends StatelessWidget {
             "Create a new account",
             style: TextStyle(
               fontSize: subtitleFontSize,
-              color: Colors.grey,
+              color: gridCol,
               fontFamily: 'Frederik',
               fontWeight: FontWeight.w200,
             ),
@@ -55,7 +56,7 @@ class SignupForm extends StatelessWidget {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               hintText: 'Enter your Username',
               hintStyle: const TextStyle(
-                color: Colors.grey,
+                color: gridCol,
                 fontFamily: 'Frederik',
                 fontSize: 16,
               ),
@@ -76,7 +77,7 @@ class SignupForm extends StatelessWidget {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               hintText: 'Enter your Email Address',
               hintStyle: const TextStyle(
-                color: Colors.grey,
+                color: gridCol,
                 fontFamily: 'Frederik',
                 fontSize: 16,
               ),
@@ -98,7 +99,7 @@ class SignupForm extends StatelessWidget {
                   OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
               hintText: 'Enter your Password',
               hintStyle: const TextStyle(
-                color: Colors.grey,
+                color: gridCol,
                 fontFamily: 'Frederik',
                 fontSize: 16,
               ),
@@ -117,8 +118,8 @@ class SignupForm extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12)),
-                backgroundColor: Colors.black,
-                foregroundColor: Colors.white,
+                backgroundColor: textColor,
+                foregroundColor: white,
               ),
               onPressed: () async {
                 provider.setLoading(true);
@@ -176,7 +177,7 @@ class SignupForm extends StatelessWidget {
                 ),
                 child: const Text(
                   "Log in",
-                  style: TextStyle(color: Colors.blue, fontFamily: 'Frederik'),
+                  style: TextStyle(color: selectedItems, fontFamily: 'Frederik'),
                 ),
               ),
             ],

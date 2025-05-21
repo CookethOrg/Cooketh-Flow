@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -60,7 +61,7 @@ class _CustomPointerState extends State<CustomPointer> {
           child: Stack(
             children: [
               Positioned.fill(
-                child: Container(color: Colors.transparent),
+                child: Container(color: transparent),
               ),
 
               if (_isCursorInside)

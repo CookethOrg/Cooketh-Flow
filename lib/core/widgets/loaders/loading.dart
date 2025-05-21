@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
@@ -8,7 +9,7 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: white,
       body: Center(
         child: Consumer<LoadingProvider>(
           builder: (context, provider, child) {
@@ -16,7 +17,9 @@ class LoadingScreen extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset(
-                  provider.currentImage.isNotEmpty ? provider.currentImage : 'assets/default.png',
+                  provider.currentImage.isNotEmpty
+                      ? provider.currentImage
+                      : 'assets/default.png',
                   height: 200,
                 ),
                 const SizedBox(height: 20),
@@ -42,14 +45,14 @@ class LoadingScreen extends StatelessWidget {
                             width: double.infinity,
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: Colors.black, width: 2),
+                              border: Border.all(color: textColor, width: 2),
                             ),
                           ),
                           ClipRRect(
                             borderRadius: BorderRadius.circular(8),
                             child: LinearProgressIndicator(
                               value: provider.progress.clamp(0.0, 1.0),
-                              backgroundColor: Colors.white,
+                              backgroundColor: white,
                               color: const Color(0xFF3F79FF),
                               minHeight: 16,
                             ),

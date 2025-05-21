@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -27,7 +28,7 @@ class ParallelogramNode extends StatelessWidget {
                 width: width,
                 height: height,
                 decoration: BoxDecoration(
-                  color: Colors.black,
+                  color: textColor,
                   borderRadius: BorderRadius.circular(6),
                 ),
               ),
@@ -61,7 +62,7 @@ class ParallelogramNode extends StatelessWidget {
                           if (pv.nodeList[id]!.isStrikeThrough)
                             TextDecoration.lineThrough
                         ]),
-                        color: Colors.black,
+                        color: textColor,
                       ),
                       decoration: InputDecoration(
                         border: InputBorder.none,

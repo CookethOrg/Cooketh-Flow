@@ -32,7 +32,7 @@ jobs:
         run: flutter pub get
 
       - name: Build web
-        run: flutter build web --release --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
+        run: flutter build web --release --dart-define="SUPABASE_URL=${{ secrets.SUPABASE_URL }}" --dart-define="SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}"
 
       - name: Debug build output
         run: |

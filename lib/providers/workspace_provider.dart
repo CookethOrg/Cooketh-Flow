@@ -260,6 +260,15 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+  void deselectAllNodes() {
+    if (hasSelectedNode) {
+      _nodeList.forEach((key, node) {
+        node.isSelected = false;
+      });
+      notifyListeners();
+    }
+  }
+
   bool displayToolbox() {
     if (selectedNode != null && selectedNode!.isSelected) {
       notifyListeners();
@@ -432,14 +441,12 @@ class WorkspaceProvider extends StateHandler {
 
   Future<void> exportWorkspace({required ExportType exportType}) async {
     try {
-      // Sanitize workspace name
       String safeName = flowManager.flowName
           .replaceAll(RegExp(r'[^\w\s-]'), '')
           .replaceAll(RegExp(r'\s+'), '_');
 
       if (safeName.isEmpty) safeName = "workspace";
 
-      // Include timestamp in file name
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       String fileName = "${safeName}_$timestamp";
 

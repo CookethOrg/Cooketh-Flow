@@ -30,6 +30,9 @@ jobs:
 
       - name: Install dependencies
         run: flutter pub get
+      
+      - name: create sample .env file
+        run: touch .env
 
       - name: Build web
         run: flutter build web --release --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}

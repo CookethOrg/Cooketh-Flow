@@ -91,6 +91,7 @@ class WorkspaceProvider extends StateHandler {
       _nodeList = {};
       flowManager.nodes.forEach((id, node) {
         _nodeList[id] = node.copy();
+        debugPrint('Loaded node $id with color: #${node.colour.value.toRadixString(16).padLeft(8, '0')}');
       });
       flowNameController.text = flowManager.flowName;
       _scale = flowManager.scale ?? 1.0;
@@ -141,6 +142,7 @@ class WorkspaceProvider extends StateHandler {
 
   Widget buildNode(String id, NodeType type) {
     Widget nodeStruct;
+    final nodeColor = _nodeList[id]!.colour; // Get the node's color
 
     switch (type) {
       case NodeType.diamond:
@@ -149,6 +151,7 @@ class WorkspaceProvider extends StateHandler {
           tcontroller: nodeList[id]!.data,
           height: getHeight(id),
           width: getWidth(id),
+          // color: nodeColor, // Pass color explicitly
         );
         break;
       case NodeType.database:
@@ -157,6 +160,7 @@ class WorkspaceProvider extends StateHandler {
           controller: nodeList[id]!.data,
           height: getHeight(id),
           width: getWidth(id),
+          // color: nodeColor, // Pass color explicitly
         );
         break;
       case NodeType.parallelogram:
@@ -165,6 +169,7 @@ class WorkspaceProvider extends StateHandler {
           controller: nodeList[id]!.data,
           width: getWidth(id),
           height: getHeight(id),
+          // color: nodeColor, // Pass color explicitly
         );
         break;
       default:
@@ -173,7 +178,7 @@ class WorkspaceProvider extends StateHandler {
           height: getHeight(id),
           padding: const EdgeInsets.fromLTRB(15, 12, 15, 18),
           decoration: BoxDecoration(
-            color: _nodeList[id]!.colour,
+            color: nodeColor,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
               color: nodeList[id]!.isSelected ? Colors.blue : Colors.black,
@@ -185,17 +190,18 @@ class WorkspaceProvider extends StateHandler {
             controller: nodeList[id]!.data,
             maxLines: null,
             style: TextStyle(
-                overflow: TextOverflow.ellipsis,
-                color: Colors.black,
-                fontStyle: nodeList[id]!.isItalic
-                    ? FontStyle.italic
-                    : FontStyle.normal,
-                fontWeight:
-                    nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
-                decoration: TextDecoration.combine([
-                  if (nodeList[id]!.isUnderlined) TextDecoration.underline,
-                  if (nodeList[id]!.isStrikeThrough) TextDecoration.lineThrough
-                ])),
+              overflow: TextOverflow.ellipsis,
+              color: Colors.black,
+              fontStyle: nodeList[id]!.isItalic
+                  ? FontStyle.italic
+                  : FontStyle.normal,
+              fontWeight:
+                  nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
+              decoration: TextDecoration.combine([
+                if (nodeList[id]!.isUnderlined) TextDecoration.underline,
+                if (nodeList[id]!.isStrikeThrough) TextDecoration.lineThrough
+              ]),
+            ),
             cursorColor: Colors.white,
             decoration: const InputDecoration(
               border: InputBorder.none,
@@ -494,15 +500,14 @@ class WorkspaceProvider extends StateHandler {
       final w = node.size.width;
       final h = node.size.height;
       final text = node.data.text;
+      final fill = '#${node.colour.value.toRadixString(16).padLeft(8, '0').substring(2)}'; // Use node color
 
       String nodeShape;
-      String fill = '';
 
       switch (node.type) {
         case NodeType.rectangular:
           nodeShape =
-              '<rect x="$x" y="$y" width="$w" height="$h" rx="8" ry="8" stroke="black" stroke-width="1" fill="#FFD8A8"/>';
-          fill = '#FFD8A8';
+              '<rect x="$x" y="$y" width="$w" height="$h" rx="8" ry="8" stroke="black" stroke-width="1" fill="$fill"/>';
           break;
         case NodeType.diamond:
           final centerX = x + w / 2;
@@ -510,24 +515,21 @@ class WorkspaceProvider extends StateHandler {
           final points =
               '$centerX,$y ${x + w},$centerY $centerX,${y + h} $x,$centerY';
           nodeShape =
-              '<polygon points="$points" stroke="black" stroke-width="1" fill="#C8E6C9"/>';
-          fill = '#C8E6C9';
+              '<polygon points="$points" stroke="black" stroke-width="1" fill="$fill"/>';
           break;
         case NodeType.parallelogram:
           final offset = 20.0;
           final points =
               '${x + offset},$y ${x + w},$y ${x + w - offset},${y + h} $x,${y + h}';
           nodeShape =
-              '<polygon points="$points" stroke="black" stroke-width="1" fill="#BBDEFB"/>';
-          fill = '#BBDEFB';
+              '<polygon points="$points" stroke="black" stroke-width="1" fill="$fill"/>';
           break;
         case NodeType.database:
           nodeShape = '''
-        <ellipse cx="${x + w / 2}" cy="$y" rx="${w / 2}" ry="${h * 0.2}" stroke="black" stroke-width="1" fill="#D1C4E9"/>
-        <rect x="$x" y="$y" width="$w" height="${h * 0.8}" stroke="black" stroke-width="1" fill="#D1C4E9"/>
-        <ellipse cx="${x + w / 2}" cy="${y + h * 0.8}" rx="${w / 2}" ry="${h * 0.2}" stroke="black" stroke-width="1" fill="#D1C4E9"/>
+        <ellipse cx="${x + w / 2}" cy="$y" rx="${w / 2}" ry="${h * 0.2}" stroke="black" stroke-width="1" fill="$fill"/>
+        <rect x="$x" y="$y" width="$w" height="${h * 0.8}" stroke="black" stroke-width="1" fill="$fill"/>
+        <ellipse cx="${x + w / 2}" cy="${y + h * 0.8}" rx="${w / 2}" ry="${h * 0.2}" stroke="black" stroke-width="1" fill="$fill"/>
         ''';
-          fill = '#D1C4E9';
           break;
       }
 

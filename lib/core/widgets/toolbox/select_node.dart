@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -43,9 +44,9 @@ class _SelectNodeWidgetState extends State<SelectNode> {
       menuPadding: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.black, width: 1),
+        side: BorderSide(color: textColor, width: 1),
       ),
-      color: Colors.white,
+      color: white,
       itemBuilder: (context) {
         return [
           PopupMenuItem<IconData>(
@@ -67,7 +68,7 @@ class _SelectNodeWidgetState extends State<SelectNode> {
                         child: Icon(
                           node,
                           size: 28,
-                          color: _tempSelectedNode == node ? Colors.blue : Colors.black,
+                          color: _tempSelectedNode == node ? selectedItems : textColor,
                         ),
                       ),
                     );
@@ -80,9 +81,9 @@ class _SelectNodeWidgetState extends State<SelectNode> {
       },
       child: Row(
         children: [
-          Icon(_tempSelectedNode, size: 24, color: Colors.black),
+          Icon(_tempSelectedNode, size: 24, color: textColor),
           SizedBox(width: 4),
-          Icon(PhosphorIconsRegular.caretDown, color: Colors.black, size: 16),
+          Icon(PhosphorIconsRegular.caretDown, color: textColor, size: 16),
         ],
       ),
     );

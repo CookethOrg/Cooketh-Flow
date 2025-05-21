@@ -1,10 +1,11 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
 class GridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.grey.withOpacity(0.1)
+      ..color = gridCol.withOpacity(0.1)
       // ..color = Colors.red
       ..strokeWidth = 1;
 

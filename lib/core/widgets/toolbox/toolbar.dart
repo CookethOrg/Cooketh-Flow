@@ -1,5 +1,6 @@
 // lib/core/widgets/toolbar.dart
 
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/widgets/buttons/add_node_button.dart';
 import 'package:cookethflow/core/widgets/buttons/redo_button.dart';
@@ -23,9 +24,9 @@ class Toolbar extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.black, width: 1),
+        border: Border.all(color: textColor, width: 1),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

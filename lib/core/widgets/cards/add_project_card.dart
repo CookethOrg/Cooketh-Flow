@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -15,11 +16,10 @@ class AddProjectCard extends StatelessWidget {
         borderType: BorderType.RRect,
         radius: const Radius.circular(10),
         dashPattern: const [16, 12], // [dash length, gap length]
-        color: Colors.black,
+        color: textColor,
         strokeWidth: 2,
         child: Center(
           child: Container(
-
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
             ),
@@ -27,7 +27,7 @@ class AddProjectCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: const [
-                Icon(PhosphorIconsRegular.plus, size: 50, color: Colors.black),
+                Icon(PhosphorIconsRegular.plus, size: 50, color: textColor),
                 SizedBox(height: 8),
                 Text(
                   'Create Project',

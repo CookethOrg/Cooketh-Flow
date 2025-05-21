@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
@@ -167,7 +168,7 @@ class FlowmanageProvider extends StateHandler {
               id: "1",
               type: NodeType.rectangular,
               position: Offset(canvasDimension / 2, canvasDimension / 2),
-              colour: Color(0xffFAD7A0),
+              colour: nodeColors[0],
             )
           });
 
@@ -358,7 +359,7 @@ class FlowmanageProvider extends StateHandler {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error importing project: $e'),
-            backgroundColor: Colors.red,
+            backgroundColor: deleteButtons,
           ),
         );
       }

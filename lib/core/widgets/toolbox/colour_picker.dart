@@ -32,21 +32,21 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
       onSelected: (color) {},
       tooltip: "Change node color",
       padding: EdgeInsets.zero,
-      shadowColor: Colors.transparent,
+      shadowColor: transparent,
       offset: Offset(-80, -15),
       menuPadding: EdgeInsets.symmetric(vertical: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.black, width: 1),
+        side: BorderSide(color: textColor, width: 1),
       ),
-      color: Colors.white,
+      color: white,
       itemBuilder: (context) {
         return [
           PopupMenuItem<Color>(
             enabled: false,
             padding: EdgeInsets.zero, // Remove default padding
             child: Material(
-              color: Colors.transparent,
+              color: transparent,
               child: StatefulBuilder(
                 builder: (context, setStatePopup) {
                   return IntrinsicWidth(
@@ -80,8 +80,8 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: _tempSelectedColor == color
-                                        ? Colors.blue
-                                        : Colors.transparent,
+                                        ? selectedItems
+                                        : transparent,
                                     width: 2,
                                   ),
                                 ),
@@ -106,11 +106,11 @@ class _ColorPickerButtonState extends State<ColorPickerButton> {
             decoration: BoxDecoration(
               color: _tempSelectedColor!,
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.black, width: 1),
+              border: Border.all(color: textColor, width: 1),
             ),
           ),
           SizedBox(width: 4),
-          Icon(PhosphorIconsRegular.caretDown, color: Colors.black, size: 16),
+          Icon(PhosphorIconsRegular.caretDown, color: textColor, size: 16),
         ],
       ),
     );

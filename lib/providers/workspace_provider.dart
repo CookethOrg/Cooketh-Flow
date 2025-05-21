@@ -183,7 +183,7 @@ class WorkspaceProvider extends StateHandler {
             color: nodeColor,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color: nodeList[id]!.isSelected ? Colors.blue : Colors.black,
+              color: nodeList[id]!.isSelected ? selectedItems : textColor,
               width: nodeList[id]!.isSelected ? 2.5 : 1.0,
             ),
           ),
@@ -193,7 +193,7 @@ class WorkspaceProvider extends StateHandler {
             maxLines: null,
             style: TextStyle(
               overflow: TextOverflow.ellipsis,
-              color: Colors.black,
+              color: textColor,
               fontStyle:
                   nodeList[id]!.isItalic ? FontStyle.italic : FontStyle.normal,
               fontWeight:
@@ -203,7 +203,7 @@ class WorkspaceProvider extends StateHandler {
                 if (nodeList[id]!.isStrikeThrough) TextDecoration.lineThrough
               ]),
             ),
-            cursorColor: Colors.white,
+            cursorColor: white,
             decoration: const InputDecoration(
               border: InputBorder.none,
               isDense: true,
@@ -311,7 +311,7 @@ class WorkspaceProvider extends StateHandler {
         ((canvasDimension / 2) - 100) + Random().nextDouble() * 300,
         ((canvasDimension / 2) - 100) + Random().nextDouble() * 300,
       ),
-      colour: Color(0xffFAD7A0),
+      colour: nodeColors[0],
     );
 
     _nodeList[newId] = node;

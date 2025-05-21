@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -13,9 +14,9 @@ class CustomToolbar extends StatelessWidget {
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
       return Container(
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1),
+          border: Border.all(color: textColor, width: 1),
           borderRadius: BorderRadius.circular(12),
-          color: Colors.white,
+          color: white,
         ),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -81,7 +82,6 @@ class CustomToolbar extends StatelessWidget {
     });
   }
 
-
   Widget _toggleableButton({
     required bool isActive,
     required IconData activeIcon,
@@ -94,8 +94,8 @@ class CustomToolbar extends StatelessWidget {
       icon: Icon(
         isActive ? activeIcon : inactiveIcon,
         // inactiveIcon,
-        color: isActive ? Colors.blue : Colors.black,
-        // color: Colors.black.withOpacity(0.5),
+        color: isActive ? selectedItems : textColor,
+        // color: textColor.withOpacity(0.5),
       ),
       onPressed: onPressed,
     );
@@ -105,7 +105,7 @@ class CustomToolbar extends StatelessWidget {
     return Container(
       width: 24,
       height: 1,
-      color: Colors.black,
+      color: textColor,
       margin: EdgeInsets.symmetric(vertical: 8),
     );
   }

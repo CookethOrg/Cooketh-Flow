@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/delete_workspace.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/export_options.dart';
@@ -112,13 +113,13 @@ class _WorkspaceState extends State<Workspace> {
               decoration: const BoxDecoration(
                 border: Border(
                   bottom: BorderSide(
-                    color: Colors.black,
+                    color: textColor,
                     width: 1.0,
                   ),
                 ),
               ),
               child: AppBar(
-                backgroundColor: Colors.transparent,
+                backgroundColor: transparent,
                 elevation: 0,
                 toolbarHeight: 80,
                 centerTitle: true,
@@ -126,7 +127,7 @@ class _WorkspaceState extends State<Workspace> {
                   workProvider.flowManager.flowName,
                   style: const TextStyle(
                     fontFamily: 'Frederik',
-                    color: Colors.black,
+                    color: textColor,
                     fontSize: 20,
                   ),
                 ),
@@ -134,7 +135,7 @@ class _WorkspaceState extends State<Workspace> {
                   alignment: Alignment.center,
                   child: IconButton(
                     padding: const EdgeInsets.only(left: 16.0),
-                    icon: const Icon(Icons.arrow_back, color: Colors.black),
+                    icon: const Icon(Icons.arrow_back, color: textColor),
                     onPressed: () => context.push(RoutesPath.dashboard),
                   ),
                 ),
@@ -144,10 +145,15 @@ class _WorkspaceState extends State<Workspace> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 8.0, vertical: 8.0),
                     child: IconButton(
-                      hoverColor: Colors.red.withOpacity(0.1),
-                      icon: Icon(PhosphorIconsRegular.trash, color: Colors.red),
+                      hoverColor: deleteButtons.withOpacity(0.1),
+                      icon: Icon(PhosphorIconsRegular.trash,
+                          color: deleteButtons),
                       tooltip: 'Delete Workspace',
-                      onPressed: () => showDialog(context: context, builder: (context) => DeleteWorkspace(flowId: widget.flowId),),
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) =>
+                            DeleteWorkspace(flowId: widget.flowId),
+                      ),
                     ),
                   ),
                   Container(
@@ -155,25 +161,27 @@ class _WorkspaceState extends State<Workspace> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 16.0, vertical: 8.0),
                     child: ElevatedButton.icon(
-                      onPressed: () =>
-                          showDialog(context: context, builder: (context) => ExportOptions(),),
+                      onPressed: () => showDialog(
+                        context: context,
+                        builder: (context) => ExportOptions(),
+                      ),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white,
+                        backgroundColor: white,
                         elevation: 0,
-                        overlayColor: Colors.orange.withOpacity(0.1),
+                        overlayColor: mainOrange.withOpacity(0.1),
                         padding: const EdgeInsets.symmetric(
                             horizontal: 28, vertical: 18),
-                        side: const BorderSide(color: Colors.black, width: 1),
+                        side: const BorderSide(color: textColor, width: 1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        shadowColor: Colors.transparent,
+                        shadowColor: transparent,
                       ),
                       icon: Padding(
                         padding: const EdgeInsets.only(right: 12.0),
                         child: PhosphorIcon(
                           PhosphorIcons.export(),
-                          color: Colors.black,
+                          color: textColor,
                           size: 20,
                         ),
                       ),
@@ -182,7 +190,7 @@ class _WorkspaceState extends State<Workspace> {
                         style: const TextStyle(
                           fontFamily: 'Frederik',
                           fontSize: 16,
-                          color: Colors.black,
+                          color: textColor,
                           fontWeight: FontWeight.w500,
                           letterSpacing: 0.3,
                         ),
@@ -193,163 +201,161 @@ class _WorkspaceState extends State<Workspace> {
               ),
             ),
           ),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+          backgroundColor: white,
           body: Stack(
-              children: [
-                // The infinite canvas
-                RepaintBoundary(
-                  key: workProvider.repaintBoundaryKey,
-                  child: InteractiveViewer(
-                    transformationController:
-                        workProvider.transformationController,
-                    minScale: 0.1, // Allow zoom out to 10%
-                    maxScale: 5.0,
-                    constrained:
-                        false, // This is critical - don't constrain the canvas
-                    boundaryMargin:
-                        EdgeInsets.all(double.infinity), // Allow infinite panning
-                    onInteractionStart: (details) {
-                      workProvider.updatePanning(true);
-                    },
-                    onInteractionUpdate: (details) {
-                      // Update provider with current scale and position for node dragging calculations
-                      final Matrix4 matrix =
-                          workProvider.transformationController.value;
-                  
-                      // Extract scale from the transformation matrixF
-                      final scaleX = math.sqrt(
-                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-                              matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
-                  
-                      final translation = Offset(
-                          matrix.getTranslation().x, matrix.getTranslation().y);
-                  
-                      workProvider.updateScale(scaleX);
-                      workProvider.updatePosition(translation);
-                    },
-                    onInteractionEnd: (details) {
-                      // Sync final state with provider
-                      _syncWithProvider();
-                      workProvider.updatePanning(false);
-                    },
-                    child: SizedBox(
-                      // Huge size for effectively infinite canvas
-                      width: canvasDimension,
-                      height: canvasDimension,
-                      child: Stack(
-                        children: [
-                          // Background grid for better visual orientation
-                          Positioned.fill(
-                            child: CustomPaint(
-                              painter: GridPainter(),
+            children: [
+              // The infinite canvas
+              RepaintBoundary(
+                key: workProvider.repaintBoundaryKey,
+                child: InteractiveViewer(
+                  transformationController:
+                      workProvider.transformationController,
+                  minScale: 0.1, // Allow zoom out to 10%
+                  maxScale: 5.0,
+                  constrained:
+                      false, // This is critical - don't constrain the canvas
+                  boundaryMargin:
+                      EdgeInsets.all(double.infinity), // Allow infinite panning
+                  onInteractionStart: (details) {
+                    workProvider.updatePanning(true);
+                  },
+                  onInteractionUpdate: (details) {
+                    // Update provider with current scale and position for node dragging calculations
+                    final Matrix4 matrix =
+                        workProvider.transformationController.value;
+
+                    // Extract scale from the transformation matrixF
+                    final scaleX = math.sqrt(
+                        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+                            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+
+                    final translation = Offset(
+                        matrix.getTranslation().x, matrix.getTranslation().y);
+
+                    workProvider.updateScale(scaleX);
+                    workProvider.updatePosition(translation);
+                  },
+                  onInteractionEnd: (details) {
+                    // Sync final state with provider
+                    _syncWithProvider();
+                    workProvider.updatePanning(false);
+                  },
+                  child: SizedBox(
+                    // Huge size for effectively infinite canvas
+                    width: canvasDimension,
+                    height: canvasDimension,
+                    child: Stack(
+                      children: [
+                        // Background grid for better visual orientation
+                        Positioned.fill(
+                          child: CustomPaint(
+                            painter: GridPainter(),
+                          ),
+                        ),
+
+                        // Draw connections
+                        ...workProvider.connections.map((connection) {
+                          return CustomPaint(
+                            size: Size.infinite,
+                            painter: LinePainter(
+                              start: workProvider
+                                  .nodeList[connection.sourceNodeId]!.position,
+                              end: workProvider
+                                  .nodeList[connection.targetNodeId]!.position,
+                              sourceNodeId: connection.sourceNodeId,
+                              startPoint: connection.sourcePoint,
+                              targetNodeId: connection.targetNodeId,
+                              endPoint: connection.targetPoint,
+                              scale: workProvider.scale,
+                              connection: connection,
                             ),
-                          ),
-                  
-                          // Draw connections
-                          ...workProvider.connections.map((connection) {
-                            return CustomPaint(
-                              size: Size.infinite,
-                              painter: LinePainter(
-                                start: workProvider
-                                    .nodeList[connection.sourceNodeId]!.position,
-                                end: workProvider
-                                    .nodeList[connection.targetNodeId]!.position,
-                                sourceNodeId: connection.sourceNodeId,
-                                startPoint: connection.sourcePoint,
-                                targetNodeId: connection.targetNodeId,
-                                endPoint: connection.targetPoint,
-                                scale: workProvider.scale,
-                                connection: connection,
-                              ),
-                            );
-                          }),
-                  
-                          // Draw nodes
-                          ...workProvider.nodeList.entries.map((entry) {
-                            var id = entry.key;
-                            var node = entry.value;
-                            return Positioned(
-                              left: node.position.dx,
-                              top: node.position.dy,
-                              child: Node(
-                                id: id,
-                                type: node.type,
-                                onResize: (Size newSize) =>
-                                    workProvider.onResize(id, newSize),
-                                onDrag: (offset) =>
-                                    workProvider.dragNode(id, offset),
-                                // position: node.position,
-                              ),
-                            );
-                          }
-                          ),
-                        ],
-                      ),
+                          );
+                        }),
+
+                        // Draw nodes
+                        ...workProvider.nodeList.entries.map((entry) {
+                          var id = entry.key;
+                          var node = entry.value;
+                          return Positioned(
+                            left: node.position.dx,
+                            top: node.position.dy,
+                            child: Node(
+                              id: id,
+                              type: node.type,
+                              onResize: (Size newSize) =>
+                                  workProvider.onResize(id, newSize),
+                              onDrag: (offset) =>
+                                  workProvider.dragNode(id, offset),
+                              // position: node.position,
+                            ),
+                          );
+                        }),
+                      ],
                     ),
                   ),
                 ),
+              ),
 
-                // UI elements that should stay fixed regardless of zoom/pan
-                FloatingDrawer(flowId: widget.flowId),
+              // UI elements that should stay fixed regardless of zoom/pan
+              FloatingDrawer(flowId: widget.flowId),
 
-                // Toolbar and node editing tools
-                Positioned(
-                  top: 20,
-                  right: 20,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Toolbar(
-                        onDelete: workProvider.removeSelectedNodes,
-                        onUndo: workProvider.undo,
-                        onRedo: workProvider.redo,
-                      ),
-                      SizedBox(height: 16),
-                      Opacity(
-                        opacity: workProvider.hasSelectedNode ? 1.0 : 0.5,
-                        child: IgnorePointer(
-                          ignoring: !workProvider.hasSelectedNode,
-                          child: CustomToolbar(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                // Zoom indicator
-                Positioned(
-                  right: 24,
-                  bottom: 24,
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.black, width: 1),
+              // Toolbar and node editing tools
+              Positioned(
+                top: 20,
+                right: 20,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Toolbar(
+                      onDelete: workProvider.removeSelectedNodes,
+                      onUndo: workProvider.undo,
+                      onRedo: workProvider.redo,
                     ),
-                    child: Builder(builder: (context) {
-                      // Get the current matrix
-                      final matrix =
-                          workProvider.transformationController.value;
-
-                      // Extract the scale value accurately
-                      final scale = math.sqrt(
-                          matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
-                              matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
-
-                      // Display accurate percentage
-                      return Text(
-                        "${(scale * 100).toInt()}%",
-                        style: TextStyle(
-                          fontFamily: 'Frederik',
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    }),
-                  ),
+                    SizedBox(height: 16),
+                    Opacity(
+                      opacity: workProvider.hasSelectedNode ? 1.0 : 0.5,
+                      child: IgnorePointer(
+                        ignoring: !workProvider.hasSelectedNode,
+                        child: CustomToolbar(),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+
+              // Zoom indicator
+              Positioned(
+                right: 24,
+                bottom: 24,
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: textColor, width: 1),
+                  ),
+                  child: Builder(builder: (context) {
+                    // Get the current matrix
+                    final matrix = workProvider.transformationController.value;
+
+                    // Extract the scale value accurately
+                    final scale = math.sqrt(
+                        matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
+                            matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
+
+                    // Display accurate percentage
+                    return Text(
+                      "${(scale * 100).toInt()}%",
+                      style: TextStyle(
+                        fontFamily: 'Frederik',
+                        fontWeight: FontWeight.bold,
+                      ),
+                    );
+                  }),
+                ),
+              ),
+            ],
+          ),
         );
       },
     );

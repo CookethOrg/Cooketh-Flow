@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/models/connection.dart';
 import 'package:flutter/material.dart';
@@ -53,7 +54,7 @@ final Connection? connection;
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black
+      ..color = textColor
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
@@ -73,7 +74,7 @@ final Connection? connection;
 
     // Draw connection points at start and end
     final pointPaint = Paint()
-      ..color = Colors.black
+      ..color = textColor
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(startOffset, 4, pointPaint);

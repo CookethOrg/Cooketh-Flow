@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,6 @@ class FloatingDrawer extends StatefulWidget {
 }
 
 class _FloatingDrawerState extends State<FloatingDrawer> {
-
   @override
   Widget build(BuildContext context) {
     return Consumer<WorkspaceProvider>(builder: (context, pv, child) {
@@ -35,9 +35,9 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                     ? 3.5 * (MediaQuery.of(context).size.height / 4)
                     : 91,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.black, width: 1),
+                  border: Border.all(color: textColor, width: 1),
                 ),
                 child: Column(
                   // mainAxisAlignment: pv.isOpen ? MainAxisAlignment.start : MainAxisAlignment.center,
@@ -78,9 +78,8 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                             }
                                           },
                                           child: Padding(
-                                            padding:
-                                                const EdgeInsets.symmetric(
-                                                    vertical: 9),
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 9),
                                             child: Text(
                                               pv.getTruncatedTitle(),
                                               style: TextStyle(
@@ -90,7 +89,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                                 color: pv.isHovered
                                                     ? const Color.fromARGB(
                                                         255, 81, 81, 81)
-                                                    : Colors.black,
+                                                    : textColor,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
@@ -115,7 +114,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                               color: pv.isHovered
                                                   ? const Color.fromARGB(
                                                       255, 61, 61, 61)
-                                                  : Colors.black,
+                                                  : textColor,
                                             ),
                                             overflow: TextOverflow.ellipsis,
                                           ),
@@ -129,7 +128,7 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                               pv.isOpen
                                   ? PhosphorIconsRegular.sidebarSimple
                                   : PhosphorIconsFill.sidebarSimple,
-                              color: Colors.black,
+                              color: textColor,
                               size: 24,
                             ),
                           ),
@@ -162,11 +161,11 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                 decoration: BoxDecoration(
                                   color: pv.nodeList[id]!.isSelected
                                       ? Colors.blue.shade50
-                                      : Colors.white,
+                                      : white,
                                   border: Border.all(
                                       color: pv.nodeList[id]!.isSelected
                                           ? Colors.blue
-                                          : Colors.black,
+                                          : textColor,
                                       width:
                                           pv.nodeList[id]!.isSelected ? 2 : 1),
                                   borderRadius: BorderRadius.circular(8),
@@ -178,13 +177,13 @@ class _FloatingDrawerState extends State<FloatingDrawer> {
                                     getIcon(type),
                                     color: pv.nodeList[id]!.isSelected
                                         ? Colors.blue
-                                        : Colors.black,
+                                        : textColor,
                                   ),
                                   title: TextField(
                                     style: TextStyle(
                                         color: pv.nodeList[id]!.isSelected
                                             ? Colors.blue
-                                            : Colors.black),
+                                            : textColor),
                                     controller: pv.nodeList[id]!.data,
                                     onSubmitted: (value) =>
                                         pv.updateFlowManager(),

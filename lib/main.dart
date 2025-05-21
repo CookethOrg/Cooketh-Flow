@@ -6,6 +6,7 @@ import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/auth_screens/splash_screen.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -20,8 +21,10 @@ Future<void> main() async {
   //  Load environment variables
   if (kIsWeb) {
     // For web, use --dart-define values
-    supabaseUrl = const String.fromEnvironment('SUPABASE_URL', defaultValue: '');
-    supabaseApiKey = const String.fromEnvironment('SUPABASE_KEY', defaultValue: '');
+    supabaseUrl =
+        const String.fromEnvironment('SUPABASE_URL', defaultValue: '');
+    supabaseApiKey =
+        const String.fromEnvironment('SUPABASE_KEY', defaultValue: '');
   } else {
     // For non-web platforms, load from .env
     await dotenv.load(fileName: '.env');
@@ -38,6 +41,8 @@ Future<void> main() async {
     url: supabaseUrl,
     anonKey: supabaseApiKey,
   );
+
+  usePathUrlStrategy();
 
   runApp(MultiProvider(
     providers: [

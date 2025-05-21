@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +34,7 @@ class ProjectCard extends StatelessWidget {
                   width: 430,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: Colors.black, width: 2),
+                    border: Border.all(color: textColor, width: 2),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
@@ -46,7 +47,7 @@ class ProjectCard extends StatelessWidget {
                           style: TextStyle(
                               fontFamily: 'Fredrick',
                               fontSize: 30,
-                              color: Colors.white),
+                              color: white),
                         ),
                       ),
                     ),

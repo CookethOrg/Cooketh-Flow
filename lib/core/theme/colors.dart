@@ -1,12 +1,15 @@
 import "package:flutter/material.dart";
+import "package:provider/provider.dart";
 
-// Dark Mode
-const Color hintTextColorDark = Color.fromARGB(255, 102, 102, 102);
-const Color primaryTextColorDark = Colors.white;
-const Color dropDownMenuText = Color.fromARGB(255, 152, 152, 152);
-const Color backgroundColor = Colors.white;
-
-const Color transparent = Color(0x00000000);
+// Light Mode
+const Color backgroundColor = Color(0xFFE0EFFF);
+const Color textColor = Colors.black;
+const Color transparent = Colors.transparent;
+const Color deleteButtons = Colors.red;
+const Color white = Colors.white;
+const Color mainOrange = Colors.orange;
+const Color selectedItems = Colors.blue;
+const Color gridCol = Colors.grey;
 
 List<Color> nodeColors = [
   Color(0xFFFFD8A8), // Existing

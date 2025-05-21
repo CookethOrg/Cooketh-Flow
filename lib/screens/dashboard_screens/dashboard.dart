@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/routes/app_route_const.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/add_project.dart';
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
 import 'package:cookethflow/core/widgets/cards/project_card.dart';
@@ -26,7 +27,7 @@ class Dashboard extends StatelessWidget {
         );
       }
       return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        backgroundColor: white,
         body: LayoutBuilder(
           builder: (context, constraints) {
             return Row(

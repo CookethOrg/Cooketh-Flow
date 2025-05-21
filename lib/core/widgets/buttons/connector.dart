@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/widgets/painters/connector_painter.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
@@ -31,7 +32,7 @@ class Connector extends StatelessWidget {
             painter: ConnectorPainter(
               connectionPoint: con,
               isHovered: isHovered,
-              color: color ?? Colors.black,
+              color: color ?? textColor,
             ),
           ),
         );

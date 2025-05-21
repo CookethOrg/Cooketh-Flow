@@ -11,9 +11,6 @@ permissions:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    env:
-      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
     steps:
       - name: Checkout code
@@ -34,22 +31,8 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Create .env file for build
-        run: |
-          echo "SUPABASE_URL=$SUPABASE_URL" > .env
-          echo "SUPABASE_KEY=$SUPABASE_KEY" >> .env
-
-      - name: Verify web configuration
-        run: |
-          if [ -f "web/index.html" ]; then
-            echo "Web configuration found"
-          else
-            echo "Error: web/index.html not found. Ensure web support is enabled in your project."
-            exit 1
-          fi
-
       - name: Build web
-        run: flutter build web --release
+        run: flutter build web --release --dart-define=SUPABASE_URL=${{ secrets.SUPABASE_URL }} --dart-define=SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}
 
       - name: Debug build output
         run: |

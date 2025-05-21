@@ -1,32 +1,36 @@
-import 'dart:io';
-
+import 'package:flutter/material.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/auth_screens/splash_screen.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/foundation.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  late String supabaseUrl;
-  late String supabaseApiKey;
+  String supabaseUrl;
+  String supabaseApiKey;
 
   // Load environment variables
   if (kIsWeb) {
-    // For web, load from github secrets
-    if(Platform.environment.containsKey('SUPABASE_URL') && Platform.environment.containsKey('SUPABASE_KEY')){
-      supabaseUrl = Platform.environment['SUPABASE_URL']!;
-    supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
+    // For web, use --dart-define values
+    supabaseUrl =
+        const String.fromEnvironment('SUPABASE_URL', defaultValue: '');
+    supabaseApiKey =
+        const String.fromEnvironment('SUPABASE_KEY', defaultValue: '');
+
+    if (supabaseUrl == '' && supabaseApiKey == '') {
+      await dotenv.load(fileName: '.env');
+      supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
+      supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? '';
     }
-  }else{
-    // for local dev, load from .env
+  } else {
+    // For non-web (local dev), load from .env
     await dotenv.load(fileName: '.env');
     supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
     supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? '';
@@ -34,7 +38,7 @@ Future<void> main() async {
 
   // Validate environment variables
   if (supabaseUrl.isEmpty || supabaseApiKey.isEmpty) {
-    throw Exception('SUPABASE_URL and SUPABASE_KEY must be provided in .env file');
+    throw Exception('SUPABASE_URL and SUPABASE_KEY must be provided');
   }
 
   final instance = await Supabase.initialize(

@@ -41,7 +41,6 @@ Future<void> main() async {
     url: supabaseUrl,
     anonKey: supabaseApiKey,
   );
-
   usePathUrlStrategy();
 
   runApp(MultiProvider(

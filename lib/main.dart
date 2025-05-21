@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
@@ -17,8 +19,14 @@ Future<void> main() async {
   late String supabaseApiKey;
 
   // Load environment variables
-  if (kIsWeb || !kIsWeb) {
-    // For web and local dev, load from .env file
+  if (kIsWeb) {
+    // For web, load from github secrets
+    if(Platform.environment.containsKey('SUPABASE_URL') && Platform.environment.containsKey('SUPABASE_KEY')){
+      supabaseUrl = Platform.environment['SUPABASE_URL']!;
+    supabaseApiKey = Platform.environment['SUPABASE_KEY']!;
+    }
+  }else{
+    // for local dev, load from .env
     await dotenv.load(fileName: '.env');
     supabaseUrl = dotenv.env['SUPABASE_URL'] ?? '';
     supabaseApiKey = dotenv.env['SUPABASE_KEY'] ?? '';

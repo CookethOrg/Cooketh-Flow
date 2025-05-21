@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/widgets/buttons/build_project.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +24,7 @@ class AddProject extends StatelessWidget {
               icon: PhosphorIconsRegular.plus,
               label: 'Start New Project',
               onTap: () async {
-                Navigator.pop(context);
+                context.pop();
                 provider.createNewProject(context);
               },
             ),
@@ -32,7 +33,7 @@ class AddProject extends StatelessWidget {
               icon: PhosphorIconsRegular.fileArrowDown,
               label: 'Import Existing Project',
               onTap: () async {
-                Navigator.pop(context);
+                context.pop();
                 provider.importExistingProject(context);
               },
             ),

@@ -1,5 +1,6 @@
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class DeleteWorkspace extends StatelessWidget {
@@ -23,7 +24,7 @@ class DeleteWorkspace extends StatelessWidget {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              context.pop();
             },
             child: Text('Cancel'),
           ),
@@ -35,14 +36,14 @@ class DeleteWorkspace extends StatelessWidget {
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('Workspace deleted successfully')));
 
-                Navigator.pop(context); // Return to dashboard
+                context.pop(); // Return to dashboard
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text('Error deleting workspace: ${e.toString()}'),
                   backgroundColor: Colors.red,
                 ));
               }
-              Navigator.pop(context);
+              context.pop();
             },
             child: Text('Delete', style: TextStyle(color: Colors.red)),
           ),

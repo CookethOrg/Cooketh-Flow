@@ -16,6 +16,7 @@ import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
 
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -91,7 +92,8 @@ class WorkspaceProvider extends StateHandler {
       _nodeList = {};
       flowManager.nodes.forEach((id, node) {
         _nodeList[id] = node.copy();
-        debugPrint('Loaded node $id with color: #${node.colour.value.toRadixString(16).padLeft(8, '0')}');
+        debugPrint(
+            'Loaded node $id with color: #${node.colour.value.toRadixString(16).padLeft(8, '0')}');
       });
       flowNameController.text = flowManager.flowName;
       _scale = flowManager.scale ?? 1.0;
@@ -192,9 +194,8 @@ class WorkspaceProvider extends StateHandler {
             style: TextStyle(
               overflow: TextOverflow.ellipsis,
               color: Colors.black,
-              fontStyle: nodeList[id]!.isItalic
-                  ? FontStyle.italic
-                  : FontStyle.normal,
+              fontStyle:
+                  nodeList[id]!.isItalic ? FontStyle.italic : FontStyle.normal,
               fontWeight:
                   nodeList[id]!.isBold ? FontWeight.bold : FontWeight.normal,
               decoration: TextDecoration.combine([
@@ -353,7 +354,8 @@ class WorkspaceProvider extends StateHandler {
 
     List<Connection> connectionsToRemove = [];
     for (var connection in flowManager.connections) {
-      if (connection.sourceNodeId == nodeId || connection.targetNodeId == nodeId) {
+      if (connection.sourceNodeId == nodeId ||
+          connection.targetNodeId == nodeId) {
         connectionsToRemove.add(connection);
       }
     }
@@ -500,7 +502,8 @@ class WorkspaceProvider extends StateHandler {
       final w = node.size.width;
       final h = node.size.height;
       final text = node.data.text;
-      final fill = '#${node.colour.value.toRadixString(16).padLeft(8, '0').substring(2)}'; // Use node color
+      final fill =
+          '#${node.colour.value.toRadixString(16).padLeft(8, '0').substring(2)}'; // Use node color
 
       String nodeShape;
 
@@ -743,12 +746,12 @@ class WorkspaceProvider extends StateHandler {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => context.pop(),
               child: Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
               },
               child: Text("Insert"),
             ),

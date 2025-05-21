@@ -5,6 +5,7 @@ import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:file_selector/file_selector.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -68,7 +69,7 @@ class _ProfileDialogState extends State<ProfileDialog> {
                         ),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () => context.pop(),
                       ),
                     ],
                   ),
@@ -298,7 +299,7 @@ void showEditDialog(BuildContext context, String attribute, String currentValue,
           ),
           actions: [
             TextButton(
-              onPressed: isProcessing ? null : () => Navigator.pop(context),
+              onPressed: isProcessing ? null : () => context.pop(),
               child: const Text('Cancel'),
             ),
             TextButton(
@@ -313,7 +314,7 @@ void showEditDialog(BuildContext context, String attribute, String currentValue,
                         return;
                       }
                       if (newValue == currentValue) {
-                        Navigator.pop(context);
+                        context.pop();
                         return;
                       }
                       setState(() {
@@ -323,7 +324,7 @@ void showEditDialog(BuildContext context, String attribute, String currentValue,
                       try {
                         await onUpdate(newValue);
                         if (context.mounted) {
-                          Navigator.pop(context);
+                          context.pop();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                                 content:
@@ -452,7 +453,7 @@ void showPasswordChangeDialog(BuildContext context) {
             ),
             actions: [
               TextButton(
-                onPressed: isProcessing ? null : () => Navigator.pop(context),
+                onPressed: isProcessing ? null : () => context.pop(),
                 child: const Text('Cancel'),
               ),
               TextButton(
@@ -496,7 +497,7 @@ void showPasswordChangeDialog(BuildContext context) {
                             newPassword: newPassword,
                           );
                           if (context.mounted) {
-                            Navigator.pop(context);
+                            context.pop();
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                   content:

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/utils/enums.dart';
@@ -10,6 +11,7 @@ import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/screens/workspace_screens/workspace.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -290,13 +292,14 @@ class FlowmanageProvider extends StateHandler {
       // Initialize the workspace with the new flow ID
       workspaceProvider.initializeWorkspace(newFlowId);
 
-      Navigator.of(context)
-          .push(
-            MaterialPageRoute(
-              builder: (context) => Workspace(flowId: newFlowId),
-            ),
-          )
-          .then((_) => refreshFlowList());
+      // Navigator.of(context)
+      //     .push(
+      //       MaterialPageRoute(
+      //         builder: (context) => Workspace(flowId: newFlowId),
+      //       ),
+      //     )
+      //     .then((_) => refreshFlowList());
+      context.go('${RoutesPath.workspace}/:$newFlowId');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -338,13 +341,14 @@ class FlowmanageProvider extends StateHandler {
           SnackBar(content: Text('Project imported successfully!')),
         );
 
-        Navigator.of(context)
-            .push(
-              MaterialPageRoute(
-                builder: (context) => Workspace(flowId: newFlowId),
-              ),
-            )
-            .then((_) => refreshFlowList());
+        // Navigator.of(context)
+        //     .push(
+        //       MaterialPageRoute(
+        //         builder: (context) => Workspace(flowId: newFlowId),
+        //       ),
+        //     )
+        //     .then((_) => refreshFlowList());
+        context.go('${RoutesPath.workspace}/:$newFlowId');
       }
     } catch (e) {
       // Hide loading indicator

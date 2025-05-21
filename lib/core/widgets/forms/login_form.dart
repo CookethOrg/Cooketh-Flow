@@ -1,7 +1,9 @@
+import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
 import 'package:cookethflow/screens/auth_screens/sign_up.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class LoginForm extends StatelessWidget {
@@ -130,11 +132,7 @@ class LoginForm extends StatelessWidget {
                         );
 
                         if (res == "Logged in successfully") {
-                          Navigator.of(context).pushReplacement(
-                            MaterialPageRoute(
-                              builder: (context) => const Dashboard(),
-                            ),
-                          );
+                          context.pushReplacement(RoutesPath.dashboard);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
@@ -174,11 +172,7 @@ class LoginForm extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => const SignupPage(),
-                    ),
-                  );
+                  context.pushReplacement(RoutesPath.signUpScreen);
                 },
                 style: TextButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 5),

@@ -7,12 +7,15 @@ on:
   pull_request:
     branches:
       - master
+    types:
+      - closed
 
 permissions:
   contents: write
 
 jobs:
   build-and-deploy:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.pull_request.merged == true)
     runs-on: ubuntu-latest
 
     steps:
@@ -34,8 +37,16 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
+      - name: Debug environment variables
+        run: |
+          echo "SUPABASE_URL is set: ${{ secrets.SUPABASE_URL != '' }}"
+          echo "SUPABASE_KEY is set: ${{ secrets.SUPABASE_KEY != '' }}"
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+
       - name: Build web
-        run: flutter build web --release --dart-define="SUPABASE_URL=${{ secrets.SUPABASE_URL }}" --dart-define="SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}"
+        run: flutter build web --release --no-source-maps --dart-define="SUPABASE_URL=${{ secrets.SUPABASE_URL }}" --dart-define="SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}"
 
       - name: Debug build output
         run: |

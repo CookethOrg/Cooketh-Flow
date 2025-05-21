@@ -16,7 +16,7 @@ Future<void> main() async {
   String supabaseUrl;
   String supabaseApiKey;
 
-  // Load environment variables
+  //  Load environment variables
   if (kIsWeb) {
     // For web, use --dart-define values
     supabaseUrl = const String.fromEnvironment('SUPABASE_URL', defaultValue: '');

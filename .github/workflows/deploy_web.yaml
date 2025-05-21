@@ -34,10 +34,10 @@ jobs:
       - name: Install dependencies
         run: flutter pub get
 
-      # - name: Create .env file for build
-      #   run: |
-      #     echo "SUPABASE_URL=$SUPABASE_URL" > .env
-      #     echo "SUPABASE_KEY=$SUPABASE_KEY" >> .env
+      - name: Create .env file for build
+        run: |
+          echo "SUPABASE_URL=$SUPABASE_URL" > .env
+          echo "SUPABASE_KEY=$SUPABASE_KEY" >> .env
 
       - name: Verify web configuration
         run: |

@@ -136,7 +136,7 @@ class _WorkspaceState extends State<Workspace> {
                   child: IconButton(
                     padding: const EdgeInsets.only(left: 16.0),
                     icon: const Icon(Icons.arrow_back, color: textColor),
-                    onPressed: () => context.push(RoutesPath.dashboard),
+                    onPressed: () => context.pushReplacement(RoutesPath.dashboard),
                   ),
                 ),
                 actions: [

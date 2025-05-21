@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart' as http;
@@ -32,12 +33,12 @@ class UpdateManager {
       PackageInfo packageInfo = await PackageInfo.fromPlatform();
       String currentVersion = packageInfo.version; // e.g., "1.0.0"
       Map<String, dynamic>? latestInfo = await getLatestVersion();
-      
+
       if (latestInfo == null) return false;
-      
+
       String latestVersion = latestInfo['version']; // e.g., "1.1.0"
       print('Current version: $currentVersion, Latest version: $latestVersion');
-      
+
       return _compareVersions(currentVersion, latestVersion) < 0;
     } catch (e) {
       print('Error checking for update: $e');
@@ -49,15 +50,15 @@ class UpdateManager {
   int _compareVersions(String current, String latest) {
     List<String> currentParts = current.split('.');
     List<String> latestParts = latest.split('.');
-    
+
     // Ensure both lists have at least 3 elements
     while (currentParts.length < 3) currentParts.add('0');
     while (latestParts.length < 3) latestParts.add('0');
-    
+
     for (int i = 0; i < 3; i++) {
       int currentNum = int.tryParse(currentParts[i]) ?? 0;
       int latestNum = int.tryParse(latestParts[i]) ?? 0;
-      
+
       if (latestNum > currentNum) return -1;
       if (latestNum < currentNum) return 1;
     }
@@ -102,7 +103,7 @@ class UpdateManager {
         // Create batch file for Windows update
         final tempDir = await getTemporaryDirectory();
         File batchFile = File('${tempDir.path}/update.bat');
-        
+
         String script = '''
         @echo off
         echo Updating Cooketh Flow...
@@ -112,9 +113,10 @@ class UpdateManager {
         start "" "$currentPath"
         exit
         ''';
-        
+
         await batchFile.writeAsString(script);
-        await Process.start('cmd.exe', ['/c', batchFile.path], runInShell: true);
+        await Process.start('cmd.exe', ['/c', batchFile.path],
+            runInShell: true);
         exit(0);
       } else if (Platform.isLinux) {
         final appDir = await getApplicationDocumentsDirectory();
@@ -122,27 +124,29 @@ class UpdateManager {
         if (!await updateDir.exists()) {
           await updateDir.create(recursive: true);
         }
-        
+
         // Extract the tarball
-        await Process.run('tar', ['-xzf', downloadedPath, '-C', updateDir.path]);
-        
+        await Process.run(
+            'tar', ['-xzf', downloadedPath, '-C', updateDir.path]);
+
         // Make the new binary executable
         String newBinaryPath = '${updateDir.path}/cookethflow';
         if (await File(newBinaryPath).exists()) {
           await Process.run('chmod', ['+x', newBinaryPath]);
-          
+
           // Create a shell script to replace the current binary and restart
           File scriptFile = File('${updateDir.path}/apply_update.sh');
-          
+
           String script = '''
           #!/bin/bash
           cp "$newBinaryPath" "${Platform.resolvedExecutable}"
           exec "${Platform.resolvedExecutable}"
           ''';
-          
+
           await scriptFile.writeAsString(script);
           await Process.run('chmod', ['+x', scriptFile.path]);
-          await Process.start(scriptFile.path, [], mode: ProcessStartMode.detached);
+          await Process.start(scriptFile.path, [],
+              mode: ProcessStartMode.detached);
           exit(0);
         } else {
           throw Exception('Update binary not found in tarball');
@@ -154,7 +158,7 @@ class UpdateManager {
         if (!await updateDir.exists()) {
           await updateDir.create(recursive: true);
         }
-        
+
         // For macOS, assuming it's a DMG file
         await Process.run('open', [downloadedPath]);
         // Show instructions to the user for manual update
@@ -162,36 +166,36 @@ class UpdateManager {
       }
     } catch (e) {
       print('Error applying update: $e');
-      throw e;
+      rethrow;
     }
   }
 
   // Show update prompt
   Future<void> checkAndPromptForUpdate(BuildContext context) async {
     if (_isCheckingForUpdate) return;
-    
+
     _isCheckingForUpdate = true;
-    
+
     try {
       bool updateAvailable = await isUpdateAvailable();
-      
+
       if (!updateAvailable) {
         print('No updates available');
         _isCheckingForUpdate = false;
         return;
       }
-      
+
       Map<String, dynamic>? latestInfo = await getLatestVersion();
       if (latestInfo == null) {
         _isCheckingForUpdate = false;
         return;
       }
-      
+
       if (!context.mounted) {
         _isCheckingForUpdate = false;
         return;
       }
-      
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -211,7 +215,8 @@ class UpdateManager {
                   } else if (snapshot.hasError) {
                     return const Text('Error fetching version');
                   } else {
-                    return Text('Current version: ${snapshot.data?.version ?? 'Unknown'}');
+                    return Text(
+                        'Current version: ${snapshot.data?.version ?? 'Unknown'}');
                   }
                 },
               ),
@@ -224,22 +229,23 @@ class UpdateManager {
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: Text(latestInfo['release_notes'] ?? 'No release notes available'),
+                child: Text(latestInfo['release_notes'] ??
+                    'No release notes available'),
               ),
             ],
           ),
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context);
+                context.pop();
                 _isCheckingForUpdate = false;
               },
               child: const Text('Later'),
             ),
             ElevatedButton(
               onPressed: () async {
-                Navigator.pop(context);
-                
+                context.pop();
+
                 // Show loading dialog
                 showDialog(
                   context: context,
@@ -251,25 +257,26 @@ class UpdateManager {
                       children: [
                         LinearProgressIndicator(),
                         SizedBox(height: 16),
-                        Text('Please wait while the update is being downloaded...'),
+                        Text(
+                            'Please wait while the update is being downloaded...'),
                       ],
                     ),
                   ),
                 );
-                
+
                 String? url = getDownloadUrl(latestInfo);
                 if (url != null) {
                   try {
                     String? path = await downloadUpdate(url);
-                    
+
                     if (!context.mounted) {
                       _isCheckingForUpdate = false;
                       return;
                     }
-                    
+
                     // Close the loading dialog
-                    Navigator.pop(context);
-                    
+                    context.pop();
+
                     if (path != null) {
                       // Show confirmation before applying update
                       showDialog(
@@ -277,26 +284,27 @@ class UpdateManager {
                         builder: (context) => AlertDialog(
                           title: const Text('Ready to Update'),
                           content: const Text(
-                            'The update has been downloaded and is ready to install. '
-                            'The application will restart during this process.'
-                          ),
+                              'The update has been downloaded and is ready to install. '
+                              'The application will restart during this process.'),
                           actions: [
                             TextButton(
                               onPressed: () {
-                                Navigator.pop(context);
+                                context.pop();
                                 _isCheckingForUpdate = false;
                               },
                               child: const Text('Cancel'),
                             ),
                             ElevatedButton(
                               onPressed: () async {
-                                Navigator.pop(context);
+                                context.pop();
                                 try {
                                   await applyUpdate(path);
                                 } catch (e) {
                                   if (context.mounted) {
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text('Failed to apply update: $e')),
+                                      SnackBar(
+                                          content: Text(
+                                              'Failed to apply update: $e')),
                                     );
                                   }
                                   _isCheckingForUpdate = false;
@@ -310,14 +318,15 @@ class UpdateManager {
                     } else {
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Failed to download update')),
+                          const SnackBar(
+                              content: Text('Failed to download update')),
                         );
                       }
                       _isCheckingForUpdate = false;
                     }
                   } catch (e) {
                     if (context.mounted) {
-                      Navigator.pop(context); // Close loading dialog
+                      context.pop(); // Close loading dialog
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Error during update: $e')),
                       );
@@ -326,9 +335,11 @@ class UpdateManager {
                   }
                 } else {
                   if (context.mounted) {
-                    Navigator.pop(context); // Close loading dialog
+                    context.pop(); // Close loading dialog
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('No download available for your platform')),
+                      const SnackBar(
+                          content:
+                              Text('No download available for your platform')),
                     );
                   }
                   _isCheckingForUpdate = false;

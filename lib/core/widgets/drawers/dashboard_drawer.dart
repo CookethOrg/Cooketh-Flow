@@ -1,11 +1,13 @@
 import 'dart:io' show File;
 
+import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/popup_box.dart';
 import 'package:cookethflow/screens/auth_screens/log_in.dart';
 import 'package:cookethflow/screens/auth_screens/sign_up.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -116,9 +118,7 @@ class DashboardDrawer extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             await auth.logout();
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const SignupPage()));
+                            context.pushReplacement(RoutesPath.signUpScreen);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,
@@ -202,9 +202,7 @@ class DashboardDrawer extends StatelessWidget {
                         child: ElevatedButton.icon(
                           onPressed: () async {
                             await auth.logout();
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) => const LoginPage()));
+                            context.pushReplacement(RoutesPath.loginScreen);
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.black,

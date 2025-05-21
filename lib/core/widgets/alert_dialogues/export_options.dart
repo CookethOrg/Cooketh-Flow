@@ -2,6 +2,7 @@ import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/widgets/buttons/export_option_widget.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -46,7 +47,7 @@ class ExportOptions extends StatelessWidget {
                       ),
                     );
                   }
-                  Navigator.pop(context); // Pop after SnackBar
+                  context.pop(); // Pop after SnackBar
                 },
               ),
               const SizedBox(height: 8),
@@ -73,7 +74,7 @@ class ExportOptions extends StatelessWidget {
                       ),
                     );
                   }
-                  Navigator.pop(context); // Pop after SnackBar
+                  context.pop(); // Pop after SnackBar
                 },
               ),
               const SizedBox(height: 8),
@@ -100,7 +101,7 @@ class ExportOptions extends StatelessWidget {
                       ),
                     );
                   }
-                  Navigator.pop(context); // Pop after SnackBar
+                  context.pop(); // Pop after SnackBar
                 },
               ),
             ],

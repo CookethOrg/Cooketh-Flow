@@ -32,23 +32,23 @@ class FlowNode {
         },
         data = TextEditingController(text: 'Node $id');
 
-  // Check if a connection point is available
   bool isConnectionPointAvailable(ConnectionPoint point) {
-    return connections[point]!.isEmpty; // Example: one connection per point
+    return connections[point]!.isEmpty;
   }
 
   FlowNode copy() {
     FlowNode newNode = FlowNode(
-        id: id,
-        type: type,
-        colour: colour,
-        position: Offset(position.dx, position.dy),
-        size: Size(size.width, size.height),
-        isSelected: isSelected,
-        isBold: isBold,
-        isItalic: isItalic,
-        isStrikeThrough: isStrikeThrough,
-        isUnderlined: isUnderlined);
+      id: id,
+      type: type,
+      colour: colour,
+      position: Offset(position.dx, position.dy),
+      size: Size(size.width, size.height),
+      isSelected: isSelected,
+      isBold: isBold,
+      isItalic: isItalic,
+      isStrikeThrough: isStrikeThrough,
+      isUnderlined: isUnderlined,
+    );
     newNode.data.text = data.text;
     return newNode;
   }
@@ -79,7 +79,6 @@ class FlowNode {
     }
   }
 
-  // For serialization
   Map<String, dynamic> toJson() {
     Map<String, dynamic> connectionsJson = {};
     connections.forEach((point, conns) {
@@ -93,20 +92,20 @@ class FlowNode {
       "type": type.index,
       "position": {"dx": position.dx, "dy": position.dy},
       "size": {"width": size.width, "height": size.height},
-      "colour": _colorToJsonString(colour), // Use our custom color serializer
+      "colour": _colorToJsonString(colour),
       "connections": connectionsJson,
       "isBold": isBold,
       "isItalic": isItalic,
       "isStrikeThrough": isStrikeThrough,
-      "isUnderlined": isUnderlined
+      "isUnderlined": isUnderlined,
     };
   }
 
   static String _colorToJsonString(Color color) {
-    return "Color(alpha: ${color.a / 255}, red: ${color.r / 255}, green: ${color.g / 255}, blue: ${color.b / 255})";
+    // Convert color to hexadecimal format (#AARRGGBB)
+    return '#${color.value.toRadixString(16).padLeft(8, '0')}';
   }
 
-  // For deserialization
   factory FlowNode.fromJson(Map<String, dynamic> json) {
     FlowNode node = FlowNode(
       id: json["id"],
@@ -119,21 +118,17 @@ class FlowNode {
         json["size"]["width"].toDouble(),
         json["size"]["height"].toDouble(),
       ),
-      // Parse the color string into a Color object
-      colour: _parseColor(json["colour"]) ??
-          const Color(0xFFFFD8A8), // Default color if parsing fails
+      colour: _parseColor(json["colour"]) ?? const Color(0xFFFFD8A8),
       isBold: json["isBold"] ?? false,
       isItalic: json["isItalic"] ?? false,
       isUnderlined: json["isUnderlined"] ?? false,
       isStrikeThrough: json["isUnderlined"] ?? false,
     );
 
-    // Set text content
     if (json["text"] != null) {
       node.data.text = json["text"];
     }
 
-    // Add connections if available
     if (json["connections"] != null) {
       Map<String, dynamic> connsJson = json["connections"];
       connsJson.forEach((pointKey, connsData) {
@@ -150,20 +145,34 @@ class FlowNode {
     return node;
   }
 
-  // Helper method to parse the color string
   static Color? _parseColor(String? colorString) {
-    if (colorString == null || !colorString.startsWith("Color(")) {
+    if (colorString == null || !colorString.startsWith('#')) {
+      // Handle legacy color format for backward compatibility
+      if (colorString != null && colorString.startsWith("Color(")) {
+        return _parseLegacyColor(colorString);
+      }
       return null;
     }
 
     try {
-      // Extract the part inside "Color(...)"
+      // Remove '#' and parse hex string
+      String hex = colorString.substring(1);
+      if (hex.length == 6) {
+        hex = 'FF$hex'; // Add opaque alpha if not provided
+      }
+      int colorValue = int.parse(hex, radix: 16);
+      return Color(colorValue);
+    } catch (e) {
+      print("Error parsing color: $e");
+      return null;
+    }
+  }
+
+  // Handle old color format for backward compatibility
+  static Color? _parseLegacyColor(String colorString) {
+    try {
       String values = colorString.substring(6, colorString.length - 1);
-
-      // Split into components
       final components = values.split(', ');
-
-      // Parse each component
       double alpha = 1.0;
       double red = 0.0;
       double green = 0.0;
@@ -172,7 +181,6 @@ class FlowNode {
       for (var component in components) {
         final parts = component.split(': ');
         if (parts.length != 2) continue;
-
         final value = double.tryParse(parts[1]) ?? 0.0;
         switch (parts[0]) {
           case 'alpha':
@@ -197,7 +205,7 @@ class FlowNode {
         alpha,
       );
     } catch (e) {
-      print("Error parsing color: $e");
+      print("Error parsing legacy color: $e");
       return null;
     }
   }

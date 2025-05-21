@@ -1,8 +1,10 @@
+import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/utils/update_manager.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
 import 'package:cookethflow/screens/auth_screens/sign_up.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -39,24 +41,20 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _checkUserSession() async {
     // Show splash for at least 2 seconds
     await Future.delayed(const Duration(seconds: 2));
-    
+
     if (!mounted) return;
-    
-    final authProvider = Provider.of<AuthenticationProvider>(context, listen: false);
+
+    final authProvider =
+        Provider.of<AuthenticationProvider>(context, listen: false);
     final isAuthenticated = await authProvider.isAuthenticated();
 
     if (!mounted) return;
 
     if (isAuthenticated) {
-      
       // Navigate to Dashboard (initialization will happen in Dashboard's initState)
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => Dashboard()),
-      );
+      context.pushReplacement(RoutesPath.dashboard);
     } else {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => SignupPage()),
-      );
+      context.pushReplacement(RoutesPath.signUpScreen);
     }
   }
 
@@ -82,7 +80,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 20,),
+            SizedBox(
+              height: 20,
+            ),
             CircularProgressIndicator()
           ],
         ),

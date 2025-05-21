@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/routes/app_route_config.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
@@ -75,9 +76,10 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: const SplashScreen(),
+      routerConfig: AppRouteConfig.returnRouter(),
+      // home: const SplashScreen(),
     );
   }
 }

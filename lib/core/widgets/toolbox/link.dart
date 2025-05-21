@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class LinkInsertButton extends StatelessWidget {
@@ -32,7 +33,7 @@ class LinkInsertButton extends StatelessWidget {
                   icon: const Icon(Icons.check, color: Colors.blue),
                   onPressed: () {
                     // Handle link insertion logic
-                    Navigator.pop(context);
+                    context.pop();
                   },
                 ),
               ],

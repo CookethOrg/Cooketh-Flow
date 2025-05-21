@@ -9,8 +9,10 @@ import 'package:cookethflow/core/widgets/toolbox/toolbar.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'dart:math' as math;
 
 class Workspace extends StatefulWidget {
@@ -133,7 +135,7 @@ class _WorkspaceState extends State<Workspace> {
                   child: IconButton(
                     padding: const EdgeInsets.only(left: 16.0),
                     icon: const Icon(Icons.arrow_back, color: Colors.black),
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => context.push(RoutesPath.dashboard),
                   ),
                 ),
                 actions: [
@@ -214,7 +216,7 @@ class _WorkspaceState extends State<Workspace> {
                       final Matrix4 matrix =
                           workProvider.transformationController.value;
                   
-                      // Extract scale from the transformation matrix
+                      // Extract scale from the transformation matrixF
                       final scaleX = math.sqrt(
                           matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
                               matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);

@@ -1,3 +1,5 @@
+# CONTRIBUTING.md
+
 # Contributing to Cooketh Flow
 
 Thank you for your interest in contributing to **Cooketh Flow**! 🚀 We welcome contributions of all kinds, including code, documentation, bug reports, and feature suggestions.
@@ -10,11 +12,12 @@ Thank you for your interest in contributing to **Cooketh Flow**! 🚀 We welcome
    git clone https://github.com/your-username/Cooketh-Flow.git
    cd Cooketh-Flow
    ```
-3. **Create a Branch**: Create a new branch for your changes:
+3. **Create a Branch**: Create a new branch for your changes from the `dev` branch:
    ```sh
+   git checkout dev
    git checkout -b feature-branch
    ```
-4. **Make Changes**: Implement your changes and ensure they follow the project's coding guidelines.
+4. **Make Changes**: Implement your changes and ensure they follow the project's coding guidelines. **Do not touch or tamper with the `master` branch**, as it is used for deployment.
 5. **Test Your Changes**: Run tests (if applicable) to verify that everything works correctly.
 6. **Commit Your Changes**: Commit with a clear message describing your changes:
    ```sh
@@ -24,7 +27,7 @@ Thank you for your interest in contributing to **Cooketh Flow**! 🚀 We welcome
    ```sh
    git push origin feature-branch
    ```
-8. **Open a Pull Request**: Go to the original repository and open a Pull Request (PR) describing your changes.
+8. **Open a Pull Request**: Go to the original repository and open a Pull Request (PR) targeting the `dev` branch. **Ensure your PR is directed to the `dev` branch, not `master`.**
 
 ## Code Guidelines
 

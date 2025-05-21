@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/add_project.dart';
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
 import 'package:cookethflow/core/widgets/cards/project_card.dart';
@@ -6,6 +7,7 @@ import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/screens/workspace_screens/workspace.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 class Dashboard extends StatelessWidget {
@@ -87,15 +89,9 @@ class Dashboard extends StatelessWidget {
                                       workspaceProvider
                                           .initializeWorkspace(flowId);
 
-                                      Navigator.of(context)
-                                          .push(
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  Workspace(flowId: flowId),
-                                            ),
-                                          )
-                                          .then((_) =>
-                                              flowProvider.refreshFlowList());
+                                      context.go('${RoutesPath.workspace}/:$flowId');
+                                          // .then((_) =>
+                                          //     flowProvider.refreshFlowList());
                                     },
                                   );
                                 }

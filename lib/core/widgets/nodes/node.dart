@@ -208,46 +208,42 @@ class Node extends StatelessWidget {
     return Consumer<WorkspaceProvider>(
       builder: (context, wp, child) {
         final nodePosition = wp.nodeList[id]?.position ?? Offset.zero;
-        return Positioned(
-          left: nodePosition.dx,
-          top: nodePosition.dy,
-          child: GestureDetector(
-            onTap: () => wp.changeSelected(id),
-            onPanStart: (details) {
-              if (!wp.nodeList[id]!.isSelected) {
-                wp.changeSelected(id);
-              }
-            },
-            onPanUpdate: (details) {
-              if (!wp.nodeList[id]!.isSelected || wp.isPanning) return;
-
-              final scaleFactor = wp.scale;
-              final adjustedDelta = details.delta / scaleFactor;
-              final newPosition = nodePosition + adjustedDelta;
-              wp.dragNode(id, newPosition);
-            },
-            onPanEnd: (details) {
-              onDrag(nodePosition);
-            },
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: wp.buildNode(id, type),
-                ),
-                if (wp.nodeList[id]!.isSelected) ...[
-                  _buildResizeHandle(context, ResizeHandle.topLeft, wp),
-                  _buildResizeHandle(context, ResizeHandle.topRight, wp),
-                  _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
-                  _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.top, id, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.right, id, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.bottom, id, wp),
-                  _buildConnectionPoints(context, ConnectionPoint.left, id, wp),
-                ]
-              ],
-            ),
+        return GestureDetector(
+          onTap: () => wp.changeSelected(id),
+          onPanStart: (details) {
+            if (!wp.nodeList[id]!.isSelected) {
+              wp.changeSelected(id);
+            }
+          },
+          onPanUpdate: (details) {
+            if (!wp.nodeList[id]!.isSelected || wp.isPanning) return;
+        
+            final scaleFactor = wp.scale;
+            final adjustedDelta = details.delta / scaleFactor;
+            final newPosition = nodePosition + adjustedDelta;
+            wp.dragNode(id, newPosition);
+          },
+          onPanEnd: (details) {
+            onDrag(nodePosition);
+          },
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: wp.buildNode(id, type),
+              ),
+              if (wp.nodeList[id]!.isSelected) ...[
+                _buildResizeHandle(context, ResizeHandle.topLeft, wp),
+                _buildResizeHandle(context, ResizeHandle.topRight, wp),
+                _buildResizeHandle(context, ResizeHandle.bottomLeft, wp),
+                _buildResizeHandle(context, ResizeHandle.bottomRight, wp),
+                _buildConnectionPoints(context, ConnectionPoint.top, id, wp),
+                _buildConnectionPoints(context, ConnectionPoint.right, id, wp),
+                _buildConnectionPoints(context, ConnectionPoint.bottom, id, wp),
+                _buildConnectionPoints(context, ConnectionPoint.left, id, wp),
+              ]
+            ],
           ),
         );
       },

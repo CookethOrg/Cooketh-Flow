@@ -1,18 +1,19 @@
-import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/add_project.dart';
 import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
 import 'package:cookethflow/core/widgets/cards/project_card.dart';
 import 'package:cookethflow/core/widgets/cards/add_project_card.dart';
+import 'package:cookethflow/presentation/dashboard/view_model.dart';
 import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
-import 'package:cookethflow/presentation/workspace_screens/workspace.dart';
+import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class Dashboard extends StatelessWidget {
-  const Dashboard({super.key});
+class DashboardView extends StatelessWidget {
+  final DashboardViewModel viewModel;
+  const DashboardView({super.key, required this.viewModel});
 
   // Future<void> _createNewProject() async {
   @override
@@ -91,7 +92,7 @@ class Dashboard extends StatelessWidget {
                                           .initializeWorkspace(flowId);
 
                                       context.go(
-                                          '${RoutesPath.workspace}/:$flowId');
+                                          '${AppView.workspace.path}/:$flowId');
                                       // .then((_) =>
                                       //     flowProvider.refreshFlowList());
                                     },

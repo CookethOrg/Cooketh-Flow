@@ -1,8 +1,10 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/presentation/slider/view_model.dart';
 import 'package:flutter/material.dart';
 
-class SliderStart extends StatelessWidget {
+class SliderView extends StatelessWidget {
+  final SliderViewModel viewModel;
   final List<String> texts = [
     "Watch your Ideas come to life",
     "Store your workflows, as many as you want",
@@ -15,7 +17,7 @@ class SliderStart extends StatelessWidget {
     "assets/Group 50.png"
   ];
 
-  SliderStart({super.key});
+  SliderView({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {

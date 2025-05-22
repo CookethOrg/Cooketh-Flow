@@ -1,5 +1,4 @@
 import "package:flutter/material.dart";
-import "package:provider/provider.dart";
 
 // Light Mode
 const Color backgroundColor = Color(0xFFE0EFFF);

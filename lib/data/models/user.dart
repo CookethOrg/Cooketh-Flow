@@ -1,4 +1,4 @@
-import 'package:cookethflow/models/flow_manager.dart';
+import 'package:cookethflow/data/models/flow_manager.dart';
 
 class UserModel {
   String username;

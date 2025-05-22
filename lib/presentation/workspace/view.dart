@@ -7,24 +7,27 @@ import 'package:cookethflow/core/widgets/painters/grid_painter.dart';
 import 'package:cookethflow/core/widgets/painters/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbar.dart';
+import 'package:cookethflow/presentation/workspace/view_model.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
+import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'dart:math' as math;
 
-class Workspace extends StatefulWidget {
+class WorkspaceView extends StatefulWidget {
   final String flowId;
-  const Workspace({super.key, required this.flowId});
+  final WorkspaceViewModel viewModel;
+  const WorkspaceView(
+      {super.key, required this.flowId, required this.viewModel});
 
   @override
-  State<Workspace> createState() => _WorkspaceState();
+  State<WorkspaceView> createState() => _WorkspaceState();
 }
 
-class _WorkspaceState extends State<Workspace> {
+class _WorkspaceState extends State<WorkspaceView> {
   @override
   void initState() {
     super.initState();
@@ -50,8 +53,7 @@ class _WorkspaceState extends State<Workspace> {
     final double centerY = (canvasDimension / 2) - (screenSize.height / 2);
 
     // Set the initial transformation matrix to center the view
-    Matrix4 matrix = Matrix4.identity()
-      ..translate(-centerX, -centerY);
+    Matrix4 matrix = Matrix4.identity()..translate(-centerX, -centerY);
 
     workspaceProvider.transformationController.value = matrix;
 
@@ -123,7 +125,8 @@ class _WorkspaceState extends State<Workspace> {
                   child: IconButton(
                     padding: const EdgeInsets.only(left: 16.0),
                     icon: const Icon(Icons.arrow_back, color: textColor),
-                    onPressed: () => context.pushReplacement(RoutesPath.dashboard),
+                    onPressed: () =>
+                        context.pushReplacement(AppView.dashboard.path),
                   ),
                 ),
                 actions: [
@@ -135,7 +138,7 @@ class _WorkspaceState extends State<Workspace> {
                       hoverColor: deleteButtons.withOpacity(0.1),
                       icon: Icon(PhosphorIconsRegular.trash,
                           color: deleteButtons),
-                      tooltip: 'Delete Workspace',
+                      tooltip: 'Delete WorkspaceView',
                       onPressed: () => showDialog(
                         context: context,
                         builder: (context) =>
@@ -173,7 +176,7 @@ class _WorkspaceState extends State<Workspace> {
                         ),
                       ),
                       label: Text(
-                        'Export Workspace',
+                        'Export WorkspaceView',
                         style: const TextStyle(
                           fontFamily: 'Frederik',
                           fontSize: 16,
@@ -241,9 +244,11 @@ class _WorkspaceState extends State<Workspace> {
                               size: Size.infinite,
                               painter: LinePainter(
                                 start: workProvider
-                                    .nodeList[connection.sourceNodeId]!.position,
+                                    .nodeList[connection.sourceNodeId]!
+                                    .position,
                                 end: workProvider
-                                    .nodeList[connection.targetNodeId]!.position,
+                                    .nodeList[connection.targetNodeId]!
+                                    .position,
                                 sourceNodeId: connection.sourceNodeId,
                                 startPoint: connection.sourcePoint,
                                 targetNodeId: connection.targetNodeId,

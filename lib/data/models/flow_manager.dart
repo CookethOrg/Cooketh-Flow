@@ -1,6 +1,6 @@
 import 'package:cookethflow/core/utils/enums.dart';
-import 'package:cookethflow/models/connection.dart';
-import 'package:cookethflow/models/flow_node.dart';
+import 'package:cookethflow/data/models/connection.dart';
+import 'package:cookethflow/data/models/flow_node.dart';
 import 'package:flutter/material.dart';
 
 class FlowManager {

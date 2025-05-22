@@ -1,11 +1,14 @@
 import 'package:cookethflow/core/widgets/forms/login_form.dart';
+import 'package:cookethflow/presentation/log_in/view_model.dart';
+import 'package:cookethflow/presentation/slider/view.dart';
+import 'package:cookethflow/presentation/slider/view_model.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cookethflow/presentation/auth_screens/slider.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LogInView extends StatelessWidget {
+  final LogInViewModel viewModel;
+  const LogInView({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +21,9 @@ class LoginPage extends StatelessWidget {
                     children: [
                       SizedBox(
                         height: 200,
-                        child: SliderStart(),
+                        child: SliderView(
+                          viewModel: SliderViewModel(),
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(
@@ -49,7 +54,11 @@ class LoginPage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Expanded(flex: 1, child: SliderStart()),
+                    Expanded(
+                        flex: 1,
+                        child: SliderView(
+                          viewModel: SliderViewModel(),
+                        )),
                   ],
                 ),
         );

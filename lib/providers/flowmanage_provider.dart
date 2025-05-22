@@ -1,16 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/services/file_services.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/core/utils/ui_helper.dart';
-import 'package:cookethflow/models/flow_manager.dart';
-import 'package:cookethflow/models/flow_node.dart';
+import 'package:cookethflow/data/models/flow_manager.dart';
+import 'package:cookethflow/data/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
-import 'package:cookethflow/presentation/workspace_screens/workspace.dart';
+import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -300,7 +299,7 @@ class FlowmanageProvider extends StateHandler {
       //       ),
       //     )
       //     .then((_) => refreshFlowList());
-      context.go('${RoutesPath.workspace}/:$newFlowId');
+      context.go('${AppView.workspace.path}/:$newFlowId');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -349,7 +348,7 @@ class FlowmanageProvider extends StateHandler {
         //       ),
         //     )
         //     .then((_) => refreshFlowList());
-        context.go('${RoutesPath.workspace}/:$newFlowId');
+        context.go('${AppView.workspace.path}/:$newFlowId');
       }
     } catch (e) {
       // Hide loading indicator

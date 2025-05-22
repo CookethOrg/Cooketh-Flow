@@ -1,21 +1,21 @@
-import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/update_manager.dart';
+import 'package:cookethflow/presentation/slash_screen/view_model.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/presentation/dashboard_screens/dashboard.dart';
-import 'package:cookethflow/presentation/auth_screens/sign_up.dart';
+import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
+class SplashScreenView extends StatefulWidget {
+  final SplashScreenViewModel viewModel;
+  const SplashScreenView({super.key, required this.viewModel});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  State<SplashScreenView> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashScreenState extends State<SplashScreenView> {
   final UpdateManager _updateManager = UpdateManager();
   bool _hasCheckedForUpdates = false;
   @override
@@ -53,9 +53,9 @@ class _SplashScreenState extends State<SplashScreen> {
 
     if (isAuthenticated) {
       // Navigate to Dashboard (initialization will happen in Dashboard's initState)
-      context.pushReplacement(RoutesPath.dashboard);
+      context.pushReplacement(AppView.dashboard.path);
     } else {
-      context.pushReplacement(RoutesPath.signUpScreen);
+      context.pushReplacement(AppView.signUp.path);
     }
   }
 

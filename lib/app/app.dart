@@ -1,4 +1,4 @@
-import 'package:cookethflow/core/routes/app_route_config.dart';
+import 'package:cookethflow/app/app_router.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -8,7 +8,7 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: AppRouteConfig.returnRouter(),
+      routerConfig: AppRouter().router,
       // home: const SplashScreen(),
     );
   }

@@ -1,6 +1,6 @@
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
-import 'package:cookethflow/models/connection.dart';
+import 'package:cookethflow/data/models/connection.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -14,25 +14,25 @@ class LinePainter extends CustomPainter {
   final double scale;
   final double cornerRadius;
   final Function(Offset, Connection)? onTap;
-final Connection? connection;
+  final Connection? connection;
 
   // Node dimensions
   static const double nodeWidth = 150.0; // Default node width
   static const double nodeHeight = 75.0; // Default node height
   static const double containerPadding = 20.0;
 
-  LinePainter({
-    required this.start,
-    required this.end,
-    required this.sourceNodeId,
-    required this.startPoint,
-    required this.targetNodeId,
-    required this.endPoint,
-    this.scale = 1.0,
-    this.cornerRadius = 10.0,
-    this.onTap,
-    this.connection // Rounded corner radius
-  });
+  LinePainter(
+      {required this.start,
+      required this.end,
+      required this.sourceNodeId,
+      required this.startPoint,
+      required this.targetNodeId,
+      required this.endPoint,
+      this.scale = 1.0,
+      this.cornerRadius = 10.0,
+      this.onTap,
+      this.connection // Rounded corner radius
+      });
 
   Offset _getConnectionPointOffset(Offset nodePosition, ConnectionPoint point) {
     // Calculate the center of the node without scaling
@@ -43,9 +43,11 @@ final Connection? connection;
       case ConnectionPoint.top:
         return Offset(centerX, nodePosition.dy + containerPadding);
       case ConnectionPoint.right:
-        return Offset(nodePosition.dx + nodeWidth + (containerPadding * 2), centerY);
+        return Offset(
+            nodePosition.dx + nodeWidth + (containerPadding * 2), centerY);
       case ConnectionPoint.bottom:
-        return Offset(centerX, nodePosition.dy + nodeHeight + (containerPadding * 2));
+        return Offset(
+            centerX, nodePosition.dy + nodeHeight + (containerPadding * 2));
       case ConnectionPoint.left:
         return Offset(nodePosition.dx + containerPadding, centerY);
     }
@@ -67,10 +69,12 @@ final Connection? connection;
     path.moveTo(startOffset.dx, startOffset.dy);
 
     // Determine intermediate points for orthogonal routing
-    List<Offset> points = _createOrthogonalPoints(startOffset, endOffset, startPoint, endPoint);
-    
+    List<Offset> points =
+        _createOrthogonalPoints(startOffset, endOffset, startPoint, endPoint);
+
     // Draw the path with rounded corners
-    _drawRoundedOrthogonalPath(canvas, path, [startOffset, ...points, endOffset], paint);
+    _drawRoundedOrthogonalPath(
+        canvas, path, [startOffset, ...points, endOffset], paint);
 
     // Draw connection points at start and end
     final pointPaint = Paint()
@@ -81,18 +85,14 @@ final Connection? connection;
     canvas.drawCircle(endOffset, 4, pointPaint);
   }
 
-  List<Offset> _createOrthogonalPoints(
-    Offset start, 
-    Offset end, 
-    ConnectionPoint startPoint, 
-    ConnectionPoint endPoint
-  ) {
+  List<Offset> _createOrthogonalPoints(Offset start, Offset end,
+      ConnectionPoint startPoint, ConnectionPoint endPoint) {
     List<Offset> points = [];
-    
+
     // Calculate the midpoint between start and end
     double midX = (start.dx + end.dx) / 2;
     double midY = (start.dy + end.dy) / 2;
-    
+
     // Create different routing patterns based on connection points
     if (_isHorizontal(startPoint) && _isHorizontal(endPoint)) {
       // Horizontal to horizontal connection (e.g., left to right or right to left)
@@ -109,49 +109,48 @@ final Connection? connection;
       // Vertical to horizontal connection
       points.add(Offset(start.dx, end.dy));
     }
-    
+
     return points;
   }
 
   bool _isHorizontal(ConnectionPoint point) {
     return point == ConnectionPoint.left || point == ConnectionPoint.right;
   }
-  
+
   bool _isVertical(ConnectionPoint point) {
     return point == ConnectionPoint.top || point == ConnectionPoint.bottom;
   }
 
   void _drawRoundedOrthogonalPath(
-    Canvas canvas, 
-    Path path, 
-    List<Offset> points, 
-    Paint paint
-  ) {
+      Canvas canvas, Path path, List<Offset> points, Paint paint) {
     if (points.length < 2) return;
-    
+
     // Begin path at the first point
     path.moveTo(points[0].dx, points[0].dy);
-    
+
     for (int i = 0; i < points.length - 2; i++) {
       final p1 = points[i];
       final p2 = points[i + 1];
       final p3 = points[i + 2];
-      
+
       // Draw line to the point before the corner
-      if ((p1.dx == p2.dx && p2.dy == p3.dy) || (p1.dy == p2.dy && p2.dx == p3.dx)) {
+      if ((p1.dx == p2.dx && p2.dy == p3.dy) ||
+          (p1.dy == p2.dy && p2.dx == p3.dx)) {
         // Determine corner type and draw rounded corner
         if (p1.dx == p2.dx) {
           // Vertical then horizontal
           double yDiff = (p2.dy - p1.dy).abs();
           double xDiff = (p3.dx - p2.dx).abs();
-          
+
           // Make sure we don't use a radius larger than half the segment length
-          double safeYDiff = yDiff > 0 ? yDiff : 1.0; // Prevent division by zero
-          double safeXDiff = xDiff > 0 ? xDiff : 1.0; // Prevent division by zero
-          
+          double safeYDiff =
+              yDiff > 0 ? yDiff : 1.0; // Prevent division by zero
+          double safeXDiff =
+              xDiff > 0 ? xDiff : 1.0; // Prevent division by zero
+
           double radius = math.min(cornerRadius, safeYDiff / 2);
           radius = math.min(radius, safeXDiff / 2);
-          
+
           if (p2.dy > p1.dy) {
             // Going down then horizontal
             path.lineTo(p2.dx, p2.dy - radius);
@@ -177,14 +176,16 @@ final Connection? connection;
           // Horizontal then vertical
           double xDiff = (p2.dx - p1.dx).abs();
           double yDiff = (p3.dy - p2.dy).abs();
-          
+
           // Make sure we don't use a radius larger than half the segment length
-          double safeXDiff = xDiff > 0 ? xDiff : 1.0; // Prevent division by zero
-          double safeYDiff = yDiff > 0 ? yDiff : 1.0; // Prevent division by zero
-          
+          double safeXDiff =
+              xDiff > 0 ? xDiff : 1.0; // Prevent division by zero
+          double safeYDiff =
+              yDiff > 0 ? yDiff : 1.0; // Prevent division by zero
+
           double radius = math.min(cornerRadius, safeXDiff / 2);
           radius = math.min(radius, safeYDiff / 2);
-          
+
           if (p2.dx > p1.dx) {
             // Going right then vertical
             path.lineTo(p2.dx - radius, p2.dy);
@@ -212,12 +213,12 @@ final Connection? connection;
         path.lineTo(p2.dx, p2.dy);
       }
     }
-    
+
     // Draw the final segment
     if (points.length >= 2) {
       path.lineTo(points[points.length - 1].dx, points[points.length - 1].dy);
     }
-    
+
     canvas.drawPath(path, paint);
   }
 

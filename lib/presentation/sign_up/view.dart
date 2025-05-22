@@ -1,12 +1,15 @@
 import 'package:cookethflow/core/widgets/forms/signup_form.dart';
+import 'package:cookethflow/presentation/sign_up/view_model.dart';
+import 'package:cookethflow/presentation/slider/view.dart';
+import 'package:cookethflow/presentation/slider/view_model.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:cookethflow/core/widgets/loaders/loading.dart';
-import 'package:cookethflow/presentation/auth_screens/slider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class SignupPage extends StatelessWidget {
-  const SignupPage({super.key});
+class SignUpView extends StatelessWidget {
+  final SignUpViewModel viewModel;
+  const SignUpView({super.key, required this.viewModel});
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +33,9 @@ class SignupPage extends StatelessWidget {
                                 value: provider.loadingProvider,
                                 child: const LoadingScreen(),
                               )
-                            : SliderStart(),
+                            : SliderView(
+                                viewModel: SliderViewModel(),
+                              ),
                       ),
 
                       // Form section
@@ -63,7 +68,10 @@ class SignupPage extends StatelessWidget {
                       )
                     else
                       Expanded(
-                          flex: isMediumScreen ? 3 : 1, child: SliderStart()),
+                          flex: isMediumScreen ? 3 : 1,
+                          child: SliderView(
+                            viewModel: SliderViewModel(),
+                          )),
                   ],
                 ),
         );

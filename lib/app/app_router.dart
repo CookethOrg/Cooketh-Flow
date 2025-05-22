@@ -1,8 +1,13 @@
-import 'package:cookethflow/presentation/auth_screens/log_in.dart';
-import 'package:cookethflow/presentation/auth_screens/sign_up.dart';
-import 'package:cookethflow/presentation/auth_screens/splash_screen.dart';
-import 'package:cookethflow/presentation/dashboard_screens/dashboard.dart';
-import 'package:cookethflow/presentation/workspace_screens/workspace.dart';
+import 'package:cookethflow/presentation/dashboard/view_model.dart';
+import 'package:cookethflow/presentation/log_in/view.dart';
+import 'package:cookethflow/presentation/log_in/view_model.dart';
+import 'package:cookethflow/presentation/sign_up/view.dart';
+import 'package:cookethflow/presentation/sign_up/view_model.dart';
+import 'package:cookethflow/presentation/slash_screen/view.dart';
+import 'package:cookethflow/presentation/dashboard/view.dart';
+import 'package:cookethflow/presentation/slash_screen/view_model.dart';
+import 'package:cookethflow/presentation/workspace/view.dart';
+import 'package:cookethflow/presentation/workspace/view_model.dart';
 import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:go_router/go_router.dart';
 
@@ -23,7 +28,9 @@ class AppRouter {
   final _splashScreenRoute = GoRoute(
     path: AppView.splash.path,
     name: AppView.splash.name,
-    builder: (context, state) => const SplashScreen(),
+    builder: (context, state) => SplashScreenView(
+      viewModel: SplashScreenViewModel(),
+    ),
   );
   //---------------------------------------------------------------------------------
   // sign up route --------------------------------------------------------------
@@ -31,7 +38,9 @@ class AppRouter {
   final _signUpRoute = GoRoute(
     path: AppView.signUp.path,
     name: AppView.signUp.name,
-    builder: (context, state) => const SignupPage(),
+    builder: (context, state) => SignUpView(
+      viewModel: SignUpViewModel(),
+    ),
   );
   //---------------------------------------------------------------------------------
   // log in route --------------------------------------------------------------
@@ -39,7 +48,9 @@ class AppRouter {
   final _logInRoute = GoRoute(
     path: AppView.logIn.path,
     name: AppView.logIn.name,
-    builder: (context, state) => const LoginPage(),
+    builder: (context, state) => LogInView(
+      viewModel: LogInViewModel(),
+    ),
   );
   //---------------------------------------------------------------------------------
   // dashboard route --------------------------------------------------------------
@@ -47,7 +58,9 @@ class AppRouter {
   final _dashboardRoute = GoRoute(
     path: AppView.dashboard.path,
     name: AppView.dashboard.name,
-    builder: (context, state) => const Dashboard(),
+    builder: (context, state) => DashboardView(
+      viewModel: DashboardViewModel(),
+    ),
   );
   //---------------------------------------------------------------------------------
   // workspace route --------------------------------------------------------------
@@ -55,7 +68,8 @@ class AppRouter {
   final _workspaceRoute = GoRoute(
       path: "${AppView.workspace.path}/:flowId",
       name: AppView.workspace.name,
-      builder: (context, state) => Workspace(
+      builder: (context, state) => WorkspaceView(
+            viewModel: WorkspaceViewModel(),
             flowId: state.pathParameters['flowId'] ?? '',
           ));
 }

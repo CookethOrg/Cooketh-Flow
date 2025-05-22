@@ -1,6 +1,6 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:cookethflow/providers/loading_provider.dart';
+import 'package:cookethflow/utilities/state_handler.dart';
+import 'package:cookethflow/app/providers/loading_provider.dart';
 import 'package:flutter/material.dart';
 
 class AuthenticationProvider extends StateHandler {

@@ -1,7 +1,7 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/widgets/painters/connector_painter.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

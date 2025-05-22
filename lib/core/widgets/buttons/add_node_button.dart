@@ -1,5 +1,5 @@
-import 'package:cookethflow/core/utils/enums.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
+import 'package:cookethflow/utilities/enums/node_type.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +19,8 @@ class AddButton extends StatelessWidget {
           },
           itemBuilder: (context) => [
             _buildMenuItem(NodeType.rectangular, PhosphorIconsRegular.square),
-            _buildMenuItem(NodeType.parallelogram, PhosphorIconsRegular.parallelogram),
+            _buildMenuItem(
+                NodeType.parallelogram, PhosphorIconsRegular.parallelogram),
             _buildMenuItem(NodeType.diamond, PhosphorIconsRegular.diamond),
             _buildMenuItem(NodeType.database, PhosphorIconsRegular.database),
           ],

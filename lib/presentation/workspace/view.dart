@@ -1,5 +1,5 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/utils/ui_helper.dart';
+import 'package:cookethflow/utilities/ui_helper.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/delete_workspace.dart';
 import 'package:cookethflow/core/widgets/alert_dialogues/export_options.dart';
 import 'package:cookethflow/core/widgets/drawers/project_page_drawer.dart';
@@ -8,7 +8,7 @@ import 'package:cookethflow/core/widgets/painters/line_painter.dart';
 import 'package:cookethflow/core/widgets/nodes/node.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbar.dart';
 import 'package:cookethflow/presentation/workspace/view_model.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
 import 'package:cookethflow/core/widgets/toolbox/toolbox.dart';
 import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:flutter/material.dart';

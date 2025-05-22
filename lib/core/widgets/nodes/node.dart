@@ -1,7 +1,9 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/widgets/buttons/connector.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
+import 'package:cookethflow/utilities/enums/node_type.dart';
+import 'package:cookethflow/utilities/enums/resize_handle.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -136,8 +138,8 @@ class Node extends StatelessWidget {
     }
   }
 
-  Widget _buildConnectionPoints(
-      BuildContext context, ConnectionPoint point, String id, WorkspaceProvider wp) {
+  Widget _buildConnectionPoints(BuildContext context, ConnectionPoint point,
+      String id, WorkspaceProvider wp) {
     if (!wp.nodeList[id]!.isConnectionPointAvailable(point)) {
       return const SizedBox.shrink();
     }
@@ -218,7 +220,7 @@ class Node extends StatelessWidget {
           },
           onPanUpdate: (details) {
             if (!wp.nodeList[id]!.isSelected || wp.isPanning) return;
-        
+
             final scaleFactor = wp.scale;
             final adjustedDelta = details.delta / scaleFactor;
             final newPosition = nodePosition + adjustedDelta;

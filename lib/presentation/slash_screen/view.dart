@@ -1,7 +1,7 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/utils/update_manager.dart';
+import 'package:cookethflow/utilities/update_manager.dart';
 import 'package:cookethflow/presentation/slash_screen/view_model.dart';
-import 'package:cookethflow/providers/authentication_provider.dart';
+import 'package:cookethflow/app/providers/authentication_provider.dart';
 import 'package:cookethflow/utilities/enums/app_view.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';

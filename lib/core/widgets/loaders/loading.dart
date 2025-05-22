@@ -1,7 +1,7 @@
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cookethflow/providers/loading_provider.dart';
+import 'package:cookethflow/app/providers/loading_provider.dart';
 
 class LoadingScreen extends StatelessWidget {
   const LoadingScreen({super.key});

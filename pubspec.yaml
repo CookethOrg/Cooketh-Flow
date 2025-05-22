@@ -2,7 +2,7 @@ name: cookethflow
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -33,6 +33,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   cached_network_image: ^3.2.3
+  collection: ^1.19.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -80,7 +81,6 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -115,11 +115,11 @@ flutter:
     #     - asset: fonts/TrajanPro.ttf
     #     - asset: fonts/TrajanPro_Bold.ttf
     #       weight: 700
-  
+
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 icons_launcher:
-  image_path: 'assets/Frame 271.png'
+  image_path: "assets/Frame 271.png"
   platforms:
     android:
       enable: true
@@ -129,7 +129,7 @@ icons_launcher:
       enable: true
     linux:
       enable: true
-      image_path: 'assets/Frame 271.png'
+      image_path: "assets/Frame 271.png"
     macos:
       enable: true
     web:

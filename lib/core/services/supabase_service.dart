@@ -1,7 +1,8 @@
 import 'dart:io';
-import 'package:cookethflow/core/utils/enums.dart';
-import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:cookethflow/core/utils/ui_helper.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
+import 'package:cookethflow/utilities/enums/node_type.dart';
+import 'package:cookethflow/utilities/state_handler.dart';
+import 'package:cookethflow/utilities/ui_helper.dart';
 import 'package:cookethflow/data/models/flow_manager.dart';
 import 'package:cookethflow/data/models/flow_node.dart';
 import 'package:file_selector/file_selector.dart';

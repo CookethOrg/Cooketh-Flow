@@ -1,5 +1,6 @@
-import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/data/models/connection.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
+import 'package:cookethflow/utilities/enums/node_type.dart';
 import 'package:flutter/material.dart';
 
 class FlowNode {

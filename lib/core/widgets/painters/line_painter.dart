@@ -1,6 +1,6 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/data/models/connection.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 

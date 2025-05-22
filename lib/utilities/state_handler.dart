@@ -1,8 +1,7 @@
 import "dart:io";
 
-import "package:cookethflow/core/utils/enums.dart";
+import "package:cookethflow/utilities/enums/provider_state.dart";
 import "package:flutter/material.dart";
-
 
 class StateHandler extends ChangeNotifier {
   ProviderState state = ProviderState.inital;

@@ -1,8 +1,8 @@
 import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/providers/flowmanage_provider.dart';
-import 'package:cookethflow/providers/loading_provider.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/authentication_provider.dart';
+import 'package:cookethflow/app/providers/flowmanage_provider.dart';
+import 'package:cookethflow/app/providers/loading_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

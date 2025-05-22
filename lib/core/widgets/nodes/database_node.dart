@@ -1,5 +1,5 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,11 +43,10 @@ class DatabaseNode extends StatelessWidget {
                       ? FontWeight.bold
                       : FontWeight.normal,
                   decoration: TextDecoration.combine([
-                          if (pv.nodeList[id]!.isUnderlined)
-                            TextDecoration.underline,
-                          if (pv.nodeList[id]!.isStrikeThrough)
-                            TextDecoration.lineThrough
-                        ]),
+                    if (pv.nodeList[id]!.isUnderlined) TextDecoration.underline,
+                    if (pv.nodeList[id]!.isStrikeThrough)
+                      TextDecoration.lineThrough
+                  ]),
                   overflow: TextOverflow.ellipsis,
                 ),
                 cursorColor: white,

@@ -1,4 +1,4 @@
-import 'package:cookethflow/core/utils/enums.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
 import 'package:flutter/material.dart';
 
 class ConnectorPainter extends CustomPainter {
@@ -31,18 +31,22 @@ class ConnectorPainter extends CustomPainter {
         path.lineTo(size.width * 0.5, size.height * 0.2);
         // Line to bottom-right
         path.lineTo(size.width * 0.8, size.height * 0.6);
-        
+
         // Create rounded corners using quadratic bezier curves
         path.quadraticBezierTo(
-          size.width * 0.8, size.height * 0.7,
-          size.width * 0.7, size.height * 0.7,
+          size.width * 0.8,
+          size.height * 0.7,
+          size.width * 0.7,
+          size.height * 0.7,
         );
         // Bottom line
         path.lineTo(size.width * 0.3, size.height * 0.7);
         // Final rounded corner
         path.quadraticBezierTo(
-          size.width * 0.2, size.height * 0.7,
-          size.width * 0.2, size.height * 0.6,
+          size.width * 0.2,
+          size.height * 0.7,
+          size.width * 0.2,
+          size.height * 0.6,
         );
         break;
 
@@ -51,18 +55,22 @@ class ConnectorPainter extends CustomPainter {
         canvas.translate(size.width / 2, size.height / 2);
         canvas.rotate(3.14159);
         canvas.translate(-size.width / 2, -size.height / 2);
-        
+
         path.moveTo(size.width * 0.2, size.height * 0.6);
         path.lineTo(size.width * 0.5, size.height * 0.2);
         path.lineTo(size.width * 0.8, size.height * 0.6);
         path.quadraticBezierTo(
-          size.width * 0.8, size.height * 0.7,
-          size.width * 0.7, size.height * 0.7,
+          size.width * 0.8,
+          size.height * 0.7,
+          size.width * 0.7,
+          size.height * 0.7,
         );
         path.lineTo(size.width * 0.3, size.height * 0.7);
         path.quadraticBezierTo(
-          size.width * 0.2, size.height * 0.7,
-          size.width * 0.2, size.height * 0.6,
+          size.width * 0.2,
+          size.height * 0.7,
+          size.width * 0.2,
+          size.height * 0.6,
         );
         break;
 
@@ -71,18 +79,22 @@ class ConnectorPainter extends CustomPainter {
         canvas.translate(size.width / 2, size.height / 2);
         canvas.rotate(-1.5708);
         canvas.translate(-size.width / 2, -size.height / 2);
-        
+
         path.moveTo(size.width * 0.2, size.height * 0.6);
         path.lineTo(size.width * 0.5, size.height * 0.2);
         path.lineTo(size.width * 0.8, size.height * 0.6);
         path.quadraticBezierTo(
-          size.width * 0.8, size.height * 0.7,
-          size.width * 0.7, size.height * 0.7,
+          size.width * 0.8,
+          size.height * 0.7,
+          size.width * 0.7,
+          size.height * 0.7,
         );
         path.lineTo(size.width * 0.3, size.height * 0.7);
         path.quadraticBezierTo(
-          size.width * 0.2, size.height * 0.7,
-          size.width * 0.2, size.height * 0.6,
+          size.width * 0.2,
+          size.height * 0.7,
+          size.width * 0.2,
+          size.height * 0.6,
         );
         break;
 
@@ -91,18 +103,22 @@ class ConnectorPainter extends CustomPainter {
         canvas.translate(size.width / 2, size.height / 2);
         canvas.rotate(1.5708);
         canvas.translate(-size.width / 2, -size.height / 2);
-        
+
         path.moveTo(size.width * 0.2, size.height * 0.6);
         path.lineTo(size.width * 0.5, size.height * 0.2);
         path.lineTo(size.width * 0.8, size.height * 0.6);
         path.quadraticBezierTo(
-          size.width * 0.8, size.height * 0.7,
-          size.width * 0.7, size.height * 0.7,
+          size.width * 0.8,
+          size.height * 0.7,
+          size.width * 0.7,
+          size.height * 0.7,
         );
         path.lineTo(size.width * 0.3, size.height * 0.7);
         path.quadraticBezierTo(
-          size.width * 0.2, size.height * 0.7,
-          size.width * 0.2, size.height * 0.6,
+          size.width * 0.2,
+          size.height * 0.7,
+          size.width * 0.2,
+          size.height * 0.6,
         );
         break;
     }

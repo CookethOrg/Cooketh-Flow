@@ -1,5 +1,5 @@
 import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/providers/workspace_provider.dart';
+import 'package:cookethflow/app/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/widgets/toolbox/colour_picker.dart';

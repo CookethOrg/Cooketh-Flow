@@ -1,6 +1,4 @@
-
-
-import 'package:cookethflow/core/utils/enums.dart';
+import 'package:cookethflow/utilities/enums/connection_point.dart';
 
 class ConnectionPointSelection {
   final String nodeId;

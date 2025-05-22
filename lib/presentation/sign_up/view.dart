@@ -2,7 +2,7 @@ import 'package:cookethflow/core/widgets/forms/signup_form.dart';
 import 'package:cookethflow/presentation/sign_up/view_model.dart';
 import 'package:cookethflow/presentation/slider/view.dart';
 import 'package:cookethflow/presentation/slider/view_model.dart';
-import 'package:cookethflow/providers/authentication_provider.dart';
+import 'package:cookethflow/app/providers/authentication_provider.dart';
 import 'package:cookethflow/core/widgets/loaders/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

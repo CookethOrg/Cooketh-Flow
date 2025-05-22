@@ -2,7 +2,7 @@ import 'package:cookethflow/core/widgets/forms/login_form.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:cookethflow/screens/auth_screens/slider.dart';
+import 'package:cookethflow/presentation/auth_screens/slider.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

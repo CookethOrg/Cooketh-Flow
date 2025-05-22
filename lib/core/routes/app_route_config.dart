@@ -1,9 +1,9 @@
 import 'package:cookethflow/core/routes/app_route_const.dart';
-import 'package:cookethflow/screens/auth_screens/log_in.dart';
-import 'package:cookethflow/screens/auth_screens/sign_up.dart';
-import 'package:cookethflow/screens/auth_screens/splash_screen.dart';
-import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
-import 'package:cookethflow/screens/workspace_screens/workspace.dart';
+import 'package:cookethflow/presentation/auth_screens/log_in.dart';
+import 'package:cookethflow/presentation/auth_screens/sign_up.dart';
+import 'package:cookethflow/presentation/auth_screens/splash_screen.dart';
+import 'package:cookethflow/presentation/dashboard_screens/dashboard.dart';
+import 'package:cookethflow/presentation/workspace_screens/workspace.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouteConfig {

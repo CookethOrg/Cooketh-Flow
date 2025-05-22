@@ -1,3 +1,4 @@
+import 'package:cookethflow/app/app.dart';
 import 'package:cookethflow/core/routes/app_route_config.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/services/supabase_service.dart';
@@ -5,7 +6,7 @@ import 'package:cookethflow/providers/flowmanage_provider.dart';
 import 'package:cookethflow/providers/loading_provider.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/auth_screens/splash_screen.dart';
+import 'package:cookethflow/presentation/auth_screens/splash_screen.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -66,24 +67,6 @@ Future<void> main() async {
       ),
       ChangeNotifierProvider<LoadingProvider>(create: (_) => LoadingProvider()),
     ],
-    child: const MyApp(),
+    child: const App(),
   ));
-}
-
-class MyApp extends StatefulWidget {
-  const MyApp({super.key});
-
-  @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: AppRouteConfig.returnRouter(),
-      // home: const SplashScreen(),
-    );
-  }
 }

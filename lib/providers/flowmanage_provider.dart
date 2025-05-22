@@ -10,7 +10,7 @@ import 'package:cookethflow/core/utils/ui_helper.dart';
 import 'package:cookethflow/models/flow_manager.dart';
 import 'package:cookethflow/models/flow_node.dart';
 import 'package:cookethflow/providers/workspace_provider.dart';
-import 'package:cookethflow/screens/workspace_screens/workspace.dart';
+import 'package:cookethflow/presentation/workspace_screens/workspace.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';

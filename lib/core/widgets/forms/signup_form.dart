@@ -1,8 +1,8 @@
 import 'package:cookethflow/core/routes/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/providers/authentication_provider.dart';
-import 'package:cookethflow/screens/dashboard_screens/dashboard.dart';
-import 'package:cookethflow/screens/auth_screens/log_in.dart';
+import 'package:cookethflow/presentation/dashboard_screens/dashboard.dart';
+import 'package:cookethflow/presentation/auth_screens/log_in.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -177,7 +177,8 @@ class SignupForm extends StatelessWidget {
                 ),
                 child: const Text(
                   "Log in",
-                  style: TextStyle(color: selectedItems, fontFamily: 'Frederik'),
+                  style:
+                      TextStyle(color: selectedItems, fontFamily: 'Frederik'),
                 ),
               ),
             ],

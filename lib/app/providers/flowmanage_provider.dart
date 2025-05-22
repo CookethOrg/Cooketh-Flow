@@ -1,8 +1,8 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:cookethflow/core/services/file_services.dart';
-import 'package:cookethflow/core/services/supabase_service.dart';
-import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/data/services/file_services.dart';
+import 'package:cookethflow/data/services/supabase_service.dart';
+import 'package:cookethflow/app/theme/colors.dart';
 import 'package:cookethflow/utilities/enums/node_type.dart';
 import 'package:cookethflow/utilities/state_handler.dart';
 import 'package:cookethflow/utilities/ui_helper.dart';

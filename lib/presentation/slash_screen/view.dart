@@ -1,4 +1,4 @@
-import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/app/theme/colors.dart';
 import 'package:cookethflow/utilities/update_manager.dart';
 import 'package:cookethflow/presentation/slash_screen/view_model.dart';
 import 'package:cookethflow/app/providers/authentication_provider.dart';

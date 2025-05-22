@@ -1,8 +1,8 @@
-import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/widgets/alert_dialogues/add_project.dart';
-import 'package:cookethflow/core/widgets/drawers/dashboard_drawer.dart';
-import 'package:cookethflow/core/widgets/cards/project_card.dart';
-import 'package:cookethflow/core/widgets/cards/add_project_card.dart';
+import 'package:cookethflow/app/theme/colors.dart';
+import 'package:cookethflow/presentation/core/alert_dialogues/add_project.dart';
+import 'package:cookethflow/presentation/core/drawers/dashboard_drawer.dart';
+import 'package:cookethflow/presentation/core/cards/project_card.dart';
+import 'package:cookethflow/presentation/core/cards/add_project_card.dart';
 import 'package:cookethflow/presentation/dashboard/view_model.dart';
 import 'package:cookethflow/app/providers/flowmanage_provider.dart';
 import 'package:cookethflow/app/providers/workspace_provider.dart';

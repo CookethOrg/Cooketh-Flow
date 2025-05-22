@@ -1,4 +1,4 @@
-import 'package:cookethflow/core/services/supabase_service.dart';
+import 'package:cookethflow/data/services/supabase_service.dart';
 import 'package:cookethflow/app/providers/authentication_provider.dart';
 import 'package:cookethflow/app/providers/flowmanage_provider.dart';
 import 'package:cookethflow/app/providers/loading_provider.dart';

@@ -1,4 +1,4 @@
-import 'package:cookethflow/core/services/supabase_service.dart';
+import 'package:cookethflow/data/services/supabase_service.dart';
 import 'package:cookethflow/utilities/state_handler.dart';
 import 'package:cookethflow/app/providers/loading_provider.dart';
 import 'package:flutter/material.dart';

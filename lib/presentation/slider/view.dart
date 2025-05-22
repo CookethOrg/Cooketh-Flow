@@ -1,5 +1,5 @@
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/app/theme/colors.dart';
 import 'package:cookethflow/presentation/slider/view_model.dart';
 import 'package:flutter/material.dart';
 

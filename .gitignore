@@ -47,3 +47,4 @@ app.*.map.json
 /dist/
 dotenv
 run.sh
+run.ps1

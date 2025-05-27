@@ -46,6 +46,9 @@ If you find a bug or have a feature request, please [open an issue](https://gith
 - Follow the [Code of Conduct](CODE_OF_CONDUCT.md).
 - Help others by reviewing and discussing pull requests.
 
+## Governance
+[Cooketh Flow](https://github.com/CookethOrg/Cooketh-Flow) is led by [Subroto Banerjee](https://github.com/TeeWrath) as BDFL, who makes final decisions on the project’s direction. Contributors are encouraged to share ideas via GitHub Issues, but the BDFL reserves the right to guide the roadmap.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the same license as Cooketh Flow.

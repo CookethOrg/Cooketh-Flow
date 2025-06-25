@@ -1,3 +1,4 @@
+import 'package:cookethflow/features/auth/pages/login.dart';
 import 'package:flutter/material.dart';
 
 class MyApp extends StatelessWidget {
@@ -7,7 +8,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-      body: Center(child: Text('Hello world'),),
+      body: LoginPage(),
     ),
     );
   }

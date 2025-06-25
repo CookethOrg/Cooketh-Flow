@@ -90,9 +90,11 @@ class Dashboard extends StatelessWidget {
                                       workspaceProvider
                                           .initializeWorkspace(flowId);
 
-                                      context.go('${RoutesPath.workspace}/:$flowId');
-                                          // .then((_) =>
-                                          //     flowProvider.refreshFlowList());
+                                      context.go(
+                                          '${RoutesPath.workspace}/:$flowId');
+                                      flowProvider.refreshFlowList();
+                                      // .then((_) =>
+                                      //     flowProvider.refreshFlowList());
                                     },
                                   );
                                 }

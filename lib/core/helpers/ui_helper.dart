@@ -1,0 +1,1 @@
+double canvasDimension = 5.0;

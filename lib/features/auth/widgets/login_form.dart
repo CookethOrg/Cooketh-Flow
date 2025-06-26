@@ -19,76 +19,83 @@ class LoginForm extends StatelessWidget {
           const Text(
             "Log In",
             style: TextStyle(
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
               fontFamily: 'Frederik',
+              fontWeight: FontWeight.w700,
+              fontSize: 24,
+              color: Color(0xFF000000),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           const Text(
-            "Log in to existing account",
+            "Log in to your existing account",
             style: TextStyle(
-              fontSize: 20,
-              color: Colors.orangeAccent,
               fontFamily: 'Frederik',
-              fontWeight: FontWeight.w200,
+              fontWeight: FontWeight.normal,
+              fontSize: 16,
+              color: Color(0xFF4B4B4B),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 40),
           const Text(
-            "Email Address",
-            style: TextStyle(fontSize: 20, fontFamily: 'Frederik'),
+            "Username/Email address",
+            style: TextStyle(
+              fontFamily: 'Frederik',
+              fontWeight: FontWeight.w500,
+              fontSize: 16,
+              color: Color(0xFF000000),
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           TextField(
-            // controller: provider.emailController,
             decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              hintText: 'Enter your Email Address',
+              contentPadding: const EdgeInsets.all(16),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              hintText: 'Enter your username/email address',
               hintStyle: const TextStyle(
-                color: Colors.orangeAccent,
                 fontFamily: 'Frederik',
+                fontWeight: FontWeight.normal,
                 fontSize: 16,
+                color: Color(0xFF4B4B4B),
               ),
               disabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.black, width: 1),
+                borderSide: const BorderSide(color: Color(0xFF000000), width: 1),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.orangeAccent, width: 2),
-                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
+                borderRadius: BorderRadius.circular(8),
               ),
             ),
           ),
           const SizedBox(height: 24),
           const Text(
             "Password",
-            style: TextStyle(fontSize: 20, fontFamily: 'Frederik'),
+            style: TextStyle(
+              fontFamily: 'Frederik',
+              fontWeight: FontWeight.w500, // Medium
+              fontSize: 16,
+              color: Color(0xFF000000),
+            ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
           TextField(
             controller: provider.passwordController,
             obscureText: provider.obscurePassword,
             decoration: InputDecoration(
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              hintText: 'Enter the Password',
+              contentPadding: const EdgeInsets.all(16),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              hintText: 'Enter your password',
               hintStyle: const TextStyle(
-                color: Colors.orange,
                 fontFamily: 'Frederik',
+                fontWeight: FontWeight.normal,
                 fontSize: 16,
-                fontWeight: FontWeight.w100,
+                color: Color(0xFF4B4B4B),
               ),
               disabledBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.black, width: 1),
+                borderSide: const BorderSide(color: Color(0xFF000000), width: 1),
               ),
               focusedBorder: OutlineInputBorder(
-                borderSide: const BorderSide(color: Colors.orange, width: 2),
-                borderRadius: BorderRadius.circular(12),
+                borderSide: const BorderSide(color: primaryColor, width: 2),
+                borderRadius: BorderRadius.circular(8),
               ),
               suffixIcon: IconButton(
                 icon: Icon(provider.obscurePassword
@@ -98,17 +105,18 @@ class LoginForm extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 40),
           Center(
             child: provider.isLoading
                 ? const CircularProgressIndicator()
                 : ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 24, horizontal: 32),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      backgroundColor: Colors.black,
+                      backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
                     ),
                     onPressed: () async {
@@ -151,23 +159,29 @@ class LoginForm extends StatelessWidget {
                       //   provider.setLoading(false);
                       // }
                     },
-                    child: const Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 32, vertical: 8),
-                      child: Text(
-                        "Log in",
-                        style: TextStyle(fontSize: 16, fontFamily: 'Frederik'),
+                    child: const Text(
+                      "Log in",
+                      style: TextStyle(
+                        fontFamily: 'Frederik',
+                        fontWeight: FontWeight.w700, // Demibold
+                        fontSize: 16,
+                        color: Colors.white,
                       ),
                     ),
                   ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
                 "Don't have an account?",
-                style: TextStyle(fontFamily: 'Frederik'),
+                style: TextStyle(
+                  fontFamily: 'Frederik',
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16,
+                  color: Color(0xFF000000),
+                ),
               ),
               TextButton(
                 onPressed: () {
@@ -178,7 +192,12 @@ class LoginForm extends StatelessWidget {
                 ),
                 child: const Text(
                   "Sign up",
-                  style: TextStyle(color: Colors.orange, fontFamily: 'Frederik'),
+                  style: TextStyle(
+                    fontFamily: 'Frederik',
+                    fontWeight: FontWeight.w500, // Medium
+                    fontSize: 16,
+                    color: Color(0xFF3B82F6), // Secondary color blue
+                  ),
                 ),
               ),
             ],

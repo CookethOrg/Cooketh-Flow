@@ -49,7 +49,10 @@ class LoginForm extends StatelessWidget {
             const SizedBox(height: 12),
             TextField(
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical:20),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -126,11 +129,8 @@ class LoginForm extends StatelessWidget {
                   ),
                   onPressed: provider.toggleObscurePassword,
                   style: ButtonStyle(
-                    overlayColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
-                    splashFactory:
-                        NoSplash.splashFactory,
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
+                    splashFactory: NoSplash.splashFactory,
                   ),
                 ),
               ),
@@ -232,9 +232,14 @@ class LoginForm extends StatelessWidget {
                         ),
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
-                        side: const BorderSide(color: Color(0xFFD9D9D9), width: 1),
+                        side: const BorderSide(
+                          color: Color(0xFFD9D9D9),
+                          width: 1,
+                        ),
                       ),
-                      onPressed: () {
+                      onPressed: () async {
+                        String res = await provider.googleAuth();
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -265,10 +270,12 @@ class LoginForm extends StatelessWidget {
                         ),
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
-                        side: const BorderSide(color: Color(0xFFD9D9D9), width: 1),
+                        side: const BorderSide(
+                          color: Color(0xFFD9D9D9),
+                          width: 1,
+                        ),
                       ),
-                      onPressed: () {
-                      },
+                      onPressed: () {},
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -315,7 +322,7 @@ class LoginForm extends StatelessWidget {
                       fontFamily: 'Frederik',
                       fontWeight: FontWeight.w500, // Medium
                       fontSize: 16,
-                      color: secondaryColors[6] // Secondary color blue
+                      color: secondaryColors[6], // Secondary color blue
                     ),
                   ),
                 ),

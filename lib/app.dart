@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/router/app_route_config.dart';
 import 'package:cookethflow/features/auth/pages/login.dart';
 import 'package:flutter/material.dart';
 
@@ -6,11 +7,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-      body: LoginPage(),
-    ),
+    routerConfig: AppRouteConfig.returnRouter(),
     );
   }
 }

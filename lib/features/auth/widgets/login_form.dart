@@ -30,7 +30,7 @@ class LoginForm extends StatelessWidget {
             "Log in to your existing account",
             style: TextStyle(
               fontFamily: 'Frederik',
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.w300,
               fontSize: 16,
               color: Color(0xFF4B4B4B),
             ),

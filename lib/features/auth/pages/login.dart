@@ -8,7 +8,7 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0XFFF8F8F8),
       body: MediaQuery.of(context).size.width < 800
           ? SingleChildScrollView(
               child: Column(

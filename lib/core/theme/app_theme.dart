@@ -2,6 +2,7 @@ import "package:flutter/cupertino.dart";
 import "package:flutter/material.dart";
 
 class AppTheme {
+  
   // Dark Mode - Android
   static const Color _scaffoldColorDark = Color.fromARGB(255, 26, 31, 37);
   static const Color _primaryColorDark = Color.fromARGB(255, 38, 45, 53);
@@ -20,6 +21,7 @@ class AppTheme {
         primary: _primaryColorDark,
         secondary: _secondaryColorDark,
       ),
+      
       // Allow developers flexibility in text theme colors and font weights to suit specific UI details.
       textTheme: const TextTheme(
         titleLarge: TextStyle(

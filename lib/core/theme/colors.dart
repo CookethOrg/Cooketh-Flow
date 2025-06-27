@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 const primaryColor = Color(0xFFED6325);
 
 // List of secondary colors
-const List<Color> secondaryColors = [
+List secondaryColors = [
   Color(0xFF30C66F), // [0] Green
   Color(0xFFFF6B6B), // [1] Coral Red
   Color(0xFFF59E0B), // [2] Amber
@@ -17,7 +17,7 @@ const List<Color> secondaryColors = [
 ];
 
 // List of tertiary colors
-const List<Color> tertiaryColors = [
+List tertiaryColors = [
   Color(0xFFB9F5CC), // [0] Light Green
   Color(0xFFFFC4BC), // [1] Light Coral
   Color(0xFFFAD7A0), // [2] Light Amber

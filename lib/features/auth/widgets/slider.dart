@@ -18,29 +18,31 @@ class SliderStart extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: const Color(0xFFF5E6CC),
+        backgroundColor: const Color(0xFFFDE2CF),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              CarouselSlider(
-                options: CarouselOptions(
-                  height: 300,
-                  autoPlay: true,
-                  autoPlayInterval: const Duration(milliseconds: 2500),
-                  viewportFraction: 1.0,
-                  enableInfiniteScroll: true,
-                  scrollPhysics: const NeverScrollableScrollPhysics(),
-                  onPageChanged: (index, reason) {
-                    currentIndex.value = index; // Update the index when slide changes
-                  },
+              SizedBox(
+                height: 640,
+                child: CarouselSlider(
+                  options: CarouselOptions(
+                    autoPlay: true,
+                    autoPlayInterval: const Duration(milliseconds: 2500),
+                    viewportFraction: 1.0,
+                    enableInfiniteScroll: true,
+                    scrollPhysics: const NeverScrollableScrollPhysics(),
+                    onPageChanged: (index, reason) {
+                      currentIndex.value = index;
+                    },
+                  ),
+                  items: images.map((image) {
+                    return Image.asset(
+                      image,
+                      fit: BoxFit.cover,
+                    );
+                  }).toList(),
                 ),
-                items: images.map((image) {
-                  return Image.asset(
-                    image,
-                    fit: BoxFit.cover,
-                  );
-                }).toList(),
               ),
               const SizedBox(height: 20),
               ValueListenableBuilder<int>(

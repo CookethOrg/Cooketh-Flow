@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -232,52 +233,35 @@ class SupabaseService extends StateHandler {
   }
 
   Future<String> googleAuthenticate() async {
-    try {
-      const webClientId =
-          '1017386220944-mp9pmjv6n179p138piberblhlvb15dv7.apps.googleusercontent.com';
+  try {
+    // Web client ID for Supabase (used in Supabase dashboard)
+    const webClientId =
+        '1017386220944-mp9pmjv6n179p138piberblhlvb15dv7.apps.googleusercontent.com';
 
-      /// TODO: update the iOS client ID with your own.
-      ///
-      /// iOS Client ID that you registered with Google Cloud.
-      const iosClientId = '1017386220944-nq0u1v5jguepl25j1is6m1f3ji8jmibl.apps.googleusercontent.com';
+    // Use Supabase's OAuth flow for Google Sign-In
+    final authResponse = await Supabase.instance.client.auth.signInWithOAuth(
+      OAuthProvider.google,
+      // Redirect to the app after authentication (important for mobile)
+      redirectTo: kIsWeb ? 'https://dowultdujeltbsocghrt.supabase.co/auth/v1/callback' : 'myapp://login-callback/',
+      // Optional: Pass client ID for web (if needed by Supabase)
+      authScreenLaunchMode: kIsWeb ? LaunchMode.inAppWebView : LaunchMode.platformDefault,
+    );
 
-      // Google sign in on Android will work without providing the Android
-      // Client ID registered on Google Cloud.
-
-      // final GoogleSignIn googleSignIn = GoogleSignIn(
-      //   // clientId: iosClientId,
-      //   serverClientId: webClientId,
-      // );
-      // final googleUser = await googleSignIn.signIn();
-      // final googleAuth = await googleUser!.authentication;
-      // final accessToken = googleAuth.accessToken;
-      // final idToken = googleAuth.idToken;
-
-      final GoogleSignIn googleSignIn = GoogleSignIn.instance;
-      unawaited(googleSignIn.initialize(clientId: iosClientId,serverClientId: webClientId));
-      final googleUser = await googleSignIn.attemptLightweightAuthentication();
-      final googleAuth = googleUser!.authentication;
-      final idToken = googleAuth.idToken;
-
-      // if (accessToken == null) {
-      //   throw 'No Access Token found.';
-      // }
-
-      if (idToken == null) {
-        throw 'No ID Token found.';
-      }
-
-      final AuthResponse response = await supabase.auth.signInWithIdToken(
-        provider: OAuthProvider.google,
-        idToken: idToken,
-        // accessToken: accessToken,
-      );
-
-      return 'User Authenticated with email: ${response.session!.user.email}';
-    } catch (e) {
-      return e.toString();
+    if (!authResponse) {
+      return 'Google Sign-In was canceled or failed.';
     }
+
+    // Get the authenticated session
+    final session = Supabase.instance.client.auth.currentSession;
+    if (session == null) {
+      throw 'No session found after Google Sign-In.';
+    }
+
+    return 'User Authenticated with email: ${session.user.email ?? 'Unknown'}';
+  } catch (e) {
+    return 'Error: ${e.toString()}';
   }
+}
 
   Future<String> loginUser({
     required String email,

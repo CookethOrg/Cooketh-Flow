@@ -238,8 +238,15 @@ class LoginForm extends StatelessWidget {
                         ),
                       ),
                       onPressed: () async {
+                        provider.setLoading(true);
                         String res = await provider.googleAuth();
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(res)));
+                        provider.setLoading(false);
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(res)));
+                        if (res.contains('User Authenticated')) {
+                          context.pushReplacement(RoutesPath.dashboard);
+                        }
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

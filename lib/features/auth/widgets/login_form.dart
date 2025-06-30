@@ -247,6 +247,7 @@ class LoginForm extends StatelessWidget {
                         if (res.contains('User Authenticated')) {
                           context.pushReplacement(RoutesPath.dashboard);
                         }
+                        context.pushReplacement(RoutesPath.dashboard);
                       },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,

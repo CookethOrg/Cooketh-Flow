@@ -86,15 +86,15 @@ class SupabaseService extends StateHandler {
     }
   }
 
-  Future<Map<String, dynamic>?> fetchCurrentUserDetails() async {
+  Future<dynamic> fetchCurrentUserDetails() async {
     final user = supabase.auth.currentUser;
     if (user == null) return null;
 
     try {
-      final response =
-          await supabase.from('User').select().eq('id', user.id).single();
-      setUserName(response['userName']);
-      setEmail(response['email']);
+      final response = await supabase.auth.getUser();
+      setUserName(response.user!.userMetadata!["full_name"]);
+      setEmail(response.user!.email);
+      // print(response.user);
       return response;
     } catch (e) {
       print("Error fetching user details: $e");
@@ -233,35 +233,37 @@ class SupabaseService extends StateHandler {
   }
 
   Future<String> googleAuthenticate() async {
-  try {
-    // Web client ID for Supabase (used in Supabase dashboard)
-    const webClientId =
-        '1017386220944-mp9pmjv6n179p138piberblhlvb15dv7.apps.googleusercontent.com';
+    try {
+      // Web client ID for Supabase (used in Supabase dashboard)
+      const webClientId =
+          '1017386220944-mp9pmjv6n179p138piberblhlvb15dv7.apps.googleusercontent.com';
 
-    // Use Supabase's OAuth flow for Google Sign-In
-    final authResponse = await Supabase.instance.client.auth.signInWithOAuth(
-      OAuthProvider.google,
-      // Redirect to the app after authentication (important for mobile)
-      redirectTo: kIsWeb ? 'https://dowultdujeltbsocghrt.supabase.co/auth/v1/callback' : 'myapp://login-callback/',
-      // Optional: Pass client ID for web (if needed by Supabase)
-      authScreenLaunchMode: kIsWeb ? LaunchMode.inAppWebView : LaunchMode.platformDefault,
-    );
+      // Use Supabase's OAuth flow for Google Sign-In
+      final authResponse = await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        // Redirect to the app after authentication (important for mobile)
+        redirectTo:
+            kIsWeb ? 'http://localhost:3000/dashboard' : 'myapp://login-callback/',
+        // Optional: Pass client ID for web (if needed by Supabase)
+        authScreenLaunchMode:
+            kIsWeb ? LaunchMode.inAppWebView : LaunchMode.platformDefault,
+      );
 
-    if (!authResponse) {
-      return 'Google Sign-In was canceled or failed.';
+      if (!authResponse) {
+        return 'Google Sign-In was canceled or failed.';
+      }
+
+      // Get the authenticated session
+      final session = Supabase.instance.client.auth.currentSession;
+      if (session == null) {
+        throw 'No session found after Google Sign-In.';
+      }
+
+      return 'User Authenticated with email: ${session.user.email ?? 'Unknown'}';
+    } catch (e) {
+      return 'Error: ${e.toString()}';
     }
-
-    // Get the authenticated session
-    final session = Supabase.instance.client.auth.currentSession;
-    if (session == null) {
-      throw 'No session found after Google Sign-In.';
-    }
-
-    return 'User Authenticated with email: ${session.user.email ?? 'Unknown'}';
-  } catch (e) {
-    return 'Error: ${e.toString()}';
   }
-}
 
   Future<String> loginUser({
     required String email,

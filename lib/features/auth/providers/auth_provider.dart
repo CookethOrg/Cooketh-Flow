@@ -1,7 +1,8 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:flutter/material.dart';
 
-class AuthenticationProvider extends StateHandler{
+class AuthenticationProvider extends StateHandler {
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -16,6 +17,9 @@ class AuthenticationProvider extends StateHandler{
   TextEditingController get userNameController => _userNameController;
   TextEditingController get emailController => _emailController;
   TextEditingController get passwordController => _passwordController;
+  late final SupabaseService supabaseService;
+
+  AuthenticationProvider(this.supabaseService) : super();
 
   void toggleObscurePassword() {
     _obscurePassword = !_obscurePassword;
@@ -30,5 +34,14 @@ class AuthenticationProvider extends StateHandler{
   void setLoading(bool val) {
     _isLoading = val;
     notifyListeners();
+  }
+
+  Future<String> googleAuth() async {
+    try {
+      String res = await supabaseService.googleAuthenticate();
+      return res;
+    } catch (e) {
+      return e.toString();
+    }
   }
 }

@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/helpers/input_validators.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
@@ -47,7 +48,9 @@ class SignUpForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
+            TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => validateUserName(value),
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 border: OutlineInputBorder(
@@ -85,7 +88,9 @@ class SignUpForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
+            TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => validateEmail(value),
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
                 border: OutlineInputBorder(
@@ -123,7 +128,9 @@ class SignUpForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
+            TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => validatePassword(value),
               controller: provider.passwordController,
               obscureText: provider.obscurePassword,
               decoration: InputDecoration(
@@ -183,7 +190,9 @@ class SignUpForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            TextField(
+            TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => validatePassword(value),
               obscureText: provider.obscurePassword,
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(

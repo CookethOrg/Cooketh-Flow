@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/helpers/input_validators.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
@@ -38,7 +39,7 @@ class LoginForm extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             const Text(
-              "Username/Email address",
+              "Email address",
               style: TextStyle(
                 fontFamily: 'Frederik',
                 fontWeight: FontWeight.w500,
@@ -47,7 +48,9 @@ class LoginForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            TextField(
+            TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => validateEmail(value),
               decoration: InputDecoration(
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 24,
@@ -56,7 +59,7 @@ class LoginForm extends StatelessWidget {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
-                hintText: 'Enter your username/email address',
+                hintText: 'Enter your email address',
                 hintStyle: const TextStyle(
                   fontFamily: 'Frederik',
                   fontWeight: FontWeight.normal,
@@ -88,7 +91,9 @@ class LoginForm extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 12),
-            TextField(
+            TextFormField(
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              validator: (value) => validatePassword(value),
               controller: provider.passwordController,
               obscureText: provider.obscurePassword,
               decoration: InputDecoration(

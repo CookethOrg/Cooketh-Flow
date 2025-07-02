@@ -4,6 +4,7 @@ import 'package:cookethflow/features/auth/providers/auth_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -39,6 +40,8 @@ void main() async {
     url: supabaseUrl,
     anonKey: supabaseApiKey,
   );
+
+  usePathUrlStrategy();
   runApp(
     MultiProvider(
       providers: [

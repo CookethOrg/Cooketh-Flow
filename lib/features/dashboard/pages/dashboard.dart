@@ -12,7 +12,7 @@ class DashboardPage extends StatelessWidget {
         return Scaffold(body: Center(child: Column(children: [
           Text(supa.userName ?? "No user"),
           Text(supa.email ?? "No user"),
-          Text(supa.userData.user!.userMetadata!["raw_user_meta_data"]["avatar_url"]?? "not found")
+          // Text(supa.userData.user!.userMetadata!["raw_user_meta_data"]["userName"]?? "not found")
         ],),),);
       }
     );

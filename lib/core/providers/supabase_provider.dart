@@ -215,12 +215,12 @@ class SupabaseService extends StateHandler {
         //         }
         //       };
 
-        await supabase.from('User').insert({
-          'id': user.id,
-          'userName': userName,
-          'email': email,
-          'flowList': {},
-        });
+        // await supabase.from('User').insert({
+        //   'id': user.id,
+        //   'userName': userName,
+        //   'email': email,
+        //   'flowList': {},
+        // });
 
         setUserName(userName);
         setEmail(email);

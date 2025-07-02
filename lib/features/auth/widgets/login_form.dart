@@ -49,6 +49,7 @@ class LoginForm extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             TextFormField(
+              controller: provider.emailController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => validateEmail(value),
               decoration: InputDecoration(
@@ -169,34 +170,34 @@ class LoginForm extends StatelessWidget {
                           //   return;
                           // }
 
-                          // provider.setLoading(true);
+                          provider.setLoading(true);
 
-                          // try {
-                          //   String res = await provider.loginUser(
-                          //     email: provider.emailController.text,
-                          //     password: provider.passwordController.text,
-                          //   );
+                          try {
+                            String res = await provider.loginUser(
+                              email: provider.emailController.text,
+                              password: provider.passwordController.text,
+                            );
 
-                          //   if (res == "Logged in successfully") {
-                          //     context.pushReplacement(RoutesPath.dashboard);
-                          //   } else {
-                          //     ScaffoldMessenger.of(context).showSnackBar(
-                          //       SnackBar(
-                          //         content: Text(res),
-                          //         duration: const Duration(seconds: 5),
-                          //       ),
-                          //     );
-                          //   }
-                          // } catch (e) {
-                          //   ScaffoldMessenger.of(context).showSnackBar(
-                          //     SnackBar(
-                          //       content: Text('Error: ${e.toString()}'),
-                          //       duration: const Duration(seconds: 5),
-                          //     ),
-                          //   );
-                          // } finally {
-                          //   provider.setLoading(false);
-                          // }
+                            if (res == "Logged in successfully") {
+                              context.pushReplacement(RoutesPath.dashboard);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(res),
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Error: ${e.toString()}'),
+                                duration: const Duration(seconds: 5),
+                              ),
+                            );
+                          } finally {
+                            provider.setLoading(false);
+                          }
                         },
                         child: const Text(
                           "Log in",

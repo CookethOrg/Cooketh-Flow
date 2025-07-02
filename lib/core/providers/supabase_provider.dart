@@ -265,6 +265,15 @@ class SupabaseService extends StateHandler {
     }
   }
 
+  Future<void> signInWithGithub() async {
+  await supabase.auth.signInWithOAuth(
+    OAuthProvider.github,
+    redirectTo: kIsWeb ? 'http://localhost:3000/dashboard' : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+    authScreenLaunchMode:
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
+  );
+}
+
   Future<String> loginUser({
     required String email,
     required String password,

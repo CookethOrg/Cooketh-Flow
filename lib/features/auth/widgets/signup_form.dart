@@ -53,7 +53,10 @@ class SignUpForm extends StatelessWidget {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => validateUserName(value),
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -94,7 +97,10 @@ class SignUpForm extends StatelessWidget {
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => validateEmail(value),
               decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -173,9 +179,7 @@ class SignUpForm extends StatelessWidget {
                   ),
                   onPressed: provider.toggleObscurePassword,
                   style: ButtonStyle(
-                    overlayColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
                     splashFactory: NoSplash.splashFactory,
                   ),
                 ),
@@ -234,9 +238,7 @@ class SignUpForm extends StatelessWidget {
                   ),
                   onPressed: provider.toggleObscurePassword,
                   style: ButtonStyle(
-                    overlayColor: WidgetStateProperty.all(
-                      Colors.transparent,
-                    ),
+                    overlayColor: WidgetStateProperty.all(Colors.transparent),
                     splashFactory: NoSplash.splashFactory,
                   ),
                 ),
@@ -244,72 +246,73 @@ class SignUpForm extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Center(
-              child: provider.isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shadowColor: Colors.transparent,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 24,
-                          horizontal: 32,
+              child:
+                  provider.isLoading
+                      ? const CircularProgressIndicator()
+                      : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shadowColor: Colors.transparent,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 24,
+                            horizontal: 32,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () async {
-                        // Validate inputs
-                        // if (provider.emailController.text.isEmpty ||
-                        //     provider.passwordController.text.isEmpty) {
-                        //   ScaffoldMessenger.of(context).showSnackBar(
-                        //     const SnackBar(
-                        //         content: Text('Email and password are required')),
-                        //   );
-                        //   return;
-                        // }
+                        onPressed: () async {
+                          // Validate inputs
+                          // if (provider.emailController.text.isEmpty ||
+                          //     provider.passwordController.text.isEmpty) {
+                          //   ScaffoldMessenger.of(context).showSnackBar(
+                          //     const SnackBar(
+                          //         content: Text('Email and password are required')),
+                          //   );
+                          //   return;
+                          // }
 
-                        provider.setLoading(true);
+                          provider.setLoading(true);
 
-                        try {
-                          String res = await provider.createNewUser(
-                            userName: provider.userNameController.text,
-                            email: provider.emailController.text,
-                            password: provider.passwordController.text,
-                          );
+                          try {
+                            String res = await provider.createNewUser(
+                              userName: provider.userNameController.text,
+                              email: provider.emailController.text,
+                              password: provider.passwordController.text,
+                            );
 
-                          if (res == "Signed Up Successfully") {
-                            context.pushReplacement(RoutesPath.dashboard);
-                          } else {
+                            if (res == "Signed Up Successfully") {
+                              context.pushReplacement(RoutesPath.dashboard);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(res),
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          } catch (e) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(res),
+                                content: Text('Error: ${e.toString()}'),
                                 duration: const Duration(seconds: 5),
                               ),
                             );
+                          } finally {
+                            provider.setLoading(false);
                           }
-                        } catch (e) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Error: ${e.toString()}'),
-                              duration: const Duration(seconds: 5),
-                            ),
-                          );
-                        } finally {
-                          provider.setLoading(false);
-                        }
-                      },
-                      child: const Text(
-                        "Sign up",
-                        style: TextStyle(
-                          fontFamily: 'Frederik',
-                          fontWeight: FontWeight.w700,
-                          fontSize: 16,
-                          color: Colors.white,
+                        },
+                        child: const Text(
+                          "Sign up",
+                          style: TextStyle(
+                            fontFamily: 'Frederik',
+                            fontWeight: FontWeight.w700,
+                            fontSize: 16,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
             ),
             const SizedBox(height: 16),
             Column(
@@ -339,7 +342,10 @@ class SignUpForm extends StatelessWidget {
                         ),
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
-                        side: const BorderSide(color: Color(0xFFD9D9D9), width: 1),
+                        side: const BorderSide(
+                          color: Color(0xFFD9D9D9),
+                          width: 1,
+                        ),
                       ),
                       onPressed: () {},
                       child: Row(
@@ -371,9 +377,14 @@ class SignUpForm extends StatelessWidget {
                         ),
                         backgroundColor: Colors.white,
                         foregroundColor: Colors.black,
-                        side: const BorderSide(color: Color(0xFFD9D9D9), width: 1),
+                        side: const BorderSide(
+                          color: Color(0xFFD9D9D9),
+                          width: 1,
+                        ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        provider.githubSignin();
+                      },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

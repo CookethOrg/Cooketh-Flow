@@ -289,7 +289,9 @@ class LoginForm extends StatelessWidget {
                           width: 1,
                         ),
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        provider.githubSignin();
+                      },
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [

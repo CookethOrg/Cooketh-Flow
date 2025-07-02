@@ -45,6 +45,10 @@ class AuthenticationProvider extends StateHandler {
     }
   }
 
+  Future<void> githubSignin() async {
+    supabaseService.signInWithGithub();
+  }
+
   Future<String> createNewUser({
     required String userName,
     required String email,

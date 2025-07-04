@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class SliderStart extends StatelessWidget {
   final List<String> images = [
@@ -24,7 +25,7 @@ class SliderStart extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: 640,
+                height: 0.8.sh, // 640
                 child: CarouselSlider(
                   options: CarouselOptions(
                     autoPlay: true,
@@ -44,7 +45,7 @@ class SliderStart extends StatelessWidget {
                   }).toList(),
                 ),
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 10.h),
               ValueListenableBuilder<int>(
                 valueListenable: currentIndex,
                 builder: (context, index, child) {
@@ -53,9 +54,9 @@ class SliderStart extends StatelessWidget {
                     children: List.generate(
                       3,
                       (i) => Container(
-                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                        width: 12,
-                        height: 12,
+                        margin: EdgeInsets.symmetric(horizontal: 4.w),
+                        width: 12.w,
+                        height: 12.h,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: i == index

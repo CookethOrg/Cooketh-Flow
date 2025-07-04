@@ -40,11 +40,12 @@ dependencies:
   carousel_slider: ^5.1.1
   flutter_provider: ^2.1.0
   provider: ^6.1.5
-  go_router: ^15.2.4
+  go_router: ^16.0.0
   supabase_flutter: ^2.9.1
   dotenv: ^4.2.0
   flutter_dotenv: ^5.2.1
   google_sign_in: ^7.0.0
+  flutter_screenutil: ^5.9.3
 
 dev_dependencies:
   flutter_test:

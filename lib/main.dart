@@ -1,6 +1,7 @@
 import 'package:cookethflow/app.dart';
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
+import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -56,6 +57,14 @@ void main() async {
           update:
               (context, supabaseService, previousAuth) =>
                   previousAuth ?? AuthenticationProvider(supabaseService),
+        ),
+        ChangeNotifierProxyProvider(
+          create:
+              (ctx) => DashboardProvider(
+                Provider.of<AuthenticationProvider>(ctx, listen: false),
+              ),
+          update:
+              (context, auth, previous) => previous ?? DashboardProvider(auth),
         ),
       ],
       child: const MyApp(),

@@ -1,5 +1,4 @@
 import 'package:cookethflow/features/auth/widgets/login_form.dart';
-import 'package:cookethflow/features/auth/widgets/slider.dart';
 import 'package:flutter/material.dart';
 
 class LoginMobile extends StatelessWidget {

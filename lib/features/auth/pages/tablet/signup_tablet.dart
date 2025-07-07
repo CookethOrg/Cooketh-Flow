@@ -7,20 +7,27 @@ class SignupTablet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-              child: Column(
-                children: [
-                  SizedBox(
-                    height: 200,
-                    child: SliderStart(),
+    return Row(
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.05,
+                        vertical: 32,
+                      ),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: MediaQuery.of(context).size.height - 64,
+                        ),
+                        child: SignUpForm(),
+                      ),
+                    ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24.0, vertical: 16.0),
-                    child: SignUpForm(),
-                  ),
-                ],
-              ),
+                ),
+                Expanded(flex: 1, child: SliderStart()),
+              ],
             );
   }
 }

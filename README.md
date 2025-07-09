@@ -73,7 +73,9 @@ flutter run
 ---
 ## 📜 License  
 
-This project is licensed under the **MIT License** – see the [`LICENSE`](LICENSE) file for details.  
+This project is licensed under the **MIT License** – see the [`LICENSE`](LICENSE) file for details.
+<br>
+I, [Subroto Banerjee](https://github.com/TeeWrath), am the Benevolent Dictator For Life (BDFL) of [Cooketh Flow](https://github.com/CookethOrg/Cooketh-Flow), leading its vision and development. I welcome contributions under our MIT license to make this visual thinking tool awesome!
 
 ---
 

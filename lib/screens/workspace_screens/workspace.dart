@@ -25,8 +25,6 @@ class Workspace extends StatefulWidget {
 }
 
 class _WorkspaceState extends State<Workspace> {
-  // bool _isPanning = false;
-
   @override
   void initState() {
     super.initState();
@@ -48,48 +46,38 @@ class _WorkspaceState extends State<Workspace> {
     final screenSize = MediaQuery.of(context).size;
 
     // Calculate the initial offset to center the view
-    // Canvas size is 100000x100000, so center is (50000, 50000)
-    // Adjust the offset to center it relative to the screen size
     final double centerX = (canvasDimension / 2) - (screenSize.width / 2);
     final double centerY = (canvasDimension / 2) - (screenSize.height / 2);
 
     // Set the initial transformation matrix to center the view
     Matrix4 matrix = Matrix4.identity()
-      ..translate(-centerX,
-          -centerY); // Negative because we move the canvas opposite to center it
+      ..translate(-centerX, -centerY);
 
     workspaceProvider.transformationController.value = matrix;
 
     // Sync initial state with provider
     workspaceProvider.updatePosition(Offset(-centerX, -centerY));
-    workspaceProvider.updateScale(1.0); // Default scale
+    workspaceProvider.updateScale(1.0);
     workspaceProvider.updateFlowManager();
 
     workspaceProvider.setInitialize(true);
   }
 
-  // Connect the transformation controller to the workspace provider
   void _syncWithProvider() {
     final workspaceProvider =
         Provider.of<WorkspaceProvider>(context, listen: false);
 
-    // Extract matrix values
     final Matrix4 matrix = workspaceProvider.transformationController.value;
 
-    // Extract scale (using proper mathematical approach to extract scale)
     final double scaleX = math.sqrt(
         matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
             matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
 
-    // Extract translation
     final Offset offset =
         Offset(matrix.getTranslation().x, matrix.getTranslation().y);
 
-    // Update provider values
     workspaceProvider.updateScale(scaleX);
     workspaceProvider.updatePosition(offset);
-
-    // Update flow manager to persist zoom/pan state
     workspaceProvider.updateFlowManager();
   }
 
@@ -105,7 +93,6 @@ class _WorkspaceState extends State<Workspace> {
           );
         }
 
-        // bool _isPanning = workProvider.isPanning;
         return Scaffold(
           appBar: PreferredSize(
             preferredSize: const Size.fromHeight(80),
@@ -136,7 +123,7 @@ class _WorkspaceState extends State<Workspace> {
                   child: IconButton(
                     padding: const EdgeInsets.only(left: 16.0),
                     icon: const Icon(Icons.arrow_back, color: textColor),
-                    onPressed: () => context.push(RoutesPath.dashboard),
+                    onPressed: () => context.pushReplacement(RoutesPath.dashboard),
                   ),
                 ),
                 actions: [
@@ -204,27 +191,22 @@ class _WorkspaceState extends State<Workspace> {
           backgroundColor: white,
           body: Stack(
             children: [
-              // The infinite canvas
               RepaintBoundary(
                 key: workProvider.repaintBoundaryKey,
                 child: InteractiveViewer(
                   transformationController:
                       workProvider.transformationController,
-                  minScale: 0.1, // Allow zoom out to 10%
+                  minScale: 0.1,
                   maxScale: 5.0,
-                  constrained:
-                      false, // This is critical - don't constrain the canvas
-                  boundaryMargin:
-                      EdgeInsets.all(double.infinity), // Allow infinite panning
+                  constrained: false,
+                  boundaryMargin: EdgeInsets.all(double.infinity),
                   onInteractionStart: (details) {
                     workProvider.updatePanning(true);
                   },
                   onInteractionUpdate: (details) {
-                    // Update provider with current scale and position for node dragging calculations
                     final Matrix4 matrix =
                         workProvider.transformationController.value;
 
-                    // Extract scale from the transformation matrixF
                     final scaleX = math.sqrt(
                         matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
                             matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
@@ -236,70 +218,64 @@ class _WorkspaceState extends State<Workspace> {
                     workProvider.updatePosition(translation);
                   },
                   onInteractionEnd: (details) {
-                    // Sync final state with provider
                     _syncWithProvider();
                     workProvider.updatePanning(false);
                   },
-                  child: SizedBox(
-                    // Huge size for effectively infinite canvas
-                    width: canvasDimension,
-                    height: canvasDimension,
-                    child: Stack(
-                      children: [
-                        // Background grid for better visual orientation
-                        Positioned.fill(
-                          child: CustomPaint(
-                            painter: GridPainter(),
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      workProvider.deselectAllNodes();
+                    },
+                    child: SizedBox(
+                      width: canvasDimension,
+                      height: canvasDimension,
+                      child: Stack(
+                        children: [
+                          Positioned.fill(
+                            child: CustomPaint(
+                              painter: GridPainter(),
+                            ),
                           ),
-                        ),
-
-                        // Draw connections
-                        ...workProvider.connections.map((connection) {
-                          return CustomPaint(
-                            size: Size.infinite,
-                            painter: LinePainter(
-                              start: workProvider
-                                  .nodeList[connection.sourceNodeId]!.position,
-                              end: workProvider
-                                  .nodeList[connection.targetNodeId]!.position,
-                              sourceNodeId: connection.sourceNodeId,
-                              startPoint: connection.sourcePoint,
-                              targetNodeId: connection.targetNodeId,
-                              endPoint: connection.targetPoint,
-                              scale: workProvider.scale,
-                              connection: connection,
-                            ),
-                          );
-                        }),
-
-                        // Draw nodes
-                        ...workProvider.nodeList.entries.map((entry) {
-                          var id = entry.key;
-                          var node = entry.value;
-                          return Positioned(
-                            left: node.position.dx,
-                            top: node.position.dy,
-                            child: Node(
-                              id: id,
-                              type: node.type,
-                              onResize: (Size newSize) =>
-                                  workProvider.onResize(id, newSize),
-                              onDrag: (offset) =>
-                                  workProvider.dragNode(id, offset),
-                              // position: node.position,
-                            ),
-                          );
-                        }),
-                      ],
+                          ...workProvider.connections.map((connection) {
+                            return CustomPaint(
+                              size: Size.infinite,
+                              painter: LinePainter(
+                                start: workProvider
+                                    .nodeList[connection.sourceNodeId]!.position,
+                                end: workProvider
+                                    .nodeList[connection.targetNodeId]!.position,
+                                sourceNodeId: connection.sourceNodeId,
+                                startPoint: connection.sourcePoint,
+                                targetNodeId: connection.targetNodeId,
+                                endPoint: connection.targetPoint,
+                                scale: workProvider.scale,
+                                connection: connection,
+                              ),
+                            );
+                          }),
+                          ...workProvider.nodeList.entries.map((entry) {
+                            var id = entry.key;
+                            var node = entry.value;
+                            return Positioned(
+                              left: node.position.dx,
+                              top: node.position.dy,
+                              child: Node(
+                                id: id,
+                                type: node.type,
+                                onResize: (Size newSize) =>
+                                    workProvider.onResize(id, newSize),
+                                onDrag: (offset) =>
+                                    workProvider.dragNode(id, offset),
+                              ),
+                            );
+                          }),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-
-              // UI elements that should stay fixed regardless of zoom/pan
               FloatingDrawer(flowId: widget.flowId),
-
-              // Toolbar and node editing tools
               Positioned(
                 top: 20,
                 right: 20,
@@ -322,8 +298,6 @@ class _WorkspaceState extends State<Workspace> {
                   ],
                 ),
               ),
-
-              // Zoom indicator
               Positioned(
                 right: 24,
                 bottom: 24,
@@ -335,15 +309,10 @@ class _WorkspaceState extends State<Workspace> {
                     border: Border.all(color: textColor, width: 1),
                   ),
                   child: Builder(builder: (context) {
-                    // Get the current matrix
                     final matrix = workProvider.transformationController.value;
-
-                    // Extract the scale value accurately
                     final scale = math.sqrt(
                         matrix.getColumn(0)[0] * matrix.getColumn(0)[0] +
                             matrix.getColumn(0)[1] * matrix.getColumn(0)[1]);
-
-                    // Display accurate percentage
                     return Text(
                       "${(scale * 100).toInt()}%",
                       style: TextStyle(

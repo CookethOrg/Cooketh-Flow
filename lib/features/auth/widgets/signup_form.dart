@@ -29,7 +29,7 @@ class SignUpForm extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Frederik',
                 fontWeight: FontWeight.w700,
-                fontSize: isMobile ? 75.sp : 50.sp,
+                fontSize: isMobile ? 75.sp : 40.sp,
                 color: const Color(0xFF000000),
               ),
             ),
@@ -43,7 +43,7 @@ class SignUpForm extends StatelessWidget {
                 color: const Color(0xFF4B4B4B),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 40.h),
             const Text(
               "Username",
               style: TextStyle(
@@ -172,7 +172,7 @@ class SignUpForm extends StatelessWidget {
                     provider.obscurePassword
                         ? PhosphorIconsRegular.eye
                         : PhosphorIconsRegular.eyeSlash,
-                    size: 20.sp,
+                    size: 24.sp,
                   ),
                   onPressed: provider.toggleObscurePassword,
                   style: ButtonStyle(
@@ -228,7 +228,7 @@ class SignUpForm extends StatelessWidget {
                     provider.obscurePassword
                         ? PhosphorIconsRegular.eye
                         : PhosphorIconsRegular.eyeSlash,
-                    size: 20.sp,
+                    size: 24.sp,
                   ),
                   onPressed: provider.toggleObscurePassword,
                   style: ButtonStyle(
@@ -246,8 +246,8 @@ class SignUpForm extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         shadowColor: Colors.transparent,
                         padding: EdgeInsets.symmetric(
-                          vertical: isMobile ? 16.h : 5.h,
-                          horizontal: isMobile ? 100.w : isDesktop ? 100.w : 150.w,
+                          vertical: isMobile ? 16.h : 32.h,
+                          horizontal: isMobile ? 100.w : isDesktop ? 80.w : 150.w,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12.r),
@@ -317,8 +317,8 @@ class SignUpForm extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 shadowColor: Colors.transparent,
                                 padding: EdgeInsets.symmetric(
-                                  vertical: 16.h,
-                                  horizontal: 16.w,
+                                  vertical: 24.h,
+                                  horizontal: 32.w,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.r),
@@ -368,8 +368,8 @@ class SignUpForm extends StatelessWidget {
                               style: ElevatedButton.styleFrom(
                                 shadowColor: Colors.transparent,
                                 padding: EdgeInsets.symmetric(
-                                  vertical: 16.h,
-                                  horizontal: 16.w,
+                                  vertical: 24.h,
+                                  horizontal: 32.w,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12.r),
@@ -421,8 +421,8 @@ class SignUpForm extends StatelessWidget {
                                     style: ElevatedButton.styleFrom(
                                       shadowColor: Colors.transparent,
                                       padding: EdgeInsets.symmetric(
-                                        vertical: 16.h,
-                                        horizontal: 16.w,
+                                        vertical: 32.h,
+                                        horizontal: 32.w,
                                       ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12.r),
@@ -468,7 +468,7 @@ class SignUpForm extends StatelessWidget {
                                     ),
                                   ),
                                 ),
-                                ),
+                              ),
                               SizedBox(width: 16.w),
                               Flexible(
                                 child: ConstrainedBox(
@@ -479,8 +479,8 @@ class SignUpForm extends StatelessWidget {
                                     style: ElevatedButton.styleFrom(
                                       shadowColor: Colors.transparent,
                                       padding: EdgeInsets.symmetric(
-                                        vertical: 16.h,
-                                        horizontal: 16.w,
+                                        vertical: 32.h,
+                                        horizontal: 32.w,
                                       ),
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(12.r),

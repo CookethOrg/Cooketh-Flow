@@ -32,8 +32,7 @@ class LoginForm extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Frederik',
                 fontWeight: FontWeight.w700,
-                fontSize:
-                    isMobile ? 75.sp : 50.sp, // Adjusted for better scaling
+                fontSize: isMobile ? 75.sp : 40.sp,
                 color: const Color(0xFF000000),
               ),
             ),
@@ -43,12 +42,11 @@ class LoginForm extends StatelessWidget {
               style: TextStyle(
                 fontFamily: 'Frederik',
                 fontWeight: FontWeight.w300,
-                fontSize:
-                    isMobile ? 50.sp : 25.sp, // Adjusted for better scaling
+                fontSize: isMobile ? 50.sp : 25.sp,
                 color: const Color(0xFF4B4B4B),
               ),
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height:40.h),
             const Text(
               "Email address",
               style: TextStyle(
@@ -65,8 +63,8 @@ class LoginForm extends StatelessWidget {
               validator: (value) => validateEmail(value),
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
-                  horizontal: 16.w, // Use .w for horizontal
-                  vertical: 16.h, // Use .h for vertical
+                  horizontal: 16.w,
+                  vertical: 16.h,
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16.r),
@@ -136,7 +134,7 @@ class LoginForm extends StatelessWidget {
                     provider.obscurePassword
                         ? PhosphorIconsRegular.eye
                         : PhosphorIconsRegular.eyeSlash,
-                    size: 20.sp,
+                    size: 24.sp,
                   ),
                   onPressed: provider.toggleObscurePassword,
                   style: ButtonStyle(
@@ -148,62 +146,59 @@ class LoginForm extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             Center(
-              child:
-                  provider.isLoading
-                      ? const CircularProgressIndicator()
-                      : ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          shadowColor: Colors.transparent,
-                          padding: EdgeInsets.symmetric(
-                            vertical: isMobile ? 16.h : 5.h,
-                            horizontal:
-                                isMobile ? 100.w : isDesktop ? 100.w : 150.w, // Adjusted padding
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.r),
-                          ),
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
+              child: provider.isLoading
+                  ? const CircularProgressIndicator()
+                  : ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        shadowColor: Colors.transparent,
+                        padding: EdgeInsets.symmetric(
+                          vertical: isMobile ? 16.h : 32.h,
+                          horizontal: isMobile ? 100.w : isDesktop ? 80.w : 150.w,
                         ),
-                        onPressed: () async {
-                          provider.setLoading(true);
-                          try {
-                            String res = await provider.loginUser(
-                              email: provider.emailController.text,
-                              password: provider.passwordController.text,
-                            );
-                            if (res == "Logged in successfully") {
-                              context.pushReplacement(RoutesPath.dashboard);
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(res),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
-                            }
-                          } catch (e) {
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () async {
+                        provider.setLoading(true);
+                        try {
+                          String res = await provider.loginUser(
+                            email: provider.emailController.text,
+                            password: provider.passwordController.text,
+                          );
+                          if (res == "Logged in successfully") {
+                            context.pushReplacement(RoutesPath.dashboard);
+                          } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Error: ${e.toString()}'),
+                                content: Text(res),
                                 duration: const Duration(seconds: 5),
                               ),
                             );
-                          } finally {
-                            provider.setLoading(false);
                           }
-                        },
-                        child: Text(
-                          "Log in",
-                          style: TextStyle(
-                            fontFamily: 'Frederik',
-                            fontWeight: FontWeight.w700,
-                            fontSize:
-                                isMobile ? 60.sp : isDesktop? 25.sp: 30.sp, // Adjusted font size
-                            color: Colors.white,
-                          ),
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Error: ${e.toString()}'),
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                        } finally {
+                          provider.setLoading(false);
+                        }
+                      },
+                      child: Text(
+                        "Log in",
+                        style: TextStyle(
+                          fontFamily: 'Frederik',
+                          fontWeight: FontWeight.w700,
+                          fontSize: isMobile ? 60.sp : isDesktop ? 25.sp : 30.sp,
+                          color: Colors.white,
                         ),
                       ),
+                    ),
             ),
             SizedBox(height: 24.h),
             Column(
@@ -220,224 +215,224 @@ class LoginForm extends StatelessWidget {
                 SizedBox(height: 12.h),
                 isMobile
                     ? Column(
-                      children: [
-                        // Google Button
-                        SizedBox(
-                          width: double.infinity, // Full width for mobile
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shadowColor: Colors.transparent,
-                              padding: EdgeInsets.symmetric(
-                                vertical: 16.h,
-                                horizontal: 16.w,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black,
-                              side: const BorderSide(
-                                color: Color(0xFFD9D9D9),
-                                width: 1,
-                              ),
-                            ),
-                            onPressed: () async {
-                              provider.setLoading(true);
-                              String res = await provider.googleAuth();
-                              provider.setLoading(false);
-                              ScaffoldMessenger.of(
-                                context,
-                              ).showSnackBar(SnackBar(content: Text(res)));
-                              if (res.contains('User Authenticated')) {
-                                context.pushReplacement(RoutesPath.dashboard);
-                              }
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(PhosphorIconsRegular.googleLogo, size: 15),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  "Login with Google",
-                                  style: TextStyle(
-                                    fontFamily: 'Frederik',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  maxLines: 1,
+                        children: [
+                          // Google Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 32.h,
+                                  horizontal: 32.w,
                                 ),
-                              ],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                side: const BorderSide(
+                                  color: Color(0xFFD9D9D9),
+                                  width: 1,
+                                ),
+                              ),
+                              onPressed: () async {
+                                provider.setLoading(true);
+                                String res = await provider.googleAuth();
+                                provider.setLoading(false);
+                                ScaffoldMessenger.of(
+                                  context,
+                                ).showSnackBar(SnackBar(content: Text(res)));
+                                if (res.contains('User Authenticated')) {
+                                  context.pushReplacement(RoutesPath.dashboard);
+                                }
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(PhosphorIconsRegular.googleLogo, size: 15),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    "Login with Google",
+                                    style: TextStyle(
+                                      fontFamily: 'Frederik',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 16.h), // Vertical spacing
-                        // GitHub Button
-                        SizedBox(
-                          width: double.infinity, // Full width for mobile
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              shadowColor: Colors.transparent,
-                              padding: EdgeInsets.symmetric(
-                                vertical: 16.h,
-                                horizontal: 16.w,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12.r),
-                              ),
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.black,
-                              side: const BorderSide(
-                                color: Color(0xFFD9D9D9),
-                                width: 1,
-                              ),
-                            ),
-                            onPressed: () {
-                              provider.githubSignin();
-                            },
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(PhosphorIconsRegular.githubLogo, size: 15),
-                                SizedBox(width: 8.w),
-                                Text(
-                                  "Login with GitHub",
-                                  style: TextStyle(
-                                    fontFamily: 'Frederik',
-                                    fontWeight: FontWeight.w500,
-                                    fontSize: 12,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  maxLines: 1,
+                          SizedBox(height: 16.h),
+                          // GitHub Button
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 32.h,
+                                  horizontal: 32.w,
                                 ),
-                              ],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                side: const BorderSide(
+                                  color: Color(0xFFD9D9D9),
+                                  width: 1,
+                                ),
+                              ),
+                              onPressed: () {
+                                provider.githubSignin();
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(PhosphorIconsRegular.githubLogo, size: 15),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    "Login with GitHub",
+                                    style: TextStyle(
+                                      fontFamily: 'Frederik',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    )
+                        ],
+                      )
                     : LayoutBuilder(
-                      builder: (context, constraints) {
-                        final maxButtonWidth =
-                            (constraints.maxWidth - 16.w) / 2;
-                        return Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Flexible(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: maxButtonWidth,
-                                ),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    shadowColor: Colors.transparent,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 16.h,
-                                      horizontal: 16.w,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                    side: const BorderSide(
-                                      color: Color(0xFFD9D9D9),
-                                      width: 1,
-                                    ),
+                        builder: (context, constraints) {
+                          final maxButtonWidth =
+                              (constraints.maxWidth - 16.w) / 2;
+                          return Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Flexible(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: maxButtonWidth,
                                   ),
-                                  onPressed: () async {
-                                    provider.setLoading(true);
-                                    String res = await provider.googleAuth();
-                                    provider.setLoading(false);
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text(res)),
-                                    );
-                                    if (res.contains('User Authenticated')) {
-                                      context.pushReplacement(
-                                        RoutesPath.dashboard,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shadowColor: Colors.transparent,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 24.h, // Increased padding
+                                        horizontal: 24.w, // Increased padding
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12.r),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      side: const BorderSide(
+                                        color: Color(0xFFD9D9D9),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      provider.setLoading(true);
+                                      String res = await provider.googleAuth();
+                                      provider.setLoading(false);
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(content: Text(res)),
                                       );
-                                    }
-                                  },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        PhosphorIconsRegular.googleLogo,
-                                        size: isDesktop ? 25.sp : 35.sp,
-                                      ),
-                                      SizedBox(width: 8.w),
-                                      Text(
-                                        "Login with Google",
-                                        style: TextStyle(
-                                          fontFamily: 'Frederik',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: isDesktop? 20.sp : 28.sp,
-                                          overflow: TextOverflow.ellipsis,
+                                      if (res.contains('User Authenticated')) {
+                                        context.pushReplacement(
+                                          RoutesPath.dashboard,
+                                        );
+                                      }
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          PhosphorIconsRegular.googleLogo,
+                                          size: isDesktop ? 25.sp : 35.sp,
                                         ),
-                                        maxLines: 1,
-                                      ),
-                                    ],
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          "Login with Google",
+                                          style: TextStyle(
+                                            fontFamily: 'Frederik',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: isDesktop ? 20.sp : 28.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 16.w),
-                            Flexible(
-                              child: ConstrainedBox(
-                                constraints: BoxConstraints(
-                                  maxWidth: maxButtonWidth,
-                                ),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    shadowColor: Colors.transparent,
-                                    padding: EdgeInsets.symmetric(
-                                      vertical: 16.h,
-                                      horizontal: 16.w,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(12.r),
-                                    ),
-                                    backgroundColor: Colors.white,
-                                    foregroundColor: Colors.black,
-                                    side: const BorderSide(
-                                      color: Color(0xFFD9D9D9),
-                                      width: 1,
-                                    ),
+                              SizedBox(width: 16.w),
+                              Flexible(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: maxButtonWidth,
                                   ),
-                                  onPressed: () {
-                                    provider.githubSignin();
-                                  },
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        PhosphorIconsRegular.githubLogo,
-                                        size: isDesktop? 25.sp: 35.sp,
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shadowColor: Colors.transparent,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 24.h,
+                                        horizontal: 24.w,
                                       ),
-                                      SizedBox(width: 8.w),
-                                      Text(
-                                        "Login with GitHub",
-                                        style: TextStyle(
-                                          fontFamily: 'Frederik',
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: isDesktop? 20.sp : 28.sp,
-                                          overflow: TextOverflow.ellipsis,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12.r),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      side: const BorderSide(
+                                        color: Color(0xFFD9D9D9),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    onPressed: () {
+                                      provider.githubSignin();
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          PhosphorIconsRegular.githubLogo,
+                                          size: isDesktop ? 25.sp : 35.sp,
                                         ),
-                                        maxLines: 1,
-                                      ),
-                                    ],
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          "Login with GitHub",
+                                          style: TextStyle(
+                                            fontFamily: 'Frederik',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: isDesktop ? 20.sp : 28.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
+                            ],
+                          );
+                        },
+                      ),
                 SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

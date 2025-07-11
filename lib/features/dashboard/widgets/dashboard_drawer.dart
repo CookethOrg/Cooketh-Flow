@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:cookethflow/features/dashboard/widgets/upgrade_pan.dart';
 
 class DashboardDrawer extends StatelessWidget {
   const DashboardDrawer({super.key});
@@ -20,7 +21,7 @@ class DashboardDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               border: Border.all(color: const Color(0xFFD9D9D9), width: 1),
-              borderRadius: BorderRadius.circular(8.r),
+              borderRadius: BorderRadius.circular(12.r),
             ),
             child: Padding(
               padding: EdgeInsets.symmetric(vertical: 24.h, horizontal: 32.w),
@@ -191,6 +192,8 @@ class DashboardDrawer extends StatelessWidget {
                       },
                     ),
                   ),
+                  Spacer(),
+                  const UpgradeCard()
                 ],
               ),
             ),

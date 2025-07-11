@@ -18,6 +18,7 @@ class ProjectCard extends StatelessWidget {
             flex: 3,
             child: Container(
               decoration: BoxDecoration(
+                
                 color: const Color(0xFFD3D3D3), // Light gray background
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(12.r),
@@ -56,7 +57,7 @@ class ProjectCard extends StatelessWidget {
           Expanded(
             flex: 1,
             child: Padding(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [

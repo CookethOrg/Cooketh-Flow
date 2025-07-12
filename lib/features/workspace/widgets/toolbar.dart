@@ -3,17 +3,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
-import 'package:cookethflow/features/workspace/widgets/colour_picker_bg.dart';
 
-class ToolBar extends StatefulWidget {
+class ToolBar extends StatelessWidget {
   const ToolBar({super.key});
-
-  @override
-  State<ToolBar> createState() => _ToolBarState();
-}
-
-class _ToolBarState extends State<ToolBar> {
-  bool showColorPicker = false;
 
   @override
   Widget build(BuildContext context) {
@@ -30,17 +22,15 @@ class _ToolBarState extends State<ToolBar> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _toolIcon(
-            PhosphorIconsRegular.paintBucket,
-            device,),
-          _horizontaldivider(),
+          _toolIcon(PhosphorIconsRegular.paintBucket, device),
+          _horizontalDivider(),
           _toolIcon(PhosphorIconsRegular.circlesThreePlus, device),
           _toolIcon(
             PhosphorIconsFill.circle,
             device,
             iconColor: tertiaryColors[3],
           ),
-          _horizontaldivider(),
+          _horizontalDivider(),
           _toolIcon(PhosphorIconsRegular.handGrabbing, device),
           _toolIcon(PhosphorIconsRegular.textT, device),
           _toolIcon(PhosphorIconsRegular.image, device),
@@ -59,7 +49,6 @@ class _ToolBarState extends State<ToolBar> {
     rh.DeviceType device, {
     Color iconColor = Colors.black87,
     Color backgroundColor = Colors.white,
-    VoidCallback? onTap,
   }) {
     return Container(
       margin: EdgeInsets.symmetric(vertical: 6.h),
@@ -67,19 +56,15 @@ class _ToolBarState extends State<ToolBar> {
         color: backgroundColor,
         borderRadius: BorderRadius.circular(8.r),
       ),
-      child: IconButton(
-        onPressed: onTap ?? () {},
-        icon: Icon(
-          iconData,
-          size: 32.sp,
-          color: iconColor,
-        ),
-        splashRadius: 28.r,
+      child: Icon(
+        iconData,
+        size: 32.sp,
+        color: iconColor,
       ),
     );
   }
 
-  Widget _horizontaldivider() {
+  Widget _horizontalDivider() {
     return Container(
       width: 24.w,
       height: 1.2.h,

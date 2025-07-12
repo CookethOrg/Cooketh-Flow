@@ -1,25 +1,8 @@
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 
-class ProfileSettingsWidget extends StatefulWidget {
-  const ProfileSettingsWidget({Key? key}) : super(key: key);
-
-  @override
-  State<ProfileSettingsWidget> createState() => _ProfileSettingsWidgetState();
-}
-
-class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
-  bool isDarkMode = true;
-  final TextEditingController nameController = TextEditingController(text: 'Antara Paul');
-  final TextEditingController usernameController = TextEditingController(text: 'antara_paul');
-  final TextEditingController emailController = TextEditingController(text: 'email@gmail.com');
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    usernameController.dispose();
-    emailController.dispose();
-    super.dispose();
-  }
+class ProfileSettingsWidget extends StatelessWidget {
+  const ProfileSettingsWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +16,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header with close button
+            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -46,9 +29,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                 ),
               ],
             ),
-            
             const SizedBox(height: 16),
-            
+
             // Profile section
             Row(
               children: [
@@ -61,13 +43,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.grey.shade300, width: 2),
                       ),
-                      child: ClipOval(
-                        child: Image.network(
-                          'https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=150&h=150&fit=crop&crop=face',
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) => 
-                            const Icon(Icons.person, size: 40, color: Colors.grey),
-                        ),
+                      child: const ClipOval(
+                        child: Icon(Icons.person, size: 40, color: Colors.grey),
                       ),
                     ),
                     Positioned(
@@ -77,24 +54,20 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         width: 24,
                         height: 24,
                         decoration: BoxDecoration(
-                          color: Colors.deepOrange,
+                          color: primaryColor,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                        child: const Icon(
-                          Icons.edit,
-                          size: 12,
-                          color: Colors.white,
-                        ),
+                        child: const Icon(Icons.edit, size: 12, color: Colors.white),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(width: 16),
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Antara Paul',
                       style: TextStyle(
                         fontSize: 24,
@@ -102,151 +75,45 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       '@antara_paul',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey.shade600,
+                        color: Colors.grey,
                       ),
                     ),
                   ],
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
+
             // Form fields
             Row(
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Name',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: nameController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Colors.deepOrange),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildField(label: 'Name', placeholder: 'Antara Paul'),
                 const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Email',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.black87,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      TextFormField(
-                        controller: emailController,
-                        decoration: InputDecoration(
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: const BorderSide(color: Colors.deepOrange),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                _buildField(label: 'Email', placeholder: 'email@gmail.com'),
               ],
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Username field
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Username',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: 250,
-                  child: TextFormField(
-                    controller: usernameController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey.shade50,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: BorderSide(color: Colors.grey.shade300),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        borderSide: const BorderSide(color: Colors.deepOrange),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            
+            _buildField(label: 'Username', placeholder: 'antara_paul', width: 250),
+
             const SizedBox(height: 32),
-            
-            // Theme toggle
+
+            // Theme toggle section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Theme',
                       style: TextStyle(
                         fontSize: 16,
@@ -254,43 +121,32 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       'Toggle between light and dark mode',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: Colors.grey,
                       ),
                     ),
                   ],
                 ),
                 Row(
-                  children: [
-                    Icon(
-                      Icons.light_mode,
-                      color: isDarkMode ? Colors.grey.shade400 : Colors.orange,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
+                  children: const [
+                    Icon(Icons.light_mode, color: Colors.grey, size: 20),
+                    SizedBox(width: 8),
                     Switch(
-                      value: isDarkMode,
-                      onChanged: (value) {
-                        setState(() {
-                          isDarkMode = value;
-                        });
-                      },
-                      activeColor: Colors.deepOrange,
-                      inactiveThumbColor: Colors.grey.shade300,
-                      inactiveTrackColor: Colors.grey.shade200,
+                      value: true,
+                      onChanged: null, // disabled switch
                     ),
                   ],
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
-            // Action buttons
+
+            // Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -312,16 +168,11 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // Handle save changes
-                    Navigator.of(context).pop();
-                  },
+                  onPressed: () => Navigator.of(context).pop(),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.deepOrange,
+                    backgroundColor: primaryColor,
                     padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
                   child: const Text(
@@ -334,22 +185,19 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                 ),
               ],
             ),
-            
+
             const SizedBox(height: 32),
-            
-            // Divider
             Divider(color: Colors.grey.shade300),
-            
             const SizedBox(height: 24),
-            
-            // Delete account section
+
+            // Delete account
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
+                const Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Delete Account',
                       style: TextStyle(
                         fontSize: 16,
@@ -357,47 +205,22 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         color: Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    SizedBox(height: 4),
                     Text(
                       'Permanently delete your account',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade600,
+                        color: Colors.grey,
                       ),
                     ),
                   ],
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    // Show delete confirmation dialog
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Delete Account'),
-                        content: const Text('Are you sure you want to permanently delete your account? This action cannot be undone.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: const Text('Cancel'),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                              Navigator.of(context).pop();
-                            },
-                            style: TextButton.styleFrom(foregroundColor: Colors.red),
-                            child: const Text('Delete'),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                  onPressed: () {},
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.red,
+                    backgroundColor: secondaryColors[1],
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                     elevation: 0,
                   ),
                   child: const Row(
@@ -423,35 +246,38 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
       ),
     );
   }
-}
 
-// Example usage widget
-class ProfileSettingsExample extends StatelessWidget {
-  const ProfileSettingsExample({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Profile Settings Example',
-      theme: ThemeData(
-        primarySwatch: Colors.deepOrange,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Profile Settings Demo'),
-          backgroundColor: Colors.deepOrange,
-        ),
-        body: Center(
-          child: ElevatedButton(
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => const ProfileSettingsWidget(),
-              );
-            },
-            child: const Text('Open Profile Settings'),
-          ),
+  Widget _buildField({required String label, required String placeholder, double? width}) {
+    return Expanded(
+      flex: width != null ? 0 : 1,
+      child: SizedBox(
+        width: width,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextFormField(
+              enabled: false,
+              initialValue: placeholder,
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.grey.shade50,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: BorderSide(color: Colors.grey.shade300),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              ),
+            ),
+          ],
         ),
       ),
     );

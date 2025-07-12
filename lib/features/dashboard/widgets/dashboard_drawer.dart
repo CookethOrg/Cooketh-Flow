@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/upgrade_plan.dart';
+import 'package:cookethflow/features/dashboard/widgets/edit_profile.dart';
 
 class DashboardDrawer extends StatelessWidget {
   const DashboardDrawer({super.key});
@@ -79,7 +80,12 @@ class DashboardDrawer extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () {
+                              showDialog(
+                                context: context,
+                                builder: (context) => const ProfileSettingsWidget(),
+                              );
+                            },
                             icon: Icon(
                               PhosphorIcons.pencilSimple(),
                               color: primaryColor,

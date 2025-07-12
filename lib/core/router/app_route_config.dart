@@ -2,6 +2,7 @@ import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/features/auth/pages/login.dart';
 import 'package:cookethflow/features/auth/pages/signup.dart';
 import 'package:cookethflow/features/dashboard/pages/dashboard.dart';
+import 'package:cookethflow/features/workspace/pages/workspace.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouteConfig {
@@ -22,7 +23,16 @@ class AppRouteConfig {
             return SignupPage();
           },
         ),
-        GoRoute(path: RoutesPath.dashboard,name: RouteName.dashboard,builder: (context, state) => DashboardPage(),)
+        GoRoute(
+          path: RoutesPath.dashboard,
+          name: RouteName.dashboard,
+          builder: (context, state) => DashboardPage(),
+          ),
+        GoRoute(
+          path: RoutesPath.workspace,
+          name: RouteName.workspace,
+          builder: (context, state) => WorkspacePage(),
+          )
       ],
     );
     return routes;

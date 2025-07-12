@@ -8,18 +8,20 @@ class ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12.r),
+        border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Container(
               decoration: BoxDecoration(
-                
-                color: const Color(0xFFD3D3D3), // Light gray background
+                color: const Color(0xFFD3D3D3),
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(12.r),
                   topRight: Radius.circular(12.r),
@@ -27,26 +29,25 @@ class ProjectCard extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  // Optional: Add your image here if needed
-                  Center(
-                        child: Image.asset(
-                       'assets/images/Frame 400.png',
-                       fit: BoxFit.cover,
-                     ),
-                   ),
+                  // Center(
+                  //   child: Image.asset(
+                  //     'assets/images/Frame 400.png',
+                  //     fit: BoxFit.cover,
+                  //   ),
+                  // ),
                   Positioned(
-                    top: 8.h,
-                    right: 8.w,
+                    top: 12.h,
+                    right: 12.w,
                     child: Container(
                       padding: EdgeInsets.all(8.w),
                       decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.r),
+                        borderRadius: BorderRadius.circular(12.r),
                       ),
                       child: Icon(
-                        Icons.more_horiz,
-                        size: 16.sp,
-                        color: Colors.black54,
+                        PhosphorIconsRegular.dotsThree,
+                        size: 32.sp,
+                        color: Colors.black,
                       ),
                     ),
                   ),
@@ -59,7 +60,7 @@ class ProjectCard extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
                     child: Column(
@@ -82,15 +83,15 @@ class ProjectCard extends StatelessWidget {
                             fontFamily: 'Fredrik',
                             color: Colors.grey[600],
                             fontSize: 14.sp,
-                            fontWeight: FontWeight.w400,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
                     ),
                   ),
                   Icon(
-                    PhosphorIcons.star(),
-                    size: 24.sp,
+                    PhosphorIconsRegular.star,
+                    size: 32.sp,
                     color: Colors.black54,
                   ),
                 ],

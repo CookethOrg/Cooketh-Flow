@@ -13,13 +13,13 @@ class UpgradeCard extends StatelessWidget {
     
     return Container(
       margin: EdgeInsets.only(top: 20.h),
-      padding: EdgeInsets.symmetric(horizontal: device == rh.DeviceType.desktop ? 24.w : 20.w, vertical: device == rh.DeviceType.desktop ? 16.w : 20.w),
+      padding: EdgeInsets.symmetric(horizontal: device == rh.DeviceType.desktop ? 24.w : 20.w, vertical: device == rh.DeviceType.desktop ? 20.w : 20.w),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: const Color(0xFFD9D9D9),
-          width: 1,
+          width: 1.2,
         ),
       ),
       child: Column(

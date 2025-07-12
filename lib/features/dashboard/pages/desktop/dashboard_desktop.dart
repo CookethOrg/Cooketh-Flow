@@ -27,21 +27,23 @@ class DashboardDesktop extends StatelessWidget {
                 width: deviceType == rh.DeviceType.desktop ? 400.w : 600.w,
                 child: DashboardDrawer(),
               ),
+              
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.symmetric(horizontal: 30.w, vertical: 20.h),
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Padding(
                         padding: EdgeInsets.only(bottom: 20.h),
                         child: ElevatedButton.icon(
                           onPressed: () {},
                           style: ElevatedButton.styleFrom(
+                            elevation: 0,
                             backgroundColor: primaryColor,
                             padding: EdgeInsets.symmetric(
-                              vertical: 15.h,
-                              horizontal: 25.w,
+                              vertical: 32.h,
+                              horizontal: 24.w,
                             ),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10.r),
@@ -49,7 +51,7 @@ class DashboardDesktop extends StatelessWidget {
                           ),
                           iconAlignment: IconAlignment.end,
                           icon: Icon(
-                            PhosphorIcons.plus(),
+                            PhosphorIconsRegular.plus,
                             color: Colors.white,
                             size: 20.sp,
                           ),
@@ -59,11 +61,12 @@ class DashboardDesktop extends StatelessWidget {
                               fontFamily: 'Fredrik',
                               fontSize: 18.sp,
                               color: Colors.white,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
                       ),
+                      SizedBox(height: 32,),
                       Expanded(
                         child: GridView.builder(
                           shrinkWrap: true,
@@ -72,7 +75,7 @@ class DashboardDesktop extends StatelessWidget {
                             crossAxisCount: 3,
                             crossAxisSpacing: 20.w,
                             mainAxisSpacing: 20.h,
-                            childAspectRatio: 1.0, // Square aspect ratio
+                            childAspectRatio: 4.5/3,
                           ),
                           itemBuilder: (context, index) {
                             return ProjectCard(idx: index.toString());

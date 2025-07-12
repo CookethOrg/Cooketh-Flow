@@ -46,6 +46,7 @@ dependencies:
   flutter_dotenv: ^5.2.1
   google_sign_in: ^7.0.0
   flutter_screenutil: ^5.9.3
+  flutter_colorpicker: ^1.1.0
 
 dev_dependencies:
   flutter_test:

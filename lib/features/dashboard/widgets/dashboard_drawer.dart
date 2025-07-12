@@ -59,7 +59,7 @@ class DashboardDrawer extends StatelessWidget {
                                     fontFamily: 'Fredrik',
                                     fontSize: device == rh.DeviceType.desktop ? 24.sp : 32.sp,
                                     fontWeight: FontWeight.w600,
-                                    letterSpacing: 1,
+                                    letterSpacing: 0.6,
                                   ),
                                 ),
                                 SizedBox(height: 2.h),

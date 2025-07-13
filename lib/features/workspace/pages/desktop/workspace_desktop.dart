@@ -9,7 +9,7 @@ import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:cookethflow/features/workspace/widgets/colour_picker_bg.dart';
 import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
 import 'package:cookethflow/features/workspace/widgets/node_colour.dart';
-import 'package:cookethflow/features/workspace/widgets/node_outline_customizer.dart';
+import 'package:cookethflow/features/workspace/widgets/connector_customizer.dart';
 
 class WorkspaceDesktop extends StatelessWidget {
   const WorkspaceDesktop({super.key});
@@ -20,7 +20,7 @@ class WorkspaceDesktop extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFF8F8F8),
-      body: NodeOutline(),
+      body: CoonectorCustomizer(),
       // body: ColorPickerWidget(
       //   onColorChanged: (Color primaryColor) {
       //     // handle color change here

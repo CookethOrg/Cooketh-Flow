@@ -3,8 +3,8 @@ import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class NodeOutline extends StatelessWidget {
-  const NodeOutline({super.key});
+class CoonectorCustomizer extends StatelessWidget {
+  const CoonectorCustomizer({super.key});
 
   @override
   Widget build(BuildContext context) {

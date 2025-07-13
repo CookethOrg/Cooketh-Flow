@@ -11,8 +11,8 @@ class NodeColourPicker extends StatelessWidget {
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Container(
-        width: 440,
-        padding: const EdgeInsets.all(24),
+        width: 420,
+        padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 
@@ -10,8 +11,8 @@ class StickyNotesWidget extends StatelessWidget {
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Container(
-        width: 240,
-        padding: EdgeInsets.all(16),
+        width: 200,
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -28,54 +29,43 @@ class StickyNotesWidget extends StatelessWidget {
                 Text(
                   'Sticky notes',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
-                    color: Colors.black87,
+                    color: Colors.black,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(PhosphorIconsRegular.x, size: 20, color: Colors.black87), // Reduced from 24
+                  icon: Icon(PhosphorIconsRegular.x, size: 24, color: Colors.black87),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
                 ),
               ],
             ),
-            SizedBox(height: 12),
-
-            GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 10, // Reduced from 16
-              crossAxisSpacing: 10, // Reduced from 16
-              childAspectRatio: 1.0,
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              children: [
-                _buildStickyNote(
-                  Color(0xFFB19CD9), // Light purple
-                  Color(0xFF9B7BC8), // Darker purple for fold
-                ),
-                _buildStickyNote(
-                  Color(0xFF87CEEB), // Sky blue
-                  Color(0xFF4FC3F7), // Darker blue for fold
-                ),
-                _buildStickyNote(
-                  Color(0xFFFFB6C1), // Light pink
-                  Color(0xFFFF8A95), // Darker pink for fold
-                ),
-                _buildStickyNote(
-                  Color(0xFFFFDDA0), // Light orange/yellow
-                  Color(0xFFFFA726), // Darker orange for fold
-                ),
-                _buildStickyNote(
-                  Color(0xFF87CEFA), // Light blue
-                  Color(0xFF42A5F5), // Darker blue for fold
-                ),
-                _buildStickyNote(
-                  Color(0xFFFFB6C1), // Light pink (duplicate)
-                  Color(0xFFFF8A95), // Darker pink for fold
-                ),
-              ],
+            SizedBox(height: 16),
+            
+            // Grid of sticky notes with scroll
+            SizedBox(
+              height: 240,
+              child: GridView.count(
+                crossAxisCount: 2,
+                mainAxisSpacing: 24,
+                crossAxisSpacing: 24,
+                childAspectRatio: 1.0,
+                shrinkWrap: true,
+                physics: AlwaysScrollableScrollPhysics(),
+                children: [
+                  _buildStickyNote(tertiaryColors[1], secondaryColors[1]),
+                  _buildStickyNote(tertiaryColors[2], secondaryColors[2]),
+                  _buildStickyNote(tertiaryColors[3], secondaryColors[3]),
+                  _buildStickyNote(tertiaryColors[4], secondaryColors[4]),
+                  _buildStickyNote(tertiaryColors[5], secondaryColors[5]),
+                  _buildStickyNote(tertiaryColors[6], secondaryColors[6]),
+                  _buildStickyNote(tertiaryColors[7], secondaryColors[7]),
+                  _buildStickyNote(tertiaryColors[8], secondaryColors[8]),
+                  _buildStickyNote(tertiaryColors[9], secondaryColors[9]),
+                ],
+              ),
             ),
           ],
         ),
@@ -83,57 +73,20 @@ class StickyNotesWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStickyNote(Color noteColor, Color foldColor) {
-    return Container(
-      width: 90, // Reduced from 120
-      height: 90, // Reduced from 120
-      child: Stack(
-        children: [
-          // Main note body
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: noteColor,
-              borderRadius: BorderRadius.circular(6), // Reduced from 8
-            ),
-          ),
-          
-          // Bottom-right corner fold
-          Positioned(
-            bottom: 0,
-            right: 0,
-            child: ClipPath(
-              clipper: CornerFoldClipper(),
-              child: Container(
-                width: 18, // Reduced from 24
-                height: 18, // Reduced from 24
-                decoration: BoxDecoration(
-                  color: foldColor,
-                  borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(6), // Reduced from 8
-                  ),
-                ),
-              ),
-            ),
-          ),
-        ],
+  Widget _buildStickyNote(Color fillColor, Color borderColor) {
+    return GestureDetector(
+      onTap: () {
+        print('Sticky note tapped');
+      },
+      child: Container(
+        width: 20,
+        height: 20,
+        decoration: BoxDecoration(
+          color: fillColor,
+          border: Border.all(color: borderColor, width: 2),
+          borderRadius: BorderRadius.circular(8),
+        ),
       ),
     );
   }
-}
-
-class CornerFoldClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.moveTo(0, size.height);
-    path.lineTo(size.width, size.height);
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

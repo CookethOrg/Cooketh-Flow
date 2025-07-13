@@ -12,8 +12,9 @@ List secondaryColors = [
   Color(0xFF1CC8C0), // [4] Cyan
   Color(0xFFF53F5F), // [5] Pink Red
   Color(0xFF3B82F6), // [6] Blue
-  Color(0xFF737492), // [7] Slate Gray
-  Color(0xFF000000), // [8] Black
+  Color(0xFFED6325), // [7] Orange
+  Color(0xFF737492), // [8] Slate Gray
+  Color(0xFF000000), // [9] Black
 ];
 
 // List of tertiary colors
@@ -25,7 +26,7 @@ List tertiaryColors = [
   Color(0xFFB9E8FF), // [4] Light Cyan
   Color(0xFFF8B6BF), // [5] Light Pink
   Color(0xFFB3D4FC), // [6] Light Blue
-  Color(0xFFC8C9E1), // [7] Light Slate
-  Color(0xFFC9C9C9), // [8] Light Gray
-  Color(0xFFFFB89E), // [9] Peach
+  Color(0xFFFFB89E), // [7] Peach
+  Color(0xFFC8C9E1), // [8] Light Slate
+  Color(0xFFC9C9C9), // [9] Light Gray
 ];

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
+
 
 class StickyNotesWidget extends StatelessWidget {
   const StickyNotesWidget({super.key});
@@ -8,8 +10,8 @@ class StickyNotesWidget extends StatelessWidget {
     return Dialog(
       insetPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Container(
-        width: 320,
-        padding: EdgeInsets.all(20),
+        width: 240,
+        padding: EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(12),
@@ -26,26 +28,25 @@ class StickyNotesWidget extends StatelessWidget {
                 Text(
                   'Sticky notes',
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.close, size: 24, color: Colors.black87),
+                  icon: Icon(PhosphorIconsRegular.x, size: 20, color: Colors.black87), // Reduced from 24
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: BoxConstraints(),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            
-            // Grid of sticky notes
+            SizedBox(height: 12),
+
             GridView.count(
               crossAxisCount: 2,
-              mainAxisSpacing: 16,
-              crossAxisSpacing: 16,
+              mainAxisSpacing: 10, // Reduced from 16
+              crossAxisSpacing: 10, // Reduced from 16
               childAspectRatio: 1.0,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
@@ -84,8 +85,8 @@ class StickyNotesWidget extends StatelessWidget {
 
   Widget _buildStickyNote(Color noteColor, Color foldColor) {
     return Container(
-      width: 120,
-      height: 120,
+      width: 90, // Reduced from 120
+      height: 90, // Reduced from 120
       child: Stack(
         children: [
           // Main note body
@@ -94,7 +95,7 @@ class StickyNotesWidget extends StatelessWidget {
             height: double.infinity,
             decoration: BoxDecoration(
               color: noteColor,
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: BorderRadius.circular(6), // Reduced from 8
             ),
           ),
           
@@ -105,12 +106,12 @@ class StickyNotesWidget extends StatelessWidget {
             child: ClipPath(
               clipper: CornerFoldClipper(),
               child: Container(
-                width: 24,
-                height: 24,
+                width: 18, // Reduced from 24
+                height: 18, // Reduced from 24
                 decoration: BoxDecoration(
                   color: foldColor,
                   borderRadius: BorderRadius.only(
-                    bottomRight: Radius.circular(8),
+                    bottomRight: Radius.circular(6), // Reduced from 8
                   ),
                 ),
               ),

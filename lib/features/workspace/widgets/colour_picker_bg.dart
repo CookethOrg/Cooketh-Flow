@@ -289,8 +289,8 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
 }
 
 // Updated ToolBar to use the new ColorPickerWidget
-class ToolBar extends StatelessWidget {
-  const ToolBar({super.key});
+class ColorToolBar extends StatelessWidget {
+  const ColorToolBar({super.key});
 
   @override
   Widget build(BuildContext context) {

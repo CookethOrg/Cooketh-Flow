@@ -44,10 +44,13 @@ class ProjectCard extends StatelessWidget {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(12.r),
                       ),
-                      child: Icon(
-                        PhosphorIconsRegular.dotsThree,
-                        size: 32.sp,
-                        color: Colors.black,
+                      child: IconButton(
+                        onPressed: () {},
+                        icon: Icon(
+                          PhosphorIconsRegular.dotsThree,
+                          size: 32.sp,
+                          color: Colors.black,
+                        ),
                       ),
                     ),
                   ),
@@ -89,10 +92,13 @@ class ProjectCard extends StatelessWidget {
                       ],
                     ),
                   ),
-                  Icon(
-                    PhosphorIconsRegular.star,
-                    size: 32.sp,
-                    color: Colors.black54,
+                  IconButton(
+                    onPressed: () {},
+                    icon: Icon(
+                      PhosphorIconsRegular.star,
+                      size: 32.sp,
+                      color: Colors.black54,
+                    ),
                   ),
                 ],
               ),

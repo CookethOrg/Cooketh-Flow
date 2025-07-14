@@ -1,4 +1,4 @@
-import 'package:cookethflow/core/providers/theme_provider.dart';
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -10,7 +10,7 @@ class ProfileSettingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer2<DashboardProvider, ThemeProvider>(
+    return Consumer2<DashboardProvider, SupabaseService>(
       builder: (context, provider,theme, child) {
         return Dialog(
           backgroundColor: Theme.of(context).cardColor,

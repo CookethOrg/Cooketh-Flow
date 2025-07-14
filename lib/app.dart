@@ -1,7 +1,6 @@
-import 'package:cookethflow/core/providers/theme_provider.dart';
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/router/app_route_config.dart';
 import 'package:cookethflow/core/theme/app_theme.dart';
-import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +14,7 @@ class MyApp extends StatelessWidget {
       designSize: const Size(1920, 1080),
       minTextAdapt: true,
       splitScreenMode: true,
-      child: Consumer<ThemeProvider>(
+      child: Consumer<SupabaseService>(
         builder: (context, themeProvider, _) {
           return MaterialApp.router(
             theme: AppTheme.light(),

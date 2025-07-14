@@ -3,12 +3,14 @@ import 'dart:async';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SupabaseService extends StateHandler {
   late final SupabaseClient supabase;
   SupabaseService(this.supabase) {
     _initializeUserData();
+    _loadTheme();
   }
 
   late AuthResponse _userData;
@@ -26,11 +28,17 @@ class SupabaseService extends StateHandler {
   String? get email => _email;
   String get defaultPfpPath => _defaultPfpPath;
 
-  void setTheme(bool val) {
-    if (_isDark != val) {
-      _isDark = val;
-      notifyListeners();
-    }
+  Future<void> _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    _isDark = prefs.getBool('isDarkTheme') ?? false;
+    notifyListeners();
+  }
+
+  Future<void> toggleTheme() async {
+    _isDark = !_isDark;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isDarkTheme', _isDark);
+    notifyListeners();
   }
 
   void setUserData(AuthResponse user) {
@@ -243,7 +251,9 @@ class SupabaseService extends StateHandler {
         OAuthProvider.google,
         // Redirect to the app after authentication (important for mobile)
         redirectTo:
-            kIsWeb ? 'http://localhost:3000/dashboard' : 'myapp://login-callback/',
+            kIsWeb
+                ? 'http://localhost:3000/dashboard'
+                : 'myapp://login-callback/',
         // Optional: Pass client ID for web (if needed by Supabase)
         authScreenLaunchMode:
             kIsWeb ? LaunchMode.inAppWebView : LaunchMode.platformDefault,
@@ -266,13 +276,19 @@ class SupabaseService extends StateHandler {
   }
 
   Future<void> signInWithGithub() async {
-  await supabase.auth.signInWithOAuth(
-    OAuthProvider.github,
-    redirectTo: kIsWeb ? 'http://localhost:3000/dashboard' : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
-    authScreenLaunchMode:
-        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
-  );
-}
+    await supabase.auth.signInWithOAuth(
+      OAuthProvider.github,
+      redirectTo:
+          kIsWeb
+              ? 'http://localhost:3000/dashboard'
+              : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
+      authScreenLaunchMode:
+          kIsWeb
+              ? LaunchMode.platformDefault
+              : LaunchMode
+                  .externalApplication, // Launch the auth screen in a new webview on mobile.
+    );
+  }
 
   Future<String> loginUser({
     required String email,

@@ -9,6 +9,9 @@ import 'package:go_router/go_router.dart';
 class AppRouteConfig {
   static GoRouter returnRouter() {
     return GoRouter(
+      // observers: [
+      //   (route)=> debugPrint('Route Changed: $(route)'),
+      // ],
       initialLocation: RoutesPath.loginScreen,
       routes: [
         GoRoute(

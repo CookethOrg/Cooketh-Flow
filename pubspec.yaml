@@ -93,9 +93,9 @@ flutter:
   fonts:
   - family: Frederik
     fonts:
-      - asset: assets/fonts/Frederik-Black-BF645d9bff2e630.otf
+      - asset: assets/fonts/Frederik-Black-BF645d9bff26630.otf
         weight: 900
-      - asset: assets/fonts/Frederik-BlackItalic-BF645d9bffaclde.otf
+      - asset: assets/fonts/Frederik-BlackItalic-BF645d9bffac1de.otf
         weight: 900
         style: italic
       - asset: assets/fonts/Frederik-Bold-BF645d9bff85e69.otf
@@ -105,12 +105,12 @@ flutter:
         style: italic
       - asset: assets/fonts/Frederik-DemiBold-BF645d9bff7b6ff.otf
         weight: 600
-      - asset: assets/fonts/Frederik-DemiBoldItalic-BF645d9bffpaca4.otf
+      - asset: assets/fonts/Frederik-DemiBoldItalic-BF645d9bff9aca4.otf
         weight: 600
         style: italic
       - asset: assets/fonts/Frederik-ExtraBold-BF645d9bffc1a5a.otf
         weight: 800
-      - asset: assets/fonts/Frederik-ExtraBoldItalic-BF645d9bffa9f8.otf
+      - asset: assets/fonts/Frederik-ExtraBoldItalic-BF645d9bffa90f8.otf
         weight: 800
         style: italic
       - asset: assets/fonts/Frederik-Heavy-BF645d9bffbbbdd.otf
@@ -128,19 +128,19 @@ flutter:
       - asset: assets/fonts/Frederik-MediumItalic-BF645d9bff71c45.otf
         weight: 500
         style: italic
-      - asset: assets/fonts/Frederik-Regular-BF645d9bffa4893.otf
+      - asset: assets/fonts/Frederik-Regular-BF645d9bffaa893.otf
         weight: 400
       - asset: assets/fonts/Frederik-RegularItalic-BF645d9bffb230a.otf
         weight: 400
         style: italic
       - asset: assets/fonts/Frederik-Thin-BF645d9bffb3edf.otf
         weight: 100
-      - asset: assets/fonts/Frederik-ThinItalic-BF645d9bffsad07.otf
+      - asset: assets/fonts/Frederik-ThinItalic-BF645d9bff5ad07.otf
         weight: 100
         style: italic
-      - asset: assets/fonts/Frederik-Ultralight-BF645d9bffac149.otf
+      - asset: assets/fonts/Frederik-UltraLight-BF645d9bffae149.otf
         weight: 200
-      - asset: assets/fonts/Frederik-UltralightItalic-BF645d9bff6ec22.otf
+      - asset: assets/fonts/Frederik-UltraLightItalic-BF645d9bff6ec22.otf
         weight: 200
         style: italic
   #         style: italic

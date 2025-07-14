@@ -55,7 +55,7 @@ class DashboardDrawer extends StatelessWidget {
                                 Text(
                                   'Antara Paul',
                                   style: TextStyle(
-                                    fontFamily: 'Fredrik',
+                                    fontFamily: 'Frederik',
                                     fontSize: device == rh.DeviceType.desktop ? 24.sp : 36.sp, // Reduced for tab
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.6,
@@ -65,7 +65,7 @@ class DashboardDrawer extends StatelessWidget {
                                 Text(
                                   '@antara_paul',
                                   style: TextStyle(
-                                    fontFamily: 'Fredrik',
+                                    fontFamily: 'Frederik',
                                     fontSize: device == rh.DeviceType.desktop ? 16.sp : 24.sp, // Reduced for tab
                                   ),
                                 ),

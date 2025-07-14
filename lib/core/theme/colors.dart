@@ -1,7 +1,16 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
-// Primary color
+// Primary color- light version
 const primaryColor = Color(0xFFED6325);
+// const deleteButton
+const scaffoldColor = Color.fromRGBO(248, 248, 248, 1);
+const tabColor = Colors.white;
+const tabBorderColor = Color.fromARGB(255, 217, 217, 217);
+
+// dark version alterings, rest colors are same for both versions
+const scaffoldDarkColor = Color.fromARGB(255, 30, 30, 30);
+const tabDarkColor = Color.fromARGB(255, 48, 48, 48);
+const tabBorderDarkColor = Color.fromARGB(255, 75, 75, 75);
 
 // List of secondary colors
 List secondaryColors = [

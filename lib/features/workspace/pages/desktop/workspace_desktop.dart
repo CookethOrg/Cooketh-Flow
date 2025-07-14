@@ -84,6 +84,7 @@ class WorkspaceDesktop extends StatelessWidget {
   //                   ],
   //                 ),
         
+<<<<<<< HEAD
   //                 Row(
   //                   children: [
   //                     ElevatedButton(
@@ -124,6 +125,48 @@ class WorkspaceDesktop extends StatelessWidget {
   //                 ),
   //               ],
   //             ),
+=======
+                  Row(
+                    children: [
+                      ElevatedButton(
+                        onPressed: () {},
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: primaryColor,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 32.h,
+                            horizontal: 24.w,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Export Flowchart',
+                              style: TextStyle(
+                                fontFamily: 'Frederik',
+                                fontSize: 18.sp,
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            SizedBox(width: 16.w),
+                            Icon(
+                              PhosphorIconsRegular.export,
+                              color: Colors.white,
+                              size: 24.sp,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+>>>>>>> fadb419 (feat: theme and models)
         
   //           // Right Toolbar
   //           Align(

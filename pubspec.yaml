@@ -47,6 +47,7 @@ dependencies:
   google_sign_in: ^7.0.0
   flutter_screenutil: ^5.9.3
   flutter_colorpicker: ^1.1.0
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:

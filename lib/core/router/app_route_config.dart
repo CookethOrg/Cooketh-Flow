@@ -3,38 +3,47 @@ import 'package:cookethflow/features/auth/pages/login.dart';
 import 'package:cookethflow/features/auth/pages/signup.dart';
 import 'package:cookethflow/features/dashboard/pages/dashboard.dart';
 import 'package:cookethflow/features/workspace/pages/workspace.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouteConfig {
   static GoRouter returnRouter() {
-    GoRouter routes = GoRouter(
+    return GoRouter(
+      initialLocation: RoutesPath.loginScreen,
       routes: [
         GoRoute(
           path: RoutesPath.loginScreen,
           name: RouteName.loginScreen,
-          builder: (context, state) {
-            return LoginPage();
-          },
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: LoginPage(),
+          ),
         ),
         GoRoute(
           path: RoutesPath.signUpScreen,
           name: RouteName.signUpScreen,
-          builder: (context, state) {
-            return SignupPage();
-          },
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: SignupPage(),
+          ),
         ),
         GoRoute(
           path: RoutesPath.dashboard,
           name: RouteName.dashboard,
-          builder: (context, state) => DashboardPage(),
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: DashboardPage(),
           ),
+        ),
         GoRoute(
           path: RoutesPath.workspace,
           name: RouteName.workspace,
-          builder: (context, state) => WorkspacePage(),
-          )
+          pageBuilder: (context, state) => NoTransitionPage(
+            child: WorkspacePage(),
+          ),
+        ),
       ],
+      redirect: (BuildContext context, GoRouterState state) {
+        // Add your authentication logic here if needed
+        return null;
+      },
     );
-    return routes;
   }
 }

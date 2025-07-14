@@ -8,10 +8,8 @@ class DashboardProvider extends StateHandler {
   DashboardProvider(this.auth);
   bool _isDrawerOpen = true;
   int _tabIndex = 0;
-  bool _isDarkTheme = false;
   bool get isDrawerOpen => _isDrawerOpen;
   int get tabIndex => _tabIndex;
-  bool get isDarkTheme => _isDarkTheme;
 
   List<Map<String, dynamic>> tabItems = [
     {"label": "All", "icon": Icon(PhosphorIcons.cardsThree())},
@@ -30,10 +28,5 @@ class DashboardProvider extends StateHandler {
       _tabIndex = idx;
       notifyListeners();
     }
-  }
-
-  void toggleTheme() {
-    _isDarkTheme = !_isDarkTheme;
-    notifyListeners();
   }
 }

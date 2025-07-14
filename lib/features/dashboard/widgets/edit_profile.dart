@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/theme_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,8 @@ class ProfileSettingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DashboardProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<DashboardProvider, ThemeProvider>(
+      builder: (context, provider,theme, child) {
         return Dialog(
           backgroundColor: Theme.of(context).cardColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -139,14 +140,14 @@ class ProfileSettingsWidget extends StatelessWidget {
                     Row(
                       children: [
                         Icon(
-                          provider.isDarkTheme ? Icons.dark_mode : Icons.light_mode, 
+                          theme.isDark ? Icons.dark_mode : Icons.light_mode,
                           color: Theme.of(context).iconTheme.color, 
                           size: 20
                         ),
                         const SizedBox(width: 8),
                         Switch(
-                          value: provider.isDarkTheme,
-                          onChanged: (value) => provider.toggleTheme(),
+                          value: theme.isDark,
+                          onChanged: (value) => theme.toggleTheme(),
                           activeColor: Theme.of(context).primaryColor,
                         ),
                       ],

@@ -55,6 +55,7 @@ class StickyNotesWidget extends StatelessWidget {
                 shrinkWrap: true,
                 physics: AlwaysScrollableScrollPhysics(),
                 children: [
+                  _buildStickyNote(tertiaryColors[0], secondaryColors[0]),
                   _buildStickyNote(tertiaryColors[1], secondaryColors[1]),
                   _buildStickyNote(tertiaryColors[2], secondaryColors[2]),
                   _buildStickyNote(tertiaryColors[3], secondaryColors[3]),

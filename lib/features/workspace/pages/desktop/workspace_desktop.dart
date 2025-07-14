@@ -118,53 +118,53 @@ class WorkspaceDesktop extends StatelessWidget {
                     ),
                   ],
                 ),
-                Align(alignment: Alignment.centerRight, child: const ToolBar()),
+                // Align(alignment: Alignment.centerRight, child: const ToolBar()),
                 // zoom control
-                Positioned(
-                  bottom: 0.h,
-                  right: 0.w,
-                  child: Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 20.w,
-                      vertical: 16.h,
-                    ),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Color(0XFFD9D9D9), width: 1.2),
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12.r),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          "100%",
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                            fontSize: 24.sp,
-                          ),
-                        ),
-                        SizedBox(width: 8.w),
-                        _verticalDivider(),
-                        SizedBox(width: 8.w),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(PhosphorIconsRegular.plus, size: 24.sp),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                        SizedBox(width: 8.w),
-                        _verticalDivider(),
-                        SizedBox(width: 8.w),
-                        IconButton(
-                          onPressed: () {},
-                          icon: Icon(PhosphorIconsRegular.minus, size: 24.sp),
-                          visualDensity: VisualDensity.compact,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+                // Positioned(
+                //   bottom: 0.h,
+                //   right: 0.w,
+                //   child: Container(
+                //     padding: EdgeInsets.symmetric(
+                //       horizontal: 20.w,
+                //       vertical: 16.h,
+                //     ),
+                //     decoration: BoxDecoration(
+                //       border: Border.all(color: Color(0XFFD9D9D9), width: 1.2),
+                //       color: Colors.white,
+                //       borderRadius: BorderRadius.circular(12.r),
+                //     ),
+                //     child: Row(
+                //       mainAxisSize: MainAxisSize.min,
+                //       crossAxisAlignment: CrossAxisAlignment.center,
+                //       children: [
+                //         Text(
+                //           "100%",
+                //           style: TextStyle(
+                //             color: Colors.black,
+                //             fontWeight: FontWeight.w500,
+                //             fontSize: 24.sp,
+                //           ),
+                //         ),
+                //         SizedBox(width: 8.w),
+                //         _verticalDivider(),
+                //         SizedBox(width: 8.w),
+                //         IconButton(
+                //           onPressed: () {},
+                //           icon: Icon(PhosphorIconsRegular.plus, size: 24.sp),
+                //           visualDensity: VisualDensity.compact,
+                //         ),
+                //         SizedBox(width: 8.w),
+                //         _verticalDivider(),
+                //         SizedBox(width: 8.w),
+                //         IconButton(
+                //           onPressed: () {},
+                //           icon: Icon(PhosphorIconsRegular.minus, size: 24.sp),
+                //           visualDensity: VisualDensity.compact,
+                //         ),
+                //       ],
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ],

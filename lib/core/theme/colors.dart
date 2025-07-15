@@ -13,7 +13,7 @@ const tabDarkColor = Color.fromARGB(255, 48, 48, 48);
 const tabBorderDarkColor = Color.fromARGB(255, 75, 75, 75);
 
 // List of secondary colors
-List secondaryColors = [
+const List<Color> secondaryColors = [
   Color(0xFF30C66F), // [0] Green
   Color(0xFFFF6B6B), // [1] Coral Red
   Color(0xFFF59E0B), // [2] Amber
@@ -27,7 +27,7 @@ List secondaryColors = [
 ];
 
 // List of tertiary colors
-List tertiaryColors = [
+const List<Color> tertiaryColors = [
   Color(0xFFB9F5CC), // [0] Light Green
   Color(0xFFFFC4BC), // [1] Light Coral
   Color(0xFFFAD7A0), // [2] Light Amber

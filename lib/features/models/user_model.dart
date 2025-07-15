@@ -22,6 +22,7 @@ class UserModel {
           json["raw_user_meta_data"]["name"] ??
           json["raw_user_meta_data"]["userName"],
       email: json["email"],
+      pfp: json["raw_user_meta_data"]["avatar_url"]
     );
     return user;
   }
@@ -32,6 +33,7 @@ class UserModel {
     'userName': userName,
     'full_name': fullName,
     'email': email,
+    'pfp':pfp
   };
 
   UserModel copyWith() {

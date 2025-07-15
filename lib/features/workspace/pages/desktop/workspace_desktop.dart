@@ -1,5 +1,6 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,8 @@ class WorkspaceDesktop extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
         child: Stack(
           children: [
+
+            // CanvasPage(),
             // Top Bar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

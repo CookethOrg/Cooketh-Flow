@@ -363,7 +363,7 @@ class SupabaseService extends StateHandler {
 
   // --- Profile Picture Management ---
   final String _profileBucketName =
-      'profile_pictures'; // Renamed bucket for clarity
+      'profile'; // Renamed bucket for clarity
   final String _defaultPfpPath =
       'assets/images/pfp.png'; // Make sure this asset exists!
 

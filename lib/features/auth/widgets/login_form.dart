@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/helpers/input_validators.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart'
     as responsive_helper;
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
@@ -21,8 +22,24 @@ class LoginForm extends StatelessWidget {
     final isDesktop =
         responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
         responsive_helper.DeviceType.desktop;
-    return Consumer<AuthenticationProvider>(
-      builder: (context, provider, child) {
+
+    // Use a MultiProvider to listen to both AuthenticationProvider and SupabaseService
+    // SupabaseService's currentUser updates will trigger rebuilds related to auth state.
+    return Consumer2<AuthenticationProvider, SupabaseService>(
+      builder: (context, authProvider, supabaseService, child) {
+        // Listen to SupabaseService's auth state for automatic navigation after social login
+        // This ensures the page reacts when SupabaseService updates currentUser
+        // For simplicity, we'll put the navigation logic here, but for complex apps,
+        // you might have a dedicated AuthWrapper or AuthStreamListener at a higher level.
+        if (supabaseService.currentUser != null && GoRouter.of(context).routerDelegate.currentConfiguration?.fullPath != RoutesPath.dashboard) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            // Check if current route is not already dashboard to prevent loop
+            context.go(RoutesPath.dashboard);
+            authProvider.setLoading(false); // Ensure loading is off after navigation
+          });
+        }
+
+
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,7 +75,7 @@ class LoginForm extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             TextFormField(
-              controller: provider.emailController,
+              controller: authProvider.emailController,
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => validateEmail(value),
               decoration: InputDecoration(
@@ -101,8 +118,8 @@ class LoginForm extends StatelessWidget {
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
               validator: (value) => validatePassword(value),
-              controller: provider.passwordController,
-              obscureText: provider.obscurePassword,
+              controller: authProvider.passwordController,
+              obscureText: authProvider.obscurePassword,
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16.w,
@@ -131,12 +148,12 @@ class LoginForm extends StatelessWidget {
                   color: Colors.black,
                   padding: EdgeInsets.symmetric(horizontal: 16.w),
                   icon: Icon(
-                    provider.obscurePassword
+                    authProvider.obscurePassword
                         ? PhosphorIconsRegular.eye
                         : PhosphorIconsRegular.eyeSlash,
                     size: 24.sp,
                   ),
-                  onPressed: provider.toggleObscurePassword,
+                  onPressed: authProvider.toggleObscurePassword,
                   style: ButtonStyle(
                     overlayColor: WidgetStateProperty.all(Colors.transparent),
                     splashFactory: NoSplash.splashFactory,
@@ -146,7 +163,7 @@ class LoginForm extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             Center(
-              child: provider.isLoading
+              child: authProvider.isLoading
                   ? const CircularProgressIndicator()
                   : ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -162,32 +179,21 @@ class LoginForm extends StatelessWidget {
                         foregroundColor: Colors.white,
                       ),
                       onPressed: () async {
-                        provider.setLoading(true);
-                        try {
-                          String res = await provider.loginUser(
-                            email: provider.emailController.text,
-                            password: provider.passwordController.text,
-                          );
-                          if (res == "Logged in successfully") {
-                            context.pushReplacement(RoutesPath.dashboard);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(res),
-                                duration: const Duration(seconds: 5),
-                              ),
-                            );
-                          }
-                        } catch (e) {
+                        // We set loading true, and it will be set to false in the provider's finally block
+                        // The navigation happens after the SupabaseService updates the current user
+                        String res = await authProvider.loginUser(
+                          email: authProvider.emailController.text,
+                          password: authProvider.passwordController.text,
+                        );
+                        if (res != "Logged in successfully") {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Error: ${e.toString()}'),
+                              content: Text(res),
                               duration: const Duration(seconds: 5),
                             ),
                           );
-                        } finally {
-                          provider.setLoading(false);
                         }
+                        // Navigation handled by the Consumer2's listener
                       },
                       child: Text(
                         "Log in",
@@ -237,15 +243,12 @@ class LoginForm extends StatelessWidget {
                                 ),
                               ),
                               onPressed: () async {
-                                provider.setLoading(true);
-                                String res = await provider.googleAuth();
-                                provider.setLoading(false);
-                                ScaffoldMessenger.of(
-                                  context,
-                                ).showSnackBar(SnackBar(content: Text(res)));
-                                if (res.contains('User Authenticated')) {
-                                  context.pushReplacement(RoutesPath.dashboard);
-                                }
+                                // Call void method, loading handled by provider
+                                await authProvider.googleAuth();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Initiating Google Sign-In...")),
+                                );
+                                // Navigation handled by the Consumer2's listener
                               },
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -288,8 +291,13 @@ class LoginForm extends StatelessWidget {
                                   width: 1,
                                 ),
                               ),
-                              onPressed: () {
-                                provider.githubSignin();
+                              onPressed: () async {
+                                // Call void method, loading handled by provider
+                                await authProvider.githubSignin();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Initiating GitHub Sign-In...")),
+                                );
+                                // Navigation handled by the Consumer2's listener
                               },
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
@@ -343,17 +351,12 @@ class LoginForm extends StatelessWidget {
                                       ),
                                     ),
                                     onPressed: () async {
-                                      provider.setLoading(true);
-                                      String res = await provider.googleAuth();
-                                      provider.setLoading(false);
+                                      // Call void method, loading handled by provider
+                                      await authProvider.googleAuth();
                                       ScaffoldMessenger.of(context).showSnackBar(
-                                        SnackBar(content: Text(res)),
+                                        const SnackBar(content: Text("Initiating Google Sign-In...")),
                                       );
-                                      if (res.contains('User Authenticated')) {
-                                        context.pushReplacement(
-                                          RoutesPath.dashboard,
-                                        );
-                                      }
+                                      // Navigation handled by the Consumer2's listener
                                     },
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
@@ -402,8 +405,13 @@ class LoginForm extends StatelessWidget {
                                         width: 1,
                                       ),
                                     ),
-                                    onPressed: () {
-                                      provider.githubSignin();
+                                    onPressed: () async {
+                                      // Call void method, loading handled by provider
+                                      await authProvider.githubSignin();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Initiating GitHub Sign-In...")),
+                                      );
+                                      // Navigation handled by the Consumer2's listener
                                     },
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,

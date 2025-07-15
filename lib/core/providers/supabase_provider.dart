@@ -1,33 +1,47 @@
 import 'dart:async';
-
+import 'dart:io'; // For File operations in non-web platforms
+// Import the new model
 import 'package:cookethflow/core/utils/state_handler.dart';
-import 'package:flutter/foundation.dart';
-import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cookethflow/features/models/user_model.dart';
+import 'package:flutter/foundation.dart'; // For kIsWeb
+import 'package:image_picker/image_picker.dart'; // For XFile
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:path_provider/path_provider.dart'; // For getTemporaryDirectory in desktop
+import 'package:http/http.dart' as http; // For fetching network images to XFile
 
 class SupabaseService extends StateHandler {
   late final SupabaseClient supabase;
+
   SupabaseService(this.supabase) {
+    // Listen for auth state changes to update user data
+    supabase.auth.onAuthStateChange.listen((data) async {
+      final AuthChangeEvent event = data.event;
+      final User? user = data.session?.user;
+
+      if (user != null) {
+        await _fetchCurrentUserDetails(
+          user,
+        ); // Fetch details on sign-in/refresh
+      } else {
+        // Clear user data on sign-out
+        _currentUser = null;
+      }
+      notifyListeners(); // Notify listeners of auth state change
+    });
+    // Initial fetch if user is already logged in (e.g., app restart)
     _initializeUserData();
     _loadTheme();
   }
 
-  late AuthResponse _userData;
-  bool _userDataSet = false;
-  // XFile? _userPfp;
-  String? _userName;
-  String? _email;
+  CurrentUser? _currentUser; // Holds the consolidated user data
   bool _isDark = false;
 
   bool get isDark => _isDark;
-  AuthResponse get userData => _userData;
-  bool get userDataSet => _userDataSet;
-  // XFile? get userPfp => _userPfp;
-  String? get userName => _userName;
-  String? get email => _email;
+  CurrentUser? get currentUser => _currentUser;
   String get defaultPfpPath => _defaultPfpPath;
 
+  // --- Theme Management ---
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
     _isDark = prefs.getBool('isDarkTheme') ?? false;
@@ -41,162 +55,45 @@ class SupabaseService extends StateHandler {
     notifyListeners();
   }
 
-  void setUserData(AuthResponse user) {
-    _userData = user;
-    _userDataSet = true;
-    notifyListeners();
-  }
+  // --- User Data Management (Internal & Public) ---
 
-  // void setUserPfp(XFile? val) {
-  //   _userPfp = val;
-  //   print('Updated userPfp: ${val?.path}');
-  //   notifyListeners();
-  // }
-
-  void setUserName(String? name) {
-    _userName = name;
-    notifyListeners();
-  }
-
-  void setEmail(String? email) {
-    _email = email;
-    notifyListeners();
-  }
-
-  String getTruncatedText(String text) {
-    return text.length > 12 ? '${text.substring(0, 12)}...' : text;
-  }
-
-  Future<void> _initializeUserData() async {
-    final user = supabase.auth.currentUser;
-    if (user != null) {
-      await fetchCurrentUserDetails();
-      // await fetchAndSetUserProfilePicture();
+  // Called initially and on auth state changes to populate _currentUser
+  Future<void> _fetchCurrentUserDetails(User? user) async {
+    if (user == null) {
+      _currentUser = null;
+      notifyListeners();
+      return;
     }
-  }
-
-  Future<Map<String, dynamic>?> fetchCurrentUserName() async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return null;
 
     try {
-      final response =
-          await supabase
-              .from('User')
-              .select('userName')
-              .eq('id', user.id)
-              .single();
-      setUserName(response['userName']);
-      return response;
-    } catch (e) {
-      print("Error fetching user name: $e");
-      return null;
-    }
-  }
-
-  Future<dynamic> fetchCurrentUserDetails() async {
-    final user = supabase.auth.currentUser;
-    if (user == null) return null;
-
-    try {
-      final response = await supabase.auth.getUser();
-      setUserName(response.user!.userMetadata!["full_name"]);
-      setEmail(response.user!.email);
-      // print(response.user);
-      return response;
+      // Re-fetch the latest user data including metadata
+      final UserResponse response = await supabase.auth.getUser();
+      if (response.user != null) {
+        _currentUser = CurrentUser.fromSupabaseUser(response.user!);
+        print(
+          "User data fetched: ${_currentUser?.name} (@${_currentUser?.username})",
+        );
+      }
     } catch (e) {
       print("Error fetching user details: $e");
-      return null;
+      _currentUser = null; // Clear if there's an error fetching
+    }
+    notifyListeners();
+  }
+
+  // Initial check for existing session and data load
+  Future<void> _initializeUserData() async {
+    final user = supabase.auth.currentUser;
+    if (user != null && _currentUser == null) {
+      // Only fetch if not already set
+      await _fetchCurrentUserDetails(user);
     }
   }
 
-  // FlowManager createTemplateWorkspace() {
-  //   double cv = (canvasDimension / 2) - 100;
-  //   String flowId = DateTime.now().millisecondsSinceEpoch.toString();
-
-  //   FlowManager flowManager = FlowManager(
-  //     flowId: flowId,
-  //     flowName: "Get Started with Cooketh Flow",
-  //   );
-
-  //   FlowNode startNode = FlowNode(
-  //     id: "node1",
-  //     type: NodeType.rectangular,
-  //     position: Offset(cv + 100, cv + 100),
-  //     colour: const Color(0xffFAD7A0),
-  //   );
-  //   startNode.data.text = "start";
-
-  //   FlowNode decisionNode = FlowNode(
-  //     id: "node2",
-  //     type: NodeType.parallelogram,
-  //     position: Offset(cv + 300, cv + 150),
-  //     colour: const Color(0xffFAD7A0),
-  //   );
-  //   decisionNode.data.text = "decision node";
-
-  //   FlowNode pageNode = FlowNode(
-  //     id: "node3",
-  //     type: NodeType.diamond,
-  //     position: Offset(cv + 500, cv + 150),
-  //     colour: const Color(0xffFAD7A0),
-  //   );
-  //   pageNode.data.text = "some page";
-
-  //   FlowNode dbNode = FlowNode(
-  //     id: "node4",
-  //     type: NodeType.database,
-  //     position: Offset(cv + 700, cv + 100),
-  //     colour: const Color(0xffFAD7A0),
-  //   );
-  //   dbNode.data.text = "database details";
-
-  //   FlowNode endNode = FlowNode(
-  //     id: "node5",
-  //     type: NodeType.rectangular,
-  //     position: Offset(cv + 900, cv + 150),
-  //     colour: const Color(0xffFAD7A0),
-  //   );
-  //   endNode.data.text = "end";
-
-  //   flowManager.addNode(startNode);
-  //   flowManager.addNode(decisionNode);
-  //   flowManager.addNode(pageNode);
-  //   flowManager.addNode(dbNode);
-  //   flowManager.addNode(endNode);
-
-  //   flowManager.connectNodes(
-  //     sourceNodeId: "node1",
-  //     targetNodeId: "node2",
-  //     sourcePoint: ConnectionPoint.bottom,
-  //     targetPoint: ConnectionPoint.top,
-  //   );
-
-  //   flowManager.connectNodes(
-  //     sourceNodeId: "node2",
-  //     targetNodeId: "node3",
-  //     sourcePoint: ConnectionPoint.bottom,
-  //     targetPoint: ConnectionPoint.top,
-  //   );
-
-  //   flowManager.connectNodes(
-  //     sourceNodeId: "node3",
-  //     targetNodeId: "node4",
-  //     sourcePoint: ConnectionPoint.bottom,
-  //     targetPoint: ConnectionPoint.top,
-  //   );
-
-  //   flowManager.connectNodes(
-  //     sourceNodeId: "node4",
-  //     targetNodeId: "node5",
-  //     sourcePoint: ConnectionPoint.bottom,
-  //     targetPoint: ConnectionPoint.top,
-  //   );
-
-  //   return flowManager;
-  // }
+  // --- Authentication Methods ---
 
   Future<String> createNewUser({
+    required String name, // Added name for email signup
     required String userName,
     required String email,
     required String password,
@@ -208,86 +105,84 @@ class SupabaseService extends StateHandler {
           email: email,
           password: password,
           emailRedirectTo: null,
-          data: {'userName': userName},
+          data: {
+            'name': name,
+            'userName': userName,
+          }, // Store name and username in user_metadata
         );
         final user = authResponse.user;
-        setUserData(authResponse);
         if (user == null) throw Exception("User signup failed.");
 
-        //       FlowManager templateWorkspace = createTemplateWorkspace();
-        //       Map<String, dynamic> flowData = templateWorkspace.exportFlow();
-        //       Map<String, dynamic> flowListMap = {
-        //         templateWorkspace.flowId: {
-        //           ...flowData,
-        //           'createdAt': DateTime.now().toIso8601String(),
-        //         }
-        //       };
+        await _fetchCurrentUserDetails(
+          user,
+        ); // Populate _currentUser after signup
 
-        // await supabase.from('User').insert({
-        //   'id': user.id,
-        //   'userName': userName,
-        //   'email': email,
-        //   'flowList': {},
-        // });
-
-        setUserName(userName);
-        setEmail(email);
         res = "Signed Up Successfully";
       }
+    } on AuthException catch (e) {
+      res = 'Authentication error: ${e.message}';
+      print("❌ AuthException: ${e.message}");
     } catch (e) {
       res = e.toString();
+      print("❌ Unexpected error: ${e.toString()}");
     }
     return res;
   }
 
   Future<String> googleAuthenticate() async {
     try {
-      // Web client ID for Supabase (used in Supabase dashboard)
-      const webClientId =
-          '1017386220944-mp9pmjv6n179p138piberblhlvb15dv7.apps.googleusercontent.com';
+      // const webClientId = 'YOUR_WEB_CLIENT_ID_HERE'; // TODO: Replace with your actual Web Client ID from Supabase
+      // Make sure you have a scheme set up for mobile, e.g., 'myapp://login-callback/'
+      // and added to your Supabase Auth Providers -> Google -> Redirect URIs
+      // For desktop, usually 'http://localhost:port' or similar is used.
+      final String? redirectUrl =
+          kIsWeb
+              ? 'http://localhost:3000/dashboard' // For web development
+              : (Platform.isAndroid || Platform.isIOS
+                  ? 'myapp://login-callback/'
+                  : null); // For mobile/desktop
 
-      // Use Supabase's OAuth flow for Google Sign-In
-      final authResponse = await Supabase.instance.client.auth.signInWithOAuth(
+      await Supabase.instance.client.auth.signInWithOAuth(
         OAuthProvider.google,
-        // Redirect to the app after authentication (important for mobile)
-        redirectTo:
-            kIsWeb
-                ? 'http://localhost:3000/dashboard'
-                : 'myapp://login-callback/',
-        // Optional: Pass client ID for web (if needed by Supabase)
+        redirectTo: redirectUrl,
         authScreenLaunchMode:
-            kIsWeb ? LaunchMode.inAppWebView : LaunchMode.platformDefault,
+            kIsWeb ? LaunchMode.inAppWebView : LaunchMode.externalApplication,
       );
 
-      if (!authResponse) {
-        return 'Google Sign-In was canceled or failed.';
-      }
-
-      // Get the authenticated session
-      final session = Supabase.instance.client.auth.currentSession;
-      if (session == null) {
-        throw 'No session found after Google Sign-In.';
-      }
-
-      return 'User Authenticated with email: ${session.user.email ?? 'Unknown'}';
+      // Auth state listener handles populating _currentUser after successful sign-in
+      return 'Google Sign-In initiated. Waiting for callback...';
+    } on AuthException catch (e) {
+      return 'Authentication error: ${e.message}';
     } catch (e) {
       return 'Error: ${e.toString()}';
     }
   }
 
-  Future<void> signInWithGithub() async {
-    await supabase.auth.signInWithOAuth(
-      OAuthProvider.github,
-      redirectTo:
+  Future<String> signInWithGithub() async {
+    try {
+      final String? redirectUrl =
           kIsWeb
-              ? 'http://localhost:3000/dashboard'
-              : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
-      authScreenLaunchMode:
-          kIsWeb
-              ? LaunchMode.platformDefault
-              : LaunchMode
-                  .externalApplication, // Launch the auth screen in a new webview on mobile.
-    );
+              ? 'http://localhost:3000/dashboard' // For web development
+              : (Platform.isAndroid || Platform.isIOS
+                  ? 'my.scheme://my-host'
+                  : null); // Replace with your actual scheme
+
+      await supabase.auth.signInWithOAuth(
+        OAuthProvider.github,
+        redirectTo: redirectUrl,
+        authScreenLaunchMode:
+            kIsWeb
+                ? LaunchMode.platformDefault
+                : LaunchMode.externalApplication,
+      );
+
+      // Auth state listener handles populating _currentUser after successful sign-in
+      return 'GitHub Sign-In initiated. Waiting for callback...';
+    } on AuthException catch (e) {
+      return 'Authentication error: ${e.message}';
+    } catch (e) {
+      return 'Error: ${e.toString()}';
+    }
   }
 
   Future<String> loginUser({
@@ -302,9 +197,9 @@ class SupabaseService extends StateHandler {
         final user = authResponse.user;
         if (user == null) throw Exception('Login failed: User not found.');
 
-        setUserData(authResponse);
-        await fetchCurrentUserDetails();
-        // await fetchAndSetUserProfilePicture();
+        await _fetchCurrentUserDetails(
+          user,
+        ); // Populate _currentUser after login
 
         res = 'Logged in successfully';
         print("✅ Login Successful! User ID: ${user.id}");
@@ -314,9 +209,6 @@ class SupabaseService extends StateHandler {
     } on AuthException catch (e) {
       res = 'Authentication error: ${e.message}';
       print("❌ AuthException: ${e.message}");
-    } on PostgrestException catch (e) {
-      res = 'Database error: ${e.message}';
-      print("❌ PostgrestException: ${e.message}");
     } catch (e) {
       res = 'Unexpected error: ${e.toString()}';
       print("❌ Unexpected error: ${e.toString()}");
@@ -327,62 +219,56 @@ class SupabaseService extends StateHandler {
   Future<void> logout() async {
     try {
       await supabase.auth.signOut();
-      _userName = null;
-      _email = null;
-      // _userPfp = null; // Set to null to use asset in UI
-      _userDataSet = false;
+      _currentUser = null; // Clear user data
       notifyListeners();
+      print("User logged out successfully.");
+    } on AuthException catch (e) {
+      print("Error during logout: ${e.message}");
+      throw Exception('Error logging out: ${e.message}');
     } catch (e) {
+      print("Unexpected error during logout: $e");
       throw Exception('Error logging out: ${e.toString()}');
     }
   }
 
-  Future<void> deleteUserAccount() async {
-    try {
-      final user = supabase.auth.currentUser;
-      if (user == null) throw Exception('No authenticated user found');
+  // --- Profile Updates ---
 
-      await supabase.from('User').delete().eq('id', user.id);
-      await supabase.auth.signOut();
-      _userName = null;
-      _email = null;
-      // _userPfp = null; // Set to null to use asset in UI
-      _userDataSet = false;
-      notifyListeners();
-    } catch (e) {
-      print("Error deleting account: $e");
-      throw Exception('Error deleting account: ${e.toString()}');
-    }
-  }
-
-  Future<bool> checkUserSession() async {
-    final user = supabase.auth.currentUser;
-    if (user != null && !_userDataSet) {
-      await fetchCurrentUserDetails();
-      // await fetchAndSetUserProfilePicture();
-    }
-    return user != null;
-  }
-
-  Future<String> updateUserName({required String userName}) async {
+  Future<String> updateUserName({
+    required String newName,
+    required String newUsername,
+  }) async {
     String res = 'Some error occurred';
     try {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('No authenticated user found');
-      if (userName.trim().isEmpty) throw Exception('Username cannot be empty');
+      if (newName.trim().isEmpty) throw Exception('Name cannot be empty');
+      if (newUsername.trim().isEmpty)
+        throw Exception('Username cannot be empty');
 
-      await supabase.auth.updateUser(
-        UserAttributes(data: {'userName': userName}),
+      // Update user_metadata directly
+      final updatedData = {
+        'name': newName,
+        'userName': newUsername, // Storing custom username in metadata
+      };
+
+      await supabase.auth.updateUser(UserAttributes(data: updatedData));
+
+      // Update local _currentUser state
+      _currentUser = _currentUser?.copyWith(
+        name: newName,
+        username: newUsername,
       );
-      await supabase
-          .from('User')
-          .update({'userName': userName})
-          .eq('id', user.id);
-      setUserName(userName);
-      res = 'Username updated successfully';
+      notifyListeners();
+
+      res = 'Profile updated successfully';
       return res;
+    } on AuthException catch (e) {
+      res = 'Authentication error: ${e.message}';
+      print("❌ AuthException updating profile: ${e.message}");
+      throw Exception(res);
     } catch (e) {
       res = e.toString();
+      print("❌ Unexpected error updating profile: ${e.toString()}");
       throw Exception(res);
     }
   }
@@ -399,12 +285,17 @@ class SupabaseService extends StateHandler {
       }
 
       await supabase.auth.updateUser(UserAttributes(email: email));
-      await supabase.from('User').update({'email': email}).eq('id', user.id);
-      setEmail(email);
+
+      // Email updates require confirmation, so local state is not updated immediately for email
       res = 'Email update requested. Please check your inbox to confirm.';
       return res;
+    } on AuthException catch (e) {
+      res = 'Authentication error: ${e.message}';
+      print("❌ AuthException updating email: ${e.message}");
+      throw Exception(res);
     } catch (e) {
       res = e.toString();
+      print("❌ Unexpected error updating email: ${e.toString()}");
       throw Exception(res);
     }
   }
@@ -421,6 +312,10 @@ class SupabaseService extends StateHandler {
         throw Exception('Password must be at least 6 characters');
       }
 
+      // Supabase's `updateUser` with password directly updates it if the session is valid.
+      // If you need current password verification, it must be done explicitly,
+      // e.g., by re-authenticating the user first, or by using a backend function.
+      // The provided code tries to signInWithPassword first, which is a good approach.
       await supabase.auth.signInWithPassword(
         email: user.email!,
         password: currentPassword,
@@ -428,105 +323,51 @@ class SupabaseService extends StateHandler {
       await supabase.auth.updateUser(UserAttributes(password: newPassword));
       res = 'Password updated successfully';
       return res;
-    } catch (AuthException) {
-      res = 'Current password is incorrect';
+    } on AuthException catch (e) {
+      res = 'Current password is incorrect or session invalid.';
+      print("❌ AuthException updating password: ${e.message}");
+      throw Exception(res);
+    } catch (e) {
+      res = e.toString();
+      print("❌ Unexpected error updating password: ${e.toString()}");
       throw Exception(res);
     }
   }
 
-  final String _profileBucketName = 'profile';
-  final String _defaultPfpPath = 'assets/Frame 271.png';
+  Future<void> deleteUserAccount() async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) throw Exception('No authenticated user found');
 
-  // Future<String> uploadUserProfilePicture(XFile imageFile) async {
-  //   try {
-  //     final user = supabase.auth.currentUser;
-  //     if (user == null) throw Exception('User not authenticated');
+      // Note: Supabase's client-side SDK doesn't directly support deleting a user
+      // from `auth.users` table for security reasons. This usually requires a
+      // backend function (Edge Function) with service_role key or a direct
+      // database operation with row level security.
+      // The current `supabase.from('User').delete()` was targeting a custom table.
+      // If you intend to truly delete the user from `auth.users`, you'll need
+      // an Edge Function or similar.
+      // For now, I'll remove the `supabase.from('User').delete()` part
+      // as per your instruction to not use the 'User' table.
+      // You can add a prompt to the user here to implement an Edge Function if needed.
 
-  //     final extension = imageFile.name.split('.').last.toLowerCase();
-  //     final mimeType = _getMimeTypeFromExtension(extension);
-  //     final storagePath = '${user.id}/pfp.$extension';
+      await supabase.auth.signOut(); // Sign out the user
+      _currentUser = null; // Clear local user data
+      notifyListeners();
+      print("User account (locally) logged out and data cleared.");
+      // Consider adding an Edge Function call here to truly delete the user from Supabase auth.
+    } catch (e) {
+      print("Error deleting account: $e");
+      throw Exception('Error deleting account: ${e.toString()}');
+    }
+  }
 
-  //     try {
-  //       await supabase.storage
-  //           .from(_profileBucketName)
-  //           .remove(['${user.id}/pfp']);
-  //     } catch (e) {
-  //       print('No existing profile picture to remove: $e');
-  //     }
+  // --- Profile Picture Management ---
+  final String _profileBucketName =
+      'profile_pictures'; // Renamed bucket for clarity
+  final String _defaultPfpPath =
+      'assets/images/pfp.png'; // Make sure this asset exists!
 
-  //     final bytes = await imageFile.readAsBytes();
-
-  //     await supabase.storage.from(_profileBucketName).uploadBinary(
-  //           storagePath,
-  //           bytes,
-  //           fileOptions: FileOptions(contentType: mimeType, upsert: true),
-  //         );
-
-  //     final String publicUrl =
-  //         supabase.storage.from(_profileBucketName).getPublicUrl(storagePath);
-
-  //     await supabase
-  //         .from('User')
-  //         .update({'profile_picture_url': publicUrl}).eq('id', user.id);
-
-  //     setUserPfp(imageFile); // Use the uploaded file directly
-  //     return publicUrl;
-  //   } catch (e) {
-  //     print('Error uploading profile picture: $e');
-  //     throw Exception('Failed to upload profile picture: ${e.toString()}');
-  //   }
-  // }
-
-  // Future<void> fetchAndSetUserProfilePicture() async {
-  //   try {
-  //     final user = supabase.auth.currentUser;
-  //     if (user == null) return;
-
-  //     final userData = await supabase
-  //         .from('User')
-  //         .select('profile_picture_url')
-  //         .eq('id', user.id)
-  //         .single();
-  //     final String? pfpUrl = userData['profile_picture_url'];
-
-  //     if (pfpUrl != null && pfpUrl.isNotEmpty) {
-  //       final uri = Uri.parse(pfpUrl);
-  //       final pathSegments = uri.pathSegments;
-  //       final fileName = pathSegments.last;
-  //       final fileExtension = fileName.split('.').last.toLowerCase();
-  //       const supportedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-  //       if (supportedExtensions.contains(fileExtension)) {
-  //         if (kIsWeb) {
-  //           // Web: Use XFile.fromData for in-memory bytes
-  //           final bytes = await http.get(uri).then((res) => res.bodyBytes);
-  //           setUserPfp(XFile.fromData(
-  //             bytes,
-  //             name: 'pfp.$fileExtension',
-  //             mimeType: _getMimeTypeFromExtension(fileExtension),
-  //           ));
-  //         } else {
-  //           // Desktop: Save to temporary file
-  //           final tempDir = await getTemporaryDirectory();
-  //           final tempFile = File('${tempDir.path}/pfp.$fileExtension');
-  //           final bytes = await http.get(uri).then((res) => res.bodyBytes);
-  //           await tempFile.writeAsBytes(bytes);
-  //           setUserPfp(XFile(tempFile.path));
-  //         }
-  //         notifyListeners();
-  //         return;
-  //       }
-  //     }
-  //     // Fallback to null (UI should use Image.asset for default)
-  //     setUserPfp(null);
-  //     notifyListeners();
-  //   } catch (e) {
-  //     print('Error fetching profile picture: $e');
-  //     setUserPfp(null);
-  //     notifyListeners();
-  //   }
-  // }
-
+  // Helper to get MIME type
   String _getMimeTypeFromExtension(String extension) {
     switch (extension) {
       case 'jpg':
@@ -541,5 +382,99 @@ class SupabaseService extends StateHandler {
       default:
         return 'application/octet-stream';
     }
+  }
+
+  Future<String> uploadUserProfilePicture(XFile imageFile) async {
+    try {
+      final user = supabase.auth.currentUser;
+      if (user == null) throw Exception('User not authenticated');
+
+      final extension = imageFile.name.split('.').last.toLowerCase();
+      final mimeType = _getMimeTypeFromExtension(extension);
+      final storagePath =
+          '${user.id}/avatar.$extension'; // Consistent file name
+
+      // Attempt to remove old profile picture if it exists to avoid clutter
+      try {
+        // List files in the user's directory in the bucket
+        final files = await supabase.storage
+            .from(_profileBucketName)
+            .list(path: user.id);
+        for (final file in files) {
+          if (file.name.startsWith('avatar.')) {
+            // Check for previous avatar files
+            await supabase.storage.from(_profileBucketName).remove([
+              '${user.id}/${file.name}',
+            ]);
+            print('Removed old profile picture: ${file.name}');
+          }
+        }
+      } catch (e) {
+        print('No existing profile picture to remove or error listing: $e');
+      }
+
+      final bytes = await imageFile.readAsBytes();
+
+      // Upload the new image
+      await supabase.storage
+          .from(_profileBucketName)
+          .uploadBinary(
+            storagePath,
+            bytes,
+            fileOptions: FileOptions(contentType: mimeType, upsert: true),
+          );
+
+      // Get the public URL for the uploaded image
+      final String publicUrl = supabase.storage
+          .from(_profileBucketName)
+          .getPublicUrl(storagePath);
+
+      // Update the user's metadata with the new avatar URL
+      await supabase.auth.updateUser(
+        UserAttributes(data: {'profile_picture_url': publicUrl}),
+      );
+
+      // Update the local CurrentUser object with the new avatar URL
+      _currentUser = _currentUser?.copyWith(avatarUrl: publicUrl);
+      notifyListeners();
+
+      print('Profile picture uploaded and metadata updated: $publicUrl');
+      return publicUrl;
+    } catch (e) {
+      print('Error uploading profile picture: $e');
+      throw Exception('Failed to upload profile picture: ${e.toString()}');
+    }
+  }
+
+  Future<XFile?> fetchUserProfilePictureFile(String avatarUrl) async {
+    if (avatarUrl.isEmpty) return null;
+    try {
+      final uri = Uri.parse(avatarUrl);
+      final response = await http.get(uri);
+      if (response.statusCode == 200) {
+        final bytes = response.bodyBytes;
+        final fileExtension = uri.path.split('.').last.toLowerCase();
+        final mimeType = _getMimeTypeFromExtension(fileExtension);
+        if (kIsWeb) {
+          return XFile.fromData(
+            bytes,
+            name: 'pfp.$fileExtension',
+            mimeType: mimeType,
+          );
+        } else {
+          final tempDir = await getTemporaryDirectory();
+          final tempFile = File('${tempDir.path}/pfp.$fileExtension');
+          await tempFile.writeAsBytes(bytes);
+          return XFile(
+            tempFile.path,
+            name: 'pfp.$fileExtension',
+            mimeType: mimeType,
+          );
+        }
+      }
+    } catch (e) {
+      print('Error fetching profile picture file: $e');
+    }
+    return null;
   }
 }

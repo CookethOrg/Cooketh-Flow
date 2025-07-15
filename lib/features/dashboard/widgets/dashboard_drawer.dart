@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/upgrade_plan.dart';
 import 'package:cookethflow/features/dashboard/widgets/edit_profile.dart';
+import 'package:cached_network_image/cached_network_image.dart'; // For network images
 
 class DashboardDrawer extends StatelessWidget {
   const DashboardDrawer({super.key});
@@ -14,8 +16,19 @@ class DashboardDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer<DashboardProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<DashboardProvider, SupabaseService>(
+      // Consume both providers
+      builder: (context, dashboardProvider, supabaseService, child) {
+        // Access both here
+        final currentUser =
+            supabaseService.currentUser; // Get current user data
+
+        // Default values if user data is not yet loaded or is null
+        final String displayName = currentUser?.name ?? 'Guest User';
+        final String displayUsername = currentUser?.username ?? '@guest';
+        final String displayAvatarUrl =
+            currentUser?.avatarUrl ?? ''; // Use empty string if null
+
         return IntrinsicWidth(
           child: Container(
             decoration: BoxDecoration(
@@ -38,35 +51,61 @@ class DashboardDrawer extends StatelessWidget {
                         children: [
                           ClipOval(
                             child: SizedBox(
-                              width: device == rh.DeviceType.desktop ? 72.w : 80.w, // Slightly larger for tab
-                              height: device == rh.DeviceType.desktop ? 72.h : 80.h,
-                              child: Image.asset(
-                                'assets/images/pfp.png',
-                                fit: BoxFit.cover,
-                              ),
+                              width:
+                                  device == rh.DeviceType.desktop ? 72.w : 80.w,
+                              height:
+                                  device == rh.DeviceType.desktop ? 72.h : 80.h,
+                              child:
+                                  displayAvatarUrl.isNotEmpty
+                                      ? CachedNetworkImage(
+                                        imageUrl: displayAvatarUrl,
+                                        fit: BoxFit.cover,
+                                        placeholder:
+                                            (context, url) =>
+                                                const CircularProgressIndicator(), // Loading indicator
+                                        errorWidget:
+                                            (context, url, error) =>
+                                                Image.asset(
+                                                  supabaseService!
+                                                      .defaultPfpPath,
+                                                  fit: BoxFit.cover,
+                                                ), // Fallback to default asset
+                                      )
+                                      : Image.asset(
+                                        supabaseService.defaultPfpPath,
+                                        fit: BoxFit.cover,
+                                      ),
                             ),
                           ),
-                          SizedBox(width: device == rh.DeviceType.desktop ? 8.w : 24.w,), // Reduced spacing for tab
+                          SizedBox(
+                            width: device == rh.DeviceType.desktop ? 8.w : 24.w,
+                          ),
                           Flexible(
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Antara Paul',
+                                  displayName,
                                   style: TextStyle(
                                     fontFamily: 'Frederik',
-                                    fontSize: device == rh.DeviceType.desktop ? 24.sp : 36.sp, // Reduced for tab
+                                    fontSize:
+                                        device == rh.DeviceType.desktop
+                                            ? 24.sp
+                                            : 36.sp,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.6,
                                   ),
                                 ),
                                 SizedBox(height: 2.h),
                                 Text(
-                                  '@antara_paul',
+                                  displayUsername,
                                   style: TextStyle(
                                     fontFamily: 'Frederik',
-                                    fontSize: device == rh.DeviceType.desktop ? 16.sp : 24.sp, // Reduced for tab
+                                    fontSize:
+                                        device == rh.DeviceType.desktop
+                                            ? 16.sp
+                                            : 24.sp,
                                   ),
                                 ),
                               ],
@@ -74,7 +113,9 @@ class DashboardDrawer extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: device == rh.DeviceType.desktop ? 30.h : 16.h), // Adjusted for tab
+                      SizedBox(
+                        height: device == rh.DeviceType.desktop ? 30.h : 16.h,
+                      ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -82,7 +123,8 @@ class DashboardDrawer extends StatelessWidget {
                             onPressed: () {
                               showDialog(
                                 context: context,
-                                builder: (context) => const ProfileSettingsWidget(),
+                                builder:
+                                    (context) => const ProfileSettingsWidget(),
                               );
                             },
                             icon: Icon(
@@ -91,8 +133,14 @@ class DashboardDrawer extends StatelessWidget {
                             ),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
-                                horizontal: device == rh.DeviceType.desktop ? 28.w : 28.w, // Adjusted for tab
-                                vertical: device == rh.DeviceType.desktop ? 24.h : 20.h, // Adjusted for tab
+                                horizontal:
+                                    device == rh.DeviceType.desktop
+                                        ? 28.w
+                                        : 28.w,
+                                vertical:
+                                    device == rh.DeviceType.desktop
+                                        ? 24.h
+                                        : 20.h,
                               ),
                               foregroundColor: primaryColor,
                               shape: RoundedRectangleBorder(
@@ -100,28 +148,43 @@ class DashboardDrawer extends StatelessWidget {
                               ),
                               backgroundColor: Colors.white,
                               side: BorderSide(color: primaryColor),
-                              minimumSize: Size(0, device == rh.DeviceType.desktop ? 48.h : 40.h), // Adjusted for tab
+                              minimumSize: Size(
+                                0,
+                                device == rh.DeviceType.desktop ? 48.h : 40.h,
+                              ),
                             ),
                             label: Text(
                               'Edit Profile',
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
-                                fontSize: device == rh.DeviceType.desktop ? 16.sp : 24.sp, // Reduced for tab
+                                fontSize:
+                                    device == rh.DeviceType.desktop
+                                        ? 16.sp
+                                        : 24.sp,
                                 color: primaryColor,
                               ),
                             ),
                           ),
                           SizedBox(width: 16),
                           ElevatedButton.icon(
-                            onPressed: () {},
+                            onPressed: () async {
+                              await supabaseService!
+                                  .logout(); // Call logout from SupabaseService
+                            },
                             icon: Icon(
                               PhosphorIcons.signOut(),
                               color: Colors.white,
                             ),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
-                                horizontal: device == rh.DeviceType.desktop ? 28.w : 28.w, // Adjusted for tab
-                                vertical: device == rh.DeviceType.desktop ? 24.h : 20.h, // Adjusted for tab
+                                horizontal:
+                                    device == rh.DeviceType.desktop
+                                        ? 28.w
+                                        : 28.w,
+                                vertical:
+                                    device == rh.DeviceType.desktop
+                                        ? 24.h
+                                        : 20.h,
                               ),
                               foregroundColor: primaryColor,
                               shape: RoundedRectangleBorder(
@@ -129,13 +192,19 @@ class DashboardDrawer extends StatelessWidget {
                               ),
                               backgroundColor: primaryColor,
                               side: BorderSide(color: primaryColor),
-                              minimumSize: Size(0, device == rh.DeviceType.desktop ? 48.h : 40.h), // Adjusted for tab
+                              minimumSize: Size(
+                                0,
+                                device == rh.DeviceType.desktop ? 48.h : 40.h,
+                              ),
                             ),
                             label: Text(
                               'Log Out',
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
-                                fontSize: device == rh.DeviceType.desktop ? 16.sp : 24.sp, // Reduced for tab
+                                fontSize:
+                                    device == rh.DeviceType.desktop
+                                        ? 16.sp
+                                        : 24.sp,
                                 color: Colors.white,
                               ),
                             ),
@@ -144,26 +213,33 @@ class DashboardDrawer extends StatelessWidget {
                       ),
                     ],
                   ),
-                  SizedBox(height: device == rh.DeviceType.desktop ? 15.h : 10.h), // Adjusted for tab
-                  Visibility(visible: provider.isDrawerOpen, child: Divider(color: Colors.grey, thickness: 0.5)),
+                  SizedBox(
+                    height: device == rh.DeviceType.desktop ? 15.h : 10.h,
+                  ),
+                  Visibility(
+                    visible: dashboardProvider.isDrawerOpen,
+                    child: Divider(color: Colors.grey, thickness: 0.5),
+                  ),
                   // Column for lower items (vertical tabs)
                   Flexible(
                     child: ListView.builder(
                       padding: EdgeInsets.zero,
                       shrinkWrap: true,
-                      itemCount: provider.tabItems.length,
+                      itemCount: dashboardProvider.tabItems.length,
                       itemBuilder: (context, index) {
-                        final isSelected = provider.tabIndex == index;
+                        final isSelected = dashboardProvider.tabIndex == index;
                         return InkWell(
                           onTap: () {
-                            provider.toggleTab(index);
+                            dashboardProvider.toggleTab(index);
                           },
                           borderRadius: BorderRadius.circular(8.r),
                           child: Container(
                             margin: EdgeInsets.symmetric(vertical: 4.h),
                             padding: EdgeInsets.symmetric(
-                              horizontal: device == rh.DeviceType.desktop ? 12.w : 16.w, // Adjusted for tab
-                              vertical: device == rh.DeviceType.desktop ? 12.h : 16.h, // Adjusted for tab
+                              horizontal:
+                                  device == rh.DeviceType.desktop ? 12.w : 16.w,
+                              vertical:
+                                  device == rh.DeviceType.desktop ? 12.h : 16.h,
                             ),
                             decoration: BoxDecoration(
                               color: Colors.transparent,
@@ -174,19 +250,38 @@ class DashboardDrawer extends StatelessWidget {
                               children: [
                                 IconTheme(
                                   data: IconThemeData(
-                                    color: isSelected ? secondaryColors[6] : Colors.black,
-                                    size: device == rh.DeviceType.desktop ? 26.sp : 30.sp, // Adjusted for tab
+                                    color:
+                                        isSelected
+                                            ? secondaryColors[6]
+                                            : Colors.black,
+                                    size:
+                                        device == rh.DeviceType.desktop
+                                            ? 26.sp
+                                            : 30.sp,
                                   ),
-                                  child: provider.tabItems[index]['icon'],
+                                  child:
+                                      dashboardProvider.tabItems[index]['icon'],
                                 ),
-                                SizedBox(width: device == rh.DeviceType.desktop ? 12.w : 10.w), // Reduced for tab
+                                SizedBox(
+                                  width:
+                                      device == rh.DeviceType.desktop
+                                          ? 12.w
+                                          : 10.w,
+                                ),
                                 Text(
-                                  provider.tabItems[index]['label'],
+                                  dashboardProvider.tabItems[index]['label'],
                                   style: TextStyle(
                                     fontFamily: 'Fredrik',
-                                    fontSize: device == rh.DeviceType.desktop ? 18.sp : 16.sp, // Reduced for tab
-                                    color: isSelected ? Colors.blue : Colors.black,
-                                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                                    fontSize:
+                                        device == rh.DeviceType.desktop
+                                            ? 18.sp
+                                            : 16.sp,
+                                    color:
+                                        isSelected ? Colors.blue : Colors.black,
+                                    fontWeight:
+                                        isSelected
+                                            ? FontWeight.w600
+                                            : FontWeight.w400,
                                   ),
                                 ),
                               ],
@@ -197,7 +292,7 @@ class DashboardDrawer extends StatelessWidget {
                     ),
                   ),
                   Spacer(),
-                  const UpgradeCard()
+                  const UpgradeCard(),
                 ],
               ),
             ),

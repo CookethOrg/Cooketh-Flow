@@ -1,6 +1,7 @@
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/build_project.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -15,14 +16,14 @@ class AddProject extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
           'Create Project',
-          style: TextStyle(fontFamily: 'Frederik', fontWeight: FontWeight.bold),
+          style: TextStyle(fontFamily: 'Frederik',fontSize: 28.sp ,fontWeight: FontWeight.bold),
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             BuildProject(
               icon: PhosphorIconsRegular.plus,
-              label: 'Start New Project',
+              label: 'Start Blank Project',
               onTap: () async {
                 context.pop();
                 provider.createNewProject(context);

@@ -1,6 +1,7 @@
 class DateTimeHelper {
-  String formatLastEdited(DateTime lastEdited) {
-  final now = DateTime.now();
+  String formatLastEdited(DateTime? lastEdited) {
+    if (lastEdited == null) return "Edited Just Now";
+    final now = DateTime.now();
   final difference = now.difference(lastEdited);
 
   if (difference.inDays > 0) {
@@ -12,5 +13,5 @@ class DateTimeHelper {
   } else {
     return 'Edited just now';
   }
-}
+  }
 }

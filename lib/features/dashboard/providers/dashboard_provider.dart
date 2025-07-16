@@ -4,6 +4,7 @@ import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:uuid/uuid.dart';
 
 class DashboardProvider extends StateHandler {
   late SupabaseClient? supabase;
@@ -54,6 +55,10 @@ class DashboardProvider extends StateHandler {
     }
   }
 
+  Future<void> refreshDashboard() async {
+    await _initializeUser();
+  }
+
   Future<void> _initializeUser() async {
     _isLoading = true;
     try {
@@ -80,7 +85,7 @@ class DashboardProvider extends StateHandler {
             name: workspace["name"],
             editorIdList: workspace["editorId"] ?? [],
             viewerIdList: workspace["viewerId"] ?? [],
-            lastEdited: DateTime.parse(workspace["last edited"]),
+            lastEdited: workspace["last edited"] != null ? DateTime.parse(workspace["last edited"]) : DateTime.now(),
           );
           // print(workspace);
           _workspaceList.add(newWorkspace);
@@ -96,7 +101,33 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  void createNewProject(BuildContext context) {}
+  Future<void> createNewProject(BuildContext context) async {
+    _isLoading = true;
+    try {
+      var res = supabase?.auth.currentUser;
+      if (res == null) {
+        _isLoading = false;
+        print("User not found");
+        notifyListeners();
+      }
+      Map<dynamic,dynamic> newWorkspace = {
+        "id" : Uuid().v4(),
+        "owner": res!.id,
+        "name": "New Project",
+        "editorId": null,
+        "viewerId":null,
+      };
+
+      await supabase!.from('workspace').insert(newWorkspace);
+
+      refreshDashboard();
+    } catch (e) {
+      print("Error creating new project: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   void importExistingProject(BuildContext context) {}
 }

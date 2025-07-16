@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/features/dashboard/widgets/add_project_dialogue.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -12,7 +13,9 @@ class StartProject extends StatelessWidget {
     return Consumer(
       builder: (context, value, child) {
         return ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            showDialog(context: context, builder: (context) => AddProject(),);
+          },
           style: ElevatedButton.styleFrom(
             elevation: 0,
             backgroundColor: primaryColor,

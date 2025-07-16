@@ -8,7 +8,7 @@ class WorkspaceModel {
   String name;
   List<String> editorIdList;
   List<String> viewerIdList;
-  DateTime lastEdited;
+  DateTime? lastEdited;
   List<NodeModel> nodeList;
   List<ConnectionModel> connectionList;
 
@@ -51,7 +51,7 @@ class WorkspaceModel {
       'name': name,
       'editorIdList': editorIdList,
       'viewerIdList': viewerIdList,
-      'lastEdited': lastEdited.toIso8601String(),
+      'lastEdited': lastEdited?.toIso8601String(),
       'nodeList': nodeList.map((node) => node.toJson()).toList(),
       'connectionList': connectionList.map((conn) => conn.toJson()).toList(),
     };

@@ -61,7 +61,8 @@ void main() async {
         ChangeNotifierProvider(
           create:
               (ctx) => DashboardProvider(
-                Provider.of<AuthenticationProvider>(ctx, listen: false),
+                instance.client,
+                Provider.of<SupabaseService>(ctx, listen: false),
               ),
           // update:
           //     (context, auth, previous) => previous ?? DashboardProvider(auth),

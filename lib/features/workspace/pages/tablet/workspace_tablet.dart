@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -19,6 +20,8 @@ class WorkspaceTablet extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 20.h), // Adjusted for tablet
         child: Stack(
           children: [
+
+            CanvasPage(),
             // Top Bar
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

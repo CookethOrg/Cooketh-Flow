@@ -205,7 +205,7 @@ class _CanvasPageState extends State<CanvasPage> {
 
             // Buttons to change the current mode.
             Positioned(
-              top: 0,
+              top: 500,
               left: 0,
               child: Row(
                 children:

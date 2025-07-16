@@ -1,8 +1,11 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
-import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
+import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
+import 'package:cookethflow/features/workspace/widgets/toolbar.dart'; // Assuming this might be used later
+import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
+import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -12,163 +15,32 @@ class WorkspaceDesktop extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool device =
+    // Determine device type for responsive adjustments
+    bool isDesktop =
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
         rh.DeviceType.desktop;
 
     return Scaffold(
       backgroundColor: const Color(0xFFFF8F8F8),
-      // body: PhosphorIconsWidget(),
-      // body: ColorPickerWidget(
-      // onColorChanged: (Color primaryColor) {
-      // handle color change here
-      // },}
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
         child: Stack(
           children: [
+            // 1. CanvasPage - This should be the base layer, filling the entire available space
+            const CanvasPage(),
 
-            // CanvasPage(),
-            // Top Bar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Back & Title
-                Row(
-                  children: [
-                    //workspace Drawer
-                    const WorkspaceDrawer(),
-                    SizedBox(width: 20.w),
-                    //Undo/redo
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal:
-                            device == rh.DeviceType.desktop ? 24.w : 32.w,
-                        vertical: 16.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12.r),
-                        border: Border.all(
-                          color: const Color(0xFFD9D9D9),
-                          width: 1.2,
-                        ),
-                      ),
-                      child: SizedBox(
-                        height: 56.h,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                PhosphorIconsRegular.arrowArcLeft,
-                                size: 32.sp,
-                                color: Colors.black,
-                              ),
-                            ),
-                            _verticalDivider(), // Use custom divider
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                PhosphorIconsRegular.arrowArcRight,
-                                size: 32.sp,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+            const WorkspaceDrawer(),
+            SizedBox(width: 20.w),
+            // Undo/Redo Controls Container
+            Positioned(top: 0,left: 0.21.sw,child: UndoRedoButton()),
+            // Export project button
+            Positioned(top: 0,right: 0.02.sw,child: ExportProjectButton()),
 
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {},
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: primaryColor,
-                        padding: EdgeInsets.symmetric(
-                          vertical: 32.h,
-                          horizontal: 24.w,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Export Flowchart',
-                            style: TextStyle(
-                              fontFamily: 'Fredrik',
-                              fontSize: 18.sp,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          SizedBox(width: 16.w),
-                          Icon(
-                            PhosphorIconsRegular.export,
-                            color: Colors.white,
-                            size: 24.sp,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-                // Align(alignment: Alignment.centerRight, child: const ToolBar()),
-                // zoom control
-                // Positioned(
-                //   bottom: 0.h,
-                //   right: 0.w,
-                //   child: Container(
-                //     padding: EdgeInsets.symmetric(
-                //       horizontal: 20.w,
-                //       vertical: 16.h,
-                //     ),
-                //     decoration: BoxDecoration(
-                //       border: Border.all(color: Color(0XFFD9D9D9), width: 1.2),
-                //       color: Colors.white,
-                //       borderRadius: BorderRadius.circular(12.r),
-                //     ),
-                //     child: Row(
-                //       mainAxisSize: MainAxisSize.min,
-                //       crossAxisAlignment: CrossAxisAlignment.center,
-                //       children: [
-                //         Text(
-                //           "100%",
-                //           style: TextStyle(
-                //             color: Colors.black,
-                //             fontWeight: FontWeight.w500,
-                //             fontSize: 24.sp,
-                //           ),
-                //         ),
-                //         SizedBox(width: 8.w),
-                //         _verticalDivider(),
-                //         SizedBox(width: 8.w),
-                //         IconButton(
-                //           onPressed: () {},
-                //           icon: Icon(PhosphorIconsRegular.plus, size: 24.sp),
-                //           visualDensity: VisualDensity.compact,
-                //         ),
-                //         SizedBox(width: 8.w),
-                //         _verticalDivider(),
-                //         SizedBox(width: 8.w),
-                //         IconButton(
-                //           onPressed: () {},
-                //           icon: Icon(PhosphorIconsRegular.minus, size: 24.sp),
-                //           visualDensity: VisualDensity.compact,
-                //         ),
-                //       ],
-                //     ),
-                //   ),
-                // ),
-              ],
+            // 3. Zoom Control - Positioned at the bottom right of the Stack
+            Positioned(
+              bottom: 0.h, // Aligns to the bottom edge of the Stack
+              right: 0.w, // Aligns to the right edge of the Stack
+              child: ZoomControlButton(),
             ),
           ],
         ),
@@ -177,6 +49,7 @@ class WorkspaceDesktop extends StatelessWidget {
   }
 }
 
+// Helper function for the vertical divider
 Widget _verticalDivider() {
   return Container(
     height: 24.h,

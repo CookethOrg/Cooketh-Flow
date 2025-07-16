@@ -2,6 +2,7 @@ import 'package:cookethflow/app.dart';
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
+import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -66,6 +67,9 @@ void main() async {
               ),
           // update:
           //     (context, auth, previous) => previous ?? DashboardProvider(auth),
+        ),
+        ChangeNotifierProvider<WorkspaceProvider>(
+          create: (context) => WorkspaceProvider(),
         ),
       ],
       child: const MyApp(),

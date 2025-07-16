@@ -36,6 +36,8 @@ class WorkspaceDesktop extends StatelessWidget {
             // Export project button
             Positioned(top: 0,right: 0.02.sw,child: ExportProjectButton()),
 
+            Positioned(right: 0,top: 0.15.sh,child: ToolBar()),
+
             // 3. Zoom Control - Positioned at the bottom right of the Stack
             Positioned(
               bottom: 0.h, // Aligns to the bottom edge of the Stack

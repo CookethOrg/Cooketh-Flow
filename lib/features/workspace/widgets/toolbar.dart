@@ -41,12 +41,12 @@ class ToolBar extends StatelessWidget {
               print('Circles three plus pressed');
             },
           ),
-          _toolIcon(
-            PhosphorIconsFill.circle,
-            device,
-            iconColor: tertiaryColors[3],
-            onPressed: () => _showColorPicker(context),
-          ),
+          // _toolIcon(
+          //   PhosphorIconsFill.circle,
+          //   device,
+          //   iconColor: tertiaryColors[3],
+          //   onPressed: () => _showColorPicker(context),
+          // ),
           _horizontalDivider(),
           _toolIcon(
             PhosphorIconsRegular.handGrabbing,

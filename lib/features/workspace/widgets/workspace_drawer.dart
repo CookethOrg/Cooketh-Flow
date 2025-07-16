@@ -164,14 +164,10 @@ class WorkspaceDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     Color iconTextColor = isSelected ? Colors.blue : Colors.black;
-    BorderSide tileBorder = isSelected ? BorderSide(color: Colors.blue, width: 2.0) : BorderSide.none;
+    // BorderSide tileBorder = isSelected ? BorderSide(color: Colors.blue, width: 2.0) : BorderSide.none;
 
     return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10.r),
-        border: Border.fromBorderSide(tileBorder),
-      ),
+      color: Colors.white,
       child: ListTile(
         leading: Icon(
           iconData,

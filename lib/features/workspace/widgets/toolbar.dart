@@ -26,6 +26,7 @@ class ToolBar extends StatelessWidget {
         children: [
           _toolIcon(
             PhosphorIconsRegular.paintBucket,
+            'Select Workspace Color',
             device,
             onPressed: () {
               _showColorPicker(context);
@@ -35,6 +36,7 @@ class ToolBar extends StatelessWidget {
           _horizontalDivider(),
           _toolIcon(
             PhosphorIconsRegular.circlesThreePlus,
+            'Add new node',
             device,
             onPressed: () {
               // *** CHANGED: Call the new method to show the NodePicker dialog ***
@@ -51,6 +53,7 @@ class ToolBar extends StatelessWidget {
           _horizontalDivider(),
           _toolIcon(
             PhosphorIconsRegular.handGrabbing,
+            'Pointer',
             device,
             onPressed: () {
               // TODO: Add hand grabbing functionality
@@ -59,6 +62,7 @@ class ToolBar extends StatelessWidget {
           ),
           _toolIcon(
             PhosphorIconsRegular.textT,
+            'Text box',
             device,
             onPressed: () {
               // TODO: Add text functionality
@@ -67,6 +71,7 @@ class ToolBar extends StatelessWidget {
           ),
           _toolIcon(
             PhosphorIconsRegular.image,
+            'Add Image/Media files',
             device,
             onPressed: () {
               // TODO: Add image functionality
@@ -75,6 +80,7 @@ class ToolBar extends StatelessWidget {
           ),
           _toolIcon(
             PhosphorIconsFill.noteBlank,
+            'Add new sticky note',
             device,
             iconColor: tertiaryColors[6],
             onPressed: () => _showStickyNote(context),
@@ -86,6 +92,7 @@ class ToolBar extends StatelessWidget {
 
   Widget _toolIcon(
     IconData iconData,
+    String tooltip,
     rh.DeviceType device, {
     Color iconColor = Colors.black87,
     Color backgroundColor = Colors.white,
@@ -96,13 +103,9 @@ class ToolBar extends StatelessWidget {
       child: Material(
         color: backgroundColor,
         borderRadius: BorderRadius.circular(12.r),
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(12.r),
-          child: Container(
-            padding: EdgeInsets.all(8.w),
-            child: Icon(iconData, size: 36.sp, color: iconColor),
-          ),
+        child: Container(
+          padding: EdgeInsets.all(8.w),
+          child: IconButton(onPressed: onPressed,tooltip: tooltip,icon: Icon(iconData,size: 36.sp,), color: iconColor),
         ),
       ),
     );

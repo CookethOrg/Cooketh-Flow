@@ -6,10 +6,12 @@ import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:universal_html/html.dart';
 import 'package:uuid/uuid.dart';
 
 class CanvasPage extends StatefulWidget {
@@ -56,7 +58,7 @@ class _CanvasPageState extends State<CanvasPage> {
                   final object = CanvasObject.fromJson(payload['object']);
                   _canvasObjects[object.id] = object;
                 }
-                if(mounted){
+                if (mounted) {
                   setState(() {});
                 }
               },
@@ -73,7 +75,7 @@ class _CanvasPageState extends State<CanvasPage> {
       final canvasObject = CanvasObject.fromJson(canvasObjectData['object']);
       _canvasObjects[canvasObject.id] = canvasObject;
     }
-    if(mounted){
+    if (mounted) {
       setState(() {});
     }
   }
@@ -109,6 +111,11 @@ class _CanvasPageState extends State<CanvasPage> {
         break;
       case _DrawMode.rectangle:
         final newObject = Rectangle.createNew(details.globalPosition);
+        _canvasObjects[newObject.id] = newObject;
+        _currentlyDrawingObjectId = newObject.id;
+        break;
+      case _DrawMode.square:
+        final newObject = Square.createNew(details.globalPosition);
         _canvasObjects[newObject.id] = newObject;
         _currentlyDrawingObjectId = newObject.id;
         break;
@@ -148,6 +155,12 @@ class _CanvasPageState extends State<CanvasPage> {
       case _DrawMode.rectangle:
         _canvasObjects[_currentlyDrawingObjectId!] =
             (_canvasObjects[_currentlyDrawingObjectId!] as Rectangle).copyWith(
+              bottomRight: details.globalPosition,
+            );
+        break;
+      case _DrawMode.square:
+        _canvasObjects[_currentlyDrawingObjectId!] =
+            (_canvasObjects[_currentlyDrawingObjectId!] as Square).copyWith(
               bottomRight: details.globalPosition,
             );
         break;
@@ -243,7 +256,8 @@ class _CanvasPageState extends State<CanvasPage> {
 enum _DrawMode {
   pointer(iconData: Icons.pan_tool_alt),
   circle(iconData: Icons.circle_outlined),
-  rectangle(iconData: Icons.rectangle_outlined);
+  rectangle(iconData: Icons.rectangle_outlined),
+  square(iconData: Icons.square_outlined);
 
   const _DrawMode({required this.iconData});
   final IconData iconData;

@@ -2,6 +2,7 @@ enum ProviderState { inital, empty, loading, loaded, success, error }
 
 enum NodeType {
   note,
+  rectangle,
   square,
   diamond,
   roundedSquare,

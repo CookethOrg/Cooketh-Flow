@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/synced_object.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -32,6 +33,8 @@ abstract class CanvasObject extends SyncedObject {
       return Circle.fromJson(json);
     } else if (json['object_type'] == Rectangle.type) {
       return Rectangle.fromJson(json);
+    } else if (json['object_type'] == Square.type) {
+      return Square.fromJson(json);
     } else {
       throw UnimplementedError('Unknown object_type: ${json['object_type']}');
     }

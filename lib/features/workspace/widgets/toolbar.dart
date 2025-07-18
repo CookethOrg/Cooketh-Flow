@@ -1,3 +1,4 @@
+import 'package:cookethflow/features/workspace/widgets/node_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -5,7 +6,6 @@ import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/features/workspace/widgets/node_colour.dart';
 import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
-
 
 class ToolBar extends StatelessWidget {
   const ToolBar({super.key});
@@ -37,7 +37,8 @@ class ToolBar extends StatelessWidget {
             PhosphorIconsRegular.circlesThreePlus,
             device,
             onPressed: () {
-              // TODO: Add circles three plus functionality
+              // *** CHANGED: Call the new method to show the NodePicker dialog ***
+              _showNodePicker(context);
               print('Circles three plus pressed');
             },
           ),
@@ -100,11 +101,7 @@ class ToolBar extends StatelessWidget {
           borderRadius: BorderRadius.circular(12.r),
           child: Container(
             padding: EdgeInsets.all(8.w),
-            child: Icon(
-              iconData,
-              size: 36.sp,
-              color: iconColor,
-            ),
+            child: Icon(iconData, size: 36.sp, color: iconColor),
           ),
         ),
       ),
@@ -120,38 +117,76 @@ class ToolBar extends StatelessWidget {
     );
   }
 
+  // *** ADDED: Method to show the NodePicker dialog ***
+  void _showNodePicker(BuildContext context) {
+    // Find the RenderBox of the ToolBar to get its position on the screen.
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox == null) return;
+
+    final position = renderBox.localToGlobal(Offset.zero);
+    final nodePickerWidth = 340; // The width of the NodePicker widget
+    final padding = 20.w; // Padding between the toolbar and the picker
+
+    showDialog(
+      context: context,
+      barrierColor: Colors.transparent, // Make the background transparent
+      builder: (context) => Stack(
+        children: [
+          // This GestureDetector captures taps outside the NodePicker to close it.
+          Positioned.fill(
+            child: GestureDetector(
+              onTap: () => Navigator.pop(context),
+              child: Container(color: Colors.transparent),
+            ),
+          ),
+          // Position the NodePicker widget to the left of the ToolBar.
+          Positioned(
+            top: position.dy,
+            left: position.dx - nodePickerWidth - padding,
+            child: const Material(
+              color: Colors.transparent,
+              child: NodePicker(),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showColorPicker(BuildContext context) {
     // Get the render box of the toolbar to position the dialog
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final position = renderBox.localToGlobal(Offset.zero);
-      
+
       showDialog(
         context: context,
         barrierColor: Colors.transparent,
-        builder: (context) => Stack(
-          children: [
-            // Invisible barrier to close dialog when tapping outside
-            Positioned.fill(
-              child: GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: Container(color: Colors.transparent),
-              ),
+        builder:
+            (context) => Stack(
+              children: [
+                // Invisible barrier to close dialog when tapping outside
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+                // Position the color picker next to the toolbar
+                Positioned(
+                  right: 40.w,
+                  top: 40.h,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: NodeColourPicker(),
+                  ),
+                ),
+              ],
             ),
-            // Position the color picker next to the toolbar
-            Positioned(
-              right: 40.w,
-              top: 40.h,
-              child: Material(
-                color: Colors.transparent,
-                child: NodeColourPicker(),
-              ),
-            ),
-          ],
-        ),
       );
     }
   }
+
   void _showStickyNote(BuildContext context) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
@@ -159,14 +194,25 @@ class ToolBar extends StatelessWidget {
       showDialog(
         context: context,
         barrierColor: Colors.transparent,
-        builder: (context) => Stack(
-          children: [
-            Positioned.fill(
-              child: GestureDetector(onTap: () => Navigator.pop(context), child: Container(color: Colors.transparent)),
+        builder:
+            (context) => Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+                Positioned(
+                  right: 40.w,
+                  top: 40.h,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: StickyNotesWidget(),
+                  ),
+                ),
+              ],
             ),
-            Positioned(right: 40.w, top: 40.h, child: Material(color: Colors.transparent, child: StickyNotesWidget())),
-          ],
-        ),
       );
     }
   }

@@ -1,5 +1,5 @@
-import 'package:cookethflow/features/models/canvas_object.dart';
-import 'package:cookethflow/features/models/user_cursor.dart';
+import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
+import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 
 abstract class SyncedObject {
   final String id;

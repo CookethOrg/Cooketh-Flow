@@ -1,7 +1,7 @@
 import 'dart:ui';
 
-import 'package:cookethflow/features/models/canvas_object.dart';
-import 'package:cookethflow/features/models/synced_object.dart';
+import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
+import 'package:cookethflow/features/models/canvas_models/synced_object.dart';
 
 /// Data model for the cursors displayed on the canvas.
 class UserCursor extends SyncedObject {

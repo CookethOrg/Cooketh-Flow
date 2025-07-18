@@ -2,9 +2,11 @@ import 'dart:math';
 
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/consts.dart';
-import 'package:cookethflow/features/models/canvas_object.dart';
-import 'package:cookethflow/features/models/canvas_painter.dart';
-import 'package:cookethflow/features/models/user_cursor.dart';
+import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
+import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';

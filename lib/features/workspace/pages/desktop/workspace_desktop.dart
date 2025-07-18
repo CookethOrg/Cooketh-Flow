@@ -51,12 +51,3 @@ class WorkspaceDesktop extends StatelessWidget {
   }
 }
 
-// Helper function for the vertical divider
-Widget _verticalDivider() {
-  return Container(
-    height: 24.h,
-    width: 1.2.w,
-    color: const Color(0xFFD9D9D9),
-    margin: EdgeInsets.symmetric(horizontal: 8.w),
-  );
-}

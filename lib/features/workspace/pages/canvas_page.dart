@@ -5,7 +5,7 @@ import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/consts.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
-// ** 1. Import all the new shape models **
+// ** Importing all the shape models **
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/diamond_object.dart';

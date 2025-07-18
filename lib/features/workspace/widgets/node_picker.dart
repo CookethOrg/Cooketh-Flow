@@ -1,18 +1,7 @@
 
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-
-// Enum to define the different shapes
-enum ShapeType {
-  square,
-  diamond,
-  roundedSquare,
-  parallelogram,
-  cylinder,
-  circle,
-  triangle,
-  invertedTriangle,
-}
 
 // The main NodePicker widget as per the design
 class NodePicker extends StatelessWidget {
@@ -142,9 +131,9 @@ class ShapePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF818CF8) // A nice purple-blue color
+      ..color = Colors.black // A nice purple-blue color
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
+      ..strokeWidth = 1.0;
 
     final path = Path();
     final w = size.width;

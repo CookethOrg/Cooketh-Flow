@@ -28,7 +28,7 @@ class ToolBar extends StatelessWidget {
             PhosphorIconsRegular.paintBucket,
             device,
             onPressed: () {
-              // TODO: Add paint bucket functionality
+              _showColorPicker(context);
               print('Paint bucket pressed');
             },
           ),
@@ -130,26 +130,27 @@ class ToolBar extends StatelessWidget {
     showDialog(
       context: context,
       barrierColor: Colors.transparent, // Make the background transparent
-      builder: (context) => Stack(
-        children: [
-          // This GestureDetector captures taps outside the NodePicker to close it.
-          Positioned.fill(
-            child: GestureDetector(
-              onTap: () => Navigator.pop(context),
-              child: Container(color: Colors.transparent),
-            ),
+      builder:
+          (context) => Stack(
+            children: [
+              // This GestureDetector captures taps outside the NodePicker to close it.
+              Positioned.fill(
+                child: GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(color: Colors.transparent),
+                ),
+              ),
+              // Position the NodePicker widget to the left of the ToolBar.
+              Positioned(
+                top: position.dy,
+                left: position.dx - nodePickerWidth - padding,
+                child: const Material(
+                  color: Colors.transparent,
+                  child: NodePicker(),
+                ),
+              ),
+            ],
           ),
-          // Position the NodePicker widget to the left of the ToolBar.
-          Positioned(
-            top: position.dy,
-            left: position.dx - nodePickerWidth - padding,
-            child: const Material(
-              color: Colors.transparent,
-              child: NodePicker(),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -174,8 +175,8 @@ class ToolBar extends StatelessWidget {
                 ),
                 // Position the color picker next to the toolbar
                 Positioned(
-                  right: 40.w,
-                  top: 40.h,
+                  right: 130.w,
+                  top: 100.h,
                   child: Material(
                     color: Colors.transparent,
                     child: NodeColourPicker(),
@@ -204,8 +205,8 @@ class ToolBar extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: 40.w,
-                  top: 40.h,
+                  right: 130.w,
+                  top: 460.h,
                   child: Material(
                     color: Colors.transparent,
                     child: StickyNotesWidget(),

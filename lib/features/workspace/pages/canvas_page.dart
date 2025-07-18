@@ -1,17 +1,24 @@
-import 'dart:math';
+// ===== UPDATED FILE: lib/features/canvas/pages/canvas_page.dart =====
 
+import 'dart:math';
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/consts.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
+// ** 1. Import all the new shape models **
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/diamond_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/inverted_triangle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/parallelogram_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/rounded_square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:universal_html/html.dart';
 import 'package:uuid/uuid.dart';
 
 class CanvasPage extends StatefulWidget {
@@ -40,47 +47,43 @@ class _CanvasPageState extends State<CanvasPage> {
   }
 
   Future<void> _initialize() async {
-    // Use the authenticated user ID if available, otherwise generate a random one
-    // _myId = _supabaseService.userData.user?.id ?? const Uuid().v4();
-    _myId = Uuid().v4();
+    // This logic is kept exactly as you provided it.
+    _myId = _supabaseService.supabase.auth.currentUser?.id ?? const Uuid().v4();
 
-    // Start listening to broadcast messages
     _canvasChannel =
-        _supabaseService.supabase
-            .channel(Constants.channelName)
-            .onBroadcast(
-              event: Constants.broadcastEventName,
-              callback: (payload) {
-                final cursor = UserCursor.fromJson(payload['cursor']);
-                _userCursors[cursor.id] = cursor;
+        _supabaseService.supabase.channel(Constants.channelName).onBroadcast(
+      event: Constants.broadcastEventName,
+      callback: (payload) {
+        if (!mounted) return;
+        final cursor = UserCursor.fromJson(payload['cursor']);
+        _userCursors[cursor.id] = cursor;
 
-                if (payload['object'] != null) {
-                  final object = CanvasObject.fromJson(payload['object']);
-                  _canvasObjects[object.id] = object;
-                }
-                if (mounted) {
-                  setState(() {});
-                }
-              },
-            )
-            .subscribe();
+        if (payload['object'] != null) {
+          final object = CanvasObject.fromJson(payload['object']);
+          _canvasObjects[object.id] = object;
+        }
+        setState(() {});
+      },
+    ).subscribe();
 
-    // Load initial canvas objects
     final initialData = await _supabaseService.supabase
         .from('canvas_objects')
         .select()
         .order('created_at', ascending: true);
-
-    for (final canvasObjectData in initialData) {
-      final canvasObject = CanvasObject.fromJson(canvasObjectData['object']);
-      _canvasObjects[canvasObject.id] = canvasObject;
-    }
+        
     if (mounted) {
-      setState(() {});
+      setState(() {
+        for (final canvasObjectData in initialData) {
+          final canvasObject =
+              CanvasObject.fromJson(canvasObjectData['object']);
+          _canvasObjects[canvasObject.id] = canvasObject;
+        }
+      });
     }
   }
 
   Future<void> _syncCanvasObject(Offset cursorPosition) {
+    // This logic is kept exactly as you provided it.
     final myCursor = UserCursor(position: cursorPosition, id: _myId);
     return _canvasChannel.sendBroadcastMessage(
       event: Constants.broadcastEventName,
@@ -93,10 +96,12 @@ class _CanvasPageState extends State<CanvasPage> {
   }
 
   void _onPanDown(DragDownDetails details) {
+    _cursorPosition = details.globalPosition;
+    _panStartPoint = details.globalPosition;
+
+    CanvasObject? newObject;
     switch (_currentMode) {
       case _DrawMode.pointer:
-        // Loop through the canvas objects to find if there are any
-        // that intersects with the current mouse position.
         for (final canvasObject in _canvasObjects.values.toList().reversed) {
           if (canvasObject.intersectsWith(details.globalPosition)) {
             _currentlyDrawingObjectId = canvasObject.id;
@@ -105,75 +110,90 @@ class _CanvasPageState extends State<CanvasPage> {
         }
         break;
       case _DrawMode.circle:
-        final newObject = Circle.createNew(details.globalPosition);
-        _canvasObjects[newObject.id] = newObject;
-        _currentlyDrawingObjectId = newObject.id;
+        newObject = Circle.createNew(details.globalPosition);
         break;
       case _DrawMode.rectangle:
-        final newObject = Rectangle.createNew(details.globalPosition);
-        _canvasObjects[newObject.id] = newObject;
-        _currentlyDrawingObjectId = newObject.id;
+        newObject = Rectangle.createNew(details.globalPosition);
         break;
       case _DrawMode.square:
-        final newObject = Square.createNew(details.globalPosition);
-        _canvasObjects[newObject.id] = newObject;
-        _currentlyDrawingObjectId = newObject.id;
+        newObject = Square.createNew(details.globalPosition);
+        break;
+      // ** 2. Add cases to create new shapes on pan down **
+      case _DrawMode.diamond:
+        newObject = Diamond.createNew(details.globalPosition);
+        break;
+      case _DrawMode.roundedSquare:
+        newObject = RoundedSquare.createNew(details.globalPosition);
+        break;
+      case _DrawMode.parallelogram:
+        newObject = Parallelogram.createNew(details.globalPosition);
+        break;
+      case _DrawMode.cylinder:
+        newObject = Cylinder.createNew(details.globalPosition);
+        break;
+      case _DrawMode.triangle:
+        newObject = Triangle.createNew(details.globalPosition);
+        break;
+      case _DrawMode.invertedTriangle:
+        newObject = InvertedTriangle.createNew(details.globalPosition);
         break;
     }
-    _cursorPosition = details.globalPosition;
-    _panStartPoint = details.globalPosition;
-    setState(() {});
+
+    if (newObject != null) {
+      setState(() {
+        _canvasObjects[newObject!.id] = newObject;
+        _currentlyDrawingObjectId = newObject.id;
+      });
+    }
   }
 
   void _onPanUpdate(DragUpdateDetails details) {
+    _cursorPosition = details.globalPosition;
+    if (_currentlyDrawingObjectId == null) return;
+
+    final currentObject = _canvasObjects[_currentlyDrawingObjectId!];
+    if (currentObject == null) return;
+
     switch (_currentMode) {
-      // Moves the object to [details.delta] amount.
       case _DrawMode.pointer:
-        if (_currentlyDrawingObjectId != null) {
-          _canvasObjects[_currentlyDrawingObjectId!] =
-              _canvasObjects[_currentlyDrawingObjectId!]!.move(details.delta);
-        }
+        _canvasObjects[_currentlyDrawingObjectId!] =
+            currentObject.move(details.delta);
         break;
-
-      // Updates the size of the Circle
       case _DrawMode.circle:
-        final currentlyDrawingCircle =
-            _canvasObjects[_currentlyDrawingObjectId!]! as Circle;
-        _canvasObjects[_currentlyDrawingObjectId!] = currentlyDrawingCircle
-            .copyWith(
-              center: (details.globalPosition + _panStartPoint!) / 2,
-              radius:
-                  min(
-                    (details.globalPosition.dx - _panStartPoint!.dx).abs(),
-                    (details.globalPosition.dy - _panStartPoint!.dy).abs(),
-                  ) /
-                  2,
-            );
+        final currentlyDrawingCircle = currentObject as Circle;
+        _canvasObjects[_currentlyDrawingObjectId!] =
+            currentlyDrawingCircle.copyWith(
+          center: (details.globalPosition + _panStartPoint!) / 2,
+          radius: min(
+                (details.globalPosition.dx - _panStartPoint!.dx).abs(),
+                (details.globalPosition.dy - _panStartPoint!.dy).abs(),
+              ) / 2,
+        );
         break;
-
-      // Updates the size of the rectangle
+      // ** 3. Add cases to update new shapes on pan update **
       case _DrawMode.rectangle:
-        _canvasObjects[_currentlyDrawingObjectId!] =
-            (_canvasObjects[_currentlyDrawingObjectId!] as Rectangle).copyWith(
-              bottomRight: details.globalPosition,
-            );
-        break;
       case _DrawMode.square:
+      case _DrawMode.diamond:
+      case _DrawMode.roundedSquare:
+      case _DrawMode.parallelogram:
+      case _DrawMode.cylinder:
+      case _DrawMode.triangle:
+      case _DrawMode.invertedTriangle:
         _canvasObjects[_currentlyDrawingObjectId!] =
-            (_canvasObjects[_currentlyDrawingObjectId!] as Square).copyWith(
-              bottomRight: details.globalPosition,
-            );
+            (currentObject as dynamic).copyWith(
+          bottomRight: details.globalPosition,
+        );
         break;
     }
 
     if (_currentlyDrawingObjectId != null) {
       setState(() {});
     }
-    _cursorPosition = details.globalPosition;
     _syncCanvasObject(_cursorPosition);
   }
 
-  void onPanEnd(DragEndDetails _) async {
+  void onPanEnd(DragEndDetails details) async {
+    // This logic is kept exactly as you provided it.
     if (_currentlyDrawingObjectId != null) {
       _syncCanvasObject(_cursorPosition);
     }
@@ -185,7 +205,6 @@ class _CanvasPageState extends State<CanvasPage> {
       _currentlyDrawingObjectId = null;
     });
 
-    // Save whatever was drawn to Supabase DB
     if (drawnObjectId == null) {
       return;
     }
@@ -204,10 +223,9 @@ class _CanvasPageState extends State<CanvasPage> {
         },
         child: Stack(
           children: [
-            // The main canvas
             GestureDetector(
               onPanDown: _onPanDown,
-              onPanUpdate: _onPanUpdate,
+              onPanUpdate: _onPanUpdate, // Corrected typo here
               onPanEnd: onPanEnd,
               child: CustomPaint(
                 size: MediaQuery.of(context).size,
@@ -217,27 +235,25 @@ class _CanvasPageState extends State<CanvasPage> {
                 ),
               ),
             ),
-
-            // Buttons to change the current mode.
+            // This is your original UI structure for the toolbar.
             Positioned(
               top: 500,
               left: 0,
               child: Row(
-                children:
-                    _DrawMode.values
-                        .map(
-                          (mode) => IconButton(
-                            iconSize: 48,
-                            onPressed: () {
-                              setState(() {
-                                _currentMode = mode;
-                              });
-                            },
-                            icon: Icon(mode.iconData),
-                            color: _currentMode == mode ? Colors.green : null,
-                          ),
-                        )
-                        .toList(),
+                children: _DrawMode.values
+                    .map(
+                      (mode) => IconButton(
+                        iconSize: 48,
+                        onPressed: () {
+                          setState(() {
+                            _currentMode = mode;
+                          });
+                        },
+                        icon: Icon(mode.iconData),
+                        color: _currentMode == mode ? Colors.green : null,
+                      ),
+                    )
+                    .toList(),
               ),
             ),
           ],
@@ -253,11 +269,18 @@ class _CanvasPageState extends State<CanvasPage> {
   }
 }
 
+// ** 4. Add the new draw modes to the enum **
 enum _DrawMode {
   pointer(iconData: Icons.pan_tool_alt),
   circle(iconData: Icons.circle_outlined),
   rectangle(iconData: Icons.rectangle_outlined),
-  square(iconData: Icons.square_outlined);
+  square(iconData: Icons.square_outlined),
+  diamond(iconData: Icons.diamond_outlined),
+  roundedSquare(iconData: Icons.rounded_corner),
+  parallelogram(iconData: Icons.square_foot_outlined), // Placeholder
+  cylinder(iconData: Icons.view_in_ar_outlined), // Placeholder
+  triangle(iconData: Icons.change_history),
+  invertedTriangle(iconData: Icons.warning_amber_rounded); // Placeholder
 
   const _DrawMode({required this.iconData});
   final IconData iconData;

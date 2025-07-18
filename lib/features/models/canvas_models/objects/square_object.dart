@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class Square extends CanvasObject {
-  static String type = 'square';
+  static const String type = 'square';
   final Offset topLeft;
   final Offset bottomRight;
 

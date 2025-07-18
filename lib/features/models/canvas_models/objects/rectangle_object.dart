@@ -6,7 +6,7 @@ import 'package:uuid/uuid.dart';
 
 /// Rectangle displayed on the canvas.
 class Rectangle extends CanvasObject {
-  static String type = 'rectangle';
+  static const String type = 'rectangle';
 
   final Offset topLeft;
   final Offset bottomRight;

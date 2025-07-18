@@ -5,7 +5,7 @@ import 'package:uuid/uuid.dart';
 
 /// Circle displayed on the canvas.
 class Circle extends CanvasObject {
-  static String type = 'circle';
+  static const String type = 'circle';
 
   final Offset center;
   final double radius;

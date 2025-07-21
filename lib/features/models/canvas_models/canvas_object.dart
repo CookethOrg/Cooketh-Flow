@@ -57,4 +57,6 @@ abstract class CanvasObject extends SyncedObject {
   bool intersectsWith(Offset point);
   CanvasObject copyWith();
   CanvasObject move(Offset delta);
+  Rect getBounds(); // New method to get the bounding box
+  CanvasObject resize(Offset newTopLeft, Offset newBottomRight); // New method for resizing
 }

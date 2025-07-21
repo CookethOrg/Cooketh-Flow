@@ -19,9 +19,9 @@ class Diamond extends CanvasObject {
         topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
         super(id: json['id'], color: Color(json['color']));
 
-  Diamond.createNew(Offset startingPoint)
-      : topLeft = startingPoint,
-        bottomRight = startingPoint,
+  Diamond.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
+      : topLeft = defaultTopLeft,
+        bottomRight = defaultBottomRight,
         super(color: RandomColor.getRandom(), id: const Uuid().v4());
 
   @override
@@ -54,5 +54,15 @@ class Diamond extends CanvasObject {
   @override
   Diamond move(Offset delta) {
     return copyWith(topLeft: topLeft + delta, bottomRight: bottomRight + delta);
+  }
+
+  @override
+  Rect getBounds() {
+    return Rect.fromPoints(topLeft, bottomRight);
+  }
+
+  @override
+  Diamond resize(Offset newTopLeft, Offset newBottomRight) {
+    return copyWith(topLeft: newTopLeft, bottomRight: newBottomRight);
   }
 }

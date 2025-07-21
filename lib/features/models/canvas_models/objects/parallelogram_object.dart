@@ -20,9 +20,9 @@ class Parallelogram extends CanvasObject {
         topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
         super(id: json['id'], color: Color(json['color']));
 
-  Parallelogram.createNew(Offset startingPoint)
-      : topLeft = startingPoint,
-        bottomRight = startingPoint,
+  Parallelogram.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
+      : topLeft = defaultTopLeft,
+        bottomRight = defaultBottomRight,
         super(color: RandomColor.getRandom(), id: const Uuid().v4());
 
   @override
@@ -55,5 +55,15 @@ class Parallelogram extends CanvasObject {
   @override
   Parallelogram move(Offset delta) {
     return copyWith(topLeft: topLeft + delta, bottomRight: bottomRight + delta);
+  }
+
+  @override
+  Rect getBounds() {
+    return Rect.fromPoints(topLeft, bottomRight);
+  }
+
+  @override
+  Parallelogram resize(Offset newTopLeft, Offset newBottomRight) {
+    return copyWith(topLeft: newTopLeft, bottomRight: newBottomRight);
   }
 }

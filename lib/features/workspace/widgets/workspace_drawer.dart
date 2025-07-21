@@ -1,3 +1,4 @@
+import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,18 +7,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:provider/provider.dart';
 
-// Assuming primaryColor is defined somewhere, e.g., core/theme/colors.dart
-import 'package:cookethflow/core/theme/colors.dart';
-
 class WorkspaceDrawer extends StatelessWidget {
   const WorkspaceDrawer({super.key});
-
-  final List<Map<String, dynamic>> _drawerItems = const [
-    {'title': 'Home', 'icon': PhosphorIconsRegular.house},
-    {'title': 'My Projects', 'icon': PhosphorIconsRegular.folder},
-    {'title': 'Settings', 'icon': PhosphorIconsRegular.gearSix},
-    {'title': 'Help', 'icon': PhosphorIconsRegular.info},
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -45,17 +36,16 @@ class WorkspaceDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(
-                color: defaultBorderColor,
-                width: 1.2,
-              ),
+              border: Border.all(color: defaultBorderColor, width: 1.2),
             ),
-            child: Column( // This is the main Column within AnimatedContainer
+            child: Column(
+              // This is the main Column within AnimatedContainer
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Always visible header row
                 Row(
-                  mainAxisSize: MainAxisSize.min, // Keep this for the header row
+                  mainAxisSize:
+                      MainAxisSize.min, // Keep this for the header row
                   children: [
                     IconButton(
                       onPressed: () {
@@ -74,7 +64,8 @@ class WorkspaceDrawer extends StatelessWidget {
                       'Cooketh Flow',
                       style: TextStyle(
                         fontFamily: 'Fredrik',
-                        fontSize: device == rh.DeviceType.desktop ? 24.sp : 32.sp,
+                        fontSize:
+                            device == rh.DeviceType.desktop ? 24.sp : 32.sp,
                         fontWeight: FontWeight.w600,
                         color: Colors.black,
                         letterSpacing: 0.6,
@@ -98,7 +89,8 @@ class WorkspaceDrawer extends StatelessWidget {
                 // Animated content below the header
                 // This is now wrapped in an Expanded, giving it a flexible height
                 // within the main Column, which has a bounded height from AnimatedContainer.
-                Expanded( // <<<--- Changed this to Expanded
+                Expanded(
+                  // <<<--- Changed this to Expanded
                   child: AnimatedOpacity(
                     opacity: provider.isDrawerOpen ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 300),
@@ -107,42 +99,61 @@ class WorkspaceDrawer extends StatelessWidget {
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                       alignment: Alignment.topCenter,
-                      child: provider.isDrawerOpen
-                          ? Column(
-                              // mainAxisSize should be max for this inner column
-                              // because it's filling the Expanded space.
-                              mainAxisSize: MainAxisSize.max, // <<<--- Ensure max here
-                              children: [
-                                SizedBox(height: 20.h),
-                                const Divider(color: Colors.grey, thickness: 0.5),
-                                SizedBox(height: 10.h),
-                                // --- ListView.builder for dynamic tiles ---
-                                // Now ListView is a direct Flexible child of a Column
-                                // that fills its Expanded parent. This is the correct setup.
-                                Expanded( // <<<--- Changed Flexible to Expanded for the ListView
-                                  child: ListView.separated(
-                                    padding: EdgeInsets.zero,
-                                    itemCount: _drawerItems.length,
-                                    separatorBuilder: (context, index) => SizedBox(height: 8.h),
-                                    itemBuilder: (context, index) {
-                                      final item = _drawerItems[index];
-                                      return _buildSelectableListTile(
-                                        context,
-                                        provider: provider,
-                                        title: item['title'] as String,
-                                        iconData: item['icon'] as IconData,
-                                        index: index,
-                                        isSelected: provider.selectedTileIndex == index,
-                                        onTap: () {
-                                          provider.selectTile(index);
-                                        },
-                                      );
-                                    },
+                      child:
+                          provider.isDrawerOpen
+                              ? Column(
+                                // mainAxisSize should be max for this inner column
+                                // because it's filling the Expanded space.
+                                mainAxisSize:
+                                    MainAxisSize.max, // <<<--- Ensure max here
+                                children: [
+                                  SizedBox(height: 20.h),
+                                  const Divider(
+                                    color: Colors.grey,
+                                    thickness: 0.5,
                                   ),
-                                ),
-                              ],
-                            )
-                          : const SizedBox.shrink(), // Renders nothing when closed
+                                  SizedBox(height: 10.h),
+                                  // --- ListView.builder for dynamic tiles ---
+                                  // Now ListView is a direct Flexible child of a Column
+                                  // that fills its Expanded parent. This is the correct setup.
+                                  Expanded(
+                                    // <<<--- Changed Flexible to Expanded for the ListView
+                                    child: ListView.separated(
+                                      padding: EdgeInsets.zero,
+                                      itemCount:
+                                          provider.canvasObjectsList.length,
+                                      separatorBuilder:
+                                          (context, index) =>
+                                              SizedBox(height: 8.h),
+                                      itemBuilder: (context, index) {
+                                        CanvasObject item =
+                                            provider.canvasObjectsList[index];
+                                        return _buildSelectableListTile(
+                                          context,
+                                          provider: provider,
+                                          title:
+                                              item.toJson()['object_type']
+                                                  as String,
+                                          iconData: provider
+                                              .getIconForObjectType(
+                                                item.toJson()['object_type']
+                                                    as String,
+                                              ),
+                                          index: index,
+                                          isSelected:
+                                              provider.currentlySelectedObjectId == item.id,
+                                          onTap: () {
+                                            provider.changeCurrentlySelectedObj(
+                                              item.id,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              )
+                              : const SizedBox.shrink(), // Renders nothing when closed
                     ),
                   ),
                 ),
@@ -169,11 +180,7 @@ class WorkspaceDrawer extends StatelessWidget {
     return Container(
       color: Colors.white,
       child: ListTile(
-        leading: Icon(
-          iconData,
-          size: 24.sp,
-          color: iconTextColor,
-        ),
+        leading: Icon(iconData, size: 24.sp, color: iconTextColor),
         title: Text(
           title,
           style: TextStyle(

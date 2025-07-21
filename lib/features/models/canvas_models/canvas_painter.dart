@@ -15,8 +15,15 @@ import 'package:flutter/material.dart';
 class CanvasPainter extends CustomPainter {
   final Map<String, UserCursor> userCursors;
   final Map<String, CanvasObject> canvasObjects;
+  final String? currentlySelectedObjectId;
+  final double handleRadius;
 
-  CanvasPainter({required this.userCursors, required this.canvasObjects});
+  CanvasPainter({
+    required this.userCursors,
+    required this.canvasObjects,
+    this.currentlySelectedObjectId,
+    this.handleRadius = 8.0,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -24,56 +31,77 @@ class CanvasPainter extends CustomPainter {
     for (final canvasObject in canvasObjects.values) {
       final paint = Paint()..color = canvasObject.color;
       
-      // Determine the correct rectangle bounds, regardless of drag direction
-      final rect = (canvasObject is! Circle) 
-          ? Rect.fromPoints((canvasObject as dynamic).topLeft, (canvasObject as dynamic).bottomRight)
-          : Rect.zero;
-
+      Rect rect;
       if (canvasObject is Circle) {
         canvas.drawCircle(canvasObject.center, canvasObject.radius, paint);
-      } else if (canvasObject is Rectangle) {
-        canvas.drawRect(rect, paint);
-      } else if (canvasObject is Square) {
-        canvas.drawRect(rect, paint);
-      } else if (canvasObject is RoundedSquare) {
-        canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(canvasObject.cornerRadius)), paint);
-      } else if (canvasObject is Diamond) {
-        final path = Path()
-          ..moveTo(rect.center.dx, rect.top)
-          ..lineTo(rect.right, rect.center.dy)
-          ..lineTo(rect.center.dx, rect.bottom)
-          ..lineTo(rect.left, rect.center.dy)
-          ..close();
-        canvas.drawPath(path, paint);
-      } else if (canvasObject is Triangle) {
-        final path = Path()
-          ..moveTo(rect.center.dx, rect.top)
-          ..lineTo(rect.right, rect.bottom)
-          ..lineTo(rect.left, rect.bottom)
-          ..close();
-        canvas.drawPath(path, paint);
-      } else if (canvasObject is InvertedTriangle) {
-        final path = Path()
-          ..moveTo(rect.left, rect.top)
-          ..lineTo(rect.right, rect.top)
-          ..lineTo(rect.center.dx, rect.bottom)
-          ..close();
-        canvas.drawPath(path, paint);
-      } else if (canvasObject is Parallelogram) {
-        final skew = rect.width * 0.25;
-        final path = Path()
-          ..moveTo(rect.left + skew, rect.top)
-          ..lineTo(rect.right, rect.top)
-          ..lineTo(rect.right - skew, rect.bottom)
-          ..lineTo(rect.left, rect.bottom)
-          ..close();
-        canvas.drawPath(path, paint);
-      } else if (canvasObject is Cylinder) {
-        final ellipseHeight = min(rect.height * 0.3, 40.0);
-        final bodyRect = Rect.fromLTRB(rect.left, rect.top + ellipseHeight / 2, rect.right, rect.bottom - ellipseHeight / 2);
-        canvas.drawRect(bodyRect, paint);
-        canvas.drawOval(Rect.fromCenter(center: bodyRect.topCenter, width: rect.width, height: ellipseHeight), paint);
-        canvas.drawOval(Rect.fromCenter(center: bodyRect.bottomCenter, width: rect.width, height: ellipseHeight), paint);
+        rect = Rect.fromCircle(center: canvasObject.center, radius: canvasObject.radius);
+      } else {
+        // For other shapes, use their getBounds() method
+        rect = canvasObject.getBounds();
+        if (canvasObject is Rectangle) {
+          canvas.drawRect(rect, paint);
+        } else if (canvasObject is Square) {
+          canvas.drawRect(rect, paint);
+        } else if (canvasObject is RoundedSquare) {
+          canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(canvasObject.cornerRadius)), paint);
+        } else if (canvasObject is Diamond) {
+          final path = Path()
+            ..moveTo(rect.center.dx, rect.top)
+            ..lineTo(rect.right, rect.center.dy)
+            ..lineTo(rect.center.dx, rect.bottom)
+            ..lineTo(rect.left, rect.center.dy)
+            ..close();
+          canvas.drawPath(path, paint);
+        } else if (canvasObject is Triangle) {
+          final path = Path()
+            ..moveTo(rect.center.dx, rect.top)
+            ..lineTo(rect.right, rect.bottom)
+            ..lineTo(rect.left, rect.bottom)
+            ..close();
+          canvas.drawPath(path, paint);
+        } else if (canvasObject is InvertedTriangle) {
+          final path = Path()
+            ..moveTo(rect.left, rect.top)
+            ..lineTo(rect.right, rect.top)
+            ..lineTo(rect.center.dx, rect.bottom)
+            ..close();
+          canvas.drawPath(path, paint);
+        } else if (canvasObject is Parallelogram) {
+          final skew = rect.width * 0.25;
+          final path = Path()
+            ..moveTo(rect.left + skew, rect.top)
+            ..lineTo(rect.right, rect.top)
+            ..lineTo(rect.right - skew, rect.bottom)
+            ..lineTo(rect.left, rect.bottom)
+            ..close();
+          canvas.drawPath(path, paint);
+        } else if (canvasObject is Cylinder) {
+          final ellipseHeight = min(rect.height * 0.3, 40.0);
+          final bodyRect = Rect.fromLTRB(rect.left, rect.top + ellipseHeight / 2, rect.right, rect.bottom - ellipseHeight / 2);
+          canvas.drawRect(bodyRect, paint);
+          canvas.drawOval(Rect.fromCenter(center: bodyRect.topCenter, width: rect.width, height: ellipseHeight), paint);
+          canvas.drawOval(Rect.fromCenter(center: bodyRect.bottomCenter, width: rect.width, height: ellipseHeight), paint);
+        }
+      }
+
+      // Draw resize handles if this object is currently selected
+      if (canvasObject.id == currentlySelectedObjectId) {
+        final handlePaint = Paint()
+          ..color = Colors.blue
+          ..style = PaintingStyle.fill;
+        
+        // Draw corner handles
+        canvas.drawCircle(rect.topLeft, handleRadius, handlePaint);
+        canvas.drawCircle(rect.topRight, handleRadius, handlePaint);
+        canvas.drawCircle(rect.bottomLeft, handleRadius, handlePaint);
+        canvas.drawCircle(rect.bottomRight, handleRadius, handlePaint);
+
+        // Draw selection border
+        final borderPaint = Paint()
+          ..color = Colors.blue
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.0;
+        canvas.drawRect(rect, borderPaint);
       }
     }
 
@@ -93,5 +121,9 @@ class CanvasPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(oldPainter) => true;
+  bool shouldRepaint(CanvasPainter oldPainter) {
+    return oldPainter.userCursors != userCursors ||
+           oldPainter.canvasObjects != canvasObjects ||
+           oldPainter.currentlySelectedObjectId != currentlySelectedObjectId;
+  }
 }

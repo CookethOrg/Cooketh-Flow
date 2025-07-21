@@ -20,9 +20,9 @@ class Triangle extends CanvasObject {
         topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
         super(id: json['id'], color: Color(json['color']));
 
-  Triangle.createNew(Offset startingPoint)
-      : topLeft = startingPoint,
-        bottomRight = startingPoint,
+  Triangle.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
+      : topLeft = defaultTopLeft,
+        bottomRight = defaultBottomRight,
         super(color: RandomColor.getRandom(), id: const Uuid().v4());
 
   @override
@@ -55,5 +55,15 @@ class Triangle extends CanvasObject {
   @override
   Triangle move(Offset delta) {
     return copyWith(topLeft: topLeft + delta, bottomRight: bottomRight + delta);
+  }
+
+  @override
+  Rect getBounds() {
+    return Rect.fromPoints(topLeft, bottomRight);
+  }
+
+  @override
+  Triangle resize(Offset newTopLeft, Offset newBottomRight) {
+    return copyWith(topLeft: newTopLeft, bottomRight: newBottomRight);
   }
 }

@@ -23,9 +23,9 @@ class RoundedSquare extends CanvasObject {
         cornerRadius = json['corner_radius'] ?? 10.0,
         super(id: json['id'], color: Color(json['color']));
 
-  RoundedSquare.createNew(Offset startingPoint)
-      : topLeft = startingPoint,
-        bottomRight = startingPoint,
+  RoundedSquare.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
+      : topLeft = defaultTopLeft,
+        bottomRight = defaultBottomRight,
         cornerRadius = 10.0,
         super(color: RandomColor.getRandom(), id: const Uuid().v4());
 
@@ -61,5 +61,15 @@ class RoundedSquare extends CanvasObject {
   @override
   RoundedSquare move(Offset delta) {
     return copyWith(topLeft: topLeft + delta, bottomRight: bottomRight + delta);
+  }
+
+  @override
+  Rect getBounds() {
+    return Rect.fromPoints(topLeft, bottomRight);
+  }
+
+  @override
+  RoundedSquare resize(Offset newTopLeft, Offset newBottomRight) {
+    return copyWith(topLeft: newTopLeft, bottomRight: newBottomRight);
   }
 }

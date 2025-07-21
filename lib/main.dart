@@ -69,7 +69,10 @@ void main() async {
           //     (context, auth, previous) => previous ?? DashboardProvider(auth),
         ),
         ChangeNotifierProvider<WorkspaceProvider>(
-          create: (context) => WorkspaceProvider(),
+          create:
+              (context) => WorkspaceProvider(
+                Provider.of<SupabaseService>(context, listen: false),
+              ),
         ),
       ],
       child: const MyApp(),

@@ -26,10 +26,10 @@ class Rectangle extends CanvasObject {
       topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
       super(id: json['id'], color: Color(json['color']));
 
-  /// Constructor to be used when first starting to draw the object on the canvas
-  Rectangle.createNew(Offset startingPoint)
-    : topLeft = startingPoint,
-      bottomRight = startingPoint,
+  /// Constructor to be used when first creating the object on the canvas with a default size
+  Rectangle.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
+    : topLeft = defaultTopLeft,
+      bottomRight = defaultBottomRight,
       super(color: RandomColor.getRandom(), id: const Uuid().v4());
 
   @override
@@ -68,5 +68,15 @@ class Rectangle extends CanvasObject {
   @override
   Rectangle move(Offset delta) {
     return copyWith(topLeft: topLeft + delta, bottomRight: bottomRight + delta);
+  }
+
+  @override
+  Rect getBounds() {
+    return Rect.fromPoints(topLeft, bottomRight);
+  }
+
+  @override
+  Rectangle resize(Offset newTopLeft, Offset newBottomRight) {
+    return copyWith(topLeft: newTopLeft, bottomRight: newBottomRight);
   }
 }

@@ -1,5 +1,8 @@
+import 'package:cookethflow/core/utils/enums.dart';
+import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/node_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -14,79 +17,84 @@ class ToolBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 24.w),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _toolIcon(
-            PhosphorIconsRegular.paintBucket,
-            'Select Workspace Color',
-            device,
-            onPressed: () {
-              _showColorPicker(context);
-              print('Paint bucket pressed');
-            },
+    return Consumer<WorkspaceProvider>(
+      builder: (context, provider, child) {
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 24.w),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12.r),
+            border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
           ),
-          _horizontalDivider(),
-          _toolIcon(
-            PhosphorIconsRegular.circlesThreePlus,
-            'Add new node',
-            device,
-            onPressed: () {
-              // *** CHANGED: Call the new method to show the NodePicker dialog ***
-              _showNodePicker(context);
-              print('Circles three plus pressed');
-            },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _toolIcon(
+                PhosphorIconsRegular.paintBucket,
+                'Select Workspace Color',
+                device,
+                onPressed: () {
+                  _showColorPicker(context);
+                  print('Paint bucket pressed');
+                },
+              ),
+              _horizontalDivider(),
+              _toolIcon(
+                PhosphorIconsRegular.circlesThreePlus,
+                'Add new node',
+                device,
+                onPressed: () {
+                  // *** CHANGED: Call the new method to show the NodePicker dialog ***
+                  _showNodePicker(context);
+                  print('Circles three plus pressed');
+                },
+              ),
+              // _toolIcon(
+              //   PhosphorIconsFill.circle,
+              //   device,
+              //   iconColor: tertiaryColors[3],
+              //   onPressed: () => _showColorPicker(context),
+              // ),
+              _horizontalDivider(),
+              _toolIcon(
+                PhosphorIconsRegular.handGrabbing,
+                iconColor: provider.currentMode == DrawMode.pointer ? Colors.blue : Colors.black,
+                'Pointer',
+                device,
+                onPressed: () {
+                  provider.changeDrawMode(DrawMode.pointer);
+                  print('Hand grabbing pressed');
+                },
+              ),
+              _toolIcon(
+                PhosphorIconsRegular.textT,
+                'Text box',
+                device,
+                onPressed: () {
+                  // TODO: Add text functionality
+                  print('Text pressed');
+                },
+              ),
+              _toolIcon(
+                PhosphorIconsRegular.image,
+                'Add Image/Media files',
+                device,
+                onPressed: () {
+                  // TODO: Add image functionality
+                  print('Image pressed');
+                },
+              ),
+              _toolIcon(
+                PhosphorIconsFill.noteBlank,
+                'Add new sticky note',
+                device,
+                iconColor: tertiaryColors[6],
+                onPressed: () => _showStickyNote(context),
+              ),
+            ],
           ),
-          // _toolIcon(
-          //   PhosphorIconsFill.circle,
-          //   device,
-          //   iconColor: tertiaryColors[3],
-          //   onPressed: () => _showColorPicker(context),
-          // ),
-          _horizontalDivider(),
-          _toolIcon(
-            PhosphorIconsRegular.handGrabbing,
-            'Pointer',
-            device,
-            onPressed: () {
-              // TODO: Add hand grabbing functionality
-              print('Hand grabbing pressed');
-            },
-          ),
-          _toolIcon(
-            PhosphorIconsRegular.textT,
-            'Text box',
-            device,
-            onPressed: () {
-              // TODO: Add text functionality
-              print('Text pressed');
-            },
-          ),
-          _toolIcon(
-            PhosphorIconsRegular.image,
-            'Add Image/Media files',
-            device,
-            onPressed: () {
-              // TODO: Add image functionality
-              print('Image pressed');
-            },
-          ),
-          _toolIcon(
-            PhosphorIconsFill.noteBlank,
-            'Add new sticky note',
-            device,
-            iconColor: tertiaryColors[6],
-            onPressed: () => _showStickyNote(context),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -105,7 +113,12 @@ class ToolBar extends StatelessWidget {
         borderRadius: BorderRadius.circular(12.r),
         child: Container(
           padding: EdgeInsets.all(8.w),
-          child: IconButton(onPressed: onPressed,tooltip: tooltip,icon: Icon(iconData,size: 36.sp,), color: iconColor),
+          child: IconButton(
+            onPressed: onPressed,
+            tooltip: tooltip,
+            icon: Icon(iconData, size: 36.sp),
+            color: iconColor,
+          ),
         ),
       ),
     );

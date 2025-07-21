@@ -22,9 +22,10 @@ class Circle extends CanvasObject {
       center = Offset(json['center']['x'], json['center']['y']),
       super(id: json['id'], color: Color(json['color']));
 
-  /// Constructor to be used when first starting to draw the object on the canvas
-  Circle.createNew(this.center)
-    : radius = 0,
+  /// Constructor to be used when first creating the object on the canvas with a default size
+  Circle.createNew(Offset position, double defaultRadius)
+    : radius = defaultRadius,
+      center = position,
       super(id: const Uuid().v4(), color: RandomColor.getRandom());
 
   @override
@@ -57,5 +58,17 @@ class Circle extends CanvasObject {
   @override
   Circle move(Offset delta) {
     return copyWith(center: center + delta);
+  }
+
+  @override
+  Rect getBounds() {
+    return Rect.fromCircle(center: center, radius: radius);
+  }
+
+  @override
+  Circle resize(Offset newTopLeft, Offset newBottomRight) {
+    final newCenter = (newTopLeft + newBottomRight) / 2;
+    final newRadius = (newBottomRight.dx - newTopLeft.dx).abs() / 2; // Assuming circular resizing
+    return copyWith(center: newCenter, radius: newRadius);
   }
 }

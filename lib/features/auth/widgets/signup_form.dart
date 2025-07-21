@@ -26,7 +26,8 @@ class SignUpForm extends StatelessWidget {
         // Listener for social logins to automatically navigate after successful authentication
         if (supabaseService.currentUser != null && GoRouter.of(context).routerDelegate.currentConfiguration?.fullPath != RoutesPath.dashboard) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            context.go(RoutesPath.dashboard);
+            // context.go(RoutesPath.dashboard);
+            context.goNamed(RouteName.dashboard,pathParameters: {'username': supabaseService.currentUser!.name!});
             authProvider.setLoading(false); // Ensure loading is off after navigation
           });
         }

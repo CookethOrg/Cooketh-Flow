@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,7 @@ class WorkspaceDrawer extends StatelessWidget {
                   children: [
                     IconButton(
                       onPressed: () {
-                        context.pop();
+                        context.goNamed(RouteName.dashboard,pathParameters: {'username': provider.supabaseService.currentUser!.name ?? "Notfound"});
                       },
                       icon: Icon(
                         PhosphorIconsRegular.arrowLeft,
@@ -74,10 +75,13 @@ class WorkspaceDrawer extends StatelessWidget {
                         // Add decoration to remove default TextField borders/fill if desired
                         decoration: const InputDecoration(
                           isDense: true, // Reduces vertical space
-                          contentPadding: EdgeInsets.zero, // Removes internal padding
+                          contentPadding:
+                              EdgeInsets.zero, // Removes internal padding
                           border: InputBorder.none, // Removes underline border
-                          focusedBorder: InputBorder.none, // Removes focused border
-                          enabledBorder: InputBorder.none, // Removes enabled border
+                          focusedBorder:
+                              InputBorder.none, // Removes focused border
+                          enabledBorder:
+                              InputBorder.none, // Removes enabled border
                         ),
                       ),
                     ),
@@ -151,7 +155,9 @@ class WorkspaceDrawer extends StatelessWidget {
                                               ),
                                           index: index,
                                           isSelected:
-                                              provider.currentlySelectedObjectId == item.id,
+                                              provider
+                                                  .currentlySelectedObjectId ==
+                                              item.id,
                                           onTap: () {
                                             provider.changeCurrentlySelectedObj(
                                               item.id,

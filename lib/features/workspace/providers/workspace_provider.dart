@@ -17,6 +17,7 @@ import 'package:cookethflow/features/models/canvas_models/objects/rounded_square
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
+import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
@@ -43,8 +44,10 @@ class WorkspaceProvider extends StateHandler {
   static const double _defaultShapeSize = 100.0;
   static const double _handleRadius = 8.0;
   Color _currentWorkspaceColor = scaffoldColor;
-  String _currentworkspaceId = "";
-  TextEditingController _workspaceNameController = TextEditingController(text: 'Workspace Name');
+  late WorkspaceModel _currentWorkspace;
+  TextEditingController _workspaceNameController = TextEditingController(
+    text: 'Workspace Name',
+  );
 
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
@@ -62,8 +65,9 @@ class WorkspaceProvider extends StateHandler {
   double get defaultShapeSize => _defaultShapeSize;
   double get handleRadius => _handleRadius;
   Color get currentWorkspaceColor => _currentWorkspaceColor;
-  String get currentworkspaceId => _currentworkspaceId;
+  WorkspaceModel get currentWorkspace => _currentWorkspace;
   TextEditingController get workspaceNameController => _workspaceNameController;
+  SupabaseService get supabaseService => _supabaseService;
 
   // New getter to easily check if any tile is selected for the drawer's border
   bool get hasSelectedTile => _selectedTileIndex != null;
@@ -99,8 +103,9 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void setWorkspaceId() {
-    _currentworkspaceId = _dashboardProvider.currentWorkspaceId;
+  void setWorkspace(String id) {
+    _currentWorkspace = _dashboardProvider.workspaceList[id]!;
+    _workspaceNameController.text = _currentWorkspace.name;
     notifyListeners();
   }
 

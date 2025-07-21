@@ -9,7 +9,6 @@ import 'package:uuid/uuid.dart';
 class DashboardProvider extends StateHandler {
   late SupabaseClient? supabase;
   late SupabaseService supabaseService;
-  late String currentWorkspaceId;
   DashboardProvider(this.supabase, this.supabaseService) : super() {
     initialize();
   }
@@ -19,14 +18,16 @@ class DashboardProvider extends StateHandler {
   int _tabIndex = 0;
   bool _isLoading = false;
   bool _isInitialized = false;
-  List<WorkspaceModel> _workspaceList = [];
+  // List<WorkspaceModel> _workspaceList = [];
+  Map<String, WorkspaceModel> _workspaceList = {};
 
   // getters
   bool get isDrawerOpen => _isDrawerOpen;
   int get tabIndex => _tabIndex;
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
-  List<WorkspaceModel> get workspaceList => _workspaceList;
+  // List<WorkspaceModel> get workspaceList => _workspaceList;
+  Map<String, WorkspaceModel> get workspaceList => _workspaceList;
 
   List<Map<String, dynamic>> tabItems = [
     {"label": "All", "icon": Icon(PhosphorIcons.cardsThree())},
@@ -92,7 +93,7 @@ class DashboardProvider extends StateHandler {
                     : DateTime.now(),
           );
           // print(workspace);
-          _workspaceList.add(newWorkspace);
+          _workspaceList[newWorkspace.id] = newWorkspace;
         }
       } catch (e) {
         print("Error parsing workspaces: $e");
@@ -125,7 +126,7 @@ class DashboardProvider extends StateHandler {
       await supabase!.from('workspace').insert(newWorkspace);
 
       refreshDashboard();
-      currentWorkspaceId = newWorkspace["id"];
+      // currentWorkspaceId = newWorkspace["id"];
     } catch (e) {
       print("Error creating new project: $e");
     } finally {

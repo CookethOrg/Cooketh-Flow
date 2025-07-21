@@ -59,7 +59,9 @@ class DashboardDesktop extends StatelessWidget {
                                     childAspectRatio: 4.5 / 3,
                                   ),
                               itemBuilder: (context, index) {
-                                return ProjectCard(idx: index);
+                                final workspaceId = provider.workspaceList.keys
+                                    .elementAt(index);
+                                return ProjectCard(workspaceId: workspaceId);
                               },
                             ),
                           ),

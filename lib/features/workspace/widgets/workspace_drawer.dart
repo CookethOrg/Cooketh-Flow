@@ -60,15 +60,25 @@ class WorkspaceDrawer extends StatelessWidget {
                       tooltip: 'Back',
                     ),
                     SizedBox(width: 12.w),
-                    Text(
-                      'Cooketh Flow',
-                      style: TextStyle(
-                        fontFamily: 'Fredrik',
-                        fontSize:
-                            device == rh.DeviceType.desktop ? 24.sp : 32.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        letterSpacing: 0.6,
+                    Expanded(
+                      child: TextField(
+                        controller: provider.workspaceNameController,
+                        style: TextStyle(
+                          fontFamily: 'Fredrik',
+                          fontSize:
+                              device == rh.DeviceType.desktop ? 24.sp : 32.sp,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black,
+                          letterSpacing: 0.6,
+                        ),
+                        // Add decoration to remove default TextField borders/fill if desired
+                        decoration: const InputDecoration(
+                          isDense: true, // Reduces vertical space
+                          contentPadding: EdgeInsets.zero, // Removes internal padding
+                          border: InputBorder.none, // Removes underline border
+                          focusedBorder: InputBorder.none, // Removes focused border
+                          enabledBorder: InputBorder.none, // Removes enabled border
+                        ),
                       ),
                     ),
                     SizedBox(width: 80.w),

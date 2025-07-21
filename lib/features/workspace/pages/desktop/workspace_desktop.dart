@@ -1,12 +1,14 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
+import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart'; // Assuming this might be used later
 import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
 import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
@@ -20,33 +22,37 @@ class WorkspaceDesktop extends StatelessWidget {
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
         rh.DeviceType.desktop;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFFF8F8F8),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
-        child: Stack(
-          children: [
-            // 1. CanvasPage - This should be the base layer, filling the entire available space
-            const CanvasPage(),
-
-            const WorkspaceDrawer(),
-            SizedBox(width: 20.w),
-            // Undo/Redo Controls Container
-            Positioned(top: 0,left: 0.21.sw,child: UndoRedoButton()),
-            // Export project button
-            Positioned(top: 0,right: 0.02.sw,child: ExportProjectButton()),
-
-            Positioned(right: 0,top: 0.15.sh,child: ToolBar()),
-
-            // 3. Zoom Control - Positioned at the bottom right of the Stack
-            Positioned(
-              bottom: 0.h, // Aligns to the bottom edge of the Stack
-              right: 0.w, // Aligns to the right edge of the Stack
-              child: ZoomControlButton(),
+    return Consumer<WorkspaceProvider>(
+      builder: (context,provider,child) {
+        return Scaffold(
+          backgroundColor: provider.currentWorkspaceColor,
+          body: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
+            child: Stack(
+              children: [
+                // 1. CanvasPage - This should be the base layer, filling the entire available space
+                const CanvasPage(),
+        
+                const WorkspaceDrawer(),
+                SizedBox(width: 20.w),
+                // Undo/Redo Controls Container
+                Positioned(top: 0,left: 0.21.sw,child: UndoRedoButton()),
+                // Export project button
+                Positioned(top: 0,right: 0.02.sw,child: ExportProjectButton()),
+        
+                Positioned(right: 0,top: 0.15.sh,child: ToolBar()),
+        
+                // 3. Zoom Control - Positioned at the bottom right of the Stack
+                Positioned(
+                  bottom: 0.h, // Aligns to the bottom edge of the Stack
+                  right: 0.w, // Aligns to the right edge of the Stack
+                  child: ZoomControlButton(),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 }

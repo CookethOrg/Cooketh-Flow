@@ -72,6 +72,7 @@ void main() async {
           create:
               (context) => WorkspaceProvider(
                 Provider.of<SupabaseService>(context, listen: false),
+                Provider.of<DashboardProvider>(context,listen: false)
               ),
         ),
       ],

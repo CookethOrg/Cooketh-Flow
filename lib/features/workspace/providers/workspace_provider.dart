@@ -1,9 +1,11 @@
 import 'dart:ui';
 
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/consts.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
+import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
@@ -21,7 +23,8 @@ import 'package:uuid/uuid.dart';
 
 class WorkspaceProvider extends StateHandler {
   late SupabaseService _supabaseService;
-  WorkspaceProvider(this._supabaseService) : super() {
+  late DashboardProvider _dashboardProvider;
+  WorkspaceProvider(this._supabaseService, this._dashboardProvider) : super() {
     _initialize();
   }
 
@@ -37,9 +40,11 @@ class WorkspaceProvider extends StateHandler {
   InteractionMode _interactionMode = InteractionMode.none;
   Offset? _panStartPoint;
   Offset _cursorPosition = const Offset(0, 0);
-
   static const double _defaultShapeSize = 100.0;
   static const double _handleRadius = 8.0;
+  Color _currentWorkspaceColor = scaffoldColor;
+  String _currentworkspaceId = "";
+  TextEditingController _workspaceNameController = TextEditingController(text: 'Workspace Name');
 
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
@@ -56,6 +61,9 @@ class WorkspaceProvider extends StateHandler {
   Offset get cursorPosition => _cursorPosition;
   double get defaultShapeSize => _defaultShapeSize;
   double get handleRadius => _handleRadius;
+  Color get currentWorkspaceColor => _currentWorkspaceColor;
+  String get currentworkspaceId => _currentworkspaceId;
+  TextEditingController get workspaceNameController => _workspaceNameController;
 
   // New getter to easily check if any tile is selected for the drawer's border
   bool get hasSelectedTile => _selectedTileIndex != null;
@@ -83,6 +91,21 @@ class WorkspaceProvider extends StateHandler {
 
   void toggleDrawer() {
     _isDrawerOpen = !_isDrawerOpen;
+    notifyListeners();
+  }
+
+  void changeWorkspaceColor(Color newColor) {
+    _currentWorkspaceColor = newColor;
+    notifyListeners();
+  }
+
+  void setWorkspaceId() {
+    _currentworkspaceId = _dashboardProvider.currentWorkspaceId;
+    notifyListeners();
+  }
+
+  void changeWorkspaceName(String newName) {
+    workspaceNameController.text = newName;
     notifyListeners();
   }
 

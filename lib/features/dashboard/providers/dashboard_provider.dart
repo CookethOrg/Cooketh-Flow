@@ -9,6 +9,7 @@ import 'package:uuid/uuid.dart';
 class DashboardProvider extends StateHandler {
   late SupabaseClient? supabase;
   late SupabaseService supabaseService;
+  late String currentWorkspaceId;
   DashboardProvider(this.supabase, this.supabaseService) : super() {
     initialize();
   }
@@ -85,7 +86,10 @@ class DashboardProvider extends StateHandler {
             name: workspace["name"],
             editorIdList: workspace["editorId"] ?? [],
             viewerIdList: workspace["viewerId"] ?? [],
-            lastEdited: workspace["last edited"] != null ? DateTime.parse(workspace["last edited"]) : DateTime.now(),
+            lastEdited:
+                workspace["last edited"] != null
+                    ? DateTime.parse(workspace["last edited"])
+                    : DateTime.now(),
           );
           // print(workspace);
           _workspaceList.add(newWorkspace);
@@ -110,17 +114,18 @@ class DashboardProvider extends StateHandler {
         print("User not found");
         notifyListeners();
       }
-      Map<dynamic,dynamic> newWorkspace = {
-        "id" : Uuid().v4(),
+      Map<dynamic, dynamic> newWorkspace = {
+        "id": Uuid().v4(),
         "owner": res!.id,
         "name": "New Project",
         "editorId": null,
-        "viewerId":null,
+        "viewerId": null,
       };
 
       await supabase!.from('workspace').insert(newWorkspace);
 
       refreshDashboard();
+      currentWorkspaceId = newWorkspace["id"];
     } catch (e) {
       print("Error creating new project: $e");
     } finally {

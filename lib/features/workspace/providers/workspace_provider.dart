@@ -25,9 +25,9 @@ import 'package:uuid/uuid.dart';
 class WorkspaceProvider extends StateHandler {
   late SupabaseService _supabaseService;
   late DashboardProvider _dashboardProvider;
-  
+
   // Initialize _currentWorkspace as null, it will be set by setWorkspace
-  WorkspaceModel? _currentWorkspace; 
+  WorkspaceModel? _currentWorkspace;
 
   WorkspaceProvider(this._supabaseService, this._dashboardProvider) : super() {
     _myId = _supabaseService.supabase.auth.currentUser?.id ?? const Uuid().v4();
@@ -48,11 +48,11 @@ class WorkspaceProvider extends StateHandler {
   String? _currentlySelectedObjectId;
   InteractionMode _interactionMode = InteractionMode.none;
   Offset? _panStartPoint;
-  Offset _cursorPosition = const Offset(0, 0);
-  static const double _defaultShapeSize = 100.0;
-  static const double _handleRadius = 8.0;
+  Offset _cursorPosition = const Offset(0, 0); // Now stores canvas coordinates
+  static const double _defaultShapeSize = 100.0; // In canvas units
+  static const double _handleRadius = 8.0; // In canvas units
   Color _currentWorkspaceColor = scaffoldColor;
-  
+
   TextEditingController _workspaceNameController = TextEditingController(
     text: 'Workspace Name',
   );
@@ -92,7 +92,7 @@ class WorkspaceProvider extends StateHandler {
       // Handle case where workspace isn't found (e.g., navigate back, show error)
       return;
     }
-    
+
     _workspaceNameController.text = _currentWorkspace!.name;
     _canvasObjects.clear(); // Clear existing objects when changing workspace
     _userCursors.clear(); // Clear cursors too
@@ -100,7 +100,7 @@ class WorkspaceProvider extends StateHandler {
 
     await _fetchCanvasObjects(); // Fetch objects for the new workspace
     _setupRealtimeChannel(_currentWorkspace!.id); // Set up realtime for new workspace
-    
+
     notifyListeners();
   }
 
@@ -118,6 +118,8 @@ class WorkspaceProvider extends StateHandler {
           .order('created_at', ascending: true);
 
       for (final canvasObjectData in initialData) {
+        // Ensure that `canvasObjectData['object']` is directly the JSONB content
+        // and not wrapped in another object if not intended.
         final canvasObject = CanvasObject.fromJson(canvasObjectData['object']);
         _canvasObjects[canvasObject.id] = canvasObject;
       }
@@ -155,6 +157,7 @@ class WorkspaceProvider extends StateHandler {
   }
 
   // --- Realtime Sync ---
+  // Now expects canvas coordinates for cursorPosition
   Future<void> syncCanvasObject(Offset cursorPosition) {
     final myCursor = UserCursor(position: cursorPosition, id: _myId);
     if (_currentWorkspace == null || _canvasChannel == null) return Future.value();
@@ -163,8 +166,8 @@ class WorkspaceProvider extends StateHandler {
       event: Constants.broadcastEventName,
       payload: {
         'cursor': myCursor.toJson(),
-        if (_currentlySelectedObjectId != null)
-          'object': _canvasObjects[_currentlySelectedObjectId]?.toJson(),
+        if (_currentlySelectedObjectId != null && _canvasObjects.containsKey(_currentlySelectedObjectId!)) // Ensure object exists
+          'object': _canvasObjects[_currentlySelectedObjectId!]!.toJson(),
         'workspace_id': _currentWorkspace!.id, // Include workspace_id in broadcast
       },
     );
@@ -196,25 +199,26 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+  // Modified onPanEnd to ensure object is saved when interaction stops
   void onPanEnd(DragEndDetails details) async {
     if (_currentlySelectedObjectId != null) {
-      syncCanvasObject(_cursorPosition);
-    }
+      syncCanvasObject(_cursorPosition); // Sync final position
 
-    final drawnObjectId = _currentlySelectedObjectId;
+      final drawnObjectId = _currentlySelectedObjectId;
+      if (drawnObjectId != null && _currentWorkspace != null) {
+        // Save the current object state to the database
+        await _supabaseService.supabase.from('canvas_objects').upsert({
+          'id': drawnObjectId,
+          'object': _canvasObjects[drawnObjectId]!.toJson(), // Ensure this toJson() matches your DB schema (jsonb)
+          'workspace_id': _currentWorkspace!.id,
+        });
+        print('Canvas object ${drawnObjectId} upserted to DB.');
+      }
+    }
 
     _panStartPoint = null;
     _interactionMode = InteractionMode.none;
     notifyListeners();
-
-    if (drawnObjectId == null || _currentWorkspace == null) {
-      return;
-    }
-    await _supabaseService.supabase.from('canvas_objects').upsert({
-      'id': drawnObjectId,
-      'object': _canvasObjects[drawnObjectId]!.toJson(),
-      'workspace_id': _currentWorkspace!.id,
-    });
   }
 
   // --- UI/Interaction Logic ---
@@ -285,7 +289,8 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  void addNewNode(DragDownDetails details) {
+  // Expects details.globalPosition to be in canvas coordinates
+  void addNewNode(DragDownDetails details) async { // Make async to save immediately
     if (_currentWorkspace == null) {
       print("Cannot add node: No workspace selected.");
       return;
@@ -329,52 +334,78 @@ class WorkspaceProvider extends StateHandler {
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;
       _currentlySelectedObjectId = newObject.id;
-      _interactionMode = InteractionMode.moving;
+      _interactionMode = InteractionMode.moving; // Set to moving immediately after creation
       notifyListeners();
+
+      // Immediately save the newly created object to the database
+      try {
+        await _supabaseService.supabase.from('canvas_objects').upsert({
+          'id': newObject.id,
+          'object': newObject.toJson(),
+          'workspace_id': _currentWorkspace!.id,
+        });
+        print('New canvas object ${newObject.id} inserted into DB.');
+      } catch (e) {
+        print('Error inserting new canvas object: $e');
+      }
     }
   }
 
+  // Expects details.globalPosition and details.delta to be in canvas coordinates
   void onPanDown(DragDownDetails details) {
-    _cursorPosition = details.globalPosition;
-    _panStartPoint = details.globalPosition;
+    _cursorPosition = details.globalPosition; // This is now in canvas coordinates
+    _panStartPoint = details.globalPosition; // This is now in canvas coordinates
 
     _currentlySelectedObjectId = null;
     _interactionMode = InteractionMode.none;
     notifyListeners();
 
     if (_currentMode == DrawMode.pointer) {
-      if (_currentlySelectedObjectId != null) {
-        final selectedObject = _canvasObjects[_currentlySelectedObjectId!]!;
-        final rect = selectedObject.getBounds();
+      // Prioritize handle interaction check
+      for (final canvasObject in _canvasObjects.values.toList().reversed) {
+        final rect = canvasObject.getBounds();
 
+        // Check for handle interaction. Handle radius also in canvas units.
         if ((details.globalPosition - rect.topLeft).distance < _handleRadius) {
+          _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingTopLeft;
+          notifyListeners();
+          return; // Exit after finding a handle
         } else if ((details.globalPosition - rect.topRight).distance < _handleRadius) {
+          _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingTopRight;
+          notifyListeners();
+          return;
         } else if ((details.globalPosition - rect.bottomLeft).distance < _handleRadius) {
+          _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingBottomLeft;
+          notifyListeners();
+          return;
         } else if ((details.globalPosition - rect.bottomRight).distance < _handleRadius) {
+          _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingBottomRight;
+          notifyListeners();
+          return;
         }
       }
 
-      if (_interactionMode == InteractionMode.none) {
-        for (final canvasObject in _canvasObjects.values.toList().reversed) {
-          if (canvasObject.intersectsWith(details.globalPosition)) {
-            _currentlySelectedObjectId = canvasObject.id;
-            _interactionMode = InteractionMode.moving;
-            notifyListeners();
-            break;
-          }
+      // If no handle interaction, check if we're clicking on an object to move it
+      for (final canvasObject in _canvasObjects.values.toList().reversed) {
+        if (canvasObject.intersectsWith(details.globalPosition)) { // details.globalPosition is now canvas coordinate
+          _currentlySelectedObjectId = canvasObject.id;
+          _interactionMode = InteractionMode.moving;
+          notifyListeners();
+          break; // Exit after selecting an object
         }
       }
     } else {
-      addNewNode(details);
+      addNewNode(details); // Call addNewNode if not in pointer mode
     }
   }
 
+  // Expects details.globalPosition and details.delta to be in canvas coordinates
   void onPanUpdate(DragUpdateDetails details) {
-    _cursorPosition = details.globalPosition;
+    _cursorPosition = details.globalPosition; // This is now in canvas coordinates
     if (_currentlySelectedObjectId == null) return;
 
     final currentObject = _canvasObjects[_currentlySelectedObjectId!];
@@ -382,7 +413,7 @@ class WorkspaceProvider extends StateHandler {
 
     switch (_interactionMode) {
       case InteractionMode.moving:
-        _canvasObjects[_currentlySelectedObjectId!] = currentObject.move(details.delta);
+        _canvasObjects[_currentlySelectedObjectId!] = currentObject.move(details.delta); // delta is already in canvas units
         break;
       case InteractionMode.resizingTopLeft:
         final newTopLeft = currentObject.getBounds().topLeft + details.delta;

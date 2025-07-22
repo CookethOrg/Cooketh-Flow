@@ -2,6 +2,7 @@ import 'package:cookethflow/app.dart';
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
+import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,13 @@ void main() async {
           create:
               (context) => WorkspaceProvider(
                 Provider.of<SupabaseService>(context, listen: false),
-                Provider.of<DashboardProvider>(context,listen: false)
+                Provider.of<DashboardProvider>(context, listen: false),
+              ),
+        ),
+        ChangeNotifierProvider<CanvasProvider>(
+          create:
+              (context) => CanvasProvider(
+                Provider.of<WorkspaceProvider>(context, listen: false),
               ),
         ),
       ],

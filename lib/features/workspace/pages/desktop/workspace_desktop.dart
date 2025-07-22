@@ -1,5 +1,4 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
-import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
@@ -10,7 +9,6 @@ import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart'
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 class WorkspaceDesktop extends StatelessWidget {
   const WorkspaceDesktop({super.key});

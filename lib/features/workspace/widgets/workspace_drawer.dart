@@ -19,6 +19,10 @@ class WorkspaceDrawer extends StatelessWidget {
       builder: (context, provider, child) {
         Color defaultBorderColor = const Color(0xFFD9D9D9);
 
+        // Check if currentWorkspace is set before accessing its properties
+        final String workspaceName = provider.currentWorkspace?.name ?? "Loading...";
+
+
         return GestureDetector(
           onTap: () {
             // Optional: Close drawer if tapping outside visible content
@@ -40,16 +44,16 @@ class WorkspaceDrawer extends StatelessWidget {
               border: Border.all(color: defaultBorderColor, width: 1.2),
             ),
             child: Column(
-              // This is the main Column within AnimatedContainer
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 // Always visible header row
                 Row(
-                  mainAxisSize:
-                      MainAxisSize.min, // Keep this for the header row
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     IconButton(
                       onPressed: () {
+                        // Ensure exitWorkspace is called when navigating back
+                        provider.exitWorkspace();
                         context.goNamed(RouteName.dashboard,pathParameters: {'username': provider.supabaseService.currentUser!.name ?? "Notfound"});
                       },
                       icon: Icon(
@@ -72,16 +76,12 @@ class WorkspaceDrawer extends StatelessWidget {
                           color: Colors.black,
                           letterSpacing: 0.6,
                         ),
-                        // Add decoration to remove default TextField borders/fill if desired
                         decoration: const InputDecoration(
-                          isDense: true, // Reduces vertical space
-                          contentPadding:
-                              EdgeInsets.zero, // Removes internal padding
-                          border: InputBorder.none, // Removes underline border
-                          focusedBorder:
-                              InputBorder.none, // Removes focused border
-                          enabledBorder:
-                              InputBorder.none, // Removes enabled border
+                          isDense: true,
+                          contentPadding: EdgeInsets.zero,
+                          border: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          enabledBorder: InputBorder.none,
                         ),
                       ),
                     ),
@@ -100,11 +100,7 @@ class WorkspaceDrawer extends StatelessWidget {
                     ),
                   ],
                 ),
-                // Animated content below the header
-                // This is now wrapped in an Expanded, giving it a flexible height
-                // within the main Column, which has a bounded height from AnimatedContainer.
                 Expanded(
-                  // <<<--- Changed this to Expanded
                   child: AnimatedOpacity(
                     opacity: provider.isDrawerOpen ? 1.0 : 0.0,
                     duration: const Duration(milliseconds: 300),
@@ -113,63 +109,41 @@ class WorkspaceDrawer extends StatelessWidget {
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                       alignment: Alignment.topCenter,
-                      child:
-                          provider.isDrawerOpen
-                              ? Column(
-                                // mainAxisSize should be max for this inner column
-                                // because it's filling the Expanded space.
-                                mainAxisSize:
-                                    MainAxisSize.max, // <<<--- Ensure max here
-                                children: [
-                                  SizedBox(height: 20.h),
-                                  const Divider(
-                                    color: Colors.grey,
-                                    thickness: 0.5,
+                      child: provider.isDrawerOpen
+                          ? Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                SizedBox(height: 20.h),
+                                const Divider(
+                                  color: Colors.grey,
+                                  thickness: 0.5,
+                                ),
+                                SizedBox(height: 10.h),
+                                Expanded(
+                                  child: ListView.separated(
+                                    padding: EdgeInsets.zero,
+                                    itemCount: provider.canvasObjectsList.length,
+                                    separatorBuilder: (context, index) =>
+                                        SizedBox(height: 8.h),
+                                    itemBuilder: (context, index) {
+                                      CanvasObject item = provider.canvasObjectsList[index];
+                                      return _buildSelectableListTile(
+                                        context,
+                                        provider: provider,
+                                        title: item.toJson()['object_type'] as String,
+                                        iconData: provider.getIconForObjectType(item.toJson()['object_type']), // Use the helper
+                                        index: index,
+                                        isSelected: provider.currentlySelectedObjectId == item.id,
+                                        onTap: () {
+                                          provider.changeCurrentlySelectedObj(item.id);
+                                        },
+                                      );
+                                    },
                                   ),
-                                  SizedBox(height: 10.h),
-                                  // --- ListView.builder for dynamic tiles ---
-                                  // Now ListView is a direct Flexible child of a Column
-                                  // that fills its Expanded parent. This is the correct setup.
-                                  Expanded(
-                                    // <<<--- Changed Flexible to Expanded for the ListView
-                                    child: ListView.separated(
-                                      padding: EdgeInsets.zero,
-                                      itemCount:
-                                          provider.canvasObjectsList.length,
-                                      separatorBuilder:
-                                          (context, index) =>
-                                              SizedBox(height: 8.h),
-                                      itemBuilder: (context, index) {
-                                        CanvasObject item =
-                                            provider.canvasObjectsList[index];
-                                        return _buildSelectableListTile(
-                                          context,
-                                          provider: provider,
-                                          title:
-                                              item.toJson()['object_type']
-                                                  as String,
-                                          iconData: provider
-                                              .getIconForObjectType(
-                                                item.toJson()['object_type']
-                                                    as String,
-                                              ),
-                                          index: index,
-                                          isSelected:
-                                              provider
-                                                  .currentlySelectedObjectId ==
-                                              item.id,
-                                          onTap: () {
-                                            provider.changeCurrentlySelectedObj(
-                                              item.id,
-                                            );
-                                          },
-                                        );
-                                      },
-                                    ),
-                                  ),
-                                ],
-                              )
-                              : const SizedBox.shrink(), // Renders nothing when closed
+                                ),
+                              ],
+                            )
+                          : const SizedBox.shrink(),
                     ),
                   ),
                 ),
@@ -191,7 +165,6 @@ class WorkspaceDrawer extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     Color iconTextColor = isSelected ? Colors.blue : Colors.black;
-    // BorderSide tileBorder = isSelected ? BorderSide(color: Colors.blue, width: 2.0) : BorderSide.none;
 
     return Container(
       color: Colors.white,

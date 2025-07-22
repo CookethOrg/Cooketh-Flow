@@ -18,7 +18,6 @@ class DashboardProvider extends StateHandler {
   int _tabIndex = 0;
   bool _isLoading = false;
   bool _isInitialized = false;
-  // List<WorkspaceModel> _workspaceList = [];
   Map<String, WorkspaceModel> _workspaceList = {};
 
   // getters
@@ -26,7 +25,6 @@ class DashboardProvider extends StateHandler {
   int get tabIndex => _tabIndex;
   bool get isLoading => _isLoading;
   bool get isInitialized => _isInitialized;
-  // List<WorkspaceModel> get workspaceList => _workspaceList;
   Map<String, WorkspaceModel> get workspaceList => _workspaceList;
 
   List<Map<String, dynamic>> tabItems = [
@@ -72,7 +70,6 @@ class DashboardProvider extends StateHandler {
         return;
       }
 
-      // print(res.id);
       try {
         List<dynamic> _dbWorkspace = await supabase!
             .from('workspace')
@@ -85,14 +82,13 @@ class DashboardProvider extends StateHandler {
             id: workspace["id"],
             owner: workspace["owner"],
             name: workspace["name"],
-            editorIdList: workspace["editorId"] ?? [],
-            viewerIdList: workspace["viewerId"] ?? [],
+            editorIdList: (workspace["editorId"] as List?)?.cast<String>() ?? [],
+            viewerIdList: (workspace["viewerId"] as List?)?.cast<String>() ?? [],
             lastEdited:
                 workspace["last edited"] != null
                     ? DateTime.parse(workspace["last edited"])
                     : DateTime.now(),
           );
-          // print(workspace);
           _workspaceList[newWorkspace.id] = newWorkspace;
         }
       } catch (e) {
@@ -106,6 +102,14 @@ class DashboardProvider extends StateHandler {
     }
   }
 
+  // New method to update workspace name from WorkspaceProvider
+  void updateWorkspaceName(String workspaceId, String newName) {
+    if (_workspaceList.containsKey(workspaceId)) {
+      _workspaceList[workspaceId] = _workspaceList[workspaceId]!.copyWith(name: newName);
+      notifyListeners();
+    }
+  }
+
   Future<void> createNewProject(BuildContext context) async {
     _isLoading = true;
     try {
@@ -114,19 +118,19 @@ class DashboardProvider extends StateHandler {
         _isLoading = false;
         print("User not found");
         notifyListeners();
+        return; // Add return to exit if user is null
       }
-      Map<dynamic, dynamic> newWorkspace = {
+      Map<String, dynamic> newWorkspaceData = { // Use Map<String, dynamic> for clarity
         "id": Uuid().v4(),
-        "owner": res!.id,
+        "owner": res.id,
         "name": "New Project",
-        "editorId": null,
-        "viewerId": null,
+        "editorId": [], // Initialize as empty list if no editors
+        "viewerId": [], // Initialize as empty list if no viewers
       };
 
-      await supabase!.from('workspace').insert(newWorkspace);
+      await supabase!.from('workspace').insert(newWorkspaceData);
 
-      refreshDashboard();
-      // currentWorkspaceId = newWorkspace["id"];
+      await refreshDashboard(); // Use await here
     } catch (e) {
       print("Error creating new project: $e");
     } finally {

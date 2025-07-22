@@ -1,6 +1,4 @@
-// import 'package:cookethflow/features/models/connection_model.dart';
-// import 'package:cookethflow/features/models/node_model.dart';
-
+// WorkspaceModel.dart (Ensuring correct key names for toJson and fromJson)
 class WorkspaceModel {
   String id;
   String owner;
@@ -8,8 +6,6 @@ class WorkspaceModel {
   List<String> editorIdList;
   List<String> viewerIdList;
   DateTime? lastEdited;
-  // List<NodeModel> nodeList;
-  // List<ConnectionModel> connectionList;
 
   WorkspaceModel({
     required this.id,
@@ -18,8 +14,6 @@ class WorkspaceModel {
     required this.editorIdList,
     required this.viewerIdList,
     required this.lastEdited,
-    // this.nodeList = const [],
-    // this.connectionList = const [],
   });
 
   WorkspaceModel copyWith({
@@ -29,8 +23,6 @@ class WorkspaceModel {
     List<String>? editorIdList,
     List<String>? viewerIdList,
     DateTime? lastEdited,
-    // List<NodeModel>? nodeList,
-    // List<ConnectionModel>? connectionList,
   }) {
     return WorkspaceModel(
       id: id ?? this.id,
@@ -39,8 +31,6 @@ class WorkspaceModel {
       editorIdList: editorIdList ?? List.from(this.editorIdList),
       viewerIdList: viewerIdList ?? List.from(this.viewerIdList),
       lastEdited: lastEdited ?? this.lastEdited,
-      // nodeList: nodeList ?? List.from(this.nodeList),
-      // connectionList: connectionList ?? List.from(this.connectionList),
     );
   }
 
@@ -49,11 +39,10 @@ class WorkspaceModel {
       'id': id,
       'owner': owner,
       'name': name,
-      'editorIdList': editorIdList,
-      'viewerIdList': viewerIdList,
-      'lastEdited': lastEdited?.toIso8601String(),
-      // 'nodeList': nodeList.map((node) => node.toJson()).toList(),
-      // 'connectionList': connectionList.map((conn) => conn.toJson()).toList(),
+      // Ensure these keys match your Supabase table column names exactly
+      'editorId': editorIdList,
+      'viewerId': viewerIdList,
+      'last edited': lastEdited?.toIso8601String(),
     };
   }
 
@@ -62,23 +51,12 @@ class WorkspaceModel {
       id: json['id'] as String,
       owner: json['owner'] as String,
       name: json['name'] as String,
-      editorIdList: List<String>.from(json['editorIdList']),
-      viewerIdList: List<String>.from(json['viewerIdList']),
-      lastEdited: DateTime.parse(json['lastEdited'] as String),
-      // nodeList:
-      //     (json['nodeList'] as List<dynamic>)
-      //         .map(
-      //           (nodeJson) =>
-      //               NodeModel.fromJson(nodeJson as Map<String, dynamic>),
-      //         )
-      //         .toList(),
-      // connectionList:
-      //     (json['connectionList'] as List<dynamic>)
-      //         .map(
-      //           (connJson) =>
-      //               ConnectionModel.fromJson(connJson as Map<String, dynamic>),
-      //         )
-      //         .toList(),
+      // Ensure these keys match your Supabase table column names exactly
+      editorIdList: List<String>.from(json['editorId'] ?? []), // Handle potential null if not always present
+      viewerIdList: List<String>.from(json['viewerId'] ?? []), // Handle potential null if not always present
+      lastEdited: json['last edited'] != null 
+          ? DateTime.parse(json['last edited'] as String) 
+          : null, // Handle potential null for 'last edited'
     );
   }
 }

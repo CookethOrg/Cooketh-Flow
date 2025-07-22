@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/helpers/date_time_helper.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
+import 'package:cookethflow/features/dashboard/widgets/workspace_options_dialog.dart';
 import 'package:cookethflow/features/workspace/pages/workspace.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -21,7 +22,10 @@ class ProjectCard extends StatelessWidget {
         return GestureDetector(
           onTap: () {
             workspaceProvider.setWorkspace(workspaceId);
-            context.goNamed(RouteName.workspace,pathParameters: {'workspace_id':workspaceId});
+            context.goNamed(
+              RouteName.workspace,
+              pathParameters: {'workspace_id': workspaceId},
+            );
           },
           child: Container(
             decoration: BoxDecoration(
@@ -60,7 +64,19 @@ class ProjectCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (dialogContext) => WorkspaceOptionsDialog( // Use dialogContext to pop the dialog
+                                    onPressed: () async { // Make onPressed async
+                                      Navigator.of(dialogContext).pop(); // Dismiss the dialog first
+                                      await provider.deleteWorkspace(workspaceId); // Then delete from DB
+                                      // No need to call refreshDashboard here as deleteWorkspace already calls it
+                                    },
+                                  ),
+                                );
+                                // Removed .then(context.pop) here
+                              },
                               icon: Icon(
                                 PhosphorIconsRegular.dotsThree,
                                 size: 32.sp,

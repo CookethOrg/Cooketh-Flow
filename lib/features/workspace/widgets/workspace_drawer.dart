@@ -20,8 +20,8 @@ class WorkspaceDrawer extends StatelessWidget {
         Color defaultBorderColor = const Color(0xFFD9D9D9);
 
         // Check if currentWorkspace is set before accessing its properties
-        final String workspaceName = provider.currentWorkspace?.name ?? "Loading...";
-
+        final String workspaceName =
+            provider.currentWorkspace?.name ?? "Loading...";
 
         return GestureDetector(
           onTap: () {
@@ -53,8 +53,20 @@ class WorkspaceDrawer extends StatelessWidget {
                     IconButton(
                       onPressed: () {
                         // Ensure exitWorkspace is called when navigating back
-                        provider.exitWorkspace();
-                        context.goNamed(RouteName.dashboard,pathParameters: {'username': provider.supabaseService.currentUser!.name ?? "Notfound"});
+                        
+                        context
+                            .goNamed(
+                              RouteName.dashboard,
+                              pathParameters: {
+                                'username':
+                                    provider
+                                        .supabaseService
+                                        .currentUser!
+                                        .name ??
+                                    "Notfound",
+                              },
+                            );
+                            provider.exitWorkspace();
                       },
                       icon: Icon(
                         PhosphorIconsRegular.arrowLeft,
@@ -109,41 +121,55 @@ class WorkspaceDrawer extends StatelessWidget {
                       duration: const Duration(milliseconds: 300),
                       curve: Curves.easeInOut,
                       alignment: Alignment.topCenter,
-                      child: provider.isDrawerOpen
-                          ? Column(
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                SizedBox(height: 20.h),
-                                const Divider(
-                                  color: Colors.grey,
-                                  thickness: 0.5,
-                                ),
-                                SizedBox(height: 10.h),
-                                Expanded(
-                                  child: ListView.separated(
-                                    padding: EdgeInsets.zero,
-                                    itemCount: provider.canvasObjectsList.length,
-                                    separatorBuilder: (context, index) =>
-                                        SizedBox(height: 8.h),
-                                    itemBuilder: (context, index) {
-                                      CanvasObject item = provider.canvasObjectsList[index];
-                                      return _buildSelectableListTile(
-                                        context,
-                                        provider: provider,
-                                        title: item.toJson()['object_type'] as String,
-                                        iconData: provider.getIconForObjectType(item.toJson()['object_type']), // Use the helper
-                                        index: index,
-                                        isSelected: provider.currentlySelectedObjectId == item.id,
-                                        onTap: () {
-                                          provider.changeCurrentlySelectedObj(item.id);
-                                        },
-                                      );
-                                    },
+                      child:
+                          provider.isDrawerOpen
+                              ? Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  SizedBox(height: 20.h),
+                                  const Divider(
+                                    color: Colors.grey,
+                                    thickness: 0.5,
                                   ),
-                                ),
-                              ],
-                            )
-                          : const SizedBox.shrink(),
+                                  SizedBox(height: 10.h),
+                                  Expanded(
+                                    child: ListView.separated(
+                                      padding: EdgeInsets.zero,
+                                      itemCount:
+                                          provider.canvasObjectsList.length,
+                                      separatorBuilder:
+                                          (context, index) =>
+                                              SizedBox(height: 8.h),
+                                      itemBuilder: (context, index) {
+                                        CanvasObject item =
+                                            provider.canvasObjectsList[index];
+                                        return _buildSelectableListTile(
+                                          context,
+                                          provider: provider,
+                                          title:
+                                              item.toJson()['object_type']
+                                                  as String,
+                                          iconData: provider
+                                              .getIconForObjectType(
+                                                item.toJson()['object_type'],
+                                              ), // Use the helper
+                                          index: index,
+                                          isSelected:
+                                              provider
+                                                  .currentlySelectedObjectId ==
+                                              item.id,
+                                          onTap: () {
+                                            provider.changeCurrentlySelectedObj(
+                                              item.id,
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                ],
+                              )
+                              : const SizedBox.shrink(),
                     ),
                   ),
                 ),

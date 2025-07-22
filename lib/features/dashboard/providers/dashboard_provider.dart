@@ -75,15 +75,16 @@ class DashboardProvider extends StateHandler {
             .from('workspace')
             .select()
             .eq('owner', res.id);
-        print(_dbWorkspace);
         _workspaceList.clear();
         for (var workspace in _dbWorkspace) {
           WorkspaceModel newWorkspace = WorkspaceModel(
             id: workspace["id"],
             owner: workspace["owner"],
             name: workspace["name"],
-            editorIdList: (workspace["editorId"] as List?)?.cast<String>() ?? [],
-            viewerIdList: (workspace["viewerId"] as List?)?.cast<String>() ?? [],
+            editorIdList:
+                (workspace["editorId"] as List?)?.cast<String>() ?? [],
+            viewerIdList:
+                (workspace["viewerId"] as List?)?.cast<String>() ?? [],
             lastEdited:
                 workspace["last edited"] != null
                     ? DateTime.parse(workspace["last edited"])
@@ -102,10 +103,11 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  // New method to update workspace name from WorkspaceProvider
   void updateWorkspaceName(String workspaceId, String newName) {
     if (_workspaceList.containsKey(workspaceId)) {
-      _workspaceList[workspaceId] = _workspaceList[workspaceId]!.copyWith(name: newName);
+      _workspaceList[workspaceId] = _workspaceList[workspaceId]!.copyWith(
+        name: newName,
+      );
       notifyListeners();
     }
   }
@@ -118,19 +120,19 @@ class DashboardProvider extends StateHandler {
         _isLoading = false;
         print("User not found");
         notifyListeners();
-        return; // Add return to exit if user is null
+        return;
       }
-      Map<String, dynamic> newWorkspaceData = { // Use Map<String, dynamic> for clarity
+      Map<String, dynamic> newWorkspaceData = {
         "id": Uuid().v4(),
         "owner": res.id,
         "name": "New Project",
-        "editorId": [], // Initialize as empty list if no editors
-        "viewerId": [], // Initialize as empty list if no viewers
+        "editorId": [],
+        "viewerId": [],
       };
 
       await supabase!.from('workspace').insert(newWorkspaceData);
 
-      await refreshDashboard(); // Use await here
+      await refreshDashboard();
     } catch (e) {
       print("Error creating new project: $e");
     } finally {
@@ -140,4 +142,75 @@ class DashboardProvider extends StateHandler {
   }
 
   void importExistingProject(BuildContext context) {}
+
+  Future<void> syncWithDb() async {
+    if (supabase == null) {
+      print("Supabase client is not initialized. Cannot sync with DB.");
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final List<Map<String, dynamic>> workspacesToSync = [];
+      _workspaceList.forEach((id, workspaceModel) {
+        workspacesToSync.add(workspaceModel.toJson());
+      });
+
+      if (workspacesToSync.isNotEmpty) {
+        await supabase!.from('workspace').upsert(workspacesToSync);
+        print("All workspaces synced successfully with the database.");
+      } else {
+        print("No workspaces to sync.");
+      }
+    } catch (e) {
+      print("Error syncing workspaces to database: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+      await refreshDashboard();
+    }
+  }
+
+  // UPDATED deleteWorkspace function
+  Future<void> deleteWorkspace(String id) async {
+    if (supabase == null) {
+      print("Supabase client is not initialized. Cannot delete workspace.");
+      return;
+    }
+
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      // 1. Delete all canvas_objects linked to this workspace
+      print('Deleting canvas_objects for workspace: $id');
+      await supabase!
+          .from('canvas_objects')
+          .delete()
+          .eq('workspace_id', id);
+      print('Canvas objects for workspace $id deleted from database.');
+
+
+      // 3. Delete the workspace from the database
+      print('Deleting workspace: $id');
+      await supabase!
+          .from('workspace')
+          .delete()
+          .eq('id', id);
+      print('Workspace $id deleted from database.');
+
+      // 4. Then remove it from the local list
+      _workspaceList.remove(id);
+      
+      print("Workspace $id removed from local list.");
+    } catch (e) {
+      print("Error deleting workspace $id: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+      await refreshDashboard(); // Refresh local list after sync to pick up DB changes
+    }
+  }
 }

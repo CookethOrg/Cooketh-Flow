@@ -137,7 +137,7 @@ class SupabaseService extends StateHandler {
       // For desktop, usually 'http://localhost:port' or similar is used.
       final String? redirectUrl =
           kIsWeb
-              ? 'http://localhost:3000/dashboard' // For web development
+              ? 'http://cookethflow.cookethcompany.xyz/dashboard' // For web development
               : (Platform.isAndroid || Platform.isIOS
                   ? 'myapp://login-callback/'
                   : null); // For mobile/desktop
@@ -162,7 +162,7 @@ class SupabaseService extends StateHandler {
     try {
       final String? redirectUrl =
           kIsWeb
-              ? 'http://localhost:3000/dashboard' // For web development
+              ? 'http://cookethflow.cookethcompany.xyz/dashboard' // For web development
               : (Platform.isAndroid || Platform.isIOS
                   ? 'my.scheme://my-host'
                   : null); // Replace with your actual scheme

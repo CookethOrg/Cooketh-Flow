@@ -19,6 +19,7 @@ import 'package:cookethflow/features/models/canvas_models/objects/triangle_objec
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -52,10 +53,10 @@ class WorkspaceProvider extends StateHandler {
   static const double _defaultShapeSize = 100.0; // In canvas units
   static const double _handleRadius = 8.0; // In canvas units
   Color _currentWorkspaceColor = scaffoldColor;
-
   TextEditingController _workspaceNameController = TextEditingController(
     text: 'Workspace Name',
   );
+  QuillController _quillController = QuillController.basic();
 
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
@@ -77,6 +78,7 @@ class WorkspaceProvider extends StateHandler {
   SupabaseService get supabaseService => _supabaseService;
 
   bool get hasSelectedTile => _selectedTileIndex != null;
+  QuillController get quillController => _quillController;
 
   // --- Core Methods ---
 
@@ -99,7 +101,9 @@ class WorkspaceProvider extends StateHandler {
     _currentlySelectedObjectId = null; // Clear selected object
 
     await _fetchCanvasObjects(); // Fetch objects for the new workspace
-    _setupRealtimeChannel(_currentWorkspace!.id); // Set up realtime for new workspace
+    _setupRealtimeChannel(
+      _currentWorkspace!.id,
+    ); // Set up realtime for new workspace
 
     notifyListeners();
   }
@@ -134,25 +138,28 @@ class WorkspaceProvider extends StateHandler {
   void _setupRealtimeChannel(String workspaceId) {
     // Only subscribe if not already subscribed to this workspace
     if (_canvasChannel?.topic != Constants.channelName + ':$workspaceId') {
-      _canvasChannel = _supabaseService.supabase
-          .channel(Constants.channelName + ':$workspaceId') // Unique channel per workspace
-          .onBroadcast(
-            event: Constants.broadcastEventName,
-            callback: (payload) {
-              // Only process broadcasts if they belong to the current workspace
-              if (payload['workspace_id'] == _currentWorkspace?.id) {
-                final cursor = UserCursor.fromJson(payload['cursor']);
-                _userCursors[cursor.id] = cursor;
+      _canvasChannel =
+          _supabaseService.supabase
+              .channel(
+                Constants.channelName + ':$workspaceId',
+              ) // Unique channel per workspace
+              .onBroadcast(
+                event: Constants.broadcastEventName,
+                callback: (payload) {
+                  // Only process broadcasts if they belong to the current workspace
+                  if (payload['workspace_id'] == _currentWorkspace?.id) {
+                    final cursor = UserCursor.fromJson(payload['cursor']);
+                    _userCursors[cursor.id] = cursor;
 
-                if (payload['object'] != null) {
-                  final object = CanvasObject.fromJson(payload['object']);
-                  _canvasObjects[object.id] = object;
-                }
-                notifyListeners();
-              }
-            },
-          )
-          .subscribe();
+                    if (payload['object'] != null) {
+                      final object = CanvasObject.fromJson(payload['object']);
+                      _canvasObjects[object.id] = object;
+                    }
+                    notifyListeners();
+                  }
+                },
+              )
+              .subscribe();
     }
   }
 
@@ -160,15 +167,20 @@ class WorkspaceProvider extends StateHandler {
   // Now expects canvas coordinates for cursorPosition
   Future<void> syncCanvasObject(Offset cursorPosition) {
     final myCursor = UserCursor(position: cursorPosition, id: _myId);
-    if (_currentWorkspace == null || _canvasChannel == null) return Future.value();
+    if (_currentWorkspace == null || _canvasChannel == null)
+      return Future.value();
 
     return _canvasChannel!.sendBroadcastMessage(
       event: Constants.broadcastEventName,
       payload: {
         'cursor': myCursor.toJson(),
-        if (_currentlySelectedObjectId != null && _canvasObjects.containsKey(_currentlySelectedObjectId!)) // Ensure object exists
+        if (_currentlySelectedObjectId != null &&
+            _canvasObjects.containsKey(
+              _currentlySelectedObjectId!,
+            )) // Ensure object exists
           'object': _canvasObjects[_currentlySelectedObjectId!]!.toJson(),
-        'workspace_id': _currentWorkspace!.id, // Include workspace_id in broadcast
+        'workspace_id':
+            _currentWorkspace!.id, // Include workspace_id in broadcast
       },
     );
   }
@@ -178,8 +190,11 @@ class WorkspaceProvider extends StateHandler {
     // Debounce this if it causes too many updates on every key stroke
     // For simplicity, we'll directly update on change for now.
     // A better approach for frequent changes is to use a debounce timer.
-    if (_currentWorkspace != null && _currentWorkspace!.name != _workspaceNameController.text) {
-      _currentWorkspace = _currentWorkspace!.copyWith(name: _workspaceNameController.text);
+    if (_currentWorkspace != null &&
+        _currentWorkspace!.name != _workspaceNameController.text) {
+      _currentWorkspace = _currentWorkspace!.copyWith(
+        name: _workspaceNameController.text,
+      );
       _updateWorkspaceNameInDb(_workspaceNameController.text);
     }
   }
@@ -209,7 +224,9 @@ class WorkspaceProvider extends StateHandler {
         // Save the current object state to the database
         await _supabaseService.supabase.from('canvas_objects').upsert({
           'id': drawnObjectId,
-          'object': _canvasObjects[drawnObjectId]!.toJson(), // Ensure this toJson() matches your DB schema (jsonb)
+          'object':
+              _canvasObjects[drawnObjectId]!
+                  .toJson(), // Ensure this toJson() matches your DB schema (jsonb)
           'workspace_id': _currentWorkspace!.id,
         });
         print('Canvas object ${drawnObjectId} upserted to DB.');
@@ -290,18 +307,26 @@ class WorkspaceProvider extends StateHandler {
   }
 
   // Expects details.globalPosition to be in canvas coordinates
-  void addNewNode(DragDownDetails details) async { // Make async to save immediately
+  void addNewNode(DragDownDetails details) async {
+    // Make async to save immediately
     if (_currentWorkspace == null) {
       print("Cannot add node: No workspace selected.");
       return;
     }
     CanvasObject? newObject;
-    final defaultTopLeft = details.globalPosition - const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
-    final defaultBottomRight = details.globalPosition + const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
+    final defaultTopLeft =
+        details.globalPosition -
+        const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
+    final defaultBottomRight =
+        details.globalPosition +
+        const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
 
     switch (_currentMode) {
       case DrawMode.circle:
-        newObject = Circle.createNew(details.globalPosition, _defaultShapeSize / 2);
+        newObject = Circle.createNew(
+          details.globalPosition,
+          _defaultShapeSize / 2,
+        );
         break;
       case DrawMode.rectangle:
         newObject = Rectangle.createNew(defaultTopLeft, defaultBottomRight);
@@ -325,7 +350,10 @@ class WorkspaceProvider extends StateHandler {
         newObject = Triangle.createNew(defaultTopLeft, defaultBottomRight);
         break;
       case DrawMode.invertedTriangle:
-        newObject = InvertedTriangle.createNew(defaultTopLeft, defaultBottomRight);
+        newObject = InvertedTriangle.createNew(
+          defaultTopLeft,
+          defaultBottomRight,
+        );
         break;
       case DrawMode.pointer:
         break;
@@ -334,7 +362,8 @@ class WorkspaceProvider extends StateHandler {
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;
       _currentlySelectedObjectId = newObject.id;
-      _interactionMode = InteractionMode.moving; // Set to moving immediately after creation
+      _interactionMode =
+          InteractionMode.moving; // Set to moving immediately after creation
       notifyListeners();
 
       // Immediately save the newly created object to the database
@@ -353,8 +382,10 @@ class WorkspaceProvider extends StateHandler {
 
   // Expects details.globalPosition and details.delta to be in canvas coordinates
   void onPanDown(DragDownDetails details) {
-    _cursorPosition = details.globalPosition; // This is now in canvas coordinates
-    _panStartPoint = details.globalPosition; // This is now in canvas coordinates
+    _cursorPosition =
+        details.globalPosition; // This is now in canvas coordinates
+    _panStartPoint =
+        details.globalPosition; // This is now in canvas coordinates
 
     _currentlySelectedObjectId = null;
     _interactionMode = InteractionMode.none;
@@ -371,17 +402,20 @@ class WorkspaceProvider extends StateHandler {
           _interactionMode = InteractionMode.resizingTopLeft;
           notifyListeners();
           return; // Exit after finding a handle
-        } else if ((details.globalPosition - rect.topRight).distance < _handleRadius) {
+        } else if ((details.globalPosition - rect.topRight).distance <
+            _handleRadius) {
           _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingTopRight;
           notifyListeners();
           return;
-        } else if ((details.globalPosition - rect.bottomLeft).distance < _handleRadius) {
+        } else if ((details.globalPosition - rect.bottomLeft).distance <
+            _handleRadius) {
           _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingBottomLeft;
           notifyListeners();
           return;
-        } else if ((details.globalPosition - rect.bottomRight).distance < _handleRadius) {
+        } else if ((details.globalPosition - rect.bottomRight).distance <
+            _handleRadius) {
           _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.resizingBottomRight;
           notifyListeners();
@@ -391,7 +425,8 @@ class WorkspaceProvider extends StateHandler {
 
       // If no handle interaction, check if we're clicking on an object to move it
       for (final canvasObject in _canvasObjects.values.toList().reversed) {
-        if (canvasObject.intersectsWith(details.globalPosition)) { // details.globalPosition is now canvas coordinate
+        if (canvasObject.intersectsWith(details.globalPosition)) {
+          // details.globalPosition is now canvas coordinate
           _currentlySelectedObjectId = canvasObject.id;
           _interactionMode = InteractionMode.moving;
           notifyListeners();
@@ -405,7 +440,8 @@ class WorkspaceProvider extends StateHandler {
 
   // Expects details.globalPosition and details.delta to be in canvas coordinates
   void onPanUpdate(DragUpdateDetails details) {
-    _cursorPosition = details.globalPosition; // This is now in canvas coordinates
+    _cursorPosition =
+        details.globalPosition; // This is now in canvas coordinates
     if (_currentlySelectedObjectId == null) return;
 
     final currentObject = _canvasObjects[_currentlySelectedObjectId!];
@@ -413,23 +449,40 @@ class WorkspaceProvider extends StateHandler {
 
     switch (_interactionMode) {
       case InteractionMode.moving:
-        _canvasObjects[_currentlySelectedObjectId!] = currentObject.move(details.delta); // delta is already in canvas units
+        _canvasObjects[_currentlySelectedObjectId!] = currentObject.move(
+          details.delta,
+        ); // delta is already in canvas units
         break;
       case InteractionMode.resizingTopLeft:
         final newTopLeft = currentObject.getBounds().topLeft + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic).resize(newTopLeft, currentObject.getBounds().bottomRight);
+        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
+            .resize(newTopLeft, currentObject.getBounds().bottomRight);
         break;
       case InteractionMode.resizingTopRight:
         final newTopRight = currentObject.getBounds().topRight + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic).resize(Offset(currentObject.getBounds().topLeft.dx, newTopRight.dy), Offset(newTopRight.dx, currentObject.getBounds().bottomRight.dy));
+        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
+            .resize(
+              Offset(currentObject.getBounds().topLeft.dx, newTopRight.dy),
+              Offset(newTopRight.dx, currentObject.getBounds().bottomRight.dy),
+            );
         break;
       case InteractionMode.resizingBottomLeft:
-        final newBottomLeft = currentObject.getBounds().bottomLeft + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic).resize(Offset(newBottomLeft.dx, currentObject.getBounds().topLeft.dy), Offset(currentObject.getBounds().bottomRight.dx, newBottomLeft.dy));
+        final newBottomLeft =
+            currentObject.getBounds().bottomLeft + details.delta;
+        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
+            .resize(
+              Offset(newBottomLeft.dx, currentObject.getBounds().topLeft.dy),
+              Offset(
+                currentObject.getBounds().bottomRight.dx,
+                newBottomLeft.dy,
+              ),
+            );
         break;
       case InteractionMode.resizingBottomRight:
-        final newBottomRight = currentObject.getBounds().bottomRight + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic).resize(currentObject.getBounds().topLeft, newBottomRight);
+        final newBottomRight =
+            currentObject.getBounds().bottomRight + details.delta;
+        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
+            .resize(currentObject.getBounds().topLeft, newBottomRight);
         break;
       case InteractionMode.none:
         break;

@@ -44,17 +44,11 @@ class ToolBar extends StatelessWidget {
                 'Add new node',
                 device,
                 onPressed: () {
-                  // *** CHANGED: Call the new method to show the NodePicker dialog ***
+                  // Call the new method to show the NodePicker dialog
                   _showNodePicker(context);
                   print('Circles three plus pressed');
                 },
               ),
-              // _toolIcon(
-              //   PhosphorIconsFill.circle,
-              //   device,
-              //   iconColor: tertiaryColors[3],
-              //   onPressed: () => _showColorPicker(context),
-              // ),
               _horizontalDivider(),
               _toolIcon(
                 PhosphorIconsRegular.handGrabbing,
@@ -70,9 +64,10 @@ class ToolBar extends StatelessWidget {
                 PhosphorIconsRegular.textT,
                 'Text box',
                 device,
+                // MODIFIED: Changed onPressed to set DrawMode.textBox
                 onPressed: () {
-                  // TODO: Add text functionality
-                  print('Text pressed');
+                  provider.changeDrawMode(DrawMode.textBox);
+                  print('Text box pressed, mode changed to textBox');
                 },
               ),
               _toolIcon(
@@ -133,9 +128,7 @@ class ToolBar extends StatelessWidget {
     );
   }
 
-  // *** ADDED: Method to show the NodePicker dialog ***
   void _showNodePicker(BuildContext context) {
-    // Find the RenderBox of the ToolBar to get its position on the screen.
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
@@ -145,18 +138,16 @@ class ToolBar extends StatelessWidget {
 
     showDialog(
       context: context,
-      barrierColor: Colors.transparent, // Make the background transparent
+      barrierColor: Colors.transparent,
       builder:
           (context) => Stack(
             children: [
-              // This GestureDetector captures taps outside the NodePicker to close it.
               Positioned.fill(
                 child: GestureDetector(
                   onTap: () => Navigator.pop(context),
                   child: Container(color: Colors.transparent),
                 ),
               ),
-              // Position the NodePicker widget to the left of the ToolBar.
               Positioned(
                 top: position.dy,
                 left: position.dx - nodePickerWidth - padding,
@@ -171,7 +162,6 @@ class ToolBar extends StatelessWidget {
   }
 
   void _showColorPicker(BuildContext context) {
-    // Get the render box of the toolbar to position the dialog
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final position = renderBox.localToGlobal(Offset.zero);
@@ -182,14 +172,12 @@ class ToolBar extends StatelessWidget {
         builder:
             (context) => Stack(
               children: [
-                // Invisible barrier to close dialog when tapping outside
                 Positioned.fill(
                   child: GestureDetector(
                     onTap: () => Navigator.pop(context),
                     child: Container(color: Colors.transparent),
                   ),
                 ),
-                // Position the color picker next to the toolbar
                 Positioned(
                   right: 130.w,
                   top: 100.h,

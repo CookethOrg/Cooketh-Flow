@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 enum ProviderState { inital, empty, loading, loaded, success, error }
 
@@ -31,7 +32,6 @@ enum ShapeType {
   invertedTriangle,
 }
 
-
 enum DrawMode {
   pointer(iconData: Icons.pan_tool_alt),
   circle(iconData: Icons.circle_outlined),
@@ -42,7 +42,8 @@ enum DrawMode {
   parallelogram(iconData: Icons.square_foot_outlined), // Placeholder
   cylinder(iconData: Icons.view_in_ar_outlined), // Placeholder
   triangle(iconData: Icons.change_history),
-  invertedTriangle(iconData: Icons.warning_amber_rounded); // Placeholder
+  invertedTriangle(iconData: Icons.warning_amber_rounded), // Placeholder
+  textBox(iconData: PhosphorIconsRegular.textT);
 
   const DrawMode({required this.iconData});
   final IconData iconData;
@@ -55,4 +56,5 @@ enum InteractionMode {
   resizingTopRight,
   resizingBottomLeft,
   resizingBottomRight,
+  editingText,
 }

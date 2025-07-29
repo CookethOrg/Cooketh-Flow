@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
@@ -15,18 +16,27 @@ class Circle extends CanvasObject {
     required super.color,
     required this.radius,
     required this.center,
+    super.textDelta,
   });
 
   Circle.fromJson(Map<String, dynamic> json)
     : radius = json['radius'],
       center = Offset(json['center']['x'], json['center']['y']),
-      super(id: json['id'], color: Color(json['color']));
+      super(
+        id: json['id'],
+        color: Color(json['color'] as int),
+        textDelta: json['text_delta'],
+      );
 
   /// Constructor to be used when first creating the object on the canvas with a default size
   Circle.createNew(Offset position, double defaultRadius)
     : radius = defaultRadius,
       center = position,
-      super(id: const Uuid().v4(), color: RandomColor.getRandom());
+      super(
+        id: const Uuid().v4(),
+        color: RandomColor.getRandom(),
+        textDelta: null,
+      );
 
   @override
   Map<String, dynamic> toJson() {
@@ -36,16 +46,23 @@ class Circle extends CanvasObject {
       'color': color.value,
       'center': {'x': center.dx, 'y': center.dy},
       'radius': radius,
+      'text_delta': textDelta,
     };
   }
 
   @override
-  Circle copyWith({double? radius, Offset? center, Color? color}) {
+  Circle copyWith({
+    double? radius,
+    Offset? center,
+    Color? color,
+    String? textDelta,
+  }) {
     return Circle(
       radius: radius ?? this.radius,
       center: center ?? this.center,
       id: id,
       color: color ?? this.color,
+      textDelta: textDelta ?? this.textDelta,
     );
   }
 
@@ -68,7 +85,9 @@ class Circle extends CanvasObject {
   @override
   Circle resize(Offset newTopLeft, Offset newBottomRight) {
     final newCenter = (newTopLeft + newBottomRight) / 2;
-    final newRadius = (newBottomRight.dx - newTopLeft.dx).abs() / 2; // Assuming circular resizing
+    final newWidth = (newBottomRight.dx - newTopLeft.dx).abs();
+    final newHeight = (newBottomRight.dy - newTopLeft.dy).abs();
+    final newRadius = (max(newWidth, newHeight)) / 2;
     return copyWith(center: newCenter, radius: newRadius);
   }
 }

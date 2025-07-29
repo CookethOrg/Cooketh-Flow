@@ -1,3 +1,5 @@
+// lib/features/models/canvas_models/objects/rectangle_object.dart
+
 import 'dart:math';
 import 'dart:ui';
 
@@ -16,6 +18,7 @@ class Rectangle extends CanvasObject {
     required super.color,
     required this.topLeft,
     required this.bottomRight,
+    super.textDelta, // ADDED: textDelta to constructor
   });
 
   Rectangle.fromJson(Map<String, dynamic> json)
@@ -24,13 +27,21 @@ class Rectangle extends CanvasObject {
         json['bottom_right']['y'],
       ),
       topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
-      super(id: json['id'], color: Color(json['color']));
+      super(
+        id: json['id'],
+        color: Color(json['color'] as int),
+        textDelta: json['text_delta'], // ADDED: Load text_delta
+      );
 
   /// Constructor to be used when first creating the object on the canvas with a default size
   Rectangle.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
     : topLeft = defaultTopLeft,
       bottomRight = defaultBottomRight,
-      super(color: RandomColor.getRandom(), id: const Uuid().v4());
+      super(
+        color: RandomColor.getRandom(),
+        id: const Uuid().v4(),
+        textDelta: null, // Initial text is null
+      );
 
   @override
   Map<String, dynamic> toJson() {
@@ -40,16 +51,24 @@ class Rectangle extends CanvasObject {
       'color': color.value,
       'top_left': {'x': topLeft.dx, 'y': topLeft.dy},
       'bottom_right': {'x': bottomRight.dx, 'y': bottomRight.dy},
+      'text_delta': textDelta, // ADDED: Save text_delta
     };
   }
 
   @override
-  Rectangle copyWith({Offset? topLeft, Offset? bottomRight, Color? color}) {
+  Rectangle copyWith({
+    Offset? topLeft,
+    Offset? bottomRight,
+    Color? color,
+    String? textDelta,
+  }) {
+    // ADDED: textDelta to copyWith signature
     return Rectangle(
       topLeft: topLeft ?? this.topLeft,
       id: id,
       bottomRight: bottomRight ?? this.bottomRight,
       color: color ?? this.color,
+      textDelta: textDelta ?? this.textDelta, // ADDED: Copy textDelta
     );
   }
 
@@ -77,6 +96,18 @@ class Rectangle extends CanvasObject {
 
   @override
   Rectangle resize(Offset newTopLeft, Offset newBottomRight) {
-    return copyWith(topLeft: newTopLeft, bottomRight: newBottomRight);
+    // Ensure that width and height are not negative
+    final correctedTopLeft = Offset(
+      min(newTopLeft.dx, newBottomRight.dx),
+      min(newTopLeft.dy, newBottomRight.dy),
+    );
+    final correctedBottomRight = Offset(
+      max(newTopLeft.dx, newBottomRight.dx),
+      max(newTopLeft.dy, newBottomRight.dy),
+    );
+    return copyWith(
+      topLeft: correctedTopLeft,
+      bottomRight: correctedBottomRight,
+    );
   }
 }

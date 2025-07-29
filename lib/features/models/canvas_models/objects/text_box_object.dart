@@ -1,14 +1,19 @@
+// import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
+
 import 'dart:math';
+
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
-class Cylinder extends CanvasObject {
-  static const String type = 'cylinder';
+class TextBoxObject extends CanvasObject {
+  static const String type = 'text_box';
+
   final Offset topLeft;
   final Offset bottomRight;
 
-  Cylinder({
+  TextBoxObject({
     required super.id,
     required super.color,
     required this.topLeft,
@@ -16,26 +21,22 @@ class Cylinder extends CanvasObject {
     super.textDelta,
   });
 
-  Cylinder.fromJson(Map<String, dynamic> json)
-    : bottomRight = Offset(
+  TextBoxObject.fromJson(Map<String, dynamic> json)
+    : topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
+      bottomRight = Offset(
         json['bottom_right']['x'],
         json['bottom_right']['y'],
       ),
-      topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
       super(
         id: json['id'],
-        color: Color(json['color'] as int),
+        color: json['color'],
         textDelta: json['text_delta'],
       );
 
-  Cylinder.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
+  TextBoxObject.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
     : topLeft = defaultTopLeft,
       bottomRight = defaultBottomRight,
-      super(
-        color: RandomColor.getRandom(),
-        id: const Uuid().v4(),
-        textDelta: null,
-      );
+      super(id: Uuid().v4(), color: Colors.transparent, textDelta: null);
 
   @override
   Map<String, dynamic> toJson() {
@@ -50,17 +51,17 @@ class Cylinder extends CanvasObject {
   }
 
   @override
-  Cylinder copyWith({
+  TextBoxObject copyWith({
     Offset? topLeft,
     Offset? bottomRight,
     Color? color,
     String? textDelta,
   }) {
-    return Cylinder(
-      topLeft: topLeft ?? this.topLeft,
+    return TextBoxObject(
       id: id,
-      bottomRight: bottomRight ?? this.bottomRight,
       color: color ?? this.color,
+      topLeft: topLeft ?? this.topLeft,
+      bottomRight: bottomRight ?? this.topLeft,
       textDelta: textDelta ?? this.textDelta,
     );
   }
@@ -72,7 +73,7 @@ class Cylinder extends CanvasObject {
   }
 
   @override
-  Cylinder move(Offset delta) {
+  TextBoxObject move(Offset delta) {
     return copyWith(topLeft: topLeft + delta, bottomRight: bottomRight + delta);
   }
 
@@ -82,19 +83,15 @@ class Cylinder extends CanvasObject {
   }
 
   @override
-  Cylinder resize(Offset newTopLeft, Offset newBottomRight) {
-    // Ensure that width and height are not negative
+  TextBoxObject resize(Offset newTopLeft, Offset newBottomRight) {
     final correctedTopLeft = Offset(
       min(newTopLeft.dx, newBottomRight.dx),
       min(newTopLeft.dy, newBottomRight.dy),
     );
-    final correctedBottomRight = Offset(
+    final corrextedBottomRight = Offset(
       max(newTopLeft.dx, newBottomRight.dx),
       max(newTopLeft.dy, newBottomRight.dy),
     );
-    return copyWith(
-      topLeft: correctedTopLeft,
-      bottomRight: correctedBottomRight,
-    );
+    return copyWith(topLeft: correctedTopLeft, bottomRight: corrextedBottomRight);
   }
 }

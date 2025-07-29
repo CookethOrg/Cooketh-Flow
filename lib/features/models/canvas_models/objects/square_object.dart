@@ -1,3 +1,5 @@
+// lib/features/models/canvas_models/objects/square_object.dart
+
 import 'dart:math';
 
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
@@ -14,6 +16,7 @@ class Square extends CanvasObject {
     required super.color,
     required this.bottomRight,
     required this.topLeft,
+    super.textDelta, // ADDED: textDelta to private constructor
   });
 
   factory Square({
@@ -21,12 +24,14 @@ class Square extends CanvasObject {
     required Color color,
     required Offset topLeft,
     required Offset bottomRight,
+    String? textDelta, // ADDED: textDelta to factory constructor
   }) {
     // Ensure it's a square when created or resized
     final dx = bottomRight.dx - topLeft.dx;
     final dy = bottomRight.dy - topLeft.dy;
     final side = max(dx.abs(), dy.abs());
 
+    // Maintain aspect ratio. The sign ensures direction (e.g., growing right/down)
     final adjustedBottomRight = Offset(
       topLeft.dx + side * dx.sign,
       topLeft.dy + side * dy.sign,
@@ -37,6 +42,7 @@ class Square extends CanvasObject {
       color: color,
       topLeft: topLeft,
       bottomRight: adjustedBottomRight,
+      textDelta: textDelta, // ADDED: Pass textDelta to private constructor
     );
   }
 
@@ -46,12 +52,20 @@ class Square extends CanvasObject {
         json['bottom_right']['y'],
       ),
       topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
-      super(id: json['id'], color: Color(json['color']));
-  
+      super(
+        id: json['id'],
+        color: Color(json['color'] as int),
+        textDelta: json['text_delta'], // ADDED: Load text_delta
+      );
+
   Square.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
     : topLeft = defaultTopLeft,
       bottomRight = defaultBottomRight,
-      super(id: const Uuid().v4(), color: RandomColor.getRandom());
+      super(
+        id: const Uuid().v4(),
+        color: RandomColor.getRandom(),
+        textDelta: null, // Initial text is null
+      );
 
   @override
   Map<String, dynamic> toJson() {
@@ -61,17 +75,25 @@ class Square extends CanvasObject {
       'color': color.value,
       'top_left': {'x': topLeft.dx, 'y': topLeft.dy},
       'bottom_right': {'x': bottomRight.dx, 'y': bottomRight.dy},
+      'text_delta': textDelta, // ADDED: Save text_delta
     };
   }
 
   @override
-  Square copyWith({Offset? topLeft, Offset? bottomRight, Color? color}) {
+  Square copyWith({
+    Offset? topLeft,
+    Offset? bottomRight,
+    Color? color,
+    String? textDelta,
+  }) {
+    // ADDED: textDelta to copyWith signature
     // Pass through the factory constructor to ensure it remains a square
     return Square(
       id: id,
       color: color ?? this.color,
       bottomRight: bottomRight ?? this.bottomRight,
       topLeft: topLeft ?? this.topLeft,
+      textDelta: textDelta ?? this.textDelta, // ADDED: Copy textDelta
     );
   }
 
@@ -100,11 +122,26 @@ class Square extends CanvasObject {
   @override
   Square resize(Offset newTopLeft, Offset newBottomRight) {
     // Ensure square constraint is maintained during resize
+    // Calculate new width/height from the bounding box
+    final newWidth = (newBottomRight.dx - newTopLeft.dx).abs();
+    final newHeight = (newBottomRight.dy - newTopLeft.dy).abs();
+    final side = max(
+      newWidth,
+      newHeight,
+    ); // Take the larger dimension for the square
+
+    // Adjust newBottomRight to maintain square aspect ratio from newTopLeft
+    final adjustedBottomRight = Offset(
+      newTopLeft.dx + side,
+      newTopLeft.dy + side,
+    );
+
     return Square(
       id: id,
       color: color,
       topLeft: newTopLeft,
-      bottomRight: newBottomRight,
+      bottomRight: adjustedBottomRight, // Use the adjusted bottom-right
+      textDelta: textDelta,
     );
   }
 }

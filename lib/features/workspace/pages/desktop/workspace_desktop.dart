@@ -1,21 +1,23 @@
+// lib/features/workspace/workspace_desktop.dart
+
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
-import 'package:cookethflow/features/workspace/widgets/toolbar.dart'; // Assuming this might be used later
+import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
 import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart'; // NEW: Import ObjectTextEditor
 
 class WorkspaceDesktop extends StatelessWidget {
   const WorkspaceDesktop({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // Determine device type for responsive adjustments
     bool isDesktop =
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
         rh.DeviceType.desktop;
@@ -46,6 +48,10 @@ class WorkspaceDesktop extends StatelessWidget {
                   right: 0.w, // Aligns to the right edge of the Stack
                   child: ZoomControlButton(),
                 ),
+
+                // NEW: ObjectTextEditor positioned here to overlay everything else
+                // Its visibility and position are controlled by ObjectTextEditor widget itself
+                const ObjectTextEditor(),
               ],
             ),
           ),
@@ -54,4 +60,3 @@ class WorkspaceDesktop extends StatelessWidget {
     );
   }
 }
-

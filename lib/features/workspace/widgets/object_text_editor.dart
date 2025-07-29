@@ -1,128 +1,152 @@
 // lib/features/workspace/widgets/object_text_editor.dart
 
 import 'package:cookethflow/core/utils/enums.dart';
-import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
-import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
-import 'package:vector_math/vector_math_64.dart' as vc; // Correct alias for Vector3
+import 'package:vector_math/vector_math_64.dart' as vc;
 
-// Renamed from TextBox to ObjectTextEditor
-class ObjectTextEditor extends StatelessWidget {
+class ObjectTextEditor extends StatefulWidget {
   const ObjectTextEditor({super.key});
+
+  @override
+  State<ObjectTextEditor> createState() => _ObjectTextEditorState();
+}
+
+class _ObjectTextEditorState extends State<ObjectTextEditor> {
+  final FocusNode _focusNode = FocusNode();
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer2<WorkspaceProvider, CanvasProvider>(
       builder: (context, workspaceProvider, canvasProvider, child) {
-        // Only show the editor if an object is selected and it's a TextBoxObject
-        // or if we are in text editing mode (which implies an object is selected for text editing).
-        final bool isSelectedAndEditable = workspaceProvider.currentlySelectedObjectId != null &&
-            (workspaceProvider.interactionMode == InteractionMode.editingText ||
-             workspaceProvider.canvasObjects[workspaceProvider.currentlySelectedObjectId!]?.textDelta != null);
+        final selectedObjectId = workspaceProvider.currentlySelectedObjectId;
+        final selectedObject =
+            selectedObjectId != null
+                ? workspaceProvider.canvasObjects[selectedObjectId]
+                : null;
 
-        if (!isSelectedAndEditable) {
-          return const SizedBox.shrink(); // Hide the editor if no editable object is selected
-        }
-
-        final CanvasObject? selectedObject = workspaceProvider.canvasObjects[workspaceProvider.currentlySelectedObjectId!];
-
-        if (selectedObject == null) {
+        if (workspaceProvider.interactionMode != InteractionMode.editingText ||
+            selectedObject == null) {
           return const SizedBox.shrink();
         }
 
-        // Get the object's bounds (in canvas coordinates)
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted && !_focusNode.hasFocus) {
+            _focusNode.requestFocus();
+          }
+        });
+
         final Rect objectBounds = selectedObject.getBounds();
-
-        // Convert canvas coordinates to screen coordinates
-        // This requires applying the current transformation from InteractiveViewer
         final Matrix4 transform = canvasProvider.transformationController.value;
-
-        // Corrected: Convert Vector3 to Offset manually
-        final vc.Vector3 transformedTopLeft = transform.transform3(vc.Vector3(objectBounds.topLeft.dx, objectBounds.topLeft.dy, 0));
-        final Offset screenTopLeft = Offset(transformedTopLeft.x, transformedTopLeft.y);
-
-        final vc.Vector3 transformedBottomRight = transform.transform3(vc.Vector3(objectBounds.bottomRight.dx, objectBounds.bottomRight.dy, 0));
-        final Offset screenBottomRight = Offset(transformedBottomRight.x, transformedBottomRight.y);
-
-        // The actual visible rectangle on screen after pan/zoom
+        final vc.Vector3 transformedTopLeft = transform.transform3(
+          vc.Vector3(objectBounds.topLeft.dx, objectBounds.topLeft.dy, 0),
+        );
+        final Offset screenTopLeft = Offset(
+          transformedTopLeft.x,
+          transformedTopLeft.y,
+        );
+        final vc.Vector3 transformedBottomRight = transform.transform3(
+          vc.Vector3(
+            objectBounds.bottomRight.dx,
+            objectBounds.bottomRight.dy,
+            0,
+          ),
+        );
         final visibleRect = Rect.fromPoints(
           screenTopLeft,
-          screenBottomRight,
+          Offset(transformedBottomRight.x, transformedBottomRight.y),
         );
 
-        // If it's a TextBoxObject, we want the editor to be exactly its size and position
-        final bool isTextBox = selectedObject is TextBoxObject;
+        final quillController = workspaceProvider.selectedObjectQuillController;
 
         return Positioned(
           left: visibleRect.left,
-          top: visibleRect.top - (isTextBox ? (50.h + 5.h) : 0), // Position toolbar above if textbox
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (isTextBox) // Only show toolbar directly above for TextBoxObjects
+          // Position the entire widget (toolbar + editor) at the object's location
+          top: visibleRect.top,
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Container(
-                  width: visibleRect.width,
-                  height: 50.h, // Fixed height for toolbar
+                  width: visibleRect.width < 350.w ? 350.w : visibleRect.width,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8.r),
-                      topRight: Radius.circular(8.r),
-                    ),
-                    border: Border.all(color: Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(8.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.15),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
                   child: QuillSimpleToolbar(
-                    controller: workspaceProvider.selectedObjectQuillController,
+                    controller: quillController,
+                    config: QuillSimpleToolbarConfig(
+                      showBackgroundColorButton: true,
+                      showFontFamily: false,
+                      showLink: false,
+                      showSearchButton: false,
+                      showInlineCode: false,
+                      showListCheck: false,
+                      showQuote: false,
+                      showCodeBlock: false,
+                      showListBullets: true,
+                      showListNumbers: true,
+                      showClearFormat: true,
+                      showBoldButton: true,
+                      showItalicButton: true,
+                      showHeaderStyle: true,
+                    ),
                   ),
                 ),
-              SizedBox(
-                width: visibleRect.width,
-                height: isTextBox ? visibleRect.height : 100.h, // Fixed height for non-textbox object's editor
-                child: Container(
-                  // CORRECTED: Moved color inside BoxDecoration when a decoration is present.
-                  decoration: isTextBox && selectedObject.color.opacity == 0
-                      ? BoxDecoration(
-                          color: Colors.transparent, // Background color for text boxes when decoration is present
-                          border: Border.all(color: Colors.grey.shade400, width: 1.0, style: BorderStyle.solid),
-                        )
-                      : BoxDecoration( // Provide a default BoxDecoration if no specific border is needed
-                          color: isTextBox ? Colors.transparent : Colors.white70, // Background color for the editor itself
+                SizedBox(height: 4.h), // Spacing between toolbar and editor
+                // FIX: Add a visible container for the editor
+                Container(
+                  width: visibleRect.width,
+                  height: visibleRect.height,
+                  decoration: BoxDecoration(
+                    color: Colors.white, // Make the editor background white
+                    border: Border.all(
+                      color: Colors.blue.shade300,
+                      width: 1.5,
+                    ), // Add a border
+                    borderRadius: BorderRadius.circular(4.r),
+                  ),
+                  child: QuillEditor.basic(
+                    controller: quillController,
+                    config: QuillEditorConfig(
+                      padding: const EdgeInsets.all(8.0),
+                      scrollable: true,
+                      expands: true,
+                      customStyles: DefaultStyles(
+                        placeHolder: DefaultTextBlockStyle(
+                          const TextStyle(color: Colors.grey),
+                          const HorizontalSpacing(0, 0),
+                          const VerticalSpacing(0, 0),
+                          const VerticalSpacing(0, 0),
+                          null,
                         ),
-                  child: AbsorbPointer(
-                    absorbing: workspaceProvider.interactionMode != InteractionMode.editingText,
-                    child: QuillEditor.basic(
-                      controller: workspaceProvider.selectedObjectQuillController,
-                      // readOnly: workspaceProvider.interactionMode != InteractionMode.editingText, // Make read-only if not in editing mode
-                      focusNode: FocusNode(), // QuillEditor needs a focus node
-                      // padding: EdgeInsets.zero, // Adjust padding if needed
-                      // expands: true,
-                      // scrollable: true,
+                      ),
+                      placeholder: 'Type here...',
                     ),
+                    focusNode: _focusNode,
+                    scrollController: ScrollController(),
                   ),
                 ),
-              ),
-              if (!isTextBox) // Show general floating toolbar for other objects
-                Padding(
-                  padding: EdgeInsets.only(top: 8.h),
-                  child: Container(
-                    width: 300.w, // Fixed width for floating toolbar
-                    height: 50.h,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8.r),
-                      border: Border.all(color: Colors.grey.shade300),
-                    ),
-                    child: QuillSimpleToolbar(
-                      controller: workspaceProvider.selectedObjectQuillController,
-                    ),
-                  ),
-                ),
-            ],
+              ],
+            ),
           ),
         );
       },

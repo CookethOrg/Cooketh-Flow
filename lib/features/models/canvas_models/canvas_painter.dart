@@ -1,9 +1,10 @@
 // lib/features/models/canvas_models/canvas_painter.dart
 
+import 'dart:convert';
 import 'dart:math';
 import 'dart:ui';
-import 'dart:convert'; // Import for jsonDecode
 
+import 'package:cookethflow/core/utils/enums.dart'; // Make sure this import is correct
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
@@ -13,23 +14,25 @@ import 'package:cookethflow/features/models/canvas_models/objects/parallelogram_
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rounded_square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
-import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart'; // NEW: Import TextBoxObject
+import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart'; // NEW: Import flutter_quill
+import 'package:flutter_quill/flutter_quill.dart';
 
 class CanvasPainter extends CustomPainter {
   final Map<String, UserCursor> userCursors;
   final Map<String, CanvasObject> canvasObjects;
   final String? currentlySelectedObjectId;
   final double handleRadius;
+  final InteractionMode interactionMode; // UPDATED: Added interactionMode
 
   CanvasPainter({
     required this.userCursors,
     required this.canvasObjects,
     this.currentlySelectedObjectId,
     this.handleRadius = 8.0,
+    required this.interactionMode, // UPDATED: Added to constructor
   });
 
   @override
@@ -37,26 +40,19 @@ class CanvasPainter extends CustomPainter {
     // Draw each canvas object
     for (final canvasObject in canvasObjects.values) {
       final paint = Paint()..color = canvasObject.color;
-
       Rect rect;
+
       if (canvasObject is Circle) {
         canvas.drawCircle(canvasObject.center, canvasObject.radius, paint);
-        rect = Rect.fromCircle(center: canvasObject.center, radius: canvasObject.radius);
-      } else if (canvasObject is TextBoxObject) { // NEW: Handle TextBoxObject drawing
+        rect = Rect.fromCircle(
+            center: canvasObject.center, radius: canvasObject.radius);
+      } else if (canvasObject is TextBoxObject) {
         rect = canvasObject.getBounds();
-        // For text boxes, we might draw a subtle border if it's transparent,
-        // or just let the text render.
-        if (canvasObject.color == Colors.transparent) {
-          final borderPaint = Paint()
-            ..color = Colors.grey.shade400
-            ..style = PaintingStyle.stroke
-            ..strokeWidth = 1.0;
-          canvas.drawRect(rect, borderPaint);
-        } else {
+        // FIX: Only draw the background if the color is NOT transparent.
+        if (canvasObject.color != Colors.transparent) {
           canvas.drawRect(rect, paint);
         }
-      }
-      else {
+      } else {
         // For other shapes, use their getBounds() method
         rect = canvasObject.getBounds();
         if (canvasObject is Rectangle) {
@@ -64,7 +60,10 @@ class CanvasPainter extends CustomPainter {
         } else if (canvasObject is Square) {
           canvas.drawRect(rect, paint);
         } else if (canvasObject is RoundedSquare) {
-          canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(canvasObject.cornerRadius)), paint);
+          canvas.drawRRect(
+              RRect.fromRectAndRadius(
+                  rect, Radius.circular(canvasObject.cornerRadius)),
+              paint);
         } else if (canvasObject is Diamond) {
           final path = Path()
             ..moveTo(rect.center.dx, rect.top)
@@ -98,15 +97,32 @@ class CanvasPainter extends CustomPainter {
           canvas.drawPath(path, paint);
         } else if (canvasObject is Cylinder) {
           final ellipseHeight = min(rect.height * 0.3, 40.0);
-          final bodyRect = Rect.fromLTRB(rect.left, rect.top + ellipseHeight / 2, rect.right, rect.bottom - ellipseHeight / 2);
+          final bodyRect = Rect.fromLTRB(rect.left,
+              rect.top + ellipseHeight / 2, rect.right, rect.bottom - ellipseHeight / 2);
           canvas.drawRect(bodyRect, paint);
-          canvas.drawOval(Rect.fromCenter(center: bodyRect.topCenter, width: rect.width, height: ellipseHeight), paint);
-          canvas.drawOval(Rect.fromCenter(center: bodyRect.bottomCenter, width: rect.width, height: ellipseHeight), paint);
+          canvas.drawOval(
+              Rect.fromCenter(
+                  center: bodyRect.topCenter,
+                  width: rect.width,
+                  height: ellipseHeight),
+              paint);
+          canvas.drawOval(
+              Rect.fromCenter(
+                  center: bodyRect.bottomCenter,
+                  width: rect.width,
+                  height: ellipseHeight),
+              paint);
         }
       }
 
-      // NEW: Draw text content for any object that has it
-      if (canvasObject.textDelta != null && canvasObject.textDelta!.isNotEmpty) {
+      // Check if this object is currently being edited
+      final bool isEditingText = interactionMode == InteractionMode.editingText &&
+                                  currentlySelectedObjectId == canvasObject.id;
+
+      // Draw text content for any object that has it, but NOT if it's being edited
+      if (canvasObject.textDelta != null &&
+          canvasObject.textDelta!.isNotEmpty &&
+          !isEditingText) {
         try {
           final doc = Document.fromJson(jsonDecode(canvasObject.textDelta!));
           final richText = TextSpan(
@@ -115,11 +131,22 @@ class CanvasPainter extends CustomPainter {
                 return TextSpan(
                   text: op.data as String,
                   style: TextStyle(
-                    fontSize: (op.attributes?['size'] as double?) ?? 14.0, // Default font size
-                    fontWeight: op.attributes?['bold'] == true ? FontWeight.bold : FontWeight.normal,
-                    fontStyle: op.attributes?['italic'] == true ? FontStyle.italic : FontStyle.normal,
-                    decoration: op.attributes?['underline'] == true ? TextDecoration.underline : TextDecoration.none,
-                    color: Color(int.tryParse((op.attributes?['color'] as String?)?.replaceAll('#', '0xff') ?? '', radix: 16) ?? Colors.black.value),
+                    fontSize: (op.attributes?['size'] as double?) ?? 14.0,
+                    fontWeight: op.attributes?['bold'] == true
+                        ? FontWeight.bold
+                        : FontWeight.normal,
+                    fontStyle: op.attributes?['italic'] == true
+                        ? FontStyle.italic
+                        : FontStyle.normal,
+                    decoration: op.attributes?['underline'] == true
+                        ? TextDecoration.underline
+                        : TextDecoration.none,
+                    color: Color(int.tryParse(
+                            (op.attributes?['color'] as String?)
+                                    ?.replaceAll('#', '0xff') ??
+                                '',
+                            radix: 16) ??
+                        Colors.black.value),
                   ),
                 );
               }
@@ -129,60 +156,47 @@ class CanvasPainter extends CustomPainter {
 
           final textPainter = TextPainter(
             text: richText,
-            textDirection: TextDirection.ltr, // Assuming LTR for most cases
-            maxLines: null, // Allow multiple lines
+            textDirection: TextDirection.ltr,
+            textAlign: TextAlign.center, // Center text
           );
 
-          // Constrain text to object's bounds.
-          // For TextBoxObject, the text fills the box.
-          // For other shapes, it can be centered with some padding.
-          double textPadding = 5.0; // Small padding inside shapes
+          double textPadding = 5.0;
           double availableWidth = rect.width - 2 * textPadding;
-          double availableHeight = rect.height - 2 * textPadding;
-
-          if (availableWidth <= 0 || availableHeight <= 0) {
-            continue; // Skip drawing text if object is too small
-          }
+          
+          if (availableWidth <= 0) continue;
 
           textPainter.layout(maxWidth: availableWidth);
-
-          // Calculate offset to center text vertically and horizontally
+          
           final textOffset = Offset(
             rect.left + textPadding + (availableWidth - textPainter.width) / 2,
-            rect.top + textPadding + (availableHeight - textPainter.height) / 2,
+            rect.top + textPadding + (rect.height - 2 * textPadding - textPainter.height) / 2,
           );
 
-          // Save canvas state before clipping, restore after
           canvas.save();
-          // Clip text to the object's bounds to prevent overflow
           canvas.clipRect(rect);
           textPainter.paint(canvas, textOffset);
           canvas.restore();
 
         } catch (e) {
-          // Fallback for malformed Quill Delta (or plain text directly saved)
+          // Fallback for plain text
           final textPainter = TextPainter(
             text: TextSpan(
-              text: canvasObject.textDelta, // Render as plain text
+              text: canvasObject.textDelta,
               style: const TextStyle(color: Colors.black, fontSize: 14.0),
             ),
             textDirection: TextDirection.ltr,
-            maxLines: null,
+            textAlign: TextAlign.center,
           );
-
           double textPadding = 5.0;
           double availableWidth = rect.width - 2 * textPadding;
-          double availableHeight = rect.height - 2 * textPadding;
 
-          if (availableWidth <= 0 || availableHeight <= 0) {
-            continue;
-          }
+          if (availableWidth <= 0) continue;
 
           textPainter.layout(maxWidth: availableWidth);
 
           final textOffset = Offset(
             rect.left + textPadding + (availableWidth - textPainter.width) / 2,
-            rect.top + textPadding + (availableHeight - textPainter.height) / 2,
+            rect.top + textPadding + (rect.height - 2 * textPadding - textPainter.height) / 2,
           );
           canvas.save();
           canvas.clipRect(rect);
@@ -198,26 +212,22 @@ class CanvasPainter extends CustomPainter {
         final handlePaint = Paint()
           ..color = Colors.blue
           ..style = PaintingStyle.fill;
-        
-        // Draw corner handles
+
         canvas.drawCircle(rect.topLeft, handleRadius, handlePaint);
         canvas.drawCircle(rect.topRight, handleRadius, handlePaint);
         canvas.drawCircle(rect.bottomLeft, handleRadius, handlePaint);
         canvas.drawCircle(rect.bottomRight, handleRadius, handlePaint);
 
-        // Draw selection border (dashed for text box if transparent)
         final borderPaint = Paint()
           ..color = Colors.blue
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.0;
-
+        
+        // Draw dashed border for transparent text box when selected
         if (canvasObject is TextBoxObject && canvasObject.color == Colors.transparent) {
-           // Draw dashed border for transparent text box
           const double dashWidth = 5.0;
           const double dashSpace = 3.0;
           double currentX = rect.left;
-          double currentY = rect.top;
-
           // Top line
           while (currentX < rect.right) {
             canvas.drawLine(
@@ -228,7 +238,7 @@ class CanvasPainter extends CustomPainter {
             currentX += dashWidth + dashSpace;
           }
           // Right line
-          currentX = rect.right;
+          double currentY = rect.top;
           while (currentY < rect.bottom) {
             canvas.drawLine(
               Offset(rect.right, currentY),
@@ -238,26 +248,24 @@ class CanvasPainter extends CustomPainter {
             currentY += dashWidth + dashSpace;
           }
           // Bottom line
-          currentY = rect.bottom;
-          currentX = rect.right;
-          while (currentX > rect.left) {
+          currentX = rect.left;
+          while (currentX < rect.right) {
             canvas.drawLine(
-              Offset(currentX, rect.bottom),
-              Offset(max(currentX - dashWidth, rect.left), rect.bottom),
+              Offset(rect.right - (currentX - rect.left), rect.bottom),
+              Offset(rect.right - min((currentX - rect.left) + dashWidth, rect.width), rect.bottom),
               borderPaint,
             );
-            currentX -= dashWidth + dashSpace;
+            currentX += dashWidth + dashSpace;
           }
           // Left line
-          currentX = rect.left;
-          currentY = rect.bottom;
-          while (currentY > rect.top) {
+          currentY = rect.top;
+          while (currentY < rect.bottom) {
             canvas.drawLine(
-              Offset(rect.left, currentY),
-              Offset(rect.left, max(currentY - dashWidth, rect.top)),
+              Offset(rect.left, rect.bottom - (currentY - rect.top)),
+              Offset(rect.left, rect.bottom - min((currentY - rect.top) + dashWidth, rect.height)),
               borderPaint,
             );
-            currentY -= dashWidth + dashSpace;
+            currentY += dashWidth + dashSpace;
           }
         } else {
           canvas.drawRect(rect, borderPaint);
@@ -282,40 +290,26 @@ class CanvasPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(CanvasPainter oldPainter) {
-    // Only repaint if the data or selection changes significantly
     return oldPainter.userCursors != userCursors ||
            oldPainter.canvasObjects.length != canvasObjects.length ||
            oldPainter.currentlySelectedObjectId != currentlySelectedObjectId ||
-           // Deep comparison of canvas objects is expensive, but necessary if text content changes frequently
+           oldPainter.interactionMode != interactionMode || // UPDATED: Add interactionMode check
            _hasCanvasObjectsChanged(oldPainter.canvasObjects, canvasObjects);
   }
 
-  // Helper method for deep comparison of canvas objects
   bool _hasCanvasObjectsChanged(Map<String, CanvasObject> oldObjects, Map<String, CanvasObject> newObjects) {
     if (oldObjects.length != newObjects.length) return true;
-
     for (final id in newObjects.keys) {
       final newObj = newObjects[id];
       final oldObj = oldObjects[id];
-
-      if (oldObj == null || newObj == null) return true; // Object added/removed
-
-      // Check if ID is different (shouldn't happen for same key)
+      if (oldObj == null || newObj == null) return true;
       if (newObj.id != oldObj.id) return true;
-
-      // Check basic properties
-      if (newObj.color != oldObj.color ||
-          newObj.getBounds() != oldObj.getBounds()) {
+      if (newObj.color != oldObj.color || newObj.getBounds() != oldObj.getBounds()) {
         return true;
       }
-
-      // Check textDelta content
       if (newObj.textDelta != oldObj.textDelta) {
         return true;
       }
-      // Add more specific checks if objects have other unique properties that can change.
-      // For instance, if circle's radius or center changed.
-      // A more robust check might involve comparing their toJson() output.
     }
     return false;
   }

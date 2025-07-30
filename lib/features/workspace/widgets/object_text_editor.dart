@@ -30,10 +30,9 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
     return Consumer2<WorkspaceProvider, CanvasProvider>(
       builder: (context, workspaceProvider, canvasProvider, child) {
         final selectedObjectId = workspaceProvider.currentlySelectedObjectId;
-        final selectedObject =
-            selectedObjectId != null
-                ? workspaceProvider.canvasObjects[selectedObjectId]
-                : null;
+        final selectedObject = selectedObjectId != null
+            ? workspaceProvider.canvasObjects[selectedObjectId]
+            : null;
 
         if (workspaceProvider.interactionMode != InteractionMode.editingText ||
             selectedObject == null) {
@@ -47,13 +46,10 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
         });
 
         final Rect objectBounds = selectedObject.getBounds();
-        final Matrix4 transform = canvasProvider.transformationController.value;
+        final Matrix4 transform =
+            canvasProvider.transformationController.value;
         final vc.Vector3 transformedTopLeft = transform.transform3(
           vc.Vector3(objectBounds.topLeft.dx, objectBounds.topLeft.dy, 0),
-        );
-        final Offset screenTopLeft = Offset(
-          transformedTopLeft.x,
-          transformedTopLeft.y,
         );
         final vc.Vector3 transformedBottomRight = transform.transform3(
           vc.Vector3(
@@ -63,23 +59,24 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
           ),
         );
         final visibleRect = Rect.fromPoints(
-          screenTopLeft,
+          Offset(transformedTopLeft.x, transformedTopLeft.y),
           Offset(transformedBottomRight.x, transformedBottomRight.y),
         );
 
-        final quillController = workspaceProvider.selectedObjectQuillController;
+        final quillController =
+            workspaceProvider.selectedObjectQuillController;
 
-        return Positioned(
-          left: visibleRect.left,
-          // Position the entire widget (toolbar + editor) at the object's location
-          top: visibleRect.top,
-          child: Material(
-            color: Colors.transparent,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: visibleRect.width < 350.w ? 350.w : visibleRect.width,
+        // RESTRUCTURE: Use a Stack to position the toolbar and editor independently.
+        return Stack(
+          children: [
+            // 1. The Quill Toolbar, positioned to the right of the text object.
+            Positioned(
+              left: visibleRect.right + 10.w, // Place it right of the object
+              top: visibleRect.top,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  // The toolbar will size itself, but you can add constraints if needed
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8.r),
@@ -111,18 +108,24 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                     ),
                   ),
                 ),
-                SizedBox(height: 4.h), // Spacing between toolbar and editor
-                // FIX: Add a visible container for the editor
-                Container(
-                  width: visibleRect.width,
-                  height: visibleRect.height,
+              ),
+            ),
+
+            // 2. The Quill Editor, positioned directly over the text object.
+            Positioned(
+              left: visibleRect.left,
+              top: visibleRect.top,
+              width: visibleRect.width,
+              height: visibleRect.height,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white, // Make the editor background white
+                    color: Colors.white,
                     border: Border.all(
-                      color: Colors.blue.shade300,
-                      width: 1.5,
-                    ), // Add a border
-                    borderRadius: BorderRadius.circular(4.r),
+                      color: Colors.blue.shade400, // Brighter border
+                      width: 2.0, // Thicker border to indicate editing
+                    ),
                   ),
                   child: QuillEditor.basic(
                     controller: quillController,
@@ -139,15 +142,15 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                           null,
                         ),
                       ),
-                      placeholder: 'Type here...',
+                      placeholder: 'Type something...',
                     ),
                     focusNode: _focusNode,
                     scrollController: ScrollController(),
                   ),
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
         );
       },
     );

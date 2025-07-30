@@ -491,16 +491,17 @@ class WorkspaceProvider extends StateHandler {
           defaultBottomRight,
         );
         break;
-      case DrawMode.textBox: // NEW: Handle TextBox creation
+      // CHANGE: Updated text box creation logic
+      case DrawMode.textBox:
         final textBoxTopLeft = details.globalPosition;
+        // Create a box with a default size instead of a single point
         final textBoxBottomRight = Offset(
           details.globalPosition.dx + _defaultTextBoxWidth,
           details.globalPosition.dy + _defaultTextBoxHeight,
         );
         newObject = TextBoxObject.createNew(textBoxTopLeft, textBoxBottomRight);
-        // NEW: Automatically set some default text for new text boxes
-        _tempQuillController.document =
-            Document()..insert(0, 'Double-click to edit text');
+        // Set initial dummy text
+        _tempQuillController.document = Document()..insert(0, 'Click to edit');
         newObject = (newObject as TextBoxObject).copyWith(
           textDelta: jsonEncode(
             _tempQuillController.document.toDelta().toJson(),

@@ -1,9 +1,7 @@
-// import 'dart:nativewrappers/_internal/vm/lib/math_patch.dart';
+// lib/features/models/canvas_models/objects/text_box_object.dart
 
 import 'dart:math';
-
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
@@ -21,22 +19,29 @@ class TextBoxObject extends CanvasObject {
     super.textDelta,
   });
 
-  TextBoxObject.fromJson(Map<String, dynamic> json)
-    : topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
-      bottomRight = Offset(
+  factory TextBoxObject.fromJson(Map<String, dynamic> json) {
+    return TextBoxObject(
+      id: json['id'],
+      color: Color(json['color']),
+      topLeft: Offset(json['top_left']['x'], json['top_left']['y']),
+      bottomRight: Offset(
         json['bottom_right']['x'],
         json['bottom_right']['y'],
       ),
-      super(
-        id: json['id'],
-        color: json['color'],
-        textDelta: json['text_delta'],
-      );
+      textDelta: json['text_delta'],
+    );
+  }
 
-  TextBoxObject.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
-    : topLeft = defaultTopLeft,
-      bottomRight = defaultBottomRight,
-      super(id: Uuid().v4(), color: Colors.transparent, textDelta: null);
+  factory TextBoxObject.createNew(
+      Offset defaultTopLeft, Offset defaultBottomRight) {
+    return TextBoxObject(
+      id: const Uuid().v4(),
+      color: Colors.transparent,
+      topLeft: defaultTopLeft,
+      bottomRight: defaultBottomRight,
+      textDelta: null,
+    );
+  }
 
   @override
   Map<String, dynamic> toJson() {
@@ -61,7 +66,8 @@ class TextBoxObject extends CanvasObject {
       id: id,
       color: color ?? this.color,
       topLeft: topLeft ?? this.topLeft,
-      bottomRight: bottomRight ?? this.topLeft,
+      // FIX: Corrected a bug where it referenced topLeft instead of bottomRight
+      bottomRight: bottomRight ?? this.bottomRight,
       textDelta: textDelta ?? this.textDelta,
     );
   }
@@ -88,10 +94,11 @@ class TextBoxObject extends CanvasObject {
       min(newTopLeft.dx, newBottomRight.dx),
       min(newTopLeft.dy, newBottomRight.dy),
     );
-    final corrextedBottomRight = Offset(
+    final correctedBottomRight = Offset(
       max(newTopLeft.dx, newBottomRight.dx),
       max(newTopLeft.dy, newBottomRight.dy),
     );
-    return copyWith(topLeft: correctedTopLeft, bottomRight: corrextedBottomRight);
+    return copyWith(
+        topLeft: correctedTopLeft, bottomRight: correctedBottomRight);
   }
 }

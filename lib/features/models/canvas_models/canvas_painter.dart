@@ -2,9 +2,7 @@
 
 import 'dart:convert';
 import 'dart:math';
-import 'dart:ui';
-
-import 'package:cookethflow/core/utils/enums.dart'; // Make sure this import is correct
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
@@ -18,26 +16,38 @@ import 'package:cookethflow/features/models/canvas_models/objects/text_box_objec
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_quill/flutter_quill.dart';
 
 class CanvasPainter extends CustomPainter {
   final Map<String, UserCursor> userCursors;
   final Map<String, CanvasObject> canvasObjects;
   final String? currentlySelectedObjectId;
   final double handleRadius;
-  final InteractionMode interactionMode; // UPDATED: Added interactionMode
+  final InteractionMode interactionMode;
 
   CanvasPainter({
     required this.userCursors,
     required this.canvasObjects,
     this.currentlySelectedObjectId,
     this.handleRadius = 8.0,
-    required this.interactionMode, // UPDATED: Added to constructor
+    required this.interactionMode,
   });
+
+  // Helper method to parse color from string
+  Color _parseColor(String? colorString) {
+    if (colorString == null) return Colors.black;
+    try {
+      final hex = colorString.replaceAll('#', '');
+      if (hex.length == 6) {
+        return Color(int.parse('FF$hex', radix: 16));
+      }
+      return Color(int.parse(hex, radix: 16));
+    } catch (e) {
+      return Colors.black;
+    }
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw each canvas object
     for (final canvasObject in canvasObjects.values) {
       final paint = Paint()..color = canvasObject.color;
       Rect rect;
@@ -48,12 +58,10 @@ class CanvasPainter extends CustomPainter {
             center: canvasObject.center, radius: canvasObject.radius);
       } else if (canvasObject is TextBoxObject) {
         rect = canvasObject.getBounds();
-        // FIX: Only draw the background if the color is NOT transparent.
         if (canvasObject.color != Colors.transparent) {
           canvas.drawRect(rect, paint);
         }
       } else {
-        // For other shapes, use their getBounds() method
         rect = canvasObject.getBounds();
         if (canvasObject is Rectangle) {
           canvas.drawRect(rect, paint);
@@ -115,49 +123,84 @@ class CanvasPainter extends CustomPainter {
         }
       }
 
-      // Check if this object is currently being edited
       final bool isEditingText = interactionMode == InteractionMode.editingText &&
                                   currentlySelectedObjectId == canvasObject.id;
 
-      // Draw text content for any object that has it, but NOT if it's being edited
+      // CHANGE: Rewrote text rendering logic for proper styling.
       if (canvasObject.textDelta != null &&
           canvasObject.textDelta!.isNotEmpty &&
           !isEditingText) {
         try {
-          final doc = Document.fromJson(jsonDecode(canvasObject.textDelta!));
-          final richText = TextSpan(
-            children: doc.toDelta().map((op) {
-              if (op.isInsert && op.data is String) {
-                return TextSpan(
-                  text: op.data as String,
-                  style: TextStyle(
-                    fontSize: (op.attributes?['size'] as double?) ?? 14.0,
-                    fontWeight: op.attributes?['bold'] == true
-                        ? FontWeight.bold
-                        : FontWeight.normal,
-                    fontStyle: op.attributes?['italic'] == true
-                        ? FontStyle.italic
-                        : FontStyle.normal,
-                    decoration: op.attributes?['underline'] == true
-                        ? TextDecoration.underline
-                        : TextDecoration.none,
-                    color: Color(int.tryParse(
-                            (op.attributes?['color'] as String?)
-                                    ?.replaceAll('#', '0xff') ??
-                                '',
-                            radix: 16) ??
-                        Colors.black.value),
-                  ),
-                );
-              }
-              return const TextSpan();
-            }).toList(),
-          );
+          final List<dynamic> deltaJson = jsonDecode(canvasObject.textDelta!);
+          final List<TextSpan> textSpans = [];
+          int listCounter = 1;
 
+          for (final op in deltaJson) {
+            if (op is Map && op.containsKey('insert')) {
+              String text = op['insert'];
+              final Map<String, dynamic>? attributes =
+                  op['attributes'] as Map<String, dynamic>?;
+
+              double fontSize = 14.0;
+              FontWeight fontWeight = FontWeight.normal;
+              FontStyle fontStyle = FontStyle.normal;
+              TextDecoration textDecoration = TextDecoration.none;
+              Color color = Colors.black;
+              Color? backgroundColor;
+              String? listType;
+
+              if (attributes != null) {
+                fontWeight = attributes['bold'] == true
+                    ? FontWeight.bold
+                    : FontWeight.normal;
+                fontStyle = attributes['italic'] == true
+                    ? FontStyle.italic
+                    : FontStyle.normal;
+                textDecoration = attributes['underline'] == true
+                    ? TextDecoration.underline
+                    : TextDecoration.none;
+                color = _parseColor(attributes['color'] as String?);
+                backgroundColor =
+                    _parseColor(attributes['background'] as String?);
+                if (attributes['header'] == 1) fontSize = 24.0;
+                if (attributes['header'] == 2) fontSize = 20.0;
+                if (attributes['list'] != null) {
+                  listType = attributes['list'];
+                }
+              }
+              
+              if (text.endsWith('\n') && listType != null) {
+                if (listType == 'bullet') {
+                  text = '• ${text.substring(0, text.length -1)}\n';
+                } else if (listType == 'ordered') {
+                  text = '$listCounter. ${text.substring(0, text.length -1)}\n';
+                  listCounter++;
+                }
+              } else if (listType == null) {
+                listCounter = 1; // Reset counter when not in a list
+              }
+
+              textSpans.add(
+                TextSpan(
+                  text: text,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: fontWeight,
+                    fontStyle: fontStyle,
+                    decoration: textDecoration,
+                    color: color,
+                    backgroundColor: backgroundColor,
+                  ),
+                ),
+              );
+            }
+          }
+
+          final richText = TextSpan(children: textSpans);
           final textPainter = TextPainter(
             text: richText,
             textDirection: TextDirection.ltr,
-            textAlign: TextAlign.center, // Center text
+            textAlign: TextAlign.start,
           );
 
           double textPadding = 5.0;
@@ -168,8 +211,8 @@ class CanvasPainter extends CustomPainter {
           textPainter.layout(maxWidth: availableWidth);
           
           final textOffset = Offset(
-            rect.left + textPadding + (availableWidth - textPainter.width) / 2,
-            rect.top + textPadding + (rect.height - 2 * textPadding - textPainter.height) / 2,
+            rect.left + textPadding,
+            rect.top + textPadding,
           );
 
           canvas.save();
@@ -178,6 +221,8 @@ class CanvasPainter extends CustomPainter {
           canvas.restore();
 
         } catch (e) {
+          print(
+              "Warning: Could not parse Quill Delta, rendering as plain text: $e");
           // Fallback for plain text
           final textPainter = TextPainter(
             text: TextSpan(
@@ -185,30 +230,13 @@ class CanvasPainter extends CustomPainter {
               style: const TextStyle(color: Colors.black, fontSize: 14.0),
             ),
             textDirection: TextDirection.ltr,
-            textAlign: TextAlign.center,
           );
-          double textPadding = 5.0;
-          double availableWidth = rect.width - 2 * textPadding;
-
-          if (availableWidth <= 0) continue;
-
-          textPainter.layout(maxWidth: availableWidth);
-
-          final textOffset = Offset(
-            rect.left + textPadding + (availableWidth - textPainter.width) / 2,
-            rect.top + textPadding + (rect.height - 2 * textPadding - textPainter.height) / 2,
-          );
-          canvas.save();
-          canvas.clipRect(rect);
-          textPainter.paint(canvas, textOffset);
-          canvas.restore();
-          print("Warning: Could not parse Quill Delta, rendering as plain text: $e");
+          textPainter.layout(maxWidth: rect.width);
+          textPainter.paint(canvas, rect.topLeft);
         }
       }
 
-
-      // Draw resize handles if this object is currently selected
-      if (canvasObject.id == currentlySelectedObjectId) {
+      if (canvasObject.id == currentlySelectedObjectId && !isEditingText) {
         final handlePaint = Paint()
           ..color = Colors.blue
           ..style = PaintingStyle.fill;
@@ -222,58 +250,22 @@ class CanvasPainter extends CustomPainter {
           ..color = Colors.blue
           ..style = PaintingStyle.stroke
           ..strokeWidth = 2.0;
-        
-        // Draw dashed border for transparent text box when selected
-        if (canvasObject is TextBoxObject && canvasObject.color == Colors.transparent) {
-          const double dashWidth = 5.0;
-          const double dashSpace = 3.0;
-          double currentX = rect.left;
-          // Top line
-          while (currentX < rect.right) {
-            canvas.drawLine(
-              Offset(currentX, rect.top),
-              Offset(min(currentX + dashWidth, rect.right), rect.top),
-              borderPaint,
-            );
-            currentX += dashWidth + dashSpace;
-          }
-          // Right line
-          double currentY = rect.top;
-          while (currentY < rect.bottom) {
-            canvas.drawLine(
-              Offset(rect.right, currentY),
-              Offset(rect.right, min(currentY + dashWidth, rect.bottom)),
-              borderPaint,
-            );
-            currentY += dashWidth + dashSpace;
-          }
-          // Bottom line
-          currentX = rect.left;
-          while (currentX < rect.right) {
-            canvas.drawLine(
-              Offset(rect.right - (currentX - rect.left), rect.bottom),
-              Offset(rect.right - min((currentX - rect.left) + dashWidth, rect.width), rect.bottom),
-              borderPaint,
-            );
-            currentX += dashWidth + dashSpace;
-          }
-          // Left line
-          currentY = rect.top;
-          while (currentY < rect.bottom) {
-            canvas.drawLine(
-              Offset(rect.left, rect.bottom - (currentY - rect.top)),
-              Offset(rect.left, rect.bottom - min((currentY - rect.top) + dashWidth, rect.height)),
-              borderPaint,
-            );
-            currentY += dashWidth + dashSpace;
-          }
+
+        if (canvasObject is TextBoxObject &&
+            canvasObject.color == Colors.transparent) {
+          // Draw dashed border for transparent text box
+          final path = Path()
+            ..addRect(rect);
+          canvas.drawPath(
+            dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])),
+            borderPaint,
+          );
         } else {
           canvas.drawRect(rect, borderPaint);
         }
       }
     }
 
-    // Draw the cursors
     for (final userCursor in userCursors.values) {
       final position = userCursor.position;
       final paint = Paint()..color = userCursor.color;
@@ -293,24 +285,53 @@ class CanvasPainter extends CustomPainter {
     return oldPainter.userCursors != userCursors ||
            oldPainter.canvasObjects.length != canvasObjects.length ||
            oldPainter.currentlySelectedObjectId != currentlySelectedObjectId ||
-           oldPainter.interactionMode != interactionMode || // UPDATED: Add interactionMode check
+           oldPainter.interactionMode != interactionMode ||
            _hasCanvasObjectsChanged(oldPainter.canvasObjects, canvasObjects);
   }
 
-  bool _hasCanvasObjectsChanged(Map<String, CanvasObject> oldObjects, Map<String, CanvasObject> newObjects) {
+  bool _hasCanvasObjectsChanged(
+      Map<String, CanvasObject> oldObjects, Map<String, CanvasObject> newObjects) {
     if (oldObjects.length != newObjects.length) return true;
     for (final id in newObjects.keys) {
       final newObj = newObjects[id];
       final oldObj = oldObjects[id];
       if (oldObj == null || newObj == null) return true;
-      if (newObj.id != oldObj.id) return true;
-      if (newObj.color != oldObj.color || newObj.getBounds() != oldObj.getBounds()) {
-        return true;
-      }
-      if (newObj.textDelta != oldObj.textDelta) {
-        return true;
-      }
+      if (newObj.getBounds() != oldObj.getBounds()) return true;
+      if (newObj.textDelta != oldObj.textDelta) return true;
     }
     return false;
+  }
+}
+
+// Copied from path_drawing package to avoid adding a dependency
+Path dashPath(
+  Path source, {
+  required CircularIntervalList<double> dashArray,
+}) {
+  final Path dest = Path();
+  for (final metric in source.computeMetrics()) {
+    double distance = 0.0;
+    bool draw = true;
+    while (distance < metric.length) {
+      final len = dashArray.next;
+      if (draw) {
+        dest.addPath(metric.extractPath(distance, distance + len), Offset.zero);
+      }
+      distance += len;
+      draw = !draw;
+    }
+  }
+  return dest;
+}
+
+class CircularIntervalList<T> {
+  CircularIntervalList(this._values);
+  final List<T> _values;
+  int _idx = 0;
+  T get next {
+    if (_idx >= _values.length) {
+      _idx = 0;
+    }
+    return _values[_idx++];
   }
 }

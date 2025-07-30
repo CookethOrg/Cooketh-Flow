@@ -41,6 +41,7 @@ class ToolBar extends StatelessWidget {
               _horizontalDivider(),
               _toolIcon(
                 PhosphorIconsRegular.circlesThreePlus,
+                iconColor: provider.currentMode != DrawMode.pointer && provider.currentMode != DrawMode.textBox ? Colors.blue : Colors.black,
                 'Add new node',
                 device,
                 onPressed: () {
@@ -62,6 +63,7 @@ class ToolBar extends StatelessWidget {
               ),
               _toolIcon(
                 PhosphorIconsRegular.textT,
+                iconColor: provider.currentMode == DrawMode.textBox ? Colors.blue : Colors.black,
                 'Text box',
                 device,
                 // MODIFIED: Changed onPressed to set DrawMode.textBox

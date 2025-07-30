@@ -24,7 +24,6 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
   @override
   void initState() {
     super.initState();
-    // Get the toolbar's height after it has been laid out
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final context = _toolbarKey.currentContext;
       if (context != null) {
@@ -85,17 +84,14 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
         final quillController =
             workspaceProvider.selectedObjectQuillController;
 
-        // CHANGE: Position the entire editor group (toolbar + text field)
         return Positioned(
-          // Position the editor group so the toolbar is just above the original object location.
           left: visibleRect.left,
-          top: visibleRect.top - _toolbarHeight - 4.h, // Position above object
+          top: visibleRect.top - _toolbarHeight - 4.h,
           child: Material(
             color: Colors.transparent,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // 1. The Quill Toolbar
                 Container(
                   key: _toolbarKey,
                   width: visibleRect.width < 350.w ? 350.w : visibleRect.width,
@@ -112,7 +108,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                   ),
                   child: QuillSimpleToolbar(
                     controller: quillController,
-                    config: QuillSimpleToolbarConfig(
+                    config: const QuillSimpleToolbarConfig(
                       showBackgroundColorButton: true,
                       showFontFamily: false,
                       showLink: false,
@@ -130,14 +126,13 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                     ),
                   ),
                 ),
-                SizedBox(height: 4.h), // Spacing between toolbar and editor
-
-                // 2. The Quill Editor
+                SizedBox(height: 4.h),
                 Container(
                   width: visibleRect.width,
                   height: visibleRect.height,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    // CHANGE: Made the editor background transparent.
+                    color: Colors.transparent,
                     border: Border.all(
                       color: Colors.blue.shade400,
                       width: 2.0,
@@ -150,9 +145,17 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                       padding: const EdgeInsets.all(8.0),
                       scrollable: true,
                       expands: true,
+                      // CHANGE: Added a default text style for readability.
                       customStyles: DefaultStyles(
                         placeHolder: DefaultTextBlockStyle(
                           const TextStyle(color: Colors.grey),
+                          const HorizontalSpacing(0, 0),
+                          const VerticalSpacing(0, 0),
+                          const VerticalSpacing(0, 0),
+                          null,
+                        ),
+                        paragraph: DefaultTextBlockStyle(
+                          const TextStyle(color: Colors.black), // Default text color
                           const HorizontalSpacing(0, 0),
                           const VerticalSpacing(0, 0),
                           const VerticalSpacing(0, 0),

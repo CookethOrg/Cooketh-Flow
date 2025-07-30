@@ -18,7 +18,7 @@ import 'package:cookethflow/features/models/canvas_models/objects/parallelogram_
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rounded_square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
-import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart'; // NEW: Import TextBoxObject
+import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:cookethflow/features/models/workspace_model.dart';
@@ -31,7 +31,6 @@ class WorkspaceProvider extends StateHandler {
   late SupabaseService _supabaseService;
   late DashboardProvider _dashboardProvider;
 
-  // Initialize _currentWorkspace as null, it will be set by setWorkspace
   WorkspaceModel? _currentWorkspace;
 
   late QuillController _tempQuillController;
@@ -68,7 +67,6 @@ class WorkspaceProvider extends StateHandler {
     text: 'Workspace Name',
   );
 
-  // CHANGE: Added fields for double-click detection
   DateTime? _lastTapTime;
   String? _lastTappedObjectId;
 
@@ -167,10 +165,10 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void _setupRealtimeChannel(String workspaceId) {
-    if (_canvasChannel?.topic != Constants.channelName + ':$workspaceId') {
+    if (_canvasChannel?.topic != '${Constants.channelName}:$workspaceId') {
       _canvasChannel = _supabaseService.supabase
           .channel(
-            Constants.channelName + ':$workspaceId',
+            '${Constants.channelName}:$workspaceId',
           )
           .onBroadcast(
             event: Constants.broadcastEventName,
@@ -302,40 +300,36 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // CHANGE: Removed automatic switching to editingText mode.
+  // CHANGE: Simplified and corrected state management.
   void changeCurrentlySelectedObj(String? id) {
-    if (_currentlySelectedObjectId == id &&
-        _interactionMode == InteractionMode.editingText) {
-      return;
-    }
-
+    // If we are switching from editing one object to another, or to nothing.
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
       _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
 
     _currentlySelectedObjectId = id;
-    _tempQuillController.clear();
 
-    if (id != null) {
-      final selectedObject = _canvasObjects[id];
-      if (selectedObject != null && selectedObject.textDelta != null) {
-        try {
-          _tempQuillController.document = Document.fromJson(
-            jsonDecode(selectedObject.textDelta!),
-          );
-        } catch (e) {
-          print("Error setting QuillController document from textDelta: $e");
-          _tempQuillController.document =
-              Document()..insert(
-                0,
-                selectedObject.textDelta!,
-              );
-        }
-      }
-      // Mode is now set in onPanDown, not here.
-    } else {
+    if (id == null) {
+      // If we are deselecting, clear the controller and reset the mode.
+      _tempQuillController.clear();
       _interactionMode = InteractionMode.none;
+    } else {
+      // If we are selecting a new object, load its content.
+      final selectedObject = _canvasObjects[id];
+      if (selectedObject?.textDelta != null) {
+        try {
+          final doc = Document.fromJson(jsonDecode(selectedObject!.textDelta!));
+          _tempQuillController.document = doc;
+        } catch (e) {
+          _tempQuillController.document = Document()
+            ..insert(0, selectedObject!.textDelta!);
+          print("Error parsing Delta, loaded as plain text: $e");
+        }
+      } else {
+        // If the object has no text, clear the controller.
+        _tempQuillController.clear();
+      }
     }
 
     notifyListeners();
@@ -448,11 +442,10 @@ class WorkspaceProvider extends StateHandler {
           details.globalPosition.dy + _defaultTextBoxHeight,
         );
         newObject = TextBoxObject.createNew(textBoxTopLeft, textBoxBottomRight);
-        _tempQuillController.document =
-            Document()..insert(0, 'Double-click to edit');
+        final initialDoc = Document()..insert(0, 'Double-click to edit');
         newObject = (newObject as TextBoxObject).copyWith(
           textDelta: jsonEncode(
-            _tempQuillController.document.toDelta().toJson(),
+            initialDoc.toDelta().toJson(),
           ),
         );
         break;
@@ -465,7 +458,6 @@ class WorkspaceProvider extends StateHandler {
       changeCurrentlySelectedObj(newObject.id);
 
       if (newObject is TextBoxObject) {
-        // CHANGE: Enter editing mode immediately upon creation
         _interactionMode = InteractionMode.editingText;
       } else {
         _interactionMode = InteractionMode.moving;
@@ -476,7 +468,6 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-  // CHANGE: Updated with double-click logic.
   void onPanDown(DragDownDetails details) {
     _cursorPosition = details.globalPosition;
     _panStartPoint = details.globalPosition;
@@ -485,86 +476,51 @@ class WorkspaceProvider extends StateHandler {
       final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
       if (selectedObject != null &&
           !selectedObject.getBounds().contains(details.globalPosition)) {
-        _saveCanvasObjectToDb(_currentlySelectedObjectId!);
-        changeCurrentlySelectedObj(null); // This resets selection and mode
+        changeCurrentlySelectedObj(null); // Save, clear, and reset mode
         notifyListeners();
-        return;
-      } else if (selectedObject != null &&
-          selectedObject.getBounds().contains(details.globalPosition)) {
-        return;
       }
+      return;
     }
-
-    // Temporarily set to none before checking for intersections.
-    _interactionMode = InteractionMode.none;
-    changeCurrentlySelectedObj(null);
-    notifyListeners();
 
     if (_currentMode == DrawMode.pointer) {
-      // Check for handle interaction first.
-      for (final canvasObject in _canvasObjects.values.toList().reversed) {
-        final rect = canvasObject.getBounds();
-        if ((details.globalPosition - rect.topLeft).distance < _handleRadius) {
-          changeCurrentlySelectedObj(canvasObject.id);
-          _interactionMode = InteractionMode.resizingTopLeft;
-          notifyListeners();
-          return;
-        } else if ((details.globalPosition - rect.topRight).distance <
-            _handleRadius) {
-          changeCurrentlySelectedObj(canvasObject.id);
-          _interactionMode = InteractionMode.resizingTopRight;
-          notifyListeners();
-          return;
-        } else if ((details.globalPosition - rect.bottomLeft).distance <
-            _handleRadius) {
-          changeCurrentlySelectedObj(canvasObject.id);
-          _interactionMode = InteractionMode.resizingBottomLeft;
-          notifyListeners();
-          return;
-        } else if ((details.globalPosition - rect.bottomRight).distance <
-            _handleRadius) {
-          changeCurrentlySelectedObj(canvasObject.id);
-          _interactionMode = InteractionMode.resizingBottomRight;
-          notifyListeners();
-          return;
-        }
-      }
-
-      // Check for object intersection (double-click vs single-click).
+      CanvasObject? tappedObject;
       for (final canvasObject in _canvasObjects.values.toList().reversed) {
         if (canvasObject.intersectsWith(details.globalPosition)) {
-          if (canvasObject is TextBoxObject) {
-            final now = DateTime.now();
-            final isDoubleTap = _lastTappedObjectId == canvasObject.id &&
-                _lastTapTime != null &&
-                now.difference(_lastTapTime!) <
-                    const Duration(milliseconds: 300);
-
-            _lastTapTime = now;
-            _lastTappedObjectId = canvasObject.id;
-
-            if (isDoubleTap) {
-              // On double-tap, enter editing mode.
-              _interactionMode = InteractionMode.editingText;
-              _lastTappedObjectId = null; // Reset for next interaction.
-            } else {
-              // On single-tap, enter moving mode.
-              _interactionMode = InteractionMode.moving;
-            }
-          } else {
-            // For other objects, always enter moving mode on click.
-            _interactionMode = InteractionMode.moving;
-          }
-
-          changeCurrentlySelectedObj(canvasObject.id);
-          notifyListeners();
-          return; // Exit after finding an object
+          tappedObject = canvasObject;
+          break;
         }
       }
+
+      if (tappedObject != null) {
+        if (tappedObject.id != _currentlySelectedObjectId) {
+          changeCurrentlySelectedObj(tappedObject.id);
+        }
+
+        if (tappedObject is TextBoxObject) {
+          final now = DateTime.now();
+          final isDoubleTap = _lastTappedObjectId == tappedObject.id &&
+              _lastTapTime != null &&
+              now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
+
+          _lastTapTime = now;
+          _lastTappedObjectId = tappedObject.id;
+
+          if (isDoubleTap) {
+            _interactionMode = InteractionMode.editingText;
+            _lastTappedObjectId = null;
+          } else {
+            _interactionMode = InteractionMode.moving;
+          }
+        } else {
+          _interactionMode = InteractionMode.moving;
+        }
+      } else {
+        changeCurrentlySelectedObj(null);
+      }
     } else {
-      // If in a drawing mode, create a new node.
       addNewNode(details);
     }
+    notifyListeners();
   }
 
   void onPanUpdate(DragUpdateDetails details) {

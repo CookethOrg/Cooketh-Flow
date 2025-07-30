@@ -42,32 +42,44 @@ class CanvasPainter extends CustomPainter {
     }
   }
 
-  // CHANGE: More robust style parsing
+  // FIX: Added robust font size parsing
+  double _getFontSize(dynamic size) {
+    if (size == null) return 14.0;
+    if (size is double) return size;
+    if (size is int) return size.toDouble();
+    if (size is String) {
+      switch (size) {
+        case 'small':
+          return 10.0;
+        case 'large':
+          return 18.0;
+        case 'huge':
+          return 22.0;
+        default:
+          return double.tryParse(size) ?? 14.0;
+      }
+    }
+    return 14.0;
+  }
+
   TextStyle _getTextStyle(Map<String, dynamic>? attributes) {
     if (attributes == null) return const TextStyle(fontSize: 14.0, color: Colors.black);
 
-    double fontSize = 14.0;
-    if (attributes['header'] == 1) {
-      fontSize = 28.0;
-    } else if (attributes['header'] == 2) {
-      fontSize = 22.0;
-    } else if (attributes.containsKey('size')) {
-        // You can add more specific size handling if needed
-        fontSize = 14.0; 
-    }
-    
-    final isCode = attributes['code-block'] == true;
+    final isLink = attributes['link'] != null;
+    final isCode = attributes['code'] == true || attributes['code-block'] == true;
 
     return TextStyle(
       fontWeight: attributes['bold'] == true ? FontWeight.bold : FontWeight.normal,
       fontStyle: attributes['italic'] == true ? FontStyle.italic : FontStyle.normal,
-      color: _parseColor(attributes['color'] as String?),
-      fontSize: fontSize,
+      // FIX: Handle links correctly
+      color: isLink ? Colors.blue : _parseColor(attributes['color'] as String?),
+      fontSize: _getFontSize(attributes['size'] ?? (attributes['header'] == 1 ? 'huge' : (attributes['header'] == 2 ? 'large' : null))),
       fontFamily: isCode ? 'monospace' : (attributes['font'] as String?),
-      decoration: attributes['underline'] == true ? TextDecoration.underline : TextDecoration.none,
+      // FIX: Handle links and inline code underline
+      decoration: attributes['underline'] == true || isLink ? TextDecoration.underline : TextDecoration.none,
       backgroundColor: attributes['background'] != null
           ? _parseColor(attributes['background'] as String?)
-          : null,
+          : (isCode && attributes['code-block'] != true ? Colors.grey.shade300 : null),
     );
   }
 
@@ -95,34 +107,17 @@ class CanvasPainter extends CustomPainter {
           canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(canvasObject.cornerRadius)), paint);
         } else if (canvasObject is Diamond) {
           final path = Path()
-            ..moveTo(rect.center.dx, rect.top)
-            ..lineTo(rect.right, rect.center.dy)
-            ..lineTo(rect.center.dx, rect.bottom)
-            ..lineTo(rect.left, rect.center.dy)
-            ..close();
+            ..moveTo(rect.center.dx, rect.top)..lineTo(rect.right, rect.center.dy)..lineTo(rect.center.dx, rect.bottom)..lineTo(rect.left, rect.center.dy)..close();
           canvas.drawPath(path, paint);
         } else if (canvasObject is Triangle) {
-          final path = Path()
-            ..moveTo(rect.center.dx, rect.top)
-            ..lineTo(rect.right, rect.bottom)
-            ..lineTo(rect.left, rect.bottom)
-            ..close();
+          final path = Path()..moveTo(rect.center.dx, rect.top)..lineTo(rect.right, rect.bottom)..lineTo(rect.left, rect.bottom)..close();
           canvas.drawPath(path, paint);
         } else if (canvasObject is InvertedTriangle) {
-          final path = Path()
-            ..moveTo(rect.left, rect.top)
-            ..lineTo(rect.right, rect.top)
-            ..lineTo(rect.center.dx, rect.bottom)
-            ..close();
+          final path = Path()..moveTo(rect.left, rect.top)..lineTo(rect.right, rect.top)..lineTo(rect.center.dx, rect.bottom)..close();
           canvas.drawPath(path, paint);
         } else if (canvasObject is Parallelogram) {
           final skew = rect.width * 0.25;
-          final path = Path()
-            ..moveTo(rect.left + skew, rect.top)
-            ..lineTo(rect.right, rect.top)
-            ..lineTo(rect.right - skew, rect.bottom)
-            ..lineTo(rect.left, rect.bottom)
-            ..close();
+          final path = Path()..moveTo(rect.left + skew, rect.top)..lineTo(rect.right, rect.top)..lineTo(rect.right - skew, rect.bottom)..lineTo(rect.left, rect.bottom)..close();
           canvas.drawPath(path, paint);
         } else if (canvasObject is Cylinder) {
           final ellipseHeight = min(rect.height * 0.3, 40.0);
@@ -135,33 +130,80 @@ class CanvasPainter extends CustomPainter {
 
       final bool isEditingText = interactionMode == InteractionMode.editingText && currentlySelectedObjectId == canvasObject.id;
 
-      // CHANGE: Rewrote text rendering logic to be more robust.
+      // FIX: Complete rewrite of the text rendering logic.
       if (canvasObject.textDelta != null && canvasObject.textDelta!.isNotEmpty && !isEditingText) {
         try {
           final List<dynamic> delta = jsonDecode(canvasObject.textDelta!);
-          
-          final List<InlineSpan> textSpans = [];
-          for (final op in delta) {
-            textSpans.add(TextSpan(
-              text: op['insert'],
-              style: _getTextStyle(op['attributes'] as Map<String, dynamic>?),
-            ));
-          }
-          final richText = TextSpan(children: textSpans);
-          
-          final textPainter = TextPainter(
-            text: richText,
-            textDirection: TextDirection.ltr,
-          );
-          
           final double textPadding = 8.0;
-          final double availableWidth = rect.width - (2 * textPadding);
-          if (availableWidth > 0) {
-              textPainter.layout(maxWidth: availableWidth);
-              canvas.save();
-              canvas.clipRect(rect);
-              textPainter.paint(canvas, rect.topLeft.translate(textPadding, textPadding));
-              canvas.restore();
+          double yOffset = rect.top + textPadding;
+          
+          List<Map<String, dynamic>> currentLineOps = [];
+          for (final op in delta) {
+            final String text = op['insert'];
+            final Map<String, dynamic>? attributes = op['attributes'] as Map<String, dynamic>?;
+
+            if (text.contains('\n')) {
+              final lines = text.split('\n');
+              for (int i = 0; i < lines.length; i++) {
+                if (lines[i].isNotEmpty) {
+                  currentLineOps.add({'insert': lines[i], 'attributes': attributes});
+                }
+                
+                if (i < lines.length - 1) { // This is a line break
+                  final lineSpans = currentLineOps.map((o) => TextSpan(text: o['insert'], style: _getTextStyle(o['attributes']))).toList();
+                  
+                  // Check for block attributes on the line break
+                  final blockAttributes = attributes ?? {};
+                  String prefix = '';
+                  double indent = 0;
+                  if(blockAttributes['list'] == 'bullet') {
+                    prefix = '• ';
+                    indent = 10.0;
+                  } else if(blockAttributes['list'] == 'ordered') {
+                    prefix = '1. '; // This is simplified, a proper implementation needs a counter
+                    indent = 10.0;
+                  } else if (blockAttributes['blockquote'] == true) {
+                    indent = 20.0;
+                  }
+
+                  if(blockAttributes['code-block'] == true) {
+                      final blockPaint = Paint()..color = Colors.grey.shade200;
+                      // This is a simplified block drawing, would need to calculate total block height for a perfect rect
+                      // For now, it draws a rect behind each line of the code block.
+                      canvas.drawRect(Rect.fromLTWH(rect.left, yOffset, rect.width, 20), blockPaint); // Approximate height
+                  }
+
+                  final textPainter = TextPainter(
+                    text: TextSpan(children: [TextSpan(text: prefix), ...lineSpans]),
+                    textDirection: TextDirection.ltr,
+                  );
+                  
+                  final availableWidth = rect.width - (2 * textPadding) - indent;
+                  if (availableWidth > 0) {
+                    textPainter.layout(maxWidth: availableWidth);
+                    textPainter.paint(canvas, Offset(rect.left + textPadding + indent, yOffset));
+                    yOffset += textPainter.height;
+                  }
+                  currentLineOps = [];
+                }
+              }
+            } else {
+              currentLineOps.add(op);
+            }
+          }
+
+          // Paint any remaining text that didn't end with a newline
+          if (currentLineOps.isNotEmpty) {
+             final lineSpans = currentLineOps.map((o) => TextSpan(text: o['insert'], style: _getTextStyle(o['attributes']))).toList();
+             final textPainter = TextPainter(
+                  text: TextSpan(children: lineSpans),
+                  textDirection: TextDirection.ltr,
+                );
+             final availableWidth = rect.width - (2 * textPadding);
+             if (availableWidth > 0) {
+                textPainter.layout(maxWidth: availableWidth);
+                textPainter.paint(canvas, Offset(rect.left + textPadding, yOffset));
+             }
           }
 
         } catch (e) {
@@ -169,27 +211,18 @@ class CanvasPainter extends CustomPainter {
         }
       }
 
-      if (canvasObject.id == currentlySelectedObjectId && !isEditingText) {
-        final handlePaint = Paint()
-          ..color = Colors.blue
-          ..style = PaintingStyle.fill;
 
+      if (canvasObject.id == currentlySelectedObjectId && !isEditingText) {
+        final handlePaint = Paint()..color = Colors.blue..style = PaintingStyle.fill;
         canvas.drawCircle(rect.topLeft, handleRadius, handlePaint);
         canvas.drawCircle(rect.topRight, handleRadius, handlePaint);
         canvas.drawCircle(rect.bottomLeft, handleRadius, handlePaint);
         canvas.drawCircle(rect.bottomRight, handleRadius, handlePaint);
 
-        final borderPaint = Paint()
-          ..color = Colors.blue
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0;
-
+        final borderPaint = Paint()..color = Colors.blue..style = PaintingStyle.stroke..strokeWidth = 2.0;
         if (canvasObject is TextBoxObject && canvasObject.color == Colors.transparent) {
           final path = Path()..addRect(rect);
-          canvas.drawPath(
-            dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])),
-            borderPaint,
-          );
+          canvas.drawPath(dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])), borderPaint);
         } else {
           canvas.drawRect(rect, borderPaint);
         }
@@ -198,15 +231,10 @@ class CanvasPainter extends CustomPainter {
 
     for (final userCursor in userCursors.values) {
       final position = userCursor.position;
-      final paint = Paint()..color = userCursor.color;
+      final paint = Paint()..color = userCursor.color..strokeWidth = 2;
       final path = Path()
-        ..moveTo(position.dx, position.dy)
-        ..lineTo(position.dx, position.dy + 20)
-        ..lineTo(position.dx + 5, position.dy + 15)
-        ..moveTo(position.dx, position.dy + 20)
-        ..lineTo(position.dx + 10, position.dy + 20)
-        ..close();
-      canvas.drawPath(path, paint..strokeWidth = 2);
+        ..moveTo(position.dx, position.dy)..lineTo(position.dx, position.dy + 20)..lineTo(position.dx + 5, position.dy + 15)..moveTo(position.dx, position.dy + 20)..lineTo(position.dx + 10, position.dy + 20)..close();
+      canvas.drawPath(path, paint);
     }
   }
 

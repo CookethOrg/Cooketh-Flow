@@ -34,21 +34,17 @@ class WorkspaceProvider extends StateHandler {
   // Initialize _currentWorkspace as null, it will be set by setWorkspace
   WorkspaceModel? _currentWorkspace;
 
-  // NEW: Temporary QuillController for editing selected object's text
   late QuillController _tempQuillController;
 
   WorkspaceProvider(this._supabaseService, this._dashboardProvider) : super() {
     _myId = _supabaseService.supabase.auth.currentUser?.id ?? const Uuid().v4();
-    // No initial fetch here, it will be triggered when a workspace is set.
 
-    // Listen for workspace name changes to sync with DB
     _workspaceNameController.addListener(_onWorkspaceNameChanged);
 
-    // Initialize the temporary QuillController
     _tempQuillController = QuillController.basic();
     _tempQuillController.addListener(
       _onQuillContentChanged,
-    ); // NEW: Listen for changes
+    );
   }
 
   bool _isLoading = false;
@@ -56,24 +52,25 @@ class WorkspaceProvider extends StateHandler {
   int? _selectedTileIndex;
   final Map<String, UserCursor> _userCursors = {};
   final Map<String, CanvasObject> _canvasObjects = {};
-  RealtimeChannel? _canvasChannel; // Make it nullable as it's initialized later
+  RealtimeChannel? _canvasChannel;
   late String _myId;
   DrawMode _currentMode = DrawMode.pointer;
   String? _currentlySelectedObjectId;
   InteractionMode _interactionMode = InteractionMode.none;
   Offset? _panStartPoint;
-  Offset _cursorPosition = const Offset(0, 0); // Now stores canvas coordinates
-  static const double _defaultShapeSize = 100.0; // In canvas units
-  static const double _defaultTextBoxWidth =
-      200.0; // Default width for a new text box
-  static const double _defaultTextBoxHeight =
-      50.0; // Default height for a new text box
-  static const double _handleRadius = 8.0; // In canvas units
+  Offset _cursorPosition = const Offset(0, 0);
+  static const double _defaultShapeSize = 100.0;
+  static const double _defaultTextBoxWidth = 200.0;
+  static const double _defaultTextBoxHeight = 50.0;
+  static const double _handleRadius = 8.0;
   Color _currentWorkspaceColor = scaffoldColor;
-  TextEditingController _workspaceNameController = TextEditingController(
+  final TextEditingController _workspaceNameController = TextEditingController(
     text: 'Workspace Name',
   );
-  // QuillController _quillController = QuillController.basic(); // REMOVED: No longer a direct field
+
+  // CHANGE: Added fields for double-click detection
+  DateTime? _lastTapTime;
+  String? _lastTappedObjectId;
 
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
@@ -95,16 +92,11 @@ class WorkspaceProvider extends StateHandler {
   SupabaseService get supabaseService => _supabaseService;
 
   bool get hasSelectedTile => _selectedTileIndex != null;
-  // QuillController get quillController => _quillController; // REMOVED: Replaced by selectedObjectQuillController
 
-  // NEW: Getter for the QuillController related to the currently selected object
   QuillController get selectedObjectQuillController {
-    // If no object is selected or it's a new object being created,
-    // the _tempQuillController will reflect that.
     return _tempQuillController;
   }
 
-  // NEW: Listener for changes in the temporary QuillController
   void _onQuillContentChanged() {
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
@@ -113,46 +105,38 @@ class WorkspaceProvider extends StateHandler {
         final newTextDelta = jsonEncode(
           _tempQuillController.document.toDelta().toJson(),
         );
-        // Only update if the text content has actually changed to avoid unnecessary re-renders/saves
         if (currentObject.textDelta != newTextDelta) {
           _canvasObjects[_currentlySelectedObjectId!] = currentObject.copyWith(
             textDelta: newTextDelta,
           );
           notifyListeners();
-          // Debounce this save if performance becomes an issue
-          // For now, let's directly sync the object with the new text.
-          syncCanvasObject(_cursorPosition); // Sync to other users
-          _saveCanvasObjectToDb(_currentlySelectedObjectId!); // Persist to DB
+          syncCanvasObject(_cursorPosition);
+          _saveCanvasObjectToDb(_currentlySelectedObjectId!);
         }
       }
     }
   }
 
-  // --- Core Methods ---
-
-  // Sets the current workspace and loads its data
   void setWorkspace(String id) async {
-    // Unsubscribe from previous channel if exists
     await _canvasChannel?.unsubscribe();
     _canvasChannel = null;
 
     _currentWorkspace = _dashboardProvider.workspaceList[id];
     if (_currentWorkspace == null) {
       print("Error: Workspace with ID $id not found in DashboardProvider.");
-      // Handle case where workspace isn't found (e.g., navigate back, show error)
       return;
     }
 
     _workspaceNameController.text = _currentWorkspace!.name;
-    _canvasObjects.clear(); // Clear existing objects when changing workspace
-    _userCursors.clear(); // Clear cursors too
-    _currentlySelectedObjectId = null; // Clear selected object
-    _tempQuillController.clear(); // NEW: Clear quill controller content
+    _canvasObjects.clear();
+    _userCursors.clear();
+    _currentlySelectedObjectId = null;
+    _tempQuillController.clear();
 
-    await _fetchCanvasObjects(); // Fetch objects for the new workspace
+    await _fetchCanvasObjects();
     _setupRealtimeChannel(
       _currentWorkspace!.id,
-    ); // Set up realtime for new workspace
+    );
 
     notifyListeners();
   }
@@ -171,8 +155,6 @@ class WorkspaceProvider extends StateHandler {
           .order('created_at', ascending: true);
 
       for (final canvasObjectData in initialData) {
-        // Ensure that `canvasObjectData['object']` is directly the JSONB content
-        // and not wrapped in another object if not intended.
         final canvasObject = CanvasObject.fromJson(canvasObjectData['object']);
         _canvasObjects[canvasObject.id] = canvasObject;
       }
@@ -185,61 +167,54 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void _setupRealtimeChannel(String workspaceId) {
-    // Only subscribe if not already subscribed to this workspace
     if (_canvasChannel?.topic != Constants.channelName + ':$workspaceId') {
-      _canvasChannel =
-          _supabaseService.supabase
-              .channel(
-                Constants.channelName + ':$workspaceId',
-              ) // Unique channel per workspace
-              .onBroadcast(
-                event: Constants.broadcastEventName,
-                callback: (payload) {
-                  // Only process broadcasts if they belong to the current workspace
-                  if (payload['workspace_id'] == _currentWorkspace?.id) {
-                    final cursor = UserCursor.fromJson(payload['cursor']);
-                    _userCursors[cursor.id] = cursor;
+      _canvasChannel = _supabaseService.supabase
+          .channel(
+            Constants.channelName + ':$workspaceId',
+          )
+          .onBroadcast(
+            event: Constants.broadcastEventName,
+            callback: (payload) {
+              if (payload['workspace_id'] == _currentWorkspace?.id) {
+                final cursor = UserCursor.fromJson(payload['cursor']);
+                _userCursors[cursor.id] = cursor;
 
-                    if (payload['object'] != null) {
-                      final object = CanvasObject.fromJson(payload['object']);
-                      _canvasObjects[object.id] = object;
-                      // NEW: If the object being updated is the currently selected one,
-                      // update the QuillController content.
-                      if (object.id == _currentlySelectedObjectId &&
-                          object.textDelta != null) {
-                        try {
-                          final doc = Document.fromJson(
-                            jsonDecode(object.textDelta!),
-                          );
-                          if (!isEqual(
-                            _tempQuillController.document.toDelta().toJson(),
-                            doc.toDelta().toJson(),
-                          )) {
-                            _tempQuillController.document = doc;
-                          }
-                        } catch (e) {
-                          print(
-                            "Error loading textDelta into QuillController: $e",
-                          );
-                        }
+                if (payload['object'] != null) {
+                  final object = CanvasObject.fromJson(payload['object']);
+                  _canvasObjects[object.id] = object;
+                  if (object.id == _currentlySelectedObjectId &&
+                      object.textDelta != null) {
+                    try {
+                      final doc = Document.fromJson(
+                        jsonDecode(object.textDelta!),
+                      );
+                      if (!isEqual(
+                        _tempQuillController.document.toDelta().toJson(),
+                        doc.toDelta().toJson(),
+                      )) {
+                        _tempQuillController.document = doc;
                       }
+                    } catch (e) {
+                      print(
+                        "Error loading textDelta into QuillController: $e",
+                      );
                     }
-                    notifyListeners();
                   }
-                },
-              )
-              .subscribe();
+                }
+                notifyListeners();
+              }
+            },
+          )
+          .subscribe();
     }
   }
 
-  // --- Realtime Sync ---
-  // Now expects canvas coordinates for cursorPosition
   Future<void> syncCanvasObject(Offset cursorPosition) {
     final myCursor = UserCursor(position: cursorPosition, id: _myId);
-    if (_currentWorkspace == null || _canvasChannel == null)
+    if (_currentWorkspace == null || _canvasChannel == null) {
       return Future.value();
+    }
 
-    // NEW: Always include the currently selected object's full state if available
     final Map<String, dynamic> payload = {
       'cursor': myCursor.toJson(),
       'workspace_id': _currentWorkspace!.id,
@@ -256,11 +231,7 @@ class WorkspaceProvider extends StateHandler {
     );
   }
 
-  // --- Database Persistence ---
   void _onWorkspaceNameChanged() {
-    // Debounce this if it causes too many updates on every key stroke
-    // For simplicity, we'll directly update on change for now.
-    // A better approach for frequent changes is to use a debounce timer.
     if (_currentWorkspace != null &&
         _currentWorkspace!.name != _workspaceNameController.text) {
       _currentWorkspace = _currentWorkspace!.copyWith(
@@ -277,7 +248,6 @@ class WorkspaceProvider extends StateHandler {
           .from('workspace')
           .update({'name': newName})
           .eq('id', _currentWorkspace!.id);
-      // Also update in DashboardProvider's list
       _dashboardProvider.updateWorkspaceName(_currentWorkspace!.id, newName);
       print("Workspace name updated in DB: $newName");
     } catch (e) {
@@ -285,7 +255,6 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-  // NEW: Helper method to upsert a canvas object to the database
   Future<void> _saveCanvasObjectToDb(String objectId) async {
     if (_currentWorkspace == null) return;
     final objectToSave = _canvasObjects[objectId];
@@ -305,24 +274,20 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-  // Modified onPanEnd to ensure object is saved when interaction stops
   void onPanEnd(DragEndDetails details) async {
     if (_currentlySelectedObjectId != null &&
         _interactionMode != InteractionMode.editingText) {
-      // NEW: Don't save on pan end if in text editing mode
-      syncCanvasObject(_cursorPosition); // Sync final position
-      _saveCanvasObjectToDb(_currentlySelectedObjectId!); // Persist to DB
+      syncCanvasObject(_cursorPosition);
+      _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
 
     _panStartPoint = null;
     if (_interactionMode != InteractionMode.editingText) {
-      // NEW: Only reset mode if not editing text
       _interactionMode = InteractionMode.none;
     }
     notifyListeners();
   }
 
-  // --- UI/Interaction Logic ---
   void selectTile(int index) {
     if (_selectedTileIndex == index) {
       _selectedTileIndex = null;
@@ -337,23 +302,20 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // NEW: Sets the currently selected object and loads its text into the Quill controller
+  // CHANGE: Removed automatic switching to editingText mode.
   void changeCurrentlySelectedObj(String? id) {
     if (_currentlySelectedObjectId == id &&
         _interactionMode == InteractionMode.editingText) {
-      // If the same text object is clicked again while editing, allow continued editing.
       return;
     }
 
-    // If a different object is selected, or we're exiting text editing of the current one
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
-      // If we were editing text, save the changes before switching.
       _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
 
     _currentlySelectedObjectId = id;
-    _tempQuillController.clear(); // Clear previous content
+    _tempQuillController.clear();
 
     if (id != null) {
       final selectedObject = _canvasObjects[id];
@@ -368,18 +330,12 @@ class WorkspaceProvider extends StateHandler {
               Document()..insert(
                 0,
                 selectedObject.textDelta!,
-              ); // Fallback to plain text
+              );
         }
       }
-      // NEW: Automatically switch to editingText mode if a TextBoxObject is selected
-      if (selectedObject is TextBoxObject) {
-        _interactionMode = InteractionMode.editingText;
-      } else {
-        _interactionMode = InteractionMode.none; // Reset mode for other objects
-      }
+      // Mode is now set in onPanDown, not here.
     } else {
-      _interactionMode =
-          InteractionMode.none; // No object selected, no interaction mode
+      _interactionMode = InteractionMode.none;
     }
 
     notifyListeners();
@@ -396,8 +352,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void changeWorkspaceName(String newName) {
-    // This method is now primarily handled by the TextField listener,
-    // but can be kept for direct programmatic changes if needed.
     _workspaceNameController.text = newName;
     notifyListeners();
   }
@@ -422,7 +376,7 @@ class WorkspaceProvider extends StateHandler {
         return Icons.change_history;
       case InvertedTriangle.type:
         return Icons.warning_amber_rounded;
-      case TextBoxObject.type: // NEW: Icon for TextBoxObject
+      case TextBoxObject.type:
         return Icons.text_fields;
       default:
         return Icons.insert_drive_file_outlined;
@@ -430,21 +384,17 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void changeDrawMode(DrawMode mode) {
-    // NEW: If changing mode from text editing, save text first
     if (_interactionMode == InteractionMode.editingText &&
         _currentlySelectedObjectId != null) {
       _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
     _currentMode = mode;
-    _currentlySelectedObjectId =
-        null; // Unselect object when changing draw mode
-    _interactionMode = InteractionMode.none; // Reset interaction mode
+    _currentlySelectedObjectId = null;
+    _interactionMode = InteractionMode.none;
     notifyListeners();
   }
 
-  // Expects details.globalPosition to be in canvas coordinates
   void addNewNode(DragDownDetails details) async {
-    // Make async to save immediately
     if (_currentWorkspace == null) {
       print("Cannot add node: No workspace selected.");
       return;
@@ -491,17 +441,15 @@ class WorkspaceProvider extends StateHandler {
           defaultBottomRight,
         );
         break;
-      // CHANGE: Updated text box creation logic
       case DrawMode.textBox:
         final textBoxTopLeft = details.globalPosition;
-        // Create a box with a default size instead of a single point
         final textBoxBottomRight = Offset(
           details.globalPosition.dx + _defaultTextBoxWidth,
           details.globalPosition.dy + _defaultTextBoxHeight,
         );
         newObject = TextBoxObject.createNew(textBoxTopLeft, textBoxBottomRight);
-        // Set initial dummy text
-        _tempQuillController.document = Document()..insert(0, 'Click to edit');
+        _tempQuillController.document =
+            Document()..insert(0, 'Double-click to edit');
         newObject = (newObject as TextBoxObject).copyWith(
           textDelta: jsonEncode(
             _tempQuillController.document.toDelta().toJson(),
@@ -514,126 +462,115 @@ class WorkspaceProvider extends StateHandler {
 
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;
-      changeCurrentlySelectedObj(
-        newObject.id,
-      ); // Use the new method to set selection and load text
-      // NEW: If a new text box, set interaction mode to editing immediately
+      changeCurrentlySelectedObj(newObject.id);
+
       if (newObject is TextBoxObject) {
+        // CHANGE: Enter editing mode immediately upon creation
         _interactionMode = InteractionMode.editingText;
       } else {
-        _interactionMode =
-            InteractionMode.moving; // For other shapes, set to moving
+        _interactionMode = InteractionMode.moving;
       }
 
       notifyListeners();
-
-      // Immediately save the newly created object to the database
       await _saveCanvasObjectToDb(newObject.id);
     }
   }
 
-  // Expects details.globalPosition and details.delta to be in canvas coordinates
+  // CHANGE: Updated with double-click logic.
   void onPanDown(DragDownDetails details) {
-    _cursorPosition =
-        details.globalPosition; // This is now in canvas coordinates
-    _panStartPoint =
-        details.globalPosition; // This is now in canvas coordinates
+    _cursorPosition = details.globalPosition;
+    _panStartPoint = details.globalPosition;
 
-    // NEW: If in text editing mode, check if click is outside the current object
     if (_interactionMode == InteractionMode.editingText) {
       final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
       if (selectedObject != null &&
           !selectedObject.getBounds().contains(details.globalPosition)) {
-        // Clicked outside, save changes and exit editing mode
         _saveCanvasObjectToDb(_currentlySelectedObjectId!);
-        _currentlySelectedObjectId = null;
-        _interactionMode = InteractionMode.none;
-        _tempQuillController.clear();
+        changeCurrentlySelectedObj(null); // This resets selection and mode
         notifyListeners();
-        return; // Don't process further pan down if exiting text editing
+        return;
       } else if (selectedObject != null &&
           selectedObject.getBounds().contains(details.globalPosition)) {
-        // If clicked inside the text box while in editing mode, stay in editing mode.
-        // This allows text selection/cursor movement within the text box.
-        // We do not want to trigger object move/resize here.
         return;
       }
     }
 
-    _currentlySelectedObjectId = null;
+    // Temporarily set to none before checking for intersections.
     _interactionMode = InteractionMode.none;
+    changeCurrentlySelectedObj(null);
     notifyListeners();
 
     if (_currentMode == DrawMode.pointer) {
-      // Prioritize handle interaction check
+      // Check for handle interaction first.
       for (final canvasObject in _canvasObjects.values.toList().reversed) {
         final rect = canvasObject.getBounds();
-
-        // Check for handle interaction. Handle radius also in canvas units.
         if ((details.globalPosition - rect.topLeft).distance < _handleRadius) {
-          changeCurrentlySelectedObj(
-            canvasObject.id,
-          ); // NEW: Use the new selection method
+          changeCurrentlySelectedObj(canvasObject.id);
           _interactionMode = InteractionMode.resizingTopLeft;
           notifyListeners();
-          return; // Exit after finding a handle
+          return;
         } else if ((details.globalPosition - rect.topRight).distance <
             _handleRadius) {
-          changeCurrentlySelectedObj(
-            canvasObject.id,
-          ); // NEW: Use the new selection method
+          changeCurrentlySelectedObj(canvasObject.id);
           _interactionMode = InteractionMode.resizingTopRight;
           notifyListeners();
           return;
         } else if ((details.globalPosition - rect.bottomLeft).distance <
             _handleRadius) {
-          changeCurrentlySelectedObj(
-            canvasObject.id,
-          ); // NEW: Use the new selection method
+          changeCurrentlySelectedObj(canvasObject.id);
           _interactionMode = InteractionMode.resizingBottomLeft;
           notifyListeners();
           return;
         } else if ((details.globalPosition - rect.bottomRight).distance <
             _handleRadius) {
-          changeCurrentlySelectedObj(
-            canvasObject.id,
-          ); // NEW: Use the new selection method
+          changeCurrentlySelectedObj(canvasObject.id);
           _interactionMode = InteractionMode.resizingBottomRight;
           notifyListeners();
           return;
         }
       }
 
-      // If no handle interaction, check if we're clicking on an object to move it or edit its text
+      // Check for object intersection (double-click vs single-click).
       for (final canvasObject in _canvasObjects.values.toList().reversed) {
         if (canvasObject.intersectsWith(details.globalPosition)) {
-          changeCurrentlySelectedObj(
-            canvasObject.id,
-          ); // NEW: Use the new selection method
-          // NEW: If it's a TextBoxObject, set interaction mode to editingText
           if (canvasObject is TextBoxObject) {
-            _interactionMode = InteractionMode.editingText;
+            final now = DateTime.now();
+            final isDoubleTap = _lastTappedObjectId == canvasObject.id &&
+                _lastTapTime != null &&
+                now.difference(_lastTapTime!) <
+                    const Duration(milliseconds: 300);
+
+            _lastTapTime = now;
+            _lastTappedObjectId = canvasObject.id;
+
+            if (isDoubleTap) {
+              // On double-tap, enter editing mode.
+              _interactionMode = InteractionMode.editingText;
+              _lastTappedObjectId = null; // Reset for next interaction.
+            } else {
+              // On single-tap, enter moving mode.
+              _interactionMode = InteractionMode.moving;
+            }
           } else {
+            // For other objects, always enter moving mode on click.
             _interactionMode = InteractionMode.moving;
           }
+
+          changeCurrentlySelectedObj(canvasObject.id);
           notifyListeners();
-          break; // Exit after selecting an object
+          return; // Exit after finding an object
         }
       }
     } else {
-      // If not in pointer mode, it means we are in a drawing mode (e.g., circle, rectangle, textBox)
-      // This path is for creating new objects.
+      // If in a drawing mode, create a new node.
       addNewNode(details);
     }
   }
 
-  // Expects details.globalPosition and details.delta to be in canvas coordinates
   void onPanUpdate(DragUpdateDetails details) {
-    _cursorPosition =
-        details.globalPosition; // This is now in canvas coordinates
+    _cursorPosition = details.globalPosition;
     if (_currentlySelectedObjectId == null) return;
 
-    // NEW: If in text editing mode, do not pan/resize
     if (_interactionMode == InteractionMode.editingText) {
       return;
     }
@@ -645,7 +582,7 @@ class WorkspaceProvider extends StateHandler {
       case InteractionMode.moving:
         _canvasObjects[_currentlySelectedObjectId!] = currentObject.move(
           details.delta,
-        ); // delta is already in canvas units
+        );
         break;
       case InteractionMode.resizingTopLeft:
         final newTopLeft = currentObject.getBounds().topLeft + details.delta;
@@ -679,7 +616,7 @@ class WorkspaceProvider extends StateHandler {
             .resize(currentObject.getBounds().topLeft, newBottomRight);
         break;
       case InteractionMode.none:
-      case InteractionMode.editingText: // Should be handled by the guard above
+      case InteractionMode.editingText:
         break;
     }
 
@@ -688,21 +625,20 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void exitWorkspace() {
-    // NEW: Save any unsaved text changes before exiting
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
       _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
 
-    _canvasChannel?.unsubscribe(); // Unsubscribe when exiting
+    _canvasChannel?.unsubscribe();
     _canvasChannel = null;
     _currentWorkspace = null;
     _canvasObjects.clear();
     _userCursors.clear();
     _currentlySelectedObjectId = null;
-    _workspaceNameController.text = 'Workspace Name'; // Reset controller
-    _tempQuillController.clear(); // NEW: Clear quill controller
-    _interactionMode = InteractionMode.none; // NEW: Reset interaction mode
+    _workspaceNameController.text = 'Workspace Name';
+    _tempQuillController.clear();
+    _interactionMode = InteractionMode.none;
     notifyListeners();
   }
 
@@ -712,13 +648,12 @@ class WorkspaceProvider extends StateHandler {
     _workspaceNameController.dispose();
     _tempQuillController.removeListener(
       _onQuillContentChanged,
-    ); // NEW: Remove listener
-    _tempQuillController.dispose(); // NEW: Dispose temporary controller
+    );
+    _tempQuillController.dispose();
     _canvasChannel?.unsubscribe();
     super.dispose();
   }
 
-  // Helper for deep comparison of JSON for Quill documents
   bool isEqual(dynamic a, dynamic b) {
     if (a is Map && b is Map) {
       if (a.length != b.length) return false;

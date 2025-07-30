@@ -18,6 +18,25 @@ class ObjectTextEditor extends StatefulWidget {
 
 class _ObjectTextEditorState extends State<ObjectTextEditor> {
   final FocusNode _focusNode = FocusNode();
+  final GlobalKey _toolbarKey = GlobalKey();
+  double _toolbarHeight = 50.h; // A default height
+
+  @override
+  void initState() {
+    super.initState();
+    // Get the toolbar's height after it has been laid out
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final context = _toolbarKey.currentContext;
+      if (context != null) {
+        final box = context.findRenderObject() as RenderBox;
+        if (mounted) {
+          setState(() {
+            _toolbarHeight = box.size.height;
+          });
+        }
+      }
+    });
+  }
 
   @override
   void dispose() {
@@ -66,17 +85,20 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
         final quillController =
             workspaceProvider.selectedObjectQuillController;
 
-        // RESTRUCTURE: Use a Stack to position the toolbar and editor independently.
-        return Stack(
-          children: [
-            // 1. The Quill Toolbar, positioned to the right of the text object.
-            Positioned(
-              left: visibleRect.right + 10.w, // Place it right of the object
-              top: visibleRect.top,
-              child: Material(
-                color: Colors.transparent,
-                child: Container(
-                  // The toolbar will size itself, but you can add constraints if needed
+        // CHANGE: Position the entire editor group (toolbar + text field)
+        return Positioned(
+          // Position the editor group so the toolbar is just above the original object location.
+          left: visibleRect.left,
+          top: visibleRect.top - _toolbarHeight - 4.h, // Position above object
+          child: Material(
+            color: Colors.transparent,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // 1. The Quill Toolbar
+                Container(
+                  key: _toolbarKey,
+                  width: visibleRect.width < 350.w ? 350.w : visibleRect.width,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(8.r),
@@ -108,24 +130,19 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                     ),
                   ),
                 ),
-              ),
-            ),
+                SizedBox(height: 4.h), // Spacing between toolbar and editor
 
-            // 2. The Quill Editor, positioned directly over the text object.
-            Positioned(
-              left: visibleRect.left,
-              top: visibleRect.top,
-              width: visibleRect.width,
-              height: visibleRect.height,
-              child: Material(
-                color: Colors.transparent,
-                child: Container(
+                // 2. The Quill Editor
+                Container(
+                  width: visibleRect.width,
+                  height: visibleRect.height,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     border: Border.all(
-                      color: Colors.blue.shade400, // Brighter border
-                      width: 2.0, // Thicker border to indicate editing
+                      color: Colors.blue.shade400,
+                      width: 2.0,
                     ),
+                    borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: QuillEditor.basic(
                     controller: quillController,
@@ -148,9 +165,9 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                     scrollController: ScrollController(),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         );
       },
     );

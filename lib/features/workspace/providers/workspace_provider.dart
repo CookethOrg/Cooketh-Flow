@@ -74,7 +74,6 @@ class WorkspaceProvider extends StateHandler {
 
   Color _nextObjectColor = Colors.yellow;
 
-  // NEW: State for drawing a connector
   String? _connectorSourceId;
   Alignment? _connectorSourceAlignment;
   Offset? _connectorDragPosition;
@@ -99,7 +98,6 @@ class WorkspaceProvider extends StateHandler {
   TextEditingController get workspaceNameController => _workspaceNameController;
   SupabaseService get supabaseService => _supabaseService;
 
-  // NEW: Getter for temporary connector state for the painter
   String? get connectorSourceId => _connectorSourceId;
   Alignment? get connectorSourceAlignment => _connectorSourceAlignment;
   Offset? get connectorDragPosition => _connectorDragPosition;
@@ -117,7 +115,6 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // ... (rest of the provider is the same until getIconForObjectType)
   void _onQuillContentChanged() {
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
@@ -296,7 +293,9 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanEnd(DragEndDetails details) async {
-    // NEW: Logic for completing a connector
+    // If we are in hand mode, do nothing.
+    if (_currentMode == DrawMode.hand) return;
+
     if (_interactionMode == InteractionMode.drawingConnector &&
         _connectorSourceId != null) {
       final target = _findConnectionTarget(_cursorPosition);
@@ -309,7 +308,7 @@ class WorkspaceProvider extends StateHandler {
         );
         _canvasObjects[newConnector.id] = newConnector;
         await _saveCanvasObjectToDb(newConnector.id);
-        syncCanvasObject(_cursorPosition); // Sync the new connector
+        syncCanvasObject(_cursorPosition);
       }
     } else if (_currentlySelectedObjectId != null &&
         _interactionMode != InteractionMode.editingText) {
@@ -358,7 +357,6 @@ class WorkspaceProvider extends StateHandler {
     } else {
       final selectedObject = _canvasObjects[id];
       if (selectedObject is ConnectorObject) {
-         // Don't load anything for connectors
         _tempQuillController.clear();
       } else if (selectedObject?.textDelta != null) {
         try {
@@ -509,6 +507,7 @@ class WorkspaceProvider extends StateHandler {
         );
         break;
       case DrawMode.pointer:
+      case DrawMode.hand: // Do nothing for pointer or hand mode
         break;
     }
 
@@ -527,10 +526,9 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-  // Helper method to find if a point is over a connection point
   Map<String, dynamic>? _findConnectionTarget(Offset point) {
     for (final object in _canvasObjects.values) {
-      if (object is ConnectorObject) continue; // Cannot connect to a connector
+      if (object is ConnectorObject) continue; 
 
       const alignments = [
         Alignment.topCenter,
@@ -549,6 +547,11 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanDown(DragDownDetails details) {
+    // If in hand mode, do nothing and let the InteractiveViewer handle panning.
+    if (_currentMode == DrawMode.hand) {
+      return;
+    }
+
     _cursorPosition = details.globalPosition;
     _panStartPoint = details.globalPosition;
 
@@ -563,7 +566,6 @@ class WorkspaceProvider extends StateHandler {
     }
 
     if (_currentMode == DrawMode.pointer) {
-      // NEW: Check for connection point interaction first
       final connectionTarget = _findConnectionTarget(details.globalPosition);
       if (connectionTarget != null) {
         _interactionMode = InteractionMode.drawingConnector;
@@ -574,7 +576,6 @@ class WorkspaceProvider extends StateHandler {
         return;
       }
 
-      // Check for resize handle interaction
       if (_currentlySelectedObjectId != null) {
         final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
         if (selectedObject != null && selectedObject is! ConnectorObject) {
@@ -645,9 +646,13 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanUpdate(DragUpdateDetails details) {
+    // If in hand mode, do nothing and let the InteractiveViewer handle panning.
+    if (_currentMode == DrawMode.hand) {
+      return;
+    }
+    
     _cursorPosition = details.globalPosition;
 
-    // NEW: Update the connector drag position
     if (_interactionMode == InteractionMode.drawingConnector) {
       _connectorDragPosition = details.globalPosition;
       notifyListeners();
@@ -699,7 +704,7 @@ class WorkspaceProvider extends StateHandler {
         break;
       case InteractionMode.none:
       case InteractionMode.editingText:
-      case InteractionMode.drawingConnector: // Already handled
+      case InteractionMode.drawingConnector:
         break;
     }
 

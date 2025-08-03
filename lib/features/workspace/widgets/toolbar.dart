@@ -41,32 +41,40 @@ class ToolBar extends StatelessWidget {
               _horizontalDivider(),
               _toolIcon(
                 PhosphorIconsRegular.circlesThreePlus,
-                iconColor: provider.currentMode != DrawMode.pointer && provider.currentMode != DrawMode.textBox ? Colors.blue : Colors.black,
                 'Add new node',
                 device,
                 onPressed: () {
-                  // Call the new method to show the NodePicker dialog
                   _showNodePicker(context);
                   print('Circles three plus pressed');
                 },
               ),
               _horizontalDivider(),
               _toolIcon(
-                PhosphorIconsRegular.handGrabbing,
-                iconColor: provider.currentMode == DrawMode.pointer ? Colors.blue : Colors.black,
+                PhosphorIconsRegular.cursor,
                 'Pointer',
                 device,
+                iconColor: provider.currentMode == DrawMode.pointer ? Colors.blue : Colors.black,
                 onPressed: () {
                   provider.changeDrawMode(DrawMode.pointer);
-                  print('Hand grabbing pressed');
+                  print('Pointer tool selected');
+                },
+              ),
+              // NEW: Hand tool for panning
+              _toolIcon(
+                PhosphorIconsRegular.handGrabbing,
+                'Pan',
+                device,
+                iconColor: provider.currentMode == DrawMode.hand ? Colors.blue : Colors.black,
+                onPressed: () {
+                  provider.changeDrawMode(DrawMode.hand);
+                  print('Hand tool selected');
                 },
               ),
               _toolIcon(
                 PhosphorIconsRegular.textT,
-                iconColor: provider.currentMode == DrawMode.textBox ? Colors.blue : Colors.black,
                 'Text box',
                 device,
-                // MODIFIED: Changed onPressed to set DrawMode.textBox
+                iconColor: provider.currentMode == DrawMode.textBox ? Colors.blue : Colors.black,
                 onPressed: () {
                   provider.changeDrawMode(DrawMode.textBox);
                   print('Text box pressed, mode changed to textBox');
@@ -85,7 +93,7 @@ class ToolBar extends StatelessWidget {
                 PhosphorIconsFill.noteBlank,
                 'Add new sticky note',
                 device,
-                iconColor: tertiaryColors[6],
+                iconColor: provider.currentMode == DrawMode.stickyNote ? Colors.blue : tertiaryColors[6],
                 onPressed: () => _showStickyNote(context),
               ),
             ],

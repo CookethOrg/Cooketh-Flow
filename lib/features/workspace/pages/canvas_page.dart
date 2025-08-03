@@ -14,6 +14,8 @@ class CanvasPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer2<WorkspaceProvider, CanvasProvider>(
       builder: (context, workspaceProvider, canvasProvider, child) {
+        final isHandToolActive = workspaceProvider.currentMode == DrawMode.hand;
+
         return Scaffold(
           backgroundColor: workspaceProvider.currentWorkspaceColor,
           body: Listener(
@@ -23,6 +25,8 @@ class CanvasPage extends StatelessWidget {
               }
             },
             child: MouseRegion(
+              // Change cursor based on the active tool
+              cursor: isHandToolActive ? SystemMouseCursors.grab : SystemMouseCursors.basic,
               onHover: (event) {
                 final Matrix4 transform = canvasProvider.transformationController.value;
                 final Matrix4? inverseTransform = Matrix4.tryInvert(transform);
@@ -43,21 +47,23 @@ class CanvasPage extends StatelessWidget {
                 maxScale: 4.0,
                 boundaryMargin: const EdgeInsets.all(double.infinity),
                 constrained: false,
-                panEnabled: workspaceProvider.interactionMode != InteractionMode.editingText && workspaceProvider.interactionMode != InteractionMode.drawingConnector,
+                // Enable panning only when Hand Tool is active
+                panEnabled: isHandToolActive,
                 scaleEnabled: workspaceProvider.interactionMode != InteractionMode.editingText,
                 child: Container(
                   color: workspaceProvider.currentWorkspaceColor,
                   child: GestureDetector(
-                    onPanDown: (details) {
+                    // Disable GestureDetector's pan events when Hand Tool is active
+                    onPanDown: isHandToolActive ? null : (details) {
                         workspaceProvider.onPanDown(DragDownDetails(globalPosition: details.localPosition));
                       },
-                    onPanUpdate: (details) {
+                    onPanUpdate: isHandToolActive ? null : (details) {
                         workspaceProvider.onPanUpdate(DragUpdateDetails(
                           globalPosition: details.localPosition,
                           delta: details.delta,
                         ));
                       },
-                    onPanEnd: workspaceProvider.onPanEnd,
+                    onPanEnd: isHandToolActive ? null : workspaceProvider.onPanEnd,
                     child: CustomPaint(
                       size: const Size(20000, 20000),
                       painter: CanvasPainter(
@@ -66,7 +72,6 @@ class CanvasPage extends StatelessWidget {
                         currentlySelectedObjectId: workspaceProvider.currentlySelectedObjectId,
                         handleRadius: workspaceProvider.handleRadius,
                         interactionMode: workspaceProvider.interactionMode,
-                        // NEW: Pass connector-related state to the painter
                         connectionPointRadius: workspaceProvider.connectionPointRadius,
                         connectorSourceId: workspaceProvider.connectorSourceId,
                         connectorSourceAlignment: workspaceProvider.connectorSourceAlignment,

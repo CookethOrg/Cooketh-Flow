@@ -38,7 +38,7 @@ class WorkspaceDesktop extends StatelessWidget {
                 // Undo/Redo Controls Container
                 Positioned(top: 0,left: 0.21.sw,child: UndoRedoButton()),
                 // Export project button
-                Positioned(top: 0,right: 0.02.sw,child: ExportProjectButton()),
+                Positioned(top: 0,right: 0.001.sw,child: ExportProjectButton()),
         
                 Positioned(right: 0,top: 0.15.sh,child: ToolBar()),
         

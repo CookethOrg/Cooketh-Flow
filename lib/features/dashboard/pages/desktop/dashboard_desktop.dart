@@ -17,6 +17,9 @@ class DashboardDesktop extends StatelessWidget {
     rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer<DashboardProvider>(
       builder: (context, provider, child) {
+        // NEW: Get the filtered list of workspaces
+        final displayedWorkspaces = provider.displayedWorkspaces;
+
         return LayoutBuilder(
           builder:
               (context, constraints) => Row(
@@ -50,7 +53,8 @@ class DashboardDesktop extends StatelessWidget {
                           Expanded(
                             child: GridView.builder(
                               shrinkWrap: true,
-                              itemCount: provider.workspaceList.length,
+                              // UPDATE: Use the length of the filtered list
+                              itemCount: displayedWorkspaces.length,
                               gridDelegate:
                                   SliverGridDelegateWithFixedCrossAxisCount(
                                     crossAxisCount: 3,
@@ -59,9 +63,9 @@ class DashboardDesktop extends StatelessWidget {
                                     childAspectRatio: 4.5 / 3,
                                   ),
                               itemBuilder: (context, index) {
-                                final workspaceId = provider.workspaceList.keys
-                                    .elementAt(index);
-                                return ProjectCard(workspaceId: workspaceId);
+                                // UPDATE: Get the workspace from the filtered list
+                                final workspace = displayedWorkspaces[index];
+                                return ProjectCard(workspaceId: workspace.id);
                               },
                             ),
                           ),

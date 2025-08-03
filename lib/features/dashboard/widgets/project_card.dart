@@ -2,7 +2,7 @@ import 'package:cookethflow/core/helpers/date_time_helper.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/workspace_options_dialog.dart';
-import 'package:cookethflow/features/workspace/pages/workspace.dart';
+import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,6 +19,13 @@ class ProjectCard extends StatelessWidget {
     DateTimeHelper dth = DateTimeHelper();
     return Consumer2<DashboardProvider, WorkspaceProvider>(
       builder: (context, provider, workspaceProvider, child) {
+        // Get the specific workspace model to access its properties
+        final WorkspaceModel? workspace = provider.workspaceList[workspaceId];
+        if (workspace == null) {
+          // Return an empty container or a placeholder if the workspace is not found
+          return Container();
+        }
+
         return GestureDetector(
           onTap: () {
             workspaceProvider.setWorkspace(workspaceId);
@@ -39,8 +46,9 @@ class ProjectCard extends StatelessWidget {
                 Expanded(
                   flex: 2,
                   child: Container(
+                    // Use the workspace background color for the thumbnail
                     decoration: BoxDecoration(
-                      color: const Color(0xFFD3D3D3),
+                      color: workspace.backgroundColor ?? const Color(0xFFD3D3D3),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(12.r),
                         topRight: Radius.circular(12.r),
@@ -48,34 +56,26 @@ class ProjectCard extends StatelessWidget {
                     ),
                     child: Stack(
                       children: [
-                        // Center(
-                        //   child: Image.asset(
-                        //     'assets/images/Frame 400.png',
-                        //     fit: BoxFit.cover,
-                        //   ),
-                        // ),
                         Positioned(
                           top: 12.h,
                           right: 12.w,
                           child: Container(
                             padding: EdgeInsets.all(8.w),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Colors.white.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: IconButton(
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder: (dialogContext) => WorkspaceOptionsDialog( // Use dialogContext to pop the dialog
-                                    onPressed: () async { // Make onPressed async
-                                      Navigator.of(dialogContext).pop(); // Dismiss the dialog first
-                                      await provider.deleteWorkspace(workspaceId); // Then delete from DB
-                                      // No need to call refreshDashboard here as deleteWorkspace already calls it
+                                  builder: (dialogContext) => WorkspaceOptionsDialog(
+                                    onPressed: () async {
+                                      Navigator.of(dialogContext).pop();
+                                      await provider.deleteWorkspace(workspaceId);
                                     },
                                   ),
                                 );
-                                // Removed .then(context.pop) here
                               },
                               icon: Icon(
                                 PhosphorIconsRegular.dotsThree,
@@ -102,22 +102,18 @@ class ProjectCard extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                provider.workspaceList[workspaceId]?.name ??
-                                    "Name not fetched",
+                                workspace.name,
                                 style: TextStyle(
                                   fontFamily: 'Fredrik',
                                   fontSize: 20.sp,
                                   color: Colors.black,
                                   fontWeight: FontWeight.w600,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                               SizedBox(height: 4.h),
                               Text(
-                                dth.formatLastEdited(
-                                  provider
-                                      .workspaceList[workspaceId]
-                                      ?.lastEdited,
-                                ),
+                                dth.formatLastEdited(workspace.lastEdited),
                                 style: TextStyle(
                                   fontFamily: 'Fredrik',
                                   color: Colors.grey[600],
@@ -128,12 +124,25 @@ class ProjectCard extends StatelessWidget {
                             ],
                           ),
                         ),
+                        // UPDATED: Star IconButton
                         IconButton(
-                          onPressed: () {},
-                          icon: Icon(
-                            PhosphorIconsRegular.star,
-                            size: 32.sp,
-                            color: Colors.black54,
+                          onPressed: () {
+                            // Call the provider method to toggle the star status
+                            provider.toggleStar(workspaceId);
+                          },
+                          icon: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 300),
+                            transitionBuilder: (child, animation) {
+                              return ScaleTransition(scale: animation, child: child);
+                            },
+                            child: Icon(
+                              // Conditionally show filled or regular star
+                              workspace.isStarred ? PhosphorIconsFill.star : PhosphorIconsRegular.star,
+                              // Use a key to help AnimatedSwitcher differentiate between the two icons
+                              key: ValueKey<bool>(workspace.isStarred),
+                              size: 32.sp,
+                              color: workspace.isStarred ? Colors.amber : Colors.black54,
+                            ),
                           ),
                         ),
                       ],

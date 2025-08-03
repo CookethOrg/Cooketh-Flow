@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/material.dart'; // Required for Color
 
 class WorkspaceModel {
   String id;
@@ -7,8 +8,9 @@ class WorkspaceModel {
   List<String> editorIdList;
   List<String> viewerIdList;
   DateTime? lastEdited;
-  // NEW: Property for background color
   Color? backgroundColor;
+  // NEW: Property for starring a workspace
+  bool isStarred;
 
   WorkspaceModel({
     required this.id,
@@ -17,7 +19,8 @@ class WorkspaceModel {
     required this.editorIdList,
     required this.viewerIdList,
     required this.lastEdited,
-    this.backgroundColor, // Add to constructor
+    this.backgroundColor,
+    this.isStarred = false, // Add to constructor with a default value
   });
 
   WorkspaceModel copyWith({
@@ -27,7 +30,8 @@ class WorkspaceModel {
     List<String>? editorIdList,
     List<String>? viewerIdList,
     DateTime? lastEdited,
-    Color? backgroundColor, // Add to copyWith
+    Color? backgroundColor,
+    bool? isStarred, // Add to copyWith
   }) {
     return WorkspaceModel(
       id: id ?? this.id,
@@ -36,17 +40,18 @@ class WorkspaceModel {
       editorIdList: editorIdList ?? List.from(this.editorIdList),
       viewerIdList: viewerIdList ?? List.from(this.viewerIdList),
       lastEdited: lastEdited ?? this.lastEdited,
-      backgroundColor: backgroundColor ?? this.backgroundColor, // Add to copyWith
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      isStarred: isStarred ?? this.isStarred, // Add to copyWith
     );
   }
 
   Map<String, dynamic> toJson() {
-    // NEW: Prepare the 'data' jsonb field
     final Map<String, dynamic> jsonData = {};
     if (backgroundColor != null) {
-      // Store color as an #AARRGGBB hex string
       jsonData['backgroundColor'] = '#${backgroundColor!.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
     }
+    // NEW: Add isStarred to the data field
+    jsonData['isStarred'] = isStarred;
 
     return {
       'id': id,
@@ -55,23 +60,31 @@ class WorkspaceModel {
       'editorId': editorIdList,
       'viewerId': viewerIdList,
       'last edited': lastEdited?.toIso8601String(),
-      'data': jsonData, // Add data field to JSON
+      'data': jsonData,
     };
   }
 
   factory WorkspaceModel.fromJson(Map<String, dynamic> json) {
-    // NEW: Parse the background color from the 'data' field
     Color? bgColor;
-    if (json['data'] != null && json['data']['backgroundColor'] != null) {
-      try {
-        final colorString = json['data']['backgroundColor'] as String;
-        final hexCode = colorString.replaceAll('#', '');
-        // Handle both RRGGBB and AARRGGBB formats
-        final fullHexCode = hexCode.length == 6 ? 'FF$hexCode' : hexCode;
-        bgColor = Color(int.parse(fullHexCode, radix: 16));
-      } catch (e) {
-        print('Error parsing background color: $e');
-        bgColor = null; // Default to null on error
+    // NEW: Parse isStarred from the data field
+    bool isStarredFlag = false;
+
+    if (json['data'] != null) {
+      // Parse background color
+      if (json['data']['backgroundColor'] != null) {
+        try {
+          final colorString = json['data']['backgroundColor'] as String;
+          final hexCode = colorString.replaceAll('#', '');
+          final fullHexCode = hexCode.length == 6 ? 'FF$hexCode' : hexCode;
+          bgColor = Color(int.parse(fullHexCode, radix: 16));
+        } catch (e) {
+          print('Error parsing background color: $e');
+          bgColor = null;
+        }
+      }
+      // Parse isStarred
+      if (json['data']['isStarred'] is bool) {
+        isStarredFlag = json['data']['isStarred'];
       }
     }
 
@@ -84,7 +97,8 @@ class WorkspaceModel {
       lastEdited: json['last edited'] != null 
           ? DateTime.parse(json['last edited'] as String) 
           : null,
-      backgroundColor: bgColor, // Assign parsed color
+      backgroundColor: bgColor,
+      isStarred: isStarredFlag, // Assign parsed value
     );
   }
 }

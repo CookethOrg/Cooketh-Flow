@@ -27,6 +27,21 @@ class DashboardProvider extends StateHandler {
   bool get isInitialized => _isInitialized;
   Map<String, WorkspaceModel> get workspaceList => _workspaceList;
 
+  // NEW: Getter for the filtered list of workspaces
+  List<WorkspaceModel> get displayedWorkspaces {
+    final allWorkspaces = _workspaceList.values.toList();
+    // Sort by last edited date, newest first
+    allWorkspaces.sort((a, b) => (b.lastEdited ?? DateTime(0)).compareTo(a.lastEdited ?? DateTime(0)));
+
+    switch (_tabIndex) {
+      case 1: // Starred
+        return allWorkspaces.where((ws) => ws.isStarred).toList();
+      case 0: // All
+      default:
+        return allWorkspaces;
+    }
+  }
+
   List<Map<String, dynamic>> tabItems = [
     {"label": "All", "icon": Icon(PhosphorIcons.cardsThree())},
     {"label": "Starred", "icon": Icon(PhosphorIcons.star())},
@@ -77,7 +92,6 @@ class DashboardProvider extends StateHandler {
             .eq('owner', res.id);
         _workspaceList.clear();
         for (var workspaceData in _dbWorkspace) {
-          // The updated fromJson factory now handles the 'data' field
           WorkspaceModel newWorkspace = WorkspaceModel.fromJson(workspaceData);
           _workspaceList[newWorkspace.id] = newWorkspace;
         }
@@ -92,7 +106,6 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  // NEW: Update an entire workspace model, used by WorkspaceProvider
   void updateWorkspace(WorkspaceModel workspace) {
     if (_workspaceList.containsKey(workspace.id)) {
       _workspaceList[workspace.id] = workspace;
@@ -105,6 +118,31 @@ class DashboardProvider extends StateHandler {
       _workspaceList[workspaceId] = _workspaceList[workspaceId]!.copyWith(
         name: newName,
       );
+      notifyListeners();
+    }
+  }
+
+  // NEW: Method to toggle the star status and save to DB
+  Future<void> toggleStar(String workspaceId) async {
+    final workspace = _workspaceList[workspaceId];
+    if (workspace == null) return;
+
+    // Toggle status locally first for immediate UI feedback
+    final updatedWorkspace = workspace.copyWith(isStarred: !workspace.isStarred);
+    _workspaceList[workspaceId] = updatedWorkspace;
+    notifyListeners();
+
+    try {
+      final dataToSave = updatedWorkspace.toJson()['data'];
+      await supabase!
+          .from('workspace')
+          .update({'data': dataToSave})
+          .eq('id', workspaceId);
+      print("Workspace $workspaceId star status updated in DB.");
+    } catch (e) {
+      print("Error updating star status for $workspaceId: $e");
+      // Revert on error
+      _workspaceList[workspaceId] = workspace;
       notifyListeners();
     }
   }
@@ -125,7 +163,7 @@ class DashboardProvider extends StateHandler {
         "name": "New Project",
         "editorId": [],
         "viewerId": [],
-        "data": {}, // Initialize with empty data
+        "data": {'isStarred': false}, // Initialize with isStarred
       };
 
       await supabase!.from('workspace').insert(newWorkspaceData);

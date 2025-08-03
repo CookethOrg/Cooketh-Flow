@@ -17,9 +17,6 @@ class DashboardDesktop extends StatelessWidget {
     rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer<DashboardProvider>(
       builder: (context, provider, child) {
-        // NEW: Get the filtered list of workspaces
-        final displayedWorkspaces = provider.displayedWorkspaces;
-
         return LayoutBuilder(
           builder:
               (context, constraints) => Row(
@@ -27,13 +24,13 @@ class DashboardDesktop extends StatelessWidget {
                 children: [
                   AnimatedContainer(
                     curve: Curves.easeInOut,
-                    duration: Duration(milliseconds: 500),
+                    duration: const Duration(milliseconds: 500),
                     height:
                         provider.isDrawerOpen
                             ? constraints.maxHeight
                             : 0.185.sh,
                     width: deviceType == rh.DeviceType.desktop ? 400.w : 600.w,
-                    child: DashboardDrawer(),
+                    child: const DashboardDrawer(),
                   ),
 
                   Expanded(
@@ -47,27 +44,12 @@ class DashboardDesktop extends StatelessWidget {
                         children: [
                           Padding(
                             padding: EdgeInsets.only(bottom: 20.h),
-                            child: StartProject(),
+                            child: const StartProject(),
                           ),
-                          SizedBox(height: 32),
+                          const SizedBox(height: 32),
                           Expanded(
-                            child: GridView.builder(
-                              shrinkWrap: true,
-                              // UPDATE: Use the length of the filtered list
-                              itemCount: displayedWorkspaces.length,
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                    crossAxisCount: 3,
-                                    crossAxisSpacing: 20.w,
-                                    mainAxisSpacing: 20.h,
-                                    childAspectRatio: 4.5 / 3,
-                                  ),
-                              itemBuilder: (context, index) {
-                                // UPDATE: Get the workspace from the filtered list
-                                final workspace = displayedWorkspaces[index];
-                                return ProjectCard(workspaceId: workspace.id);
-                              },
-                            ),
+                            // NEW: Conditionally build the main content area
+                            child: _buildMainContent(provider),
                           ),
                         ],
                       ),
@@ -78,5 +60,70 @@ class DashboardDesktop extends StatelessWidget {
         );
       },
     );
+  }
+
+  // NEW: Helper widget to build content based on the selected tab
+  Widget _buildMainContent(DashboardProvider provider) {
+    switch (provider.tabIndex) {
+      case 2: // Trash Tab
+        return Center(
+          child: Text(
+            'Feature Coming Soon',
+            style: TextStyle(
+              fontFamily: 'Fredrik',
+              fontSize: 24.sp,
+              fontWeight: FontWeight.w600,
+              color: Colors.grey[600],
+            ),
+          ),
+        );
+      case 3: // About Us Tab
+        return SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 20.h),
+          child: Text(
+            "Cooketh Flow is an open-source, powerful visual thinking tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, or organizing tasks, Cooketh Flow provides an intuitive drag-and-drop interface that makes building and refining workflows effortless.\n\nWith features like customizable nodes and cloud sync with Supabase, Cooketh Flow is built to streamline complex processes and enhance productivity. Developed with Flutter for cross-platform support, it offers a fast, responsive, and visually engaging experience.\n\nAs an open-source project, Cooketh Flow is community-driven and extensible, inviting developers and creators to contribute, innovate, and shape the future of workflow automation.",
+            textAlign: TextAlign.justify,
+            style: TextStyle(
+              fontFamily: 'Fredrik',
+              fontSize: 18.sp,
+              height: 1.6,
+              color: Colors.black.withOpacity(0.75),
+            ),
+          ),
+        );
+      default: // All and Starred Tabs
+        final displayedWorkspaces = provider.displayedWorkspaces;
+        
+        // Show a message if the "Starred" tab is empty
+        if (displayedWorkspaces.isEmpty && provider.tabIndex == 1) {
+           return Center(
+            child: Text(
+              'No starred workspaces yet!',
+              style: TextStyle(
+                fontFamily: 'Fredrik',
+                fontSize: 24.sp,
+                fontWeight: FontWeight.w600,
+                color: Colors.grey[600],
+              ),
+            ),
+          );
+        }
+
+        return GridView.builder(
+          shrinkWrap: true,
+          itemCount: displayedWorkspaces.length,
+          gridDelegate:
+              SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 20.w,
+                mainAxisSpacing: 20.h,
+                childAspectRatio: 4.5 / 3,
+              ),
+          itemBuilder: (context, index) {
+            final workspace = displayedWorkspaces[index];
+            return ProjectCard(workspaceId: workspace.id);
+          },
+        );
+    }
   }
 }

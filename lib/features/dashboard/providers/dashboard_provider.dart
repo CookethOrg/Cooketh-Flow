@@ -27,15 +27,17 @@ class DashboardProvider extends StateHandler {
   bool get isInitialized => _isInitialized;
   Map<String, WorkspaceModel> get workspaceList => _workspaceList;
 
-  // NEW: Getter for the filtered list of workspaces
   List<WorkspaceModel> get displayedWorkspaces {
     final allWorkspaces = _workspaceList.values.toList();
-    // Sort by last edited date, newest first
     allWorkspaces.sort((a, b) => (b.lastEdited ?? DateTime(0)).compareTo(a.lastEdited ?? DateTime(0)));
 
     switch (_tabIndex) {
       case 1: // Starred
         return allWorkspaces.where((ws) => ws.isStarred).toList();
+      case 2: // Trash
+      case 3: // About Us
+        // Return an empty list for non-project tabs
+        return [];
       case 0: // All
       default:
         return allWorkspaces;
@@ -122,12 +124,10 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  // NEW: Method to toggle the star status and save to DB
   Future<void> toggleStar(String workspaceId) async {
     final workspace = _workspaceList[workspaceId];
     if (workspace == null) return;
 
-    // Toggle status locally first for immediate UI feedback
     final updatedWorkspace = workspace.copyWith(isStarred: !workspace.isStarred);
     _workspaceList[workspaceId] = updatedWorkspace;
     notifyListeners();
@@ -141,7 +141,6 @@ class DashboardProvider extends StateHandler {
       print("Workspace $workspaceId star status updated in DB.");
     } catch (e) {
       print("Error updating star status for $workspaceId: $e");
-      // Revert on error
       _workspaceList[workspaceId] = workspace;
       notifyListeners();
     }
@@ -163,7 +162,7 @@ class DashboardProvider extends StateHandler {
         "name": "New Project",
         "editorId": [],
         "viewerId": [],
-        "data": {'isStarred': false}, // Initialize with isStarred
+        "data": {'isStarred': false},
       };
 
       await supabase!.from('workspace').insert(newWorkspaceData);

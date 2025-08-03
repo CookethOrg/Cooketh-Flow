@@ -1,5 +1,3 @@
-// lib/features/workspace/pages/canvas_page.dart
-
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
@@ -18,7 +16,7 @@ class CanvasPage extends StatelessWidget {
       builder: (context, workspaceProvider, canvasProvider, child) {
         return Scaffold(
           backgroundColor: workspaceProvider.currentWorkspaceColor,
-          body: Listener( // Using Listener to get pointer signal for double-clicks
+          body: Listener(
             onPointerDown: (event) {
               if (event.kind == PointerDeviceKind.mouse && event.buttons == kPrimaryMouseButton && event.down) {
                  // You could implement double-click logic here if needed
@@ -35,7 +33,6 @@ class CanvasPage extends StatelessWidget {
                     vector_math.Vector3(event.localPosition.dx, event.localPosition.dy, 0));
                 final Offset canvasCoordinates = Offset(transformed.x, transformed.y);
 
-                // Only sync cursor position if not in text editing mode to avoid flickering
                 if (workspaceProvider.interactionMode != InteractionMode.editingText) {
                   workspaceProvider.syncCanvasObject(canvasCoordinates);
                 }
@@ -46,7 +43,7 @@ class CanvasPage extends StatelessWidget {
                 maxScale: 4.0,
                 boundaryMargin: const EdgeInsets.all(double.infinity),
                 constrained: false,
-                panEnabled: workspaceProvider.interactionMode != InteractionMode.editingText,
+                panEnabled: workspaceProvider.interactionMode != InteractionMode.editingText && workspaceProvider.interactionMode != InteractionMode.drawingConnector,
                 scaleEnabled: workspaceProvider.interactionMode != InteractionMode.editingText,
                 child: Container(
                   color: workspaceProvider.currentWorkspaceColor,
@@ -68,8 +65,12 @@ class CanvasPage extends StatelessWidget {
                         canvasObjects: workspaceProvider.canvasObjects,
                         currentlySelectedObjectId: workspaceProvider.currentlySelectedObjectId,
                         handleRadius: workspaceProvider.handleRadius,
-                        // UPDATED: Pass the interactionMode to the painter
                         interactionMode: workspaceProvider.interactionMode,
+                        // NEW: Pass connector-related state to the painter
+                        connectionPointRadius: workspaceProvider.connectionPointRadius,
+                        connectorSourceId: workspaceProvider.connectorSourceId,
+                        connectorSourceAlignment: workspaceProvider.connectorSourceAlignment,
+                        connectorDragPosition: workspaceProvider.connectorDragPosition,
                       ),
                     ),
                   ),

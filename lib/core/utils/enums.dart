@@ -45,6 +45,7 @@ enum DrawMode {
   invertedTriangle(iconData: Icons.warning_amber_rounded), // Placeholder
   textBox(iconData: PhosphorIconsRegular.textT),
   stickyNote(iconData: PhosphorIconsRegular.notePencil);
+  // connector(iconData: PhosphorIconsRegular.lineSegment);
 
   const DrawMode({required this.iconData});
   final IconData iconData;
@@ -58,4 +59,7 @@ enum InteractionMode {
   resizingBottomLeft,
   resizingBottomRight,
   editingText,
+  drawingConnector,
 }
+
+enum ConnectorAnchor { top, bottom, left, right }

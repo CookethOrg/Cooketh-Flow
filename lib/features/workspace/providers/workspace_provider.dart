@@ -9,6 +9,7 @@ import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/diamond_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/inverted_triangle_object.dart';
@@ -16,14 +17,14 @@ import 'package:cookethflow/features/models/canvas_models/objects/parallelogram_
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rounded_square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
-import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart'; // Import StickyNoteObject
+import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart'; // Import for icon
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -62,6 +63,7 @@ class WorkspaceProvider extends StateHandler {
   static const double _defaultTextBoxWidth = 200.0;
   static const double _defaultTextBoxHeight = 50.0;
   static const double _handleRadius = 8.0;
+  static const double _connectionPointRadius = 6.0;
   Color _currentWorkspaceColor = scaffoldColor;
   final TextEditingController _workspaceNameController = TextEditingController(
     text: 'Workspace Name',
@@ -70,8 +72,12 @@ class WorkspaceProvider extends StateHandler {
   DateTime? _lastTapTime;
   String? _lastTappedObjectId;
 
-  // NEW: Add a field to store the color for the next object
   Color _nextObjectColor = Colors.yellow;
+
+  // NEW: State for drawing a connector
+  String? _connectorSourceId;
+  Alignment? _connectorSourceAlignment;
+  Offset? _connectorDragPosition;
 
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
@@ -87,26 +93,31 @@ class WorkspaceProvider extends StateHandler {
   Offset get cursorPosition => _cursorPosition;
   double get defaultShapeSize => _defaultShapeSize;
   double get handleRadius => _handleRadius;
+  double get connectionPointRadius => _connectionPointRadius;
   Color get currentWorkspaceColor => _currentWorkspaceColor;
   WorkspaceModel? get currentWorkspace => _currentWorkspace;
   TextEditingController get workspaceNameController => _workspaceNameController;
   SupabaseService get supabaseService => _supabaseService;
+
+  // NEW: Getter for temporary connector state for the painter
+  String? get connectorSourceId => _connectorSourceId;
+  Alignment? get connectorSourceAlignment => _connectorSourceAlignment;
+  Offset? get connectorDragPosition => _connectorDragPosition;
 
   bool get hasSelectedTile => _selectedTileIndex != null;
 
   QuillController get selectedObjectQuillController {
     return _tempQuillController;
   }
-  
-  // NEW: Method to prepare for creating a sticky note
+
   void setStickyNoteMode(Color color) {
     _currentMode = DrawMode.stickyNote;
     _nextObjectColor = color;
-    // Deselect any current object to avoid confusion
     changeCurrentlySelectedObj(null);
     notifyListeners();
   }
 
+  // ... (rest of the provider is the same until getIconForObjectType)
   void _onQuillContentChanged() {
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
@@ -285,13 +296,32 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanEnd(DragEndDetails details) async {
-    if (_currentlySelectedObjectId != null &&
+    // NEW: Logic for completing a connector
+    if (_interactionMode == InteractionMode.drawingConnector &&
+        _connectorSourceId != null) {
+      final target = _findConnectionTarget(_cursorPosition);
+      if (target != null) {
+        final newConnector = ConnectorObject.createNew(
+          sourceId: _connectorSourceId!,
+          sourceAlignment: _connectorSourceAlignment!,
+          targetId: target['id'] as String,
+          targetAlignment: target['alignment'] as Alignment,
+        );
+        _canvasObjects[newConnector.id] = newConnector;
+        await _saveCanvasObjectToDb(newConnector.id);
+        syncCanvasObject(_cursorPosition); // Sync the new connector
+      }
+    } else if (_currentlySelectedObjectId != null &&
         _interactionMode != InteractionMode.editingText) {
       syncCanvasObject(_cursorPosition);
-      _saveCanvasObjectToDb(_currentlySelectedObjectId!);
+      await _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
 
     _panStartPoint = null;
+    _connectorSourceId = null;
+    _connectorSourceAlignment = null;
+    _connectorDragPosition = null;
+
     if (_interactionMode != InteractionMode.editingText) {
       _interactionMode = InteractionMode.none;
     }
@@ -322,10 +352,15 @@ class WorkspaceProvider extends StateHandler {
 
     if (id == null) {
       _tempQuillController.clear();
-      _interactionMode = InteractionMode.none;
+      if (_interactionMode != InteractionMode.drawingConnector) {
+         _interactionMode = InteractionMode.none;
+      }
     } else {
       final selectedObject = _canvasObjects[id];
-      if (selectedObject?.textDelta != null) {
+      if (selectedObject is ConnectorObject) {
+         // Don't load anything for connectors
+        _tempQuillController.clear();
+      } else if (selectedObject?.textDelta != null) {
         try {
           final doc = Document.fromJson(jsonDecode(selectedObject!.textDelta!));
           _tempQuillController.document = doc;
@@ -377,11 +412,12 @@ class WorkspaceProvider extends StateHandler {
         return Icons.change_history;
       case InvertedTriangle.type:
         return Icons.warning_amber_rounded;
-      // NEW: Add icon for sticky note
       case StickyNoteObject.type:
         return PhosphorIconsRegular.noteBlank;
       case TextBoxObject.type:
         return Icons.text_fields;
+      case ConnectorObject.type:
+        return Icons.polyline_outlined;
       default:
         return Icons.insert_drive_file_outlined;
     }
@@ -445,7 +481,6 @@ class WorkspaceProvider extends StateHandler {
           defaultBottomRight,
         );
         break;
-      // NEW: Add case for creating a sticky note
       case DrawMode.stickyNote:
         newObject = StickyNoteObject.createNew(
           position: details.globalPosition,
@@ -457,7 +492,6 @@ class WorkspaceProvider extends StateHandler {
             initialDoc.toDelta().toJson(),
           ),
         );
-        // After placing the note, revert to pointer mode
         _currentMode = DrawMode.pointer;
         break;
       case DrawMode.textBox:
@@ -493,6 +527,27 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+  // Helper method to find if a point is over a connection point
+  Map<String, dynamic>? _findConnectionTarget(Offset point) {
+    for (final object in _canvasObjects.values) {
+      if (object is ConnectorObject) continue; // Cannot connect to a connector
+
+      const alignments = [
+        Alignment.topCenter,
+        Alignment.bottomCenter,
+        Alignment.centerLeft,
+        Alignment.centerRight,
+      ];
+      for (final alignment in alignments) {
+        final connectionPoint = object.getConnectionPoint(alignment);
+        if ((point - connectionPoint).distance <= _connectionPointRadius * 2) {
+          return {'id': object.id, 'alignment': alignment};
+        }
+      }
+    }
+    return null;
+  }
+
   void onPanDown(DragDownDetails details) {
     _cursorPosition = details.globalPosition;
     _panStartPoint = details.globalPosition;
@@ -508,10 +563,21 @@ class WorkspaceProvider extends StateHandler {
     }
 
     if (_currentMode == DrawMode.pointer) {
-      // Check for resize handle interaction first
+      // NEW: Check for connection point interaction first
+      final connectionTarget = _findConnectionTarget(details.globalPosition);
+      if (connectionTarget != null) {
+        _interactionMode = InteractionMode.drawingConnector;
+        _connectorSourceId = connectionTarget['id'] as String;
+        _connectorSourceAlignment = connectionTarget['alignment'] as Alignment;
+        _connectorDragPosition = details.globalPosition;
+        notifyListeners();
+        return;
+      }
+
+      // Check for resize handle interaction
       if (_currentlySelectedObjectId != null) {
         final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
-        if (selectedObject != null) {
+        if (selectedObject != null && selectedObject is! ConnectorObject) {
           final bounds = selectedObject.getBounds();
           if (Rect.fromCircle(center: bounds.topLeft, radius: _handleRadius)
               .contains(details.globalPosition)) {
@@ -563,7 +629,7 @@ class WorkspaceProvider extends StateHandler {
         _lastTapTime = now;
         _lastTappedObjectId = tappedObject.id;
 
-        if (isDoubleTap) {
+        if (isDoubleTap && tappedObject is! ConnectorObject) {
           _interactionMode = InteractionMode.editingText;
           _lastTappedObjectId = null;
         } else {
@@ -580,8 +646,15 @@ class WorkspaceProvider extends StateHandler {
 
   void onPanUpdate(DragUpdateDetails details) {
     _cursorPosition = details.globalPosition;
-    if (_currentlySelectedObjectId == null) return;
 
+    // NEW: Update the connector drag position
+    if (_interactionMode == InteractionMode.drawingConnector) {
+      _connectorDragPosition = details.globalPosition;
+      notifyListeners();
+      return;
+    }
+
+    if (_currentlySelectedObjectId == null) return;
     if (_interactionMode == InteractionMode.editingText) {
       return;
     }
@@ -626,6 +699,7 @@ class WorkspaceProvider extends StateHandler {
         break;
       case InteractionMode.none:
       case InteractionMode.editingText:
+      case InteractionMode.drawingConnector: // Already handled
         break;
     }
 

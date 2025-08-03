@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/diamond_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/inverted_triangle_object.dart';
@@ -24,15 +25,27 @@ class CanvasPainter extends CustomPainter {
   final double handleRadius;
   final InteractionMode interactionMode;
 
+  // NEW: Connector-related properties
+  final double connectionPointRadius;
+  final String? connectorSourceId;
+  final Alignment? connectorSourceAlignment;
+  final Offset? connectorDragPosition;
+
   CanvasPainter({
     required this.userCursors,
     required this.canvasObjects,
     this.currentlySelectedObjectId,
     this.handleRadius = 8.0,
     required this.interactionMode,
+    // NEW: Initialize connector properties
+    this.connectionPointRadius = 6.0,
+    this.connectorSourceId,
+    this.connectorSourceAlignment,
+    this.connectorDragPosition,
   });
 
-  Color _parseColor(String? colorString) {
+  // ... (_parseColor, _getFontSize, _getTextStyle methods remain the same)
+    Color _parseColor(String? colorString) {
     if (colorString == null) return Colors.black;
     try {
       final hex = colorString.replaceAll('#', '');
@@ -90,31 +103,56 @@ class CanvasPainter extends CustomPainter {
     );
   }
 
+  void _drawArrowhead(Canvas canvas, Offset start, Offset end, Paint paint) {
+    final double arrowSize = 12;
+    final double arrowAngle = 25 * pi / 180;
+    final angle = atan2(end.dy - start.dy, end.dx - start.dx);
+
+    final path = Path();
+    path.moveTo(end.dx - arrowSize * cos(angle - arrowAngle), end.dy - arrowSize * sin(angle - arrowAngle));
+    path.lineTo(end.dx, end.dy);
+    path.lineTo(end.dx - arrowSize * cos(angle + arrowAngle), end.dy - arrowSize * sin(angle + arrowAngle));
+    canvas.drawPath(path, paint..style=PaintingStyle.stroke);
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    for (final canvasObject in canvasObjects.values) {
+    final shapeObjects = canvasObjects.values.where((obj) => obj is! ConnectorObject);
+    final connectorObjects = canvasObjects.values.whereType<ConnectorObject>();
+    
+    // 1. Draw all connectors first (so they appear behind shapes)
+    for (final connector in connectorObjects) {
+      final source = canvasObjects[connector.sourceId];
+      final target = canvasObjects[connector.targetId];
+
+      if (source != null && target != null) {
+        final startPoint = source.getConnectionPoint(connector.sourceAlignment);
+        final endPoint = target.getConnectionPoint(connector.targetAlignment);
+        final paint = Paint()
+          // ..color(Colors.black87)
+          ..strokeWidth = 2.0
+          ..style = PaintingStyle.stroke;
+
+        canvas.drawLine(startPoint, endPoint, paint);
+        _drawArrowhead(canvas, startPoint, endPoint, paint);
+      }
+    }
+    
+    // 2. Draw all shapes and their decorations
+    for (final canvasObject in shapeObjects) {
       final paint = Paint()..color = canvasObject.color;
       Rect rect;
 
+      // ... (existing shape drawing logic remains the same)
       if (canvasObject is Circle) {
         canvas.drawCircle(canvasObject.center, canvasObject.radius, paint);
         rect = Rect.fromCircle(center: canvasObject.center, radius: canvasObject.radius);
       } else if (canvasObject is StickyNoteObject) {
         rect = canvasObject.getBounds();
-        // Define a dynamic border thickness
         final double borderThickness = min(min(rect.width, rect.height) * 0.05, 5.0);
-
-        // The outer rect is the darker border
         final borderPaint = Paint()..color = Color.lerp(canvasObject.color, Colors.black, 0.1)!;
         canvas.drawRect(rect, borderPaint);
-
-        // The inner rect is the lighter main body
-        final bodyRect = Rect.fromLTRB(
-          rect.left + borderThickness,
-          rect.top + borderThickness,
-          rect.right - borderThickness,
-          rect.bottom - borderThickness,
-        );
+        final bodyRect = Rect.fromLTRB(rect.left + borderThickness, rect.top + borderThickness, rect.right - borderThickness, rect.bottom - borderThickness);
         final bodyPaint = Paint()..color = canvasObject.color;
         canvas.drawRect(bodyRect, bodyPaint);
       } else if (canvasObject is TextBoxObject) {
@@ -152,41 +190,31 @@ class CanvasPainter extends CustomPainter {
           canvas.drawOval(Rect.fromCenter(center: bodyRect.bottomCenter, width: rect.width, height: ellipseHeight), paint);
         }
       }
-
+      
+      // ... (existing text drawing logic remains the same)
       final bool isEditingText = interactionMode == InteractionMode.editingText && currentlySelectedObjectId == canvasObject.id;
-
       if (canvasObject.textDelta != null && canvasObject.textDelta!.isNotEmpty && !isEditingText) {
         try {
           final List<dynamic> delta = jsonDecode(canvasObject.textDelta!);
-
-          // Define a base padding and adjust it for sticky notes
           double textPadding = 8.0;
           if (canvasObject is StickyNoteObject) {
             final double borderThickness = min(min(rect.width, rect.height) * 0.05, 5.0);
             textPadding += borderThickness;
           }
-          
           double yOffset = rect.top + textPadding;
-          
           final List<Map<String, dynamic>> lines = [];
           List<Map<String, dynamic>> currentLineOps = [];
-
           for (final op in delta) {
             final String text = op['insert'];
             final Map<String, dynamic>? attributes = op['attributes'] as Map<String, dynamic>?;
-
             if (text.contains('\n')) {
               final textLines = text.split('\n');
               for (int i = 0; i < textLines.length; i++) {
                 if (textLines[i].isNotEmpty) {
                   currentLineOps.add({'insert': textLines[i], 'attributes': attributes});
                 }
-                
-                if (i < textLines.length - 1) { // Line break
-                  lines.add({
-                    'ops': List.from(currentLineOps),
-                    'attributes': attributes ?? {},
-                  });
+                if (i < textLines.length - 1) {
+                  lines.add({'ops': List.from(currentLineOps), 'attributes': attributes ?? {}});
                   currentLineOps.clear();
                 }
               }
@@ -197,45 +225,38 @@ class CanvasPainter extends CustomPainter {
           if (currentLineOps.isNotEmpty) {
              lines.add({'ops': currentLineOps, 'attributes': {}});
           }
-
           int orderedListCounter = 1;
           for(final line in lines) {
               final lineOps = List<Map<String, dynamic>>.from(line['ops'] as List);
               final blockAttributes = line['attributes'] as Map<String, dynamic>;
-
               final lineSpans = lineOps.map((o) => TextSpan(text: o['insert'], style: _getTextStyle(o['attributes'] as Map<String, dynamic>?))).toList();
-
               String prefix = '';
               double indent = 0;
               if (blockAttributes['list'] == 'bullet') {
                 prefix = '• ';
                 indent = 10.0;
-                orderedListCounter = 1; // Reset ordered list
+                orderedListCounter = 1;
               } else if (blockAttributes['list'] == 'ordered') {
                 prefix = '$orderedListCounter. ';
                 indent = 10.0;
                 orderedListCounter++;
               } else {
-                orderedListCounter = 1; // Reset
+                orderedListCounter = 1;
               }
-              
               if (blockAttributes['blockquote'] == true) {
                 indent = 20.0;
                 final blockPaint = Paint()..color = Colors.grey.shade300..strokeWidth = 2;
-                canvas.drawLine(Offset(rect.left + textPadding, yOffset), Offset(rect.left + textPadding, yOffset + 20), blockPaint); // Approximate height
+                canvas.drawLine(Offset(rect.left + textPadding, yOffset), Offset(rect.left + textPadding, yOffset + 20), blockPaint);
               }
-
               if (blockAttributes['code-block'] == true) {
                   final blockPaint = Paint()..color = Colors.grey.shade200;
-                  canvas.drawRect(Rect.fromLTWH(rect.left, yOffset, rect.width, 20), blockPaint); // Approximate height
+                  canvas.drawRect(Rect.fromLTWH(rect.left, yOffset, rect.width, 20), blockPaint);
               }
-
               final textPainter = TextPainter(
                 text: TextSpan(children: [TextSpan(text: prefix, style: _getTextStyle(blockAttributes)), ...lineSpans]),
                 textDirection: TextDirection.ltr,
                 textAlign: TextAlign.start,
               );
-              
               final availableWidth = rect.width - (2 * textPadding) - indent;
               if (availableWidth > 0) {
                 textPainter.layout(maxWidth: availableWidth);
@@ -248,7 +269,7 @@ class CanvasPainter extends CustomPainter {
         }
       }
 
-
+      // Draw resize handles and connection points for the selected object
       if (canvasObject.id == currentlySelectedObjectId && !isEditingText) {
         final handlePaint = Paint()..color = Colors.blue..style = PaintingStyle.fill;
         canvas.drawCircle(rect.topLeft, handleRadius, handlePaint);
@@ -259,9 +280,42 @@ class CanvasPainter extends CustomPainter {
         final borderPaint = Paint()..color = Colors.blue..style = PaintingStyle.stroke..strokeWidth = 2.0;
         final path = Path()..addRect(rect);
         canvas.drawPath(dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])), borderPaint);
+        
+        // NEW: Draw connection points for the selected object
+        final connectionPointPaint = Paint()..color = Colors.white..style = PaintingStyle.fill;
+        final connectionPointBorderPaint = Paint()..color = Colors.blue..style = PaintingStyle.stroke..strokeWidth = 1.5;
+
+        final points = [
+          canvasObject.getConnectionPoint(Alignment.topCenter),
+          canvasObject.getConnectionPoint(Alignment.bottomCenter),
+          canvasObject.getConnectionPoint(Alignment.centerLeft),
+          canvasObject.getConnectionPoint(Alignment.centerRight),
+        ];
+
+        for (final point in points) {
+          canvas.drawCircle(point, connectionPointRadius, connectionPointPaint);
+          canvas.drawCircle(point, connectionPointRadius, connectionPointBorderPaint);
+        }
       }
     }
 
+    // 3. Draw the temporary connector line while dragging
+    if (interactionMode == InteractionMode.drawingConnector &&
+        connectorSourceId != null &&
+        connectorDragPosition != null) {
+      final sourceObject = canvasObjects[connectorSourceId!];
+      if (sourceObject != null) {
+        final startPoint = sourceObject.getConnectionPoint(connectorSourceAlignment!);
+        final endPoint = connectorDragPosition!;
+        final paint = Paint()..color = Colors.blue..strokeWidth = 2.0..style = PaintingStyle.stroke;
+        
+        final path = Path()..moveTo(startPoint.dx, startPoint.dy)..lineTo(endPoint.dx, endPoint.dy);
+        canvas.drawPath(dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])), paint);
+        _drawArrowhead(canvas, startPoint, endPoint, paint);
+      }
+    }
+
+    // 4. Draw user cursors on top of everything
     for (final userCursor in userCursors.values) {
       final position = userCursor.position;
       final paint = Paint()..color = userCursor.color..strokeWidth = 2;
@@ -277,7 +331,8 @@ class CanvasPainter extends CustomPainter {
            oldPainter.canvasObjects.length != canvasObjects.length ||
            oldPainter.currentlySelectedObjectId != currentlySelectedObjectId ||
            oldPainter.interactionMode != interactionMode ||
-           _hasCanvasObjectsChanged(oldPainter.canvasObjects, canvasObjects);
+           _hasCanvasObjectsChanged(oldPainter.canvasObjects, canvasObjects) ||
+           oldPainter.connectorDragPosition != connectorDragPosition; // Add check for connector drag
   }
 
   bool _hasCanvasObjectsChanged(Map<String, CanvasObject> oldObjects, Map<String, CanvasObject> newObjects) {

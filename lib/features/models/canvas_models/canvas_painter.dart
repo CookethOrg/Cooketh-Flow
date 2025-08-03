@@ -1,5 +1,3 @@
-// lib/features/models/canvas_models/canvas_painter.dart
-
 import 'dart:convert';
 import 'dart:math';
 import 'package:cookethflow/core/utils/enums.dart';
@@ -12,6 +10,7 @@ import 'package:cookethflow/features/models/canvas_models/objects/parallelogram_
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rounded_square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
@@ -100,6 +99,24 @@ class CanvasPainter extends CustomPainter {
       if (canvasObject is Circle) {
         canvas.drawCircle(canvasObject.center, canvasObject.radius, paint);
         rect = Rect.fromCircle(center: canvasObject.center, radius: canvasObject.radius);
+      } else if (canvasObject is StickyNoteObject) {
+        rect = canvasObject.getBounds();
+        // Define a dynamic border thickness
+        final double borderThickness = min(min(rect.width, rect.height) * 0.05, 5.0);
+
+        // The outer rect is the darker border
+        final borderPaint = Paint()..color = Color.lerp(canvasObject.color, Colors.black, 0.1)!;
+        canvas.drawRect(rect, borderPaint);
+
+        // The inner rect is the lighter main body
+        final bodyRect = Rect.fromLTRB(
+          rect.left + borderThickness,
+          rect.top + borderThickness,
+          rect.right - borderThickness,
+          rect.bottom - borderThickness,
+        );
+        final bodyPaint = Paint()..color = canvasObject.color;
+        canvas.drawRect(bodyRect, bodyPaint);
       } else if (canvasObject is TextBoxObject) {
         rect = canvasObject.getBounds();
         if (canvasObject.color != Colors.transparent) {
@@ -141,7 +158,14 @@ class CanvasPainter extends CustomPainter {
       if (canvasObject.textDelta != null && canvasObject.textDelta!.isNotEmpty && !isEditingText) {
         try {
           final List<dynamic> delta = jsonDecode(canvasObject.textDelta!);
-          final double textPadding = 8.0;
+
+          // Define a base padding and adjust it for sticky notes
+          double textPadding = 8.0;
+          if (canvasObject is StickyNoteObject) {
+            final double borderThickness = min(min(rect.width, rect.height) * 0.05, 5.0);
+            textPadding += borderThickness;
+          }
+          
           double yOffset = rect.top + textPadding;
           
           final List<Map<String, dynamic>> lines = [];
@@ -176,7 +200,6 @@ class CanvasPainter extends CustomPainter {
 
           int orderedListCounter = 1;
           for(final line in lines) {
-              // FIX: Safely create a typed list from the dynamic list.
               final lineOps = List<Map<String, dynamic>>.from(line['ops'] as List);
               final blockAttributes = line['attributes'] as Map<String, dynamic>;
 

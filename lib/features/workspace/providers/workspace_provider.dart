@@ -1,5 +1,3 @@
-// lib/features/workspace/providers/workspace_provider.dart
-
 import 'dart:ui';
 import 'dart:convert'; // For jsonDecode/jsonEncode
 
@@ -18,12 +16,14 @@ import 'package:cookethflow/features/models/canvas_models/objects/parallelogram_
 import 'package:cookethflow/features/models/canvas_models/objects/rectangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/rounded_square_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/square_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart'; // Import StickyNoteObject
 import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/triangle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart'; // Import for icon
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
@@ -70,6 +70,9 @@ class WorkspaceProvider extends StateHandler {
   DateTime? _lastTapTime;
   String? _lastTappedObjectId;
 
+  // NEW: Add a field to store the color for the next object
+  Color _nextObjectColor = Colors.yellow;
+
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
   int? get selectedTileIndex => _selectedTileIndex;
@@ -93,6 +96,15 @@ class WorkspaceProvider extends StateHandler {
 
   QuillController get selectedObjectQuillController {
     return _tempQuillController;
+  }
+  
+  // NEW: Method to prepare for creating a sticky note
+  void setStickyNoteMode(Color color) {
+    _currentMode = DrawMode.stickyNote;
+    _nextObjectColor = color;
+    // Deselect any current object to avoid confusion
+    changeCurrentlySelectedObj(null);
+    notifyListeners();
   }
 
   void _onQuillContentChanged() {
@@ -365,6 +377,9 @@ class WorkspaceProvider extends StateHandler {
         return Icons.change_history;
       case InvertedTriangle.type:
         return Icons.warning_amber_rounded;
+      // NEW: Add icon for sticky note
+      case StickyNoteObject.type:
+        return PhosphorIconsRegular.noteBlank;
       case TextBoxObject.type:
         return Icons.text_fields;
       default:
@@ -429,6 +444,21 @@ class WorkspaceProvider extends StateHandler {
           defaultTopLeft,
           defaultBottomRight,
         );
+        break;
+      // NEW: Add case for creating a sticky note
+      case DrawMode.stickyNote:
+        newObject = StickyNoteObject.createNew(
+          position: details.globalPosition,
+          color: _nextObjectColor,
+        );
+        final initialDoc = Document()..insert(0, 'Double-click to edit');
+        newObject = newObject.copyWith(
+          textDelta: jsonEncode(
+            initialDoc.toDelta().toJson(),
+          ),
+        );
+        // After placing the note, revert to pointer mode
+        _currentMode = DrawMode.pointer;
         break;
       case DrawMode.textBox:
         final textBoxTopLeft = details.globalPosition;

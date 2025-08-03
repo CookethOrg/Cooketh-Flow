@@ -43,7 +43,8 @@ enum DrawMode {
   cylinder(iconData: Icons.view_in_ar_outlined), // Placeholder
   triangle(iconData: Icons.change_history),
   invertedTriangle(iconData: Icons.warning_amber_rounded), // Placeholder
-  textBox(iconData: PhosphorIconsRegular.textT);
+  textBox(iconData: PhosphorIconsRegular.textT),
+  stickyNote(iconData: PhosphorIconsRegular.notePencil);
 
   const DrawMode({required this.iconData});
   final IconData iconData;

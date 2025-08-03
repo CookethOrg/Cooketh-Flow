@@ -5,17 +5,64 @@ import 'dart:math' as math;
 
 import 'package:provider/provider.dart';
 
-// The main NodePicker widget as per the design
-class NodePicker extends StatelessWidget {
+// The main NodePicker widget, now stateful
+class NodePicker extends StatefulWidget {
   const NodePicker({super.key});
 
   @override
+  State<NodePicker> createState() => _NodePickerState();
+}
+
+class _NodePickerState extends State<NodePicker> {
+  late final TextEditingController _searchController;
+  late final List<Map<String, dynamic>> _allShapes;
+  List<Map<String, dynamic>> _filteredShapes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _searchController = TextEditingController();
+
+    // Define all available shapes
+    _allShapes = [
+      {'name': 'Square', 'drawMode': DrawMode.square, 'shapeType': ShapeType.square},
+      {'name': 'Diamond', 'drawMode': DrawMode.diamond, 'shapeType': ShapeType.diamond},
+      {'name': 'Rounded Square', 'drawMode': DrawMode.roundedSquare, 'shapeType': ShapeType.roundedSquare},
+      {'name': 'Parallelogram', 'drawMode': DrawMode.parallelogram, 'shapeType': ShapeType.parallelogram},
+      {'name': 'Cylinder', 'drawMode': DrawMode.cylinder, 'shapeType': ShapeType.cylinder},
+      {'name': 'Circle', 'drawMode': DrawMode.circle, 'shapeType': ShapeType.circle},
+      {'name': 'Triangle', 'drawMode': DrawMode.triangle, 'shapeType': ShapeType.triangle},
+      {'name': 'Inverted Triangle', 'drawMode': DrawMode.invertedTriangle, 'shapeType': ShapeType.invertedTriangle},
+    ];
+
+    _filteredShapes = _allShapes;
+
+    _searchController.addListener(_filterShapes);
+  }
+
+  void _filterShapes() {
+    final query = _searchController.text.toLowerCase();
+    setState(() {
+      _filteredShapes = _allShapes.where((shape) {
+        final shapeName = shape['name'].toString().toLowerCase();
+        return shapeName.contains(query);
+      }).toList();
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_filterShapes);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Using a container to create the card-like appearance
     return Consumer<WorkspaceProvider>(
       builder: (context, provider, child) {
         return Container(
-          width: 340, // Fixed width as it appears in the image
+          width: 340,
           padding: const EdgeInsets.all(24.0),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -29,11 +76,9 @@ class NodePicker extends StatelessWidget {
             ],
           ),
           child: Column(
-            mainAxisSize:
-                MainAxisSize.min, // To make the column wrap its content
+            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header section with Title and Close button
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -45,7 +90,6 @@ class NodePicker extends StatelessWidget {
                       color: Color(0xFF111827),
                     ),
                   ),
-                  // The close button inside the picker itself
                   IconButton(
                     icon: const Icon(
                       Icons.close,
@@ -53,7 +97,6 @@ class NodePicker extends StatelessWidget {
                       size: 28,
                     ),
                     onPressed: () {
-                      // Closes the dialog
                       Navigator.of(context).pop();
                     },
                   ),
@@ -62,6 +105,7 @@ class NodePicker extends StatelessWidget {
               const SizedBox(height: 20),
               // Search bar
               TextField(
+                controller: _searchController,
                 decoration: InputDecoration(
                   hintText: 'Search for a shape',
                   hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
@@ -91,52 +135,25 @@ class NodePicker extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               // Grid of shapes
-              GridView.count(
-                crossAxisCount: 4,
-                shrinkWrap:
-                    true, // Important to make GridView work inside a Column
-                physics:
-                    const NeverScrollableScrollPhysics(), // Disable scrolling in the grid
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                children: [
-                  GestureDetector(
-                    onTap: () => provider.changeDrawMode(DrawMode.square),
-                    child: ShapeWidget(shapeType: ShapeType.square),
-                  ),
-                  GestureDetector(
-                    onTap: () => provider.changeDrawMode(DrawMode.diamond),
-                    child: ShapeWidget(shapeType: ShapeType.diamond),
-                  ),
-                  GestureDetector(
-                    onTap:
-                        () => provider.changeDrawMode(DrawMode.roundedSquare),
-                    child: ShapeWidget(shapeType: ShapeType.roundedSquare),
-                  ),
-                  GestureDetector(
-                    onTap:
-                        () => provider.changeDrawMode(DrawMode.parallelogram),
-                    child: ShapeWidget(shapeType: ShapeType.parallelogram),
-                  ),
-                  GestureDetector(
-                    onTap: () => provider.changeDrawMode(DrawMode.cylinder),
-                    child: ShapeWidget(shapeType: ShapeType.cylinder),
-                  ),
-                  GestureDetector(
-                    onTap: () => provider.changeDrawMode(DrawMode.circle),
-                    child: ShapeWidget(shapeType: ShapeType.circle),
-                  ),
-                  GestureDetector(
-                    onTap: () => provider.changeDrawMode(DrawMode.triangle),
-                    child: ShapeWidget(shapeType: ShapeType.triangle),
-                  ),
-                  GestureDetector(
-                    onTap:
-                        () =>
-                            provider.changeDrawMode(DrawMode.invertedTriangle),
-                    child: ShapeWidget(shapeType: ShapeType.invertedTriangle),
-                  ),
-                ],
+              GridView.builder(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                ),
+                itemCount: _filteredShapes.length,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemBuilder: (context, index) {
+                  final shape = _filteredShapes[index];
+                  return GestureDetector(
+                    onTap: () {
+                      provider.changeDrawMode(shape['drawMode']);
+                      Navigator.of(context).pop(); // Close picker on selection
+                    },
+                    child: ShapeWidget(shapeType: shape['shapeType']),
+                  );
+                },
               ),
             ],
           ),
@@ -158,7 +175,7 @@ class ShapeWidget extends StatelessWidget {
       width: 60,
       height: 60,
       decoration: BoxDecoration(
-        color: Colors.transparent, // transparent background
+        color: Colors.transparent,
         borderRadius: BorderRadius.circular(8.0),
       ),
       child: CustomPaint(painter: ShapePainter(shapeType: shapeType)),
@@ -178,7 +195,7 @@ class ShapePainter extends CustomPainter {
         Paint()
           ..color =
               Colors
-                  .black // A nice purple-blue color
+                  .black
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.0;
 
@@ -239,7 +256,7 @@ class ShapePainter extends CustomPainter {
         );
         canvas.drawLine(rect.topLeft, rect.bottomLeft, paint);
         canvas.drawLine(rect.topRight, rect.bottomRight, paint);
-        return; // Return early as we are drawing multiple parts
+        return;
       case ShapeType.circle:
         path.addOval(Rect.fromLTWH(w * 0.1, h * 0.1, w * 0.8, h * 0.8));
         break;

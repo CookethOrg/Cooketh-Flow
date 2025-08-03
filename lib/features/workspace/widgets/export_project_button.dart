@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/features/workspace/widgets/export_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -9,7 +10,9 @@ class ExportProjectButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
-      onPressed: () {},
+      onPressed: () {
+        showDialog(context: context, builder: (context) => ExportDialog(),);
+      },
       style: ElevatedButton.styleFrom(
         elevation: 0,
         backgroundColor: primaryColor,

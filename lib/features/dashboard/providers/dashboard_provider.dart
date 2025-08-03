@@ -76,20 +76,9 @@ class DashboardProvider extends StateHandler {
             .select()
             .eq('owner', res.id);
         _workspaceList.clear();
-        for (var workspace in _dbWorkspace) {
-          WorkspaceModel newWorkspace = WorkspaceModel(
-            id: workspace["id"],
-            owner: workspace["owner"],
-            name: workspace["name"],
-            editorIdList:
-                (workspace["editorId"] as List?)?.cast<String>() ?? [],
-            viewerIdList:
-                (workspace["viewerId"] as List?)?.cast<String>() ?? [],
-            lastEdited:
-                workspace["last edited"] != null
-                    ? DateTime.parse(workspace["last edited"])
-                    : DateTime.now(),
-          );
+        for (var workspaceData in _dbWorkspace) {
+          // The updated fromJson factory now handles the 'data' field
+          WorkspaceModel newWorkspace = WorkspaceModel.fromJson(workspaceData);
           _workspaceList[newWorkspace.id] = newWorkspace;
         }
       } catch (e) {
@@ -99,6 +88,14 @@ class DashboardProvider extends StateHandler {
       print("Error initialising user: $e");
     } finally {
       _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  // NEW: Update an entire workspace model, used by WorkspaceProvider
+  void updateWorkspace(WorkspaceModel workspace) {
+    if (_workspaceList.containsKey(workspace.id)) {
+      _workspaceList[workspace.id] = workspace;
       notifyListeners();
     }
   }
@@ -128,6 +125,7 @@ class DashboardProvider extends StateHandler {
         "name": "New Project",
         "editorId": [],
         "viewerId": [],
+        "data": {}, // Initialize with empty data
       };
 
       await supabase!.from('workspace').insert(newWorkspaceData);
@@ -173,7 +171,6 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  // UPDATED deleteWorkspace function
   Future<void> deleteWorkspace(String id) async {
     if (supabase == null) {
       print("Supabase client is not initialized. Cannot delete workspace.");
@@ -184,7 +181,6 @@ class DashboardProvider extends StateHandler {
     notifyListeners();
 
     try {
-      // 1. Delete all canvas_objects linked to this workspace
       print('Deleting canvas_objects for workspace: $id');
       await supabase!
           .from('canvas_objects')
@@ -192,8 +188,6 @@ class DashboardProvider extends StateHandler {
           .eq('workspace_id', id);
       print('Canvas objects for workspace $id deleted from database.');
 
-
-      // 3. Delete the workspace from the database
       print('Deleting workspace: $id');
       await supabase!
           .from('workspace')
@@ -201,7 +195,6 @@ class DashboardProvider extends StateHandler {
           .eq('id', id);
       print('Workspace $id deleted from database.');
 
-      // 4. Then remove it from the local list
       _workspaceList.remove(id);
       
       print("Workspace $id removed from local list.");
@@ -210,7 +203,7 @@ class DashboardProvider extends StateHandler {
     } finally {
       _isLoading = false;
       notifyListeners();
-      await refreshDashboard(); // Refresh local list after sync to pick up DB changes
+      await refreshDashboard();
     }
   }
 }

@@ -146,6 +146,9 @@ class WorkspaceProvider extends StateHandler {
     }
 
     _workspaceNameController.text = _currentWorkspace!.name;
+    // NEW: Set the workspace color from the loaded model
+    _currentWorkspaceColor = _currentWorkspace?.backgroundColor ?? scaffoldColor;
+    
     _canvasObjects.clear();
     _userCursors.clear();
     _currentlySelectedObjectId = null;
@@ -273,6 +276,27 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+  // NEW: Method to save workspace 'data' field
+  Future<void> _updateWorkspaceDataInDb() async {
+    if (_currentWorkspace == null) return;
+    try {
+      final dataToSave = _currentWorkspace!.toJson()['data'];
+
+      await _supabaseService.supabase
+          .from('workspace')
+          .update({'data': dataToSave})
+          .eq('id', _currentWorkspace!.id);
+
+      // Update the model in the DashboardProvider to keep states consistent
+      _dashboardProvider.updateWorkspace(_currentWorkspace!);
+
+      print("Workspace data updated in DB: $dataToSave");
+    } catch (e) {
+      print("Error updating workspace data: $e");
+    }
+  }
+
+
   Future<void> _saveCanvasObjectToDb(String objectId) async {
     if (_currentWorkspace == null) return;
     final objectToSave = _canvasObjects[objectId];
@@ -293,7 +317,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanEnd(DragEndDetails details) async {
-    // If we are in hand mode, do nothing.
     if (_currentMode == DrawMode.hand) return;
 
     if (_interactionMode == InteractionMode.drawingConnector &&
@@ -380,8 +403,15 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
+  // UPDATED: This method now saves the color to the database.
   void changeWorkspaceColor(Color newColor) {
     _currentWorkspaceColor = newColor;
+
+    if (_currentWorkspace != null) {
+      _currentWorkspace = _currentWorkspace!.copyWith(backgroundColor: newColor);
+      _updateWorkspaceDataInDb();
+    }
+    
     notifyListeners();
   }
 
@@ -507,7 +537,7 @@ class WorkspaceProvider extends StateHandler {
         );
         break;
       case DrawMode.pointer:
-      case DrawMode.hand: // Do nothing for pointer or hand mode
+      case DrawMode.hand:
         break;
     }
 
@@ -547,7 +577,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanDown(DragDownDetails details) {
-    // If in hand mode, do nothing and let the InteractiveViewer handle panning.
     if (_currentMode == DrawMode.hand) {
       return;
     }
@@ -646,7 +675,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanUpdate(DragUpdateDetails details) {
-    // If in hand mode, do nothing and let the InteractiveViewer handle panning.
     if (_currentMode == DrawMode.hand) {
       return;
     }

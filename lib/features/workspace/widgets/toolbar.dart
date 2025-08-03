@@ -7,8 +7,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
-import 'package:cookethflow/features/workspace/widgets/node_colour.dart';
 import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
+import 'package:cookethflow/features/workspace/widgets/workspace_color_picker.dart'; // Import the new picker
 
 class ToolBar extends StatelessWidget {
   const ToolBar({super.key});
@@ -34,8 +34,7 @@ class ToolBar extends StatelessWidget {
                 'Select Workspace Color',
                 device,
                 onPressed: () {
-                  _showColorPicker(context);
-                  print('Paint bucket pressed');
+                  _showColorPicker(context, provider); // Pass the provider
                 },
               ),
               _horizontalDivider(),
@@ -45,7 +44,6 @@ class ToolBar extends StatelessWidget {
                 device,
                 onPressed: () {
                   _showNodePicker(context);
-                  print('Circles three plus pressed');
                 },
               ),
               _horizontalDivider(),
@@ -56,10 +54,8 @@ class ToolBar extends StatelessWidget {
                 iconColor: provider.currentMode == DrawMode.pointer ? Colors.blue : Colors.black,
                 onPressed: () {
                   provider.changeDrawMode(DrawMode.pointer);
-                  print('Pointer tool selected');
                 },
               ),
-              // NEW: Hand tool for panning
               _toolIcon(
                 PhosphorIconsRegular.handGrabbing,
                 'Pan',
@@ -67,7 +63,6 @@ class ToolBar extends StatelessWidget {
                 iconColor: provider.currentMode == DrawMode.hand ? Colors.blue : Colors.black,
                 onPressed: () {
                   provider.changeDrawMode(DrawMode.hand);
-                  print('Hand tool selected');
                 },
               ),
               _toolIcon(
@@ -77,17 +72,13 @@ class ToolBar extends StatelessWidget {
                 iconColor: provider.currentMode == DrawMode.textBox ? Colors.blue : Colors.black,
                 onPressed: () {
                   provider.changeDrawMode(DrawMode.textBox);
-                  print('Text box pressed, mode changed to textBox');
                 },
               ),
               _toolIcon(
                 PhosphorIconsRegular.image,
-                'Add Image/Media files',
+                'Add Image/Media files - Coming soon',
                 device,
-                onPressed: () {
-                  // TODO: Add image functionality
-                  print('Image pressed');
-                },
+                onPressed: () {},
               ),
               _toolIcon(
                 PhosphorIconsFill.noteBlank,
@@ -171,33 +162,39 @@ class ToolBar extends StatelessWidget {
     );
   }
 
-  void _showColorPicker(BuildContext context) {
+  void _showColorPicker(BuildContext context, WorkspaceProvider provider) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final position = renderBox.localToGlobal(Offset.zero);
+      final pickerWidth = 350.w;
+      final padding = 20.w;
 
       showDialog(
         context: context,
         barrierColor: Colors.transparent,
-        builder:
-            (context) => Stack(
-              children: [
-                Positioned.fill(
-                  child: GestureDetector(
-                    onTap: () => Navigator.pop(context),
-                    child: Container(color: Colors.transparent),
-                  ),
-                ),
-                Positioned(
-                  right: 130.w,
-                  top: 100.h,
-                  child: Material(
-                    color: Colors.transparent,
-                    child: NodeColourPicker(),
-                  ),
-                ),
-              ],
+        builder: (context) => Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(color: Colors.transparent),
+              ),
             ),
+            Positioned(
+              top: position.dy,
+              left: position.dx - pickerWidth - padding,
+              child: Material(
+                color: Colors.transparent,
+                child: WorkspaceColorPicker(
+                  initialColor: provider.currentWorkspaceColor,
+                  onColorChanged: (color) {
+                    provider.changeWorkspaceColor(color);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       );
     }
   }

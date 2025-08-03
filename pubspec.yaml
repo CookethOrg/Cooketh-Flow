@@ -59,6 +59,7 @@ dependencies:
   cached_network_image: ^3.4.1
   vector_math: ^2.1.4
   flutter_quill: ^11.4.2
+  path_drawing: ^1.0.1
 
 dev_dependencies:
   flutter_test:

@@ -49,7 +49,7 @@ class CanvasPage extends StatelessWidget {
                 panEnabled: workspaceProvider.interactionMode != InteractionMode.editingText,
                 scaleEnabled: workspaceProvider.interactionMode != InteractionMode.editingText,
                 child: Container(
-                  color: Colors.grey[200],
+                  color: workspaceProvider.currentWorkspaceColor,
                   child: GestureDetector(
                     onPanDown: (details) {
                         workspaceProvider.onPanDown(DragDownDetails(globalPosition: details.localPosition));

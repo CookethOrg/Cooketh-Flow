@@ -300,9 +300,7 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // CHANGE: Simplified and corrected state management.
   void changeCurrentlySelectedObj(String? id) {
-    // If we are switching from editing one object to another, or to nothing.
     if (_currentlySelectedObjectId != null &&
         _interactionMode == InteractionMode.editingText) {
       _saveCanvasObjectToDb(_currentlySelectedObjectId!);
@@ -311,11 +309,9 @@ class WorkspaceProvider extends StateHandler {
     _currentlySelectedObjectId = id;
 
     if (id == null) {
-      // If we are deselecting, clear the controller and reset the mode.
       _tempQuillController.clear();
       _interactionMode = InteractionMode.none;
     } else {
-      // If we are selecting a new object, load its content.
       final selectedObject = _canvasObjects[id];
       if (selectedObject?.textDelta != null) {
         try {
@@ -327,7 +323,6 @@ class WorkspaceProvider extends StateHandler {
           print("Error parsing Delta, loaded as plain text: $e");
         }
       } else {
-        // If the object has no text, clear the controller.
         _tempQuillController.clear();
       }
     }
@@ -443,7 +438,7 @@ class WorkspaceProvider extends StateHandler {
         );
         newObject = TextBoxObject.createNew(textBoxTopLeft, textBoxBottomRight);
         final initialDoc = Document()..insert(0, 'Double-click to edit');
-        newObject = (newObject as TextBoxObject).copyWith(
+        newObject = (newObject).copyWith(
           textDelta: jsonEncode(
             initialDoc.toDelta().toJson(),
           ),
@@ -476,13 +471,47 @@ class WorkspaceProvider extends StateHandler {
       final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
       if (selectedObject != null &&
           !selectedObject.getBounds().contains(details.globalPosition)) {
-        changeCurrentlySelectedObj(null); // Save, clear, and reset mode
+        changeCurrentlySelectedObj(null);
         notifyListeners();
       }
       return;
     }
 
     if (_currentMode == DrawMode.pointer) {
+      // Check for resize handle interaction first
+      if (_currentlySelectedObjectId != null) {
+        final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
+        if (selectedObject != null) {
+          final bounds = selectedObject.getBounds();
+          if (Rect.fromCircle(center: bounds.topLeft, radius: _handleRadius)
+              .contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingTopLeft;
+            notifyListeners();
+            return;
+          }
+          if (Rect.fromCircle(center: bounds.topRight, radius: _handleRadius)
+              .contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingTopRight;
+            notifyListeners();
+            return;
+          }
+          if (Rect.fromCircle(
+                  center: bounds.bottomLeft, radius: _handleRadius)
+              .contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingBottomLeft;
+            notifyListeners();
+            return;
+          }
+          if (Rect.fromCircle(
+                  center: bounds.bottomRight, radius: _handleRadius)
+              .contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingBottomRight;
+            notifyListeners();
+            return;
+          }
+        }
+      }
+
       CanvasObject? tappedObject;
       for (final canvasObject in _canvasObjects.values.toList().reversed) {
         if (canvasObject.intersectsWith(details.globalPosition)) {
@@ -496,21 +525,17 @@ class WorkspaceProvider extends StateHandler {
           changeCurrentlySelectedObj(tappedObject.id);
         }
 
-        if (tappedObject is TextBoxObject) {
-          final now = DateTime.now();
-          final isDoubleTap = _lastTappedObjectId == tappedObject.id &&
-              _lastTapTime != null &&
-              now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
+        final now = DateTime.now();
+        final isDoubleTap = _lastTappedObjectId == tappedObject.id &&
+            _lastTapTime != null &&
+            now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
 
-          _lastTapTime = now;
-          _lastTappedObjectId = tappedObject.id;
+        _lastTapTime = now;
+        _lastTappedObjectId = tappedObject.id;
 
-          if (isDoubleTap) {
-            _interactionMode = InteractionMode.editingText;
-            _lastTappedObjectId = null;
-          } else {
-            _interactionMode = InteractionMode.moving;
-          }
+        if (isDoubleTap) {
+          _interactionMode = InteractionMode.editingText;
+          _lastTappedObjectId = null;
         } else {
           _interactionMode = InteractionMode.moving;
         }
@@ -542,13 +567,12 @@ class WorkspaceProvider extends StateHandler {
         break;
       case InteractionMode.resizingTopLeft:
         final newTopLeft = currentObject.getBounds().topLeft + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
-            .resize(newTopLeft, currentObject.getBounds().bottomRight);
+        _canvasObjects[_currentlySelectedObjectId!] =
+            currentObject.resize(newTopLeft, currentObject.getBounds().bottomRight);
         break;
       case InteractionMode.resizingTopRight:
         final newTopRight = currentObject.getBounds().topRight + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
-            .resize(
+        _canvasObjects[_currentlySelectedObjectId!] = currentObject.resize(
               Offset(currentObject.getBounds().topLeft.dx, newTopRight.dy),
               Offset(newTopRight.dx, currentObject.getBounds().bottomRight.dy),
             );
@@ -556,8 +580,7 @@ class WorkspaceProvider extends StateHandler {
       case InteractionMode.resizingBottomLeft:
         final newBottomLeft =
             currentObject.getBounds().bottomLeft + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
-            .resize(
+        _canvasObjects[_currentlySelectedObjectId!] = currentObject.resize(
               Offset(newBottomLeft.dx, currentObject.getBounds().topLeft.dy),
               Offset(
                 currentObject.getBounds().bottomRight.dx,
@@ -568,8 +591,8 @@ class WorkspaceProvider extends StateHandler {
       case InteractionMode.resizingBottomRight:
         final newBottomRight =
             currentObject.getBounds().bottomRight + details.delta;
-        _canvasObjects[_currentlySelectedObjectId!] = (currentObject as dynamic)
-            .resize(currentObject.getBounds().topLeft, newBottomRight);
+        _canvasObjects[_currentlySelectedObjectId!] =
+            currentObject.resize(currentObject.getBounds().topLeft, newBottomRight);
         break;
       case InteractionMode.none:
       case InteractionMode.editingText:

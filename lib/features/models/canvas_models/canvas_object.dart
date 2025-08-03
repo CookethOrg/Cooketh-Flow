@@ -1,3 +1,5 @@
+// lib/features/models/canvas_models/canvas_object.dart
+
 import 'dart:convert';
 import 'dart:math';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
@@ -61,7 +63,7 @@ abstract class CanvasObject extends SyncedObject {
   }
 
   bool intersectsWith(Offset point);
-  CanvasObject copyWith({String? textDelta});
+  CanvasObject copyWith({String? textDelta, Color? color});
   CanvasObject move(Offset delta);
   Rect getBounds();
   CanvasObject resize(

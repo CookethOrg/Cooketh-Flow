@@ -131,7 +131,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                   width: visibleRect.width,
                   height: visibleRect.height,
                   decoration: BoxDecoration(
-                    // CHANGE: Made the editor background transparent.
+                    // The editor background is transparent to see the object behind it.
                     color: Colors.transparent,
                     border: Border.all(
                       color: Colors.blue.shade400,
@@ -145,7 +145,6 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                       padding: const EdgeInsets.all(8.0),
                       scrollable: true,
                       expands: true,
-                      // CHANGE: Added a default text style for readability.
                       customStyles: DefaultStyles(
                         placeHolder: DefaultTextBlockStyle(
                           const TextStyle(color: Colors.grey),
@@ -155,7 +154,8 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                           null,
                         ),
                         paragraph: DefaultTextBlockStyle(
-                          const TextStyle(color: Colors.black), // Default text color
+                          // Default text color
+                          const TextStyle(color: Colors.black),
                           const HorizontalSpacing(0, 0),
                           const VerticalSpacing(0, 0),
                           const VerticalSpacing(0, 0),

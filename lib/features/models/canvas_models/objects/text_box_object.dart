@@ -66,7 +66,6 @@ class TextBoxObject extends CanvasObject {
       id: id,
       color: color ?? this.color,
       topLeft: topLeft ?? this.topLeft,
-      // FIX: Corrected a bug where it referenced topLeft instead of bottomRight
       bottomRight: bottomRight ?? this.bottomRight,
       textDelta: textDelta ?? this.textDelta,
     );

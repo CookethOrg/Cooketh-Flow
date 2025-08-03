@@ -16,7 +16,7 @@ class Square extends CanvasObject {
     required super.color,
     required this.bottomRight,
     required this.topLeft,
-    super.textDelta, // ADDED: textDelta to private constructor
+    super.textDelta,
   });
 
   factory Square({
@@ -24,14 +24,12 @@ class Square extends CanvasObject {
     required Color color,
     required Offset topLeft,
     required Offset bottomRight,
-    String? textDelta, // ADDED: textDelta to factory constructor
+    String? textDelta,
   }) {
-    // Ensure it's a square when created or resized
     final dx = bottomRight.dx - topLeft.dx;
     final dy = bottomRight.dy - topLeft.dy;
     final side = max(dx.abs(), dy.abs());
 
-    // Maintain aspect ratio. The sign ensures direction (e.g., growing right/down)
     final adjustedBottomRight = Offset(
       topLeft.dx + side * dx.sign,
       topLeft.dy + side * dy.sign,
@@ -42,7 +40,7 @@ class Square extends CanvasObject {
       color: color,
       topLeft: topLeft,
       bottomRight: adjustedBottomRight,
-      textDelta: textDelta, // ADDED: Pass textDelta to private constructor
+      textDelta: textDelta,
     );
   }
 
@@ -55,7 +53,7 @@ class Square extends CanvasObject {
       super(
         id: json['id'],
         color: Color(json['color'] as int),
-        textDelta: json['text_delta'], // ADDED: Load text_delta
+        textDelta: json['text_delta'],
       );
 
   Square.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
@@ -64,7 +62,7 @@ class Square extends CanvasObject {
       super(
         id: const Uuid().v4(),
         color: RandomColor.getRandom(),
-        textDelta: null, // Initial text is null
+        textDelta: null,
       );
 
   @override
@@ -75,7 +73,7 @@ class Square extends CanvasObject {
       'color': color.value,
       'top_left': {'x': topLeft.dx, 'y': topLeft.dy},
       'bottom_right': {'x': bottomRight.dx, 'y': bottomRight.dy},
-      'text_delta': textDelta, // ADDED: Save text_delta
+      'text_delta': textDelta,
     };
   }
 
@@ -86,14 +84,12 @@ class Square extends CanvasObject {
     Color? color,
     String? textDelta,
   }) {
-    // ADDED: textDelta to copyWith signature
-    // Pass through the factory constructor to ensure it remains a square
     return Square(
       id: id,
       color: color ?? this.color,
       bottomRight: bottomRight ?? this.bottomRight,
       topLeft: topLeft ?? this.topLeft,
-      textDelta: textDelta ?? this.textDelta, // ADDED: Copy textDelta
+      textDelta: textDelta ?? this.textDelta,
     );
   }
 
@@ -121,16 +117,13 @@ class Square extends CanvasObject {
 
   @override
   Square resize(Offset newTopLeft, Offset newBottomRight) {
-    // Ensure square constraint is maintained during resize
-    // Calculate new width/height from the bounding box
     final newWidth = (newBottomRight.dx - newTopLeft.dx).abs();
     final newHeight = (newBottomRight.dy - newTopLeft.dy).abs();
     final side = max(
       newWidth,
       newHeight,
-    ); // Take the larger dimension for the square
+    );
 
-    // Adjust newBottomRight to maintain square aspect ratio from newTopLeft
     final adjustedBottomRight = Offset(
       newTopLeft.dx + side,
       newTopLeft.dy + side,
@@ -140,7 +133,7 @@ class Square extends CanvasObject {
       id: id,
       color: color,
       topLeft: newTopLeft,
-      bottomRight: adjustedBottomRight, // Use the adjusted bottom-right
+      bottomRight: adjustedBottomRight,
       textDelta: textDelta,
     );
   }

@@ -18,7 +18,7 @@ class Rectangle extends CanvasObject {
     required super.color,
     required this.topLeft,
     required this.bottomRight,
-    super.textDelta, // ADDED: textDelta to constructor
+    super.textDelta,
   });
 
   Rectangle.fromJson(Map<String, dynamic> json)
@@ -30,7 +30,7 @@ class Rectangle extends CanvasObject {
       super(
         id: json['id'],
         color: Color(json['color'] as int),
-        textDelta: json['text_delta'], // ADDED: Load text_delta
+        textDelta: json['text_delta'],
       );
 
   /// Constructor to be used when first creating the object on the canvas with a default size
@@ -40,7 +40,7 @@ class Rectangle extends CanvasObject {
       super(
         color: RandomColor.getRandom(),
         id: const Uuid().v4(),
-        textDelta: null, // Initial text is null
+        textDelta: null,
       );
 
   @override
@@ -51,7 +51,7 @@ class Rectangle extends CanvasObject {
       'color': color.value,
       'top_left': {'x': topLeft.dx, 'y': topLeft.dy},
       'bottom_right': {'x': bottomRight.dx, 'y': bottomRight.dy},
-      'text_delta': textDelta, // ADDED: Save text_delta
+      'text_delta': textDelta,
     };
   }
 
@@ -62,13 +62,12 @@ class Rectangle extends CanvasObject {
     Color? color,
     String? textDelta,
   }) {
-    // ADDED: textDelta to copyWith signature
     return Rectangle(
       topLeft: topLeft ?? this.topLeft,
       id: id,
       bottomRight: bottomRight ?? this.bottomRight,
       color: color ?? this.color,
-      textDelta: textDelta ?? this.textDelta, // ADDED: Copy textDelta
+      textDelta: textDelta ?? this.textDelta,
     );
   }
 
@@ -96,7 +95,6 @@ class Rectangle extends CanvasObject {
 
   @override
   Rectangle resize(Offset newTopLeft, Offset newBottomRight) {
-    // Ensure that width and height are not negative
     final correctedTopLeft = Offset(
       min(newTopLeft.dx, newBottomRight.dx),
       min(newTopLeft.dy, newBottomRight.dy),

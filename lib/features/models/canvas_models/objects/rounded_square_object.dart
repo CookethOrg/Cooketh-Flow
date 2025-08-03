@@ -1,6 +1,6 @@
 // lib/features/models/canvas_models/objects/rounded_square_object.dart
 
-import 'dart:math'; // Added for min/max in resize
+import 'dart:math';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
@@ -17,7 +17,7 @@ class RoundedSquare extends CanvasObject {
     required this.topLeft,
     required this.bottomRight,
     this.cornerRadius = 10.0,
-    super.textDelta, // ADDED: textDelta to constructor
+    super.textDelta,
   });
 
   RoundedSquare.fromJson(Map<String, dynamic> json)
@@ -30,7 +30,7 @@ class RoundedSquare extends CanvasObject {
       super(
         id: json['id'],
         color: Color(json['color'] as int),
-        textDelta: json['text_delta'], // ADDED: Load text_delta
+        textDelta: json['text_delta'],
       );
 
   RoundedSquare.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
@@ -40,7 +40,7 @@ class RoundedSquare extends CanvasObject {
       super(
         color: RandomColor.getRandom(),
         id: const Uuid().v4(),
-        textDelta: null, // Initial text is null
+        textDelta: null,
       );
 
   @override
@@ -52,7 +52,7 @@ class RoundedSquare extends CanvasObject {
       'top_left': {'x': topLeft.dx, 'y': topLeft.dy},
       'bottom_right': {'x': bottomRight.dx, 'y': bottomRight.dy},
       'corner_radius': cornerRadius,
-      'text_delta': textDelta, // ADDED: Save text_delta
+      'text_delta': textDelta,
     };
   }
 
@@ -63,14 +63,13 @@ class RoundedSquare extends CanvasObject {
     Color? color,
     String? textDelta,
   }) {
-    // ADDED: textDelta to copyWith signature
     return RoundedSquare(
       topLeft: topLeft ?? this.topLeft,
       id: id,
       bottomRight: bottomRight ?? this.bottomRight,
       color: color ?? this.color,
       cornerRadius: cornerRadius,
-      textDelta: textDelta ?? this.textDelta, // ADDED: Copy textDelta
+      textDelta: textDelta ?? this.textDelta,
     );
   }
 
@@ -92,7 +91,6 @@ class RoundedSquare extends CanvasObject {
 
   @override
   RoundedSquare resize(Offset newTopLeft, Offset newBottomRight) {
-    // Ensure that width and height are not negative
     final correctedTopLeft = Offset(
       min(newTopLeft.dx, newBottomRight.dx),
       min(newTopLeft.dy, newBottomRight.dy),

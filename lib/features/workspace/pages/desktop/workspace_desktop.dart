@@ -1,9 +1,9 @@
-// lib/features/workspace/workspace_desktop.dart
-
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
+import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
+import 'package:cookethflow/features/workspace/widgets/node_editing_toolbox.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
@@ -11,7 +11,8 @@ import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart'
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart'; // NEW: Import ObjectTextEditor
+import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart';
+import 'package:vector_math/vector_math_64.dart' as vector_math;
 
 class WorkspaceDesktop extends StatelessWidget {
   const WorkspaceDesktop({super.key});
@@ -20,43 +21,75 @@ class WorkspaceDesktop extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDesktop =
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
-        rh.DeviceType.desktop;
+            rh.DeviceType.desktop;
 
-    return Consumer<WorkspaceProvider>(
-      builder: (context,provider,child) {
-        return Scaffold(
-          backgroundColor: provider.currentWorkspaceColor,
-          body: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
-            child: Stack(
-              children: [
-                // 1. CanvasPage - This should be the base layer, filling the entire available space
-                const CanvasPage(),
-        
-                const WorkspaceDrawer(),
-                SizedBox(width: 20.w),
-                // Undo/Redo Controls Container
-                Positioned(top: 0,left: 0.21.sw,child: UndoRedoButton()),
-                // Export project button
-                Positioned(top: 0,right: 0.001.sw,child: ExportProjectButton()),
-        
-                Positioned(right: 0,top: 0.15.sh,child: ToolBar()),
-        
-                // 3. Zoom Control - Positioned at the bottom right of the Stack
-                Positioned(
-                  bottom: 0.h, // Aligns to the bottom edge of the Stack
-                  right: 0.w, // Aligns to the right edge of the Stack
-                  child: ZoomControlButton(),
-                ),
+    return Consumer<WorkspaceProvider>(builder: (context, provider, child) {
+      return Scaffold(
+        backgroundColor: provider.currentWorkspaceColor,
+        body: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
+          child: Stack(
+            clipBehavior: Clip.none, // Allow toolbox to render outside the Stack's bounds
+            children: [
+              const CanvasPage(),
 
-                // NEW: ObjectTextEditor positioned here to overlay everything else
-                // Its visibility and position are controlled by ObjectTextEditor widget itself
-                const ObjectTextEditor(),
-              ],
-            ),
+              const WorkspaceDrawer(),
+              SizedBox(width: 20.w),
+              Positioned(top: 0, left: 0.21.sw, child: UndoRedoButton()),
+              Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton()),
+
+              Positioned(right: 0, top: 0.15.sh, child: ToolBar()),
+
+              Positioned(
+                bottom: 0.h,
+                right: 0.w,
+                child: ZoomControlButton(),
+              ),
+
+              // The new Object Editing Toolbox, positioned dynamically
+              Consumer2<WorkspaceProvider, CanvasProvider>(
+                builder: (context, workspaceProvider, canvasProvider, child) {
+                  // Listen for changes in the transformation to update position
+                  return ListenableBuilder(
+                    listenable: canvasProvider.transformationController,
+                    builder: (context, child) {
+                      if (workspaceProvider.shouldShowObjectToolbox) {
+                        final selectedObject = workspaceProvider.canvasObjects[
+                            workspaceProvider.currentlySelectedObjectId!]!;
+                        final objectBounds = selectedObject.getBounds();
+                        final matrix =
+                            canvasProvider.transformationController.value;
+
+                        // Use the matrix to find the object's top-center position on the screen
+                        final transformedTopCenter = matrix.transform3(
+                            vector_math.Vector3(objectBounds.topCenter.dx,
+                                objectBounds.topCenter.dy, 0));
+
+                        // Calculate the screen position
+                        final screenPosition = Offset(
+                            transformedTopCenter.x, transformedTopCenter.y);
+
+                        // Define an approximate size for the toolbox to help with centering.
+                        const double toolboxWidth = 240;
+                        const double toolboxHeight = 48;
+
+                        return Positioned(
+                          left: screenPosition.dx - (toolboxWidth / 2),
+                          top: screenPosition.dy - toolboxHeight - 15, // 15px margin above object
+                          child: const NodeEditingToolbox(),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    },
+                  );
+                },
+              ),
+
+              const ObjectTextEditor(),
+            ],
           ),
-        );
-      }
-    );
+        ),
+      );
+    });
   }
 }

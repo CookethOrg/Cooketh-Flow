@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'dart:convert'; // For jsonDecode/jsonEncode
+import 'dart:math';
 
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -107,10 +108,7 @@ class WorkspaceProvider extends StateHandler {
     if (_currentlySelectedObjectId == null) return false;
     final object = _canvasObjects[_currentlySelectedObjectId!];
     // Show for any object that is NOT a TextBox or Connector
-    return object != null &&
-        object is! TextBoxObject &&
-        object is! ConnectorObject &&
-        object is! StickyNoteObject;
+    return object != null;
   }
 
   QuillController get selectedObjectQuillController {
@@ -196,59 +194,58 @@ class WorkspaceProvider extends StateHandler {
 
   void _setupRealtimeChannel(String workspaceId) {
     if (_canvasChannel?.topic != '${Constants.channelName}:$workspaceId') {
-      _canvasChannel =
-          _supabaseService.supabase
-              .channel('${Constants.channelName}:$workspaceId')
-              .onBroadcast(
-                event: Constants.broadcastEventName,
-                callback: (payload) {
-                  if (payload['workspace_id'] == _currentWorkspace?.id) {
-                    final cursor = UserCursor.fromJson(payload['cursor']);
-                    if (cursor.id != _myId) {
-                      _userCursors[cursor.id] = cursor;
-                    }
+      _canvasChannel = _supabaseService.supabase
+          .channel('${Constants.channelName}:$workspaceId')
+          .onBroadcast(
+            event: Constants.broadcastEventName,
+            callback: (payload) {
+              if (payload['workspace_id'] == _currentWorkspace?.id) {
+                final cursor = UserCursor.fromJson(payload['cursor']);
+                if (cursor.id != _myId) {
+                  _userCursors[cursor.id] = cursor;
+                }
 
-                    if (payload['object'] != null) {
-                      final object = CanvasObject.fromJson(payload['object']);
-                      _canvasObjects[object.id] = object;
-                      if (object.id == _currentlySelectedObjectId &&
-                          object.textDelta != null) {
-                        try {
-                          final doc = Document.fromJson(
-                            jsonDecode(object.textDelta!),
-                          );
-                          if (!isEqual(
-                            _tempQuillController.document.toDelta().toJson(),
-                            doc.toDelta().toJson(),
-                          )) {
-                            _tempQuillController.document = doc;
-                          }
-                        } catch (e) {
-                          print(
-                            "Error loading textDelta into QuillController: $e",
-                          );
-                        }
-                      }
-                    }
-
-                    // NEW: Handle object deletion broadcast
-                    if (payload['deleted_ids'] != null) {
-                      final List<String> deletedIds = List<String>.from(
-                        payload['deleted_ids'],
+                if (payload['object'] != null) {
+                  final object = CanvasObject.fromJson(payload['object']);
+                  _canvasObjects[object.id] = object;
+                  if (object.id == _currentlySelectedObjectId &&
+                      object.textDelta != null) {
+                    try {
+                      final doc = Document.fromJson(
+                        jsonDecode(object.textDelta!),
                       );
-                      for (final id in deletedIds) {
-                        _canvasObjects.remove(id);
-                        if (_currentlySelectedObjectId == id) {
-                          _currentlySelectedObjectId = null;
-                        }
+                      if (!isEqual(
+                        _tempQuillController.document.toDelta().toJson(),
+                        doc.toDelta().toJson(),
+                      )) {
+                        _tempQuillController.document = doc;
                       }
+                    } catch (e) {
+                      print(
+                        "Error loading textDelta into QuillController: $e",
+                      );
                     }
-
-                    notifyListeners();
                   }
-                },
-              )
-              .subscribe();
+                }
+
+                // NEW: Handle object deletion broadcast
+                if (payload['deleted_ids'] != null) {
+                  final List<String> deletedIds = List<String>.from(
+                    payload['deleted_ids'],
+                  );
+                  for (final id in deletedIds) {
+                    _canvasObjects.remove(id);
+                    if (_currentlySelectedObjectId == id) {
+                      _currentlySelectedObjectId = null;
+                    }
+                  }
+                }
+
+                notifyListeners();
+              }
+            },
+          )
+          .subscribe();
     }
   }
 
@@ -450,7 +447,103 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // NEW: Method to delete the currently selected object
+  // NEW: Method to change the color of the selected object
+  void changeObjectColor(Color newColor) {
+    if (_currentlySelectedObjectId == null) return;
+    final object = _canvasObjects[_currentlySelectedObjectId!];
+    if (object == null) return;
+
+    // Use the existing copyWith method on the abstract class
+    _canvasObjects[_currentlySelectedObjectId!] = object.copyWith(color: newColor);
+
+    notifyListeners();
+    syncCanvasObject(_cursorPosition);
+    _saveCanvasObjectToDb(_currentlySelectedObjectId!);
+  }
+
+  // NEW: Helper method to convert an object from one shape to another
+  CanvasObject _convertObject(CanvasObject oldObject, ShapeType newShapeType) {
+    final bounds = oldObject.getBounds();
+    final color = oldObject.color;
+    final textDelta = oldObject.textDelta;
+    final id = oldObject.id; // Crucially, keep the same ID
+
+    switch (newShapeType) {
+      case ShapeType.square:
+        return Square(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+      case ShapeType.circle:
+        return Circle(
+            id: id,
+            color: color,
+            center: bounds.center,
+            radius: max(bounds.width, bounds.height) / 2,
+            textDelta: textDelta);
+      case ShapeType.diamond:
+        return Diamond(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+      case ShapeType.roundedSquare:
+        return RoundedSquare(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+      case ShapeType.parallelogram:
+        return Parallelogram(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+      case ShapeType.cylinder:
+        return Cylinder(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+      case ShapeType.triangle:
+        return Triangle(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+      case ShapeType.invertedTriangle:
+        return InvertedTriangle(
+            id: id,
+            color: color,
+            topLeft: bounds.topLeft,
+            bottomRight: bounds.bottomRight,
+            textDelta: textDelta);
+    }
+  }
+
+  // NEW: Method to change the shape of the selected object
+  void changeObjectShape(ShapeType newShapeType) {
+    if (_currentlySelectedObjectId == null) return;
+    final oldObject = _canvasObjects[_currentlySelectedObjectId!];
+    if (oldObject == null) return;
+
+    final newObject = _convertObject(oldObject, newShapeType);
+
+    _canvasObjects[_currentlySelectedObjectId!] = newObject;
+
+    notifyListeners();
+    syncCanvasObject(_cursorPosition);
+    _saveCanvasObjectToDb(_currentlySelectedObjectId!);
+  }
+
+  // Method to delete the currently selected object
   void deleteSelectedObject() async {
     if (_currentlySelectedObjectId == null) return;
 
@@ -458,14 +551,12 @@ class WorkspaceProvider extends StateHandler {
 
     // Find all connectors attached to this object
     final List<String> idsToDelete = [idToDelete];
-    final attachedConnectors =
-        _canvasObjects.values
-            .whereType<ConnectorObject>()
-            .where(
-              (conn) =>
-                  conn.sourceId == idToDelete || conn.targetId == idToDelete,
-            )
-            .toList();
+    final attachedConnectors = _canvasObjects.values
+        .whereType<ConnectorObject>()
+        .where(
+          (conn) => conn.sourceId == idToDelete || conn.targetId == idToDelete,
+        )
+        .toList();
 
     for (final conn in attachedConnectors) {
       idsToDelete.add(conn.id);
@@ -546,11 +637,9 @@ class WorkspaceProvider extends StateHandler {
       return;
     }
     CanvasObject? newObject;
-    final defaultTopLeft =
-        details.globalPosition -
+    final defaultTopLeft = details.globalPosition -
         const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
-    final defaultBottomRight =
-        details.globalPosition +
+    final defaultBottomRight = details.globalPosition +
         const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
 
     switch (_currentMode) {
@@ -733,8 +822,7 @@ class WorkspaceProvider extends StateHandler {
         }
 
         final now = DateTime.now();
-        final isDoubleTap =
-            _lastTappedObjectId == tappedObject.id &&
+        final isDoubleTap = _lastTappedObjectId == tappedObject.id &&
             _lastTapTime != null &&
             now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
 

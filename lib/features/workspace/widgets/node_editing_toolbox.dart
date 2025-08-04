@@ -1,4 +1,10 @@
+import 'package:cookethflow/core/utils/enums.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
+import 'package:cookethflow/features/workspace/widgets/node_colour.dart';
+import 'package:cookethflow/features/workspace/widgets/node_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
@@ -15,11 +21,12 @@ class NodeEditingToolbox extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 6),
     );
   }
-  
+
   // Helper to build icon buttons consistently
-  Widget _buildIconButton(BuildContext context, {
-    required IconData icon, 
-    required VoidCallback onPressed, 
+  Widget _buildIconButton(
+    BuildContext context, {
+    required IconData icon,
+    required VoidCallback onPressed,
     required String tooltip,
     Color? color,
   }) {
@@ -36,10 +43,80 @@ class NodeEditingToolbox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // This widget doesn't need to listen to the provider for its own build,
-    // as its visibility is controlled by the parent. The onPressed callbacks
-    // will use a read-only provider instance.
     final provider = context.read<WorkspaceProvider>();
+    final object = provider.canvasObjects[provider.currentlySelectedObjectId];
+
+    // Determine which buttons to show based on object type
+    final showShapeChanger = object is! TextBoxObject &&
+        object is! ConnectorObject &&
+        object is! StickyNoteObject;
+    final showColorChanger =
+        object is! TextBoxObject && object is! ConnectorObject;
+    final showDeleteButton = true; // Always show delete
+
+    // Collect all visible buttons
+    final buttons = <Widget>[];
+
+    // 1. Node Type Alter
+    if (showShapeChanger) {
+      buttons.add(
+        _buildIconButton(
+          context,
+          icon: PhosphorIcons.shapes(),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => NodePicker(
+                onShapeSelected: (shapeType) {
+                  provider.changeObjectShape(shapeType);
+                },
+              ),
+            );
+          },
+          tooltip: 'Change Shape',
+        ),
+      );
+      buttons.add(_buildDivider());
+    }
+
+    // 2. Node Color Alter
+    if (showColorChanger) {
+      buttons.add(
+        _buildIconButton(
+          context,
+          icon: PhosphorIcons.paintBucket(),
+          onPressed: () {
+            final selectedObject =
+                provider.canvasObjects[provider.currentlySelectedObjectId!];
+            showDialog(
+              context: context,
+              builder: (context) => NodeColourPicker(
+                initialColor: selectedObject?.color,
+                onColorSelected: (color) {
+                  provider.changeObjectColor(color);
+                  Navigator.of(context).pop();
+                },
+              ),
+            );
+          },
+          tooltip: 'Change Color',
+        ),
+      );
+      buttons.add(_buildDivider());
+    }
+
+    // 5. Delete Node
+    buttons.add(
+      _buildIconButton(
+        context,
+        icon: PhosphorIcons.trash(),
+        onPressed: () {
+          provider.deleteSelectedObject();
+        },
+        tooltip: 'Delete Object',
+        color: Colors.redAccent,
+      ),
+    );
 
     return Material(
       color: Colors.transparent,
@@ -57,57 +134,7 @@ class NodeEditingToolbox extends StatelessWidget {
             ),
           ],
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // 1. Node Type Alter
-            _buildIconButton(
-              context, 
-              icon: PhosphorIcons.shapes(), 
-              onPressed: () { /* Unimplemented */ }, 
-              tooltip: 'Change Shape'
-            ),
-            _buildDivider(),
-
-            // 2. Node Color Alter
-            _buildIconButton(
-              context, 
-              icon: PhosphorIcons.paintBucket(), 
-              onPressed: () { /* Unimplemented */ }, 
-              tooltip: 'Change Color'
-            ),
-            _buildDivider(),
-
-            // 3. Text Editing Feature
-            _buildIconButton(
-              context, 
-              icon: PhosphorIcons.textT(), 
-              onPressed: () { /* Unimplemented */ }, 
-              tooltip: 'Edit Text'
-            ),
-            _buildDivider(),
-
-            // 4. Link Adder
-            _buildIconButton(
-              context, 
-              icon: PhosphorIcons.link(), 
-              onPressed: () { /* Unimplemented */ }, 
-              tooltip: 'Add Link'
-            ),
-            _buildDivider(),
-
-            // 5. Delete Node
-            _buildIconButton(
-              context, 
-              icon: PhosphorIcons.trash(), 
-              onPressed: () {
-                provider.deleteSelectedObject();
-              }, 
-              tooltip: 'Delete Object',
-              color: Colors.redAccent,
-            ),
-          ],
-        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: buttons),
       ),
     );
   }

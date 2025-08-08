@@ -11,7 +11,7 @@ class LoginMobile extends StatelessWidget {
     return SingleChildScrollView(
       child: Column(
         children: [
-          SizedBox(height: 0.55.sh, child: SliderStart2()),
+          SizedBox(height: 0.35.sh, child: SliderStart2()),
           Padding(
             padding: const EdgeInsets.symmetric(
               horizontal: 24.0,

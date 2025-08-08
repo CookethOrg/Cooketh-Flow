@@ -82,7 +82,7 @@ class AppTheme {
       ),
 
       // Custom dark theme components
-      cardTheme: CardTheme(color: scaffoldDarkColor, surfaceTintColor: scaffoldDarkColor),
+      //cardTheme: CardTheme(color: scaffoldDarkColor, surfaceTintColor: scaffoldDarkColor),
       dividerTheme: DividerThemeData(color: tabBorderDarkColor),
       appBarTheme: AppBarTheme(
         backgroundColor: scaffoldDarkColor,

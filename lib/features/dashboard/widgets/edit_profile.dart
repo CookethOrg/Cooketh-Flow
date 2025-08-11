@@ -6,9 +6,12 @@ import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/features/dashboard/widgets/delete_account.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
+
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ProfileSettingsWidget extends StatefulWidget {
   const ProfileSettingsWidget({super.key});
@@ -127,6 +130,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    bool is_desk = deviceType == rh.DeviceType.desktop ? true : false;
+
     return Consumer2<DashboardProvider, SupabaseService>(
       builder: (context, dashboardProvider, supabaseService, child) {
         final currentUser = supabaseService.currentUser;
@@ -142,8 +148,11 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            width: 500,
-            padding: const EdgeInsets.all(24),
+            width: deviceType == rh.DeviceType.desktop ? 500 : 1.6.sw,
+            padding:
+                deviceType == rh.DeviceType.desktop
+                    ? const EdgeInsets.all(24)
+                    : const EdgeInsets.only(top: 16, left: 10, right: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,7 +167,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                     constraints: const BoxConstraints(),
                   ),
                 ),
-                const SizedBox(height: 16),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 16)
+                    : const SizedBox(height: 8),
 
                 // Profile section
                 Row(
@@ -237,7 +248,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         ),
                       ],
                     ),
-                    const SizedBox(width: 16),
+                    deviceType == rh.DeviceType.desktop
+                        ? const SizedBox(height: 16)
+                        : const SizedBox(height: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -250,7 +263,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        deviceType == rh.DeviceType.desktop
+                            ? const SizedBox(height: 4)
+                            : const SizedBox(height: 2),
                         Text(
                           currentUser?.username ?? 'Loading Username...',
                           style: TextStyle(
@@ -263,7 +278,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 32)
+                    : const SizedBox(height: 16),
 
                 // Form fields
                 Row(
@@ -282,7 +299,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                const SizedBox(height: 20),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 20)
+                    : const SizedBox(height: 10),
 
                 // Username field
                 _buildField(
@@ -292,7 +311,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   width: 250,
                 ),
 
-                const SizedBox(height: 32),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 32)
+                    : const SizedBox(height: 16),
 
                 // Theme toggle section
                 Row(
@@ -310,11 +331,13 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        deviceType == rh.DeviceType.desktop
+                            ? const SizedBox(height: 4)
+                            : const SizedBox(height: 2),
                         Text(
                           'Toggle between light and dark mode',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize:deviceType == rh.DeviceType.desktop? 14 : 10,
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
@@ -327,9 +350,11 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                               ? Icons.dark_mode
                               : Icons.light_mode,
                           color: Theme.of(context).iconTheme.color,
-                          size: 20,
+                          size:deviceType == rh.DeviceType.desktop?20 : 10,
                         ),
-                        const SizedBox(width: 8),
+                        deviceType == rh.DeviceType.desktop
+                            ? const SizedBox(height: 8)
+                            : const SizedBox(height: 4),
                         Switch(
                           value: supabaseService.isDark,
                           onChanged: (value) => supabaseService.toggleTheme(),
@@ -340,7 +365,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 32)
+                    : const SizedBox(height: 16),
 
                 // Buttons
                 Row(
@@ -392,9 +419,13 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                const SizedBox(height: 32),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 32)
+                    : const SizedBox(height: 16),
                 Divider(color: Theme.of(context).dividerColor),
-                const SizedBox(height: 24),
+                deviceType == rh.DeviceType.desktop
+                    ? const SizedBox(height: 24)
+                    : const SizedBox(height: 12),
 
                 // Delete account
                 Row(
@@ -412,17 +443,68 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        deviceType == rh.DeviceType.desktop
+                            ? const SizedBox(height: 4)
+                            : const SizedBox(height: 4),
                         Text(
                           'Permanently delete your account',
                           style: TextStyle(
-                            fontSize: 14,
+                            fontSize:deviceType == rh.DeviceType.desktop? 14 : 10,
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
                       ],
                     ),
-                    ElevatedButton(
+                    Visibility(
+                      visible: is_desk,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (context) => const DeleteAccountDialog(),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: secondaryColors[1],
+                          padding: EdgeInsets.symmetric(
+                            horizontal:
+                                deviceType == rh.DeviceType.desktop ? 20 : 10,
+                            vertical:
+                                deviceType == rh.DeviceType.desktop ? 10 : 5,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.delete_outline,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Delete Account',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Visibility(
+                  visible: !is_desk,
+                  child: Center(
+                    child: ElevatedButton(
                       onPressed: () {
                         showDialog(
                           context: context,
@@ -431,9 +513,11 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: secondaryColors[1],
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 10,
+                        padding: EdgeInsets.symmetric(
+                          horizontal:
+                              deviceType == rh.DeviceType.desktop ? 20 : 10,
+                          vertical:
+                              deviceType == rh.DeviceType.desktop ? 10 : 5,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -460,7 +544,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),

@@ -4,7 +4,7 @@ enum DeviceType { mobile, tab, desktop }
 
 class ResponsiveLayoutHelper {
   static const int mobileMaxWidth = 375;
-  static const int tabletMaxWidth = 600;
+  static const int tabletMaxWidth = 720;
   static const int desktopMaxWidth = 1024;
 
   static DeviceType getDeviceType(BuildContext context) {

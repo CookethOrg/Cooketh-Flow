@@ -1,11 +1,10 @@
-import 'package:cookethflow/core/theme/colors.dart';
+
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/dashboard_drawer.dart';
 import 'package:cookethflow/features/dashboard/widgets/project_card.dart';
 import 'package:cookethflow/features/dashboard/widgets/start_project.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
@@ -29,7 +28,7 @@ class DashboardDesktop extends StatelessWidget {
                         provider.isDrawerOpen
                             ? constraints.maxHeight
                             : 0.185.sh,
-                    width: deviceType == rh.DeviceType.desktop ? 400.w : 600.w,
+                    width: deviceType == rh.DeviceType.desktop ? 0.24.sw : deviceType == rh.DeviceType.tab ? 0.257.sw : 600.w,
                     child: const DashboardDrawer(),
                   ),
 
@@ -49,7 +48,7 @@ class DashboardDesktop extends StatelessWidget {
                           const SizedBox(height: 32),
                           Expanded(
                             // NEW: Conditionally build the main content area
-                            child: _buildMainContent(provider),
+                            child: _buildMainContent(provider,context),
                           ),
                         ],
                       ),
@@ -63,7 +62,7 @@ class DashboardDesktop extends StatelessWidget {
   }
 
   // NEW: Helper widget to build content based on the selected tab
-  Widget _buildMainContent(DashboardProvider provider) {
+  Widget _buildMainContent(DashboardProvider provider,BuildContext context) {
     switch (provider.tabIndex) {
       case 2: // Trash Tab
         return Center(
@@ -108,7 +107,7 @@ class DashboardDesktop extends StatelessWidget {
             ),
           );
         }
-
+        rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
         return GridView.builder(
           shrinkWrap: true,
           itemCount: displayedWorkspaces.length,
@@ -117,7 +116,7 @@ class DashboardDesktop extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 20.w,
                 mainAxisSpacing: 20.h,
-                childAspectRatio: 4.5 / 3,
+                childAspectRatio: deviceType == rh.DeviceType.desktop ? 4.0/3 :  3.3/ 3,
               ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];

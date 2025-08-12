@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ProjectCard extends StatelessWidget {
   const ProjectCard({super.key, required this.workspaceId});
@@ -16,6 +17,7 @@ class ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+        rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     DateTimeHelper dth = DateTimeHelper();
     return Consumer2<DashboardProvider, WorkspaceProvider>(
       builder: (context, provider, workspaceProvider, child) {
@@ -60,12 +62,14 @@ class ProjectCard extends StatelessWidget {
                           top: 12.h,
                           right: 12.w,
                           child: Container(
-                            padding: EdgeInsets.all(8.w),
+                            padding:deviceType == rh.DeviceType.desktop ? EdgeInsets.all(8.w) : EdgeInsets.all(8.w),
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
                               onPressed: () {
                                 showDialog(
                                   context: context,
@@ -79,7 +83,7 @@ class ProjectCard extends StatelessWidget {
                               },
                               icon: Icon(
                                 PhosphorIconsRegular.dotsThree,
-                                size: 32.sp,
+                                size: deviceType == rh.DeviceType.desktop ? 32.sp : deviceType == rh.DeviceType.tab ? 32.sp : 80.sp,
                                 color: Colors.black,
                               ),
                             ),
@@ -105,7 +109,7 @@ class ProjectCard extends StatelessWidget {
                                 workspace.name,
                                 style: TextStyle(
                                   fontFamily: 'Fredrik',
-                                  fontSize: 20.sp,
+                                  fontSize:deviceType == rh.DeviceType.desktop ? 20.sp : deviceType == rh.DeviceType.tab ? 16.sp: 50.sp,
                                   color: Colors.black,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -117,7 +121,7 @@ class ProjectCard extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'Fredrik',
                                   color: Colors.grey[600],
-                                  fontSize: 14.sp,
+                                  fontSize:deviceType == rh.DeviceType.desktop ? 14.sp : deviceType == rh.DeviceType.tab ?12.sp : 44.sp,
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -140,7 +144,7 @@ class ProjectCard extends StatelessWidget {
                               workspace.isStarred ? PhosphorIconsFill.star : PhosphorIconsRegular.star,
                               // Use a key to help AnimatedSwitcher differentiate between the two icons
                               key: ValueKey<bool>(workspace.isStarred),
-                              size: 32.sp,
+                              size:deviceType == rh.DeviceType.desktop ? 32.sp : deviceType == rh.DeviceType.tab ?32.sp: 62.sp,
                               color: workspace.isStarred ? Colors.amber : Colors.black54,
                             ),
                           ),

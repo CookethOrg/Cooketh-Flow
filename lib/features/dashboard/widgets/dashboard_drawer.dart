@@ -52,9 +52,9 @@ class DashboardDrawer extends StatelessWidget {
                           ClipOval(
                             child: SizedBox(
                               width:
-                                  device == rh.DeviceType.desktop ? 72.w : 80.w,
+                                  device == rh.DeviceType.desktop ?  72.w : device == rh.DeviceType.tab ? 72.w : 80.w,
                               height:
-                                  device == rh.DeviceType.desktop ? 72.h : 80.h,
+                                  device == rh.DeviceType.desktop ? 72.h : device == rh.DeviceType.tab ?72.h : 80.h,
                               child:
                                   displayAvatarUrl.isNotEmpty
                                       ? CachedNetworkImage(
@@ -78,7 +78,7 @@ class DashboardDrawer extends StatelessWidget {
                             ),
                           ),
                           SizedBox(
-                            width: device == rh.DeviceType.desktop ? 8.w : 24.w,
+                            width: device == rh.DeviceType.desktop ? 8.w : device == rh.DeviceType.tab ? 8.w : 24.w,
                           ),
                           Flexible(
                             child: Column(
@@ -92,7 +92,7 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 24.sp
-                                            : 36.sp,
+                                            : device == rh.DeviceType.tab ?24.sp : 36.sp,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.6,
                                   ),
@@ -105,7 +105,7 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 16.sp
-                                            : 24.sp,
+                                            : device == rh.DeviceType.tab ? 16.sp : 24.sp,
                                   ),
                                 ),
                               ],
@@ -114,10 +114,11 @@ class DashboardDrawer extends StatelessWidget {
                         ],
                       ),
                       SizedBox(
-                        height: device == rh.DeviceType.desktop ? 30.h : 16.h,
+                        height: device == rh.DeviceType.desktop ? 30.h : device == rh.DeviceType.tab ?30.h : 16.h,
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: device == rh.DeviceType.desktop ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween ,
                         children: [
                           ElevatedButton.icon(
                             onPressed: () {
@@ -136,11 +137,11 @@ class DashboardDrawer extends StatelessWidget {
                                 horizontal:
                                     device == rh.DeviceType.desktop
                                         ? 28.w
-                                        : 28.w,
+                                        : 24.w,
                                 vertical:
                                     device == rh.DeviceType.desktop
                                         ? 24.h
-                                        : 20.h,
+                                        : 15.h,
                               ),
                               foregroundColor: primaryColor,
                               shape: RoundedRectangleBorder(
@@ -150,7 +151,7 @@ class DashboardDrawer extends StatelessWidget {
                               side: BorderSide(color: primaryColor),
                               minimumSize: Size(
                                 0,
-                                device == rh.DeviceType.desktop ? 48.h : 40.h,
+                                device == rh.DeviceType.desktop ? 48.h : device == rh.DeviceType.tab ?48.h: 40.h,
                               ),
                             ),
                             label: Text(
@@ -160,7 +161,7 @@ class DashboardDrawer extends StatelessWidget {
                                 fontSize:
                                     device == rh.DeviceType.desktop
                                         ? 16.sp
-                                        : 24.sp,
+                                        : device == rh.DeviceType.tab ? 16.sp : 24.sp,
                                 color: primaryColor,
                               ),
                             ),
@@ -180,11 +181,11 @@ class DashboardDrawer extends StatelessWidget {
                                 horizontal:
                                     device == rh.DeviceType.desktop
                                         ? 28.w
-                                        : 28.w,
+                                        : 24.w,
                                 vertical:
                                     device == rh.DeviceType.desktop
                                         ? 24.h
-                                        : 20.h,
+                                        : 15.h,
                               ),
                               foregroundColor: primaryColor,
                               shape: RoundedRectangleBorder(
@@ -194,7 +195,7 @@ class DashboardDrawer extends StatelessWidget {
                               side: BorderSide(color: primaryColor),
                               minimumSize: Size(
                                 0,
-                                device == rh.DeviceType.desktop ? 48.h : 40.h,
+                                device == rh.DeviceType.desktop ? 48.h :device == rh.DeviceType.tab ?48.h: 40.h,
                               ),
                             ),
                             label: Text(
@@ -204,7 +205,7 @@ class DashboardDrawer extends StatelessWidget {
                                 fontSize:
                                     device == rh.DeviceType.desktop
                                         ? 16.sp
-                                        : 24.sp,
+                                        : device == rh.DeviceType.tab ? 16.sp: 24.sp,
                                 color: Colors.white,
                               ),
                             ),
@@ -214,7 +215,7 @@ class DashboardDrawer extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: device == rh.DeviceType.desktop ? 15.h : 10.h,
+                    height: device == rh.DeviceType.desktop ? 15.h :device == rh.DeviceType.tab ?15.h: 10.h,
                   ),
                   Visibility(
                     visible: dashboardProvider.isDrawerOpen,
@@ -275,7 +276,7 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 18.sp
-                                            : 16.sp,
+                                            : device == rh.DeviceType.tab ? 18.sp : 16.sp,
                                     color:
                                         isSelected ? Colors.blue : Colors.black,
                                     fontWeight:

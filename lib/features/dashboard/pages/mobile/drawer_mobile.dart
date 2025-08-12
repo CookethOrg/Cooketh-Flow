@@ -49,9 +49,9 @@ class DashboardDrawerMob extends StatelessWidget {
                         ClipOval(
                           child: SizedBox(
                             width:
-                                device == rh.DeviceType.desktop ? 72.w : 150.w,
+                                device == rh.DeviceType.desktop ? 72.w : 190.w,
                             height:
-                                device == rh.DeviceType.desktop ? 72.h : 50.h,
+                                device == rh.DeviceType.desktop ? 72.h : 80.h,
                             child:
                                 displayAvatarUrl.isNotEmpty
                                     ? CachedNetworkImage(
@@ -87,7 +87,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                   fontSize:
                                       device == rh.DeviceType.desktop
                                           ? 24.sp
-                                          : 50.sp,
+                                          : 75.sp,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.6,
                                 ),
@@ -100,7 +100,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                   fontSize:
                                       device == rh.DeviceType.desktop
                                           ? 16.sp
-                                          : 46.sp,
+                                          : 58.sp,
                                 ),
                               ),
                             ],
@@ -130,9 +130,9 @@ class DashboardDrawerMob extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               horizontal:
-                                  device == rh.DeviceType.desktop ? 28.w : 30.w,
+                                  device == rh.DeviceType.desktop ? 28.w : 65.w,
                               vertical:
-                                  device == rh.DeviceType.desktop ? 24.h : 6.h,
+                                  device == rh.DeviceType.desktop ? 24.h : 15.h,
                             ),
                             foregroundColor: primaryColor,
                             shape: RoundedRectangleBorder(
@@ -152,7 +152,7 @@ class DashboardDrawerMob extends StatelessWidget {
                               fontSize:
                                   device == rh.DeviceType.desktop
                                       ? 16.sp
-                                      : 35.sp,
+                                      : 45.sp,
                               color: primaryColor,
                             ),
                           ),
@@ -171,9 +171,9 @@ class DashboardDrawerMob extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               horizontal:
-                                  device == rh.DeviceType.desktop ? 28.w : 30.w,
+                                  device == rh.DeviceType.desktop ? 28.w : 65.w,
                               vertical:
-                                  device == rh.DeviceType.desktop ? 24.h : 6.h,
+                                  device == rh.DeviceType.desktop ? 24.h : 15.h,
                             ),
                             foregroundColor: primaryColor,
                             shape: RoundedRectangleBorder(
@@ -193,7 +193,7 @@ class DashboardDrawerMob extends StatelessWidget {
                               fontSize:
                                   device == rh.DeviceType.desktop
                                       ? 16.sp
-                                      : 35.sp,
+                                      : 45.sp,
                               color: Colors.white,
                             ),
                           ),
@@ -244,7 +244,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                   size:
                                       device == rh.DeviceType.desktop
                                           ? 26.sp
-                                          : 80.sp,
+                                          : 100.sp,
                                 ),
                                 child:
                                     dashboardProvider.tabItems[index]['icon'],
@@ -262,7 +262,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                   fontSize:
                                       device == rh.DeviceType.desktop
                                           ? 18.sp
-                                          : 35.sp,
+                                          : 55.sp,
                                   color:
                                       isSelected ? Colors.blue : Colors.black,
                                   fontWeight:

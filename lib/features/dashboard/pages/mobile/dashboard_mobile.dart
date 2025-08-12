@@ -63,14 +63,14 @@ class _DashboardMobileState extends State<DashboardMobile> {
                  Visibility(
                       visible: is_Visible,
                       child: Positioned(
-                        top: 80.h,
+                        top: 90.h,
                         left: 8.w,
                         child: AnimatedContainer(
                           curve: Curves.easeInOut,
                           duration: const Duration(milliseconds: 500),
                           height: provider.isDrawerOpen ? 0.8.sh : 0.185.sh,
                           width:
-                              deviceType == rh.DeviceType.desktop ? 400.w : 0.45.sw,
+                              deviceType == rh.DeviceType.desktop ? 400.w : 0.70.sw,
                           child: const DashboardDrawerMob(),
                         ),
                       ),

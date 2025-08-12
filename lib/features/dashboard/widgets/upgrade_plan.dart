@@ -38,7 +38,7 @@ class UpgradeCard extends StatelessWidget {
                 'Upgrade your Plan',
                 style: TextStyle(
                   fontFamily: 'Fredrik',
-                  fontSize: device == rh.DeviceType.desktop ? 20.sp : device == rh.DeviceType.tab ? 20.sp: 35.sp,
+                  fontSize: device == rh.DeviceType.desktop ? 20.sp : device == rh.DeviceType.tab ? 20.sp: 45.sp,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
@@ -50,7 +50,7 @@ class UpgradeCard extends StatelessWidget {
             'Get more with CookethFlow Pro – Access exclusive features like [feature 1], [feature 2], and [feature 3]. Cancel anytime, no strings attached.',
             style: TextStyle(
               fontFamily: 'Fredrik',
-              fontSize: device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp: 37.sp,
+              fontSize: device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp: 45.sp,
               color: const Color(0xFF4B4B4B),
               height: 2,
             ),
@@ -77,7 +77,7 @@ class UpgradeCard extends StatelessWidget {
                 'Explore',
                 style: TextStyle(
                   fontFamily: 'Fredrik',
-                  fontSize: device == rh.DeviceType.desktop ? 14.sp : device == rh.DeviceType.tab ? 14.sp : 35.sp,
+                  fontSize: device == rh.DeviceType.desktop ? 14.sp : device == rh.DeviceType.tab ? 14.sp : 45.sp,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),

@@ -8,7 +8,7 @@ class VerticalCustomDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
     height: 24.h,
-    width: 1.2.w,
+    width: 1.5.w,
     color: const Color(0xFFD9D9D9),
     margin: EdgeInsets.symmetric(horizontal: 8.w),
   );

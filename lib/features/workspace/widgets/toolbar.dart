@@ -20,7 +20,7 @@ class ToolBar extends StatelessWidget {
     return Consumer<WorkspaceProvider>(
       builder: (context, provider, child) {
         return Container(
-          padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 24.w),
+          padding: EdgeInsets.symmetric(vertical:device == rh.DeviceType.desktop ? 20.h : 16.h, horizontal: 24.w),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(12.r),
@@ -37,7 +37,7 @@ class ToolBar extends StatelessWidget {
                   _showColorPicker(context, provider); // Pass the provider
                 },
               ),
-              _horizontalDivider(),
+              _horizontalDivider(device),
               _toolIcon(
                 PhosphorIconsRegular.circlesThreePlus,
                 'Add new node',
@@ -46,7 +46,7 @@ class ToolBar extends StatelessWidget {
                   _showNodePicker(context);
                 },
               ),
-              _horizontalDivider(),
+              _horizontalDivider(device),
               _toolIcon(
                 PhosphorIconsRegular.cursor,
                 'Pointer',
@@ -56,6 +56,7 @@ class ToolBar extends StatelessWidget {
                   provider.changeDrawMode(DrawMode.pointer);
                 },
               ),
+               _horizontalDivider(device),
               _toolIcon(
                 PhosphorIconsRegular.handGrabbing,
                 'Pan',
@@ -65,6 +66,7 @@ class ToolBar extends StatelessWidget {
                   provider.changeDrawMode(DrawMode.hand);
                 },
               ),
+               _horizontalDivider(device),
               _toolIcon(
                 PhosphorIconsRegular.textT,
                 'Text box',
@@ -74,12 +76,14 @@ class ToolBar extends StatelessWidget {
                   provider.changeDrawMode(DrawMode.textBox);
                 },
               ),
+               _horizontalDivider(device),
               _toolIcon(
                 PhosphorIconsRegular.image,
                 'Add Image/Media files - Coming soon',
                 device,
                 onPressed: () {},
               ),
+               _horizontalDivider(device),
               _toolIcon(
                 PhosphorIconsFill.noteBlank,
                 'Add new sticky note',
@@ -112,7 +116,7 @@ class ToolBar extends StatelessWidget {
           child: IconButton(
             onPressed: onPressed,
             tooltip: tooltip,
-            icon: Icon(iconData, size: 36.sp),
+            icon: Icon(iconData, size:device == rh.DeviceType.desktop? 36.sp : 60.sp),
             color: iconColor,
           ),
         ),
@@ -120,9 +124,9 @@ class ToolBar extends StatelessWidget {
     );
   }
 
-  Widget _horizontalDivider() {
+  Widget _horizontalDivider(rh.DeviceType device) {
     return Container(
-      width: 28.w,
+      width: device == rh.DeviceType.desktop? 28.w : 45.w,
       height: 2.h,
       color: const Color(0xFFD9D9D9),
       margin: EdgeInsets.symmetric(vertical: 8.h),

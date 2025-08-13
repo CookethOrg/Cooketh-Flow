@@ -116,7 +116,7 @@ class DashboardDesktop extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 20.w,
                 mainAxisSpacing: 20.h,
-                childAspectRatio: deviceType == rh.DeviceType.desktop ? 4.0/3 :  3.3/ 3,
+                childAspectRatio: deviceType == rh.DeviceType.desktop ? 4.0/3 :  3.2/ 3,
               ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];

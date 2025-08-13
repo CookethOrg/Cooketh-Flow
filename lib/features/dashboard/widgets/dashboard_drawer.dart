@@ -131,6 +131,7 @@ class DashboardDrawer extends StatelessWidget {
                             icon: Icon(
                               PhosphorIcons.pencilSimple(),
                               color: primaryColor,
+                              size:device == rh.DeviceType.desktop ? 30.h : 25.h ,
                             ),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
@@ -161,7 +162,7 @@ class DashboardDrawer extends StatelessWidget {
                                 fontSize:
                                     device == rh.DeviceType.desktop
                                         ? 16.sp
-                                        : device == rh.DeviceType.tab ? 16.sp : 24.sp,
+                                        : device == rh.DeviceType.tab ? 18.sp : 24.sp,
                                 color: primaryColor,
                               ),
                             ),
@@ -175,6 +176,7 @@ class DashboardDrawer extends StatelessWidget {
                             icon: Icon(
                               PhosphorIcons.signOut(),
                               color: Colors.white,
+                              size:device == rh.DeviceType.desktop ? 30.h : 25.h ,
                             ),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
@@ -205,7 +207,7 @@ class DashboardDrawer extends StatelessWidget {
                                 fontSize:
                                     device == rh.DeviceType.desktop
                                         ? 16.sp
-                                        : device == rh.DeviceType.tab ? 16.sp: 24.sp,
+                                        : device == rh.DeviceType.tab ? 18.sp: 24.sp,
                                 color: Colors.white,
                               ),
                             ),
@@ -258,7 +260,7 @@ class DashboardDrawer extends StatelessWidget {
                                     size:
                                         device == rh.DeviceType.desktop
                                             ? 26.sp
-                                            : 30.sp,
+                                            : 34.sp,
                                   ),
                                   child:
                                       dashboardProvider.tabItems[index]['icon'],
@@ -276,7 +278,7 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 18.sp
-                                            : device == rh.DeviceType.tab ? 18.sp : 16.sp,
+                                            : device == rh.DeviceType.tab ? 25.sp : 16.sp,
                                     color:
                                         isSelected ? Colors.blue : Colors.black,
                                     fontWeight:

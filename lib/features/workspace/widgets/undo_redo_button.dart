@@ -14,8 +14,8 @@ class UndoRedoButton extends StatelessWidget {
         rh.DeviceType.desktop;
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 24.w : 32.w,
-        vertical: 16.h,
+        horizontal: isDesktop ? 24.w : 20.w,
+        vertical:isDesktop? 17.h : 13.h,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -31,7 +31,7 @@ class UndoRedoButton extends StatelessWidget {
               onPressed: () {},
               icon: Icon(
                 PhosphorIconsRegular.arrowArcLeft,
-                size: 32.sp,
+                size:isDesktop ? 32.sp : 55.sp,
                 color: Colors.black,
               ),
             ),
@@ -40,7 +40,7 @@ class UndoRedoButton extends StatelessWidget {
               onPressed: () {},
               icon: Icon(
                 PhosphorIconsRegular.arrowArcRight,
-                size: 32.sp,
+                size:isDesktop ? 32.sp : 55.sp,
                 color: Colors.black,
               ),
             ),

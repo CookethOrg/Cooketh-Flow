@@ -1,6 +1,8 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
+import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
+import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/vertical_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -26,90 +28,81 @@ class WorkspaceTablet extends StatelessWidget {
           children: [
             CanvasPage(),
             // Top Bar
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Back & Title
-                Row(
-                  children: [
-                    const WorkspaceDrawer(),
-                    SizedBox(width: 16.w),
-                    Container(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: device == rh.DeviceType.tab ? 20.w : 24.w,
-                        vertical: 16.h,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8.r),
-                        border: Border.all(
-                          color: const Color(0xFFD9D9D9),
-                          width: 1.2,
-                        ),
-                      ),
-                      child: SizedBox(
-                        height: 32.h,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                PhosphorIconsRegular.arrowArcLeft,
-                                size: 28.sp,
-                                color: Colors.black,
-                              ),
-                            ),
-                            VerticalCustomDivider(),
-                            IconButton(
-                              onPressed: () {},
-                              icon: Icon(
-                                PhosphorIconsRegular.arrowArcRight,
-                                size: 28.sp,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                ElevatedButton(
-                  onPressed: () {},
-                  style: ElevatedButton.styleFrom(
-                    elevation: 0,
-                    backgroundColor: primaryColor,
-                    padding: EdgeInsets.symmetric(
-                      vertical: 24.h,
-                      horizontal: 16.w,
-                    ), // Adjusted for tablet
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10.r),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Export Flowchart',
-                        style: TextStyle(
-                          fontSize: 16.sp,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      SizedBox(width: 12.w),
-                      Icon(
-                        PhosphorIconsRegular.export,
-                        color: Colors.white,
-                        size: 20.sp,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+            const WorkspaceDrawer(),
+            SizedBox(width: 16.w),
+
+            Positioned(top: 0, left: 0.31.sw, child: UndoRedoButton()),
+            Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton()),
+
+            // Container(
+            //   padding: EdgeInsets.symmetric(
+            //     horizontal: device == rh.DeviceType.tab ? 20.w : 24.w,
+            //     vertical: 16.h,
+            //   ),
+            //   decoration: BoxDecoration(
+            //     color: Colors.white,
+            //     borderRadius: BorderRadius.circular(8.r),
+            //     border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
+            //   ),
+            //   child: SizedBox(
+            //     height: 32.h,
+            //     child: Row(
+            //       mainAxisSize: MainAxisSize.min,
+            //       children: [
+            //         IconButton(
+            //           onPressed: () {},
+            //           icon: Icon(
+            //             PhosphorIconsRegular.arrowArcLeft,
+            //             size: 28.sp,
+            //             color: Colors.black,
+            //           ),
+            //         ),
+            //         VerticalCustomDivider(),
+            //         IconButton(
+            //           onPressed: () {},
+            //           icon: Icon(
+            //             PhosphorIconsRegular.arrowArcRight,
+            //             size: 28.sp,
+            //             color: Colors.black,
+            //           ),
+            //         ),
+            //       ],
+            //     ),
+            //   ),
+            // ),
+            // ElevatedButton(
+            //   onPressed: () {},
+            //   style: ElevatedButton.styleFrom(
+            //     elevation: 0,
+            //     backgroundColor: primaryColor,
+            //     padding: EdgeInsets.symmetric(
+            //       vertical: 24.h,
+            //       horizontal: 16.w,
+            //     ), // Adjusted for tablet
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(10.r),
+            //     ),
+            //   ),
+            //   child: Row(
+            //     mainAxisSize: MainAxisSize.min,
+            //     children: [
+            //       Text(
+            //         'Export Flowchart',
+            //         style: TextStyle(
+            //           fontSize: 16.sp,
+            //           color: Colors.white,
+            //           fontWeight: FontWeight.w500,
+            //         ),
+            //       ),
+            //       SizedBox(width: 12.w),
+            //       Icon(
+            //         PhosphorIconsRegular.export,
+            //         color: Colors.white,
+            //         size: 20.sp,
+            //       ),
+            //     ],
+            //   ),
+            // ),
             // Right Toolbar
             Align(
               alignment: Alignment.centerRight,
@@ -122,7 +115,7 @@ class WorkspaceTablet extends StatelessWidget {
             ),
             // Zoom Control
             Positioned(
-              bottom: 0.h,
+              bottom: 20.h,
               right: 0.w,
               child: Container(
                 padding: EdgeInsets.symmetric(
@@ -144,7 +137,8 @@ class WorkspaceTablet extends StatelessWidget {
                     Text(
                       "100%",
                       style: TextStyle(
-                        fontSize: 20.sp,
+                        fontSize:
+                            device == rh.DeviceType.desktop ? 20.sp : 40.sp,
                         color: Colors.black,
                         fontWeight: FontWeight.w500,
                       ),
@@ -154,7 +148,10 @@ class WorkspaceTablet extends StatelessWidget {
                     SizedBox(width: 6.w),
                     IconButton(
                       onPressed: () {},
-                      icon: Icon(PhosphorIconsRegular.plus, size: 20.sp),
+                      icon: Icon(
+                        PhosphorIconsRegular.plus,
+                        size: device == rh.DeviceType.desktop ? 20.sp : 50.sp,
+                      ),
                       visualDensity: VisualDensity.compact,
                     ),
                     SizedBox(width: 6.w),
@@ -162,7 +159,10 @@ class WorkspaceTablet extends StatelessWidget {
                     SizedBox(width: 6.w),
                     IconButton(
                       onPressed: () {},
-                      icon: Icon(PhosphorIconsRegular.minus, size: 20.sp),
+                      icon: Icon(
+                        PhosphorIconsRegular.minus,
+                        size: device == rh.DeviceType.desktop ? 20.sp : 50.sp,
+                      ),
                       visualDensity: VisualDensity.compact,
                     ),
                   ],

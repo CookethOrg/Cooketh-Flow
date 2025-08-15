@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class WorkspaceColorPicker extends StatefulWidget {
   final Color initialColor;
@@ -52,8 +53,9 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Container(
-      width: 350.w,
+      width:device == rh.DeviceType.desktop ?  350.w : device == rh.DeviceType.tab ? 350.w : 850.w,
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -76,11 +78,11 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
             children: [
               Text(
                 'Background Colour',
-                style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize:device == rh.DeviceType.desktop ?  20.sp : device == rh.DeviceType.tab ? 20.sp : 50.sp, fontWeight: FontWeight.w600),
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(PhosphorIconsRegular.x, size: 24.sp),
+                icon: Icon(PhosphorIconsRegular.x, size:device == rh.DeviceType.desktop ? 24.sp : device == rh.DeviceType.tab ? 24.sp : 55.sp),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
@@ -174,7 +176,7 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                     style: TextStyle(
                       color: Colors.grey.shade800,
                       fontWeight: FontWeight.w500,
-                      fontSize: 16.sp,
+                      fontSize:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 40.sp,
                       fontFamily: 'monospace'
                     ),
                   ),

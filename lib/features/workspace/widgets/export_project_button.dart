@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/workspace/widgets/export_dialog.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +10,7 @@ class ExportProjectButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+      final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return ElevatedButton(
       onPressed: () {
         showDialog(context: context, builder: (context) => ExportDialog(),);
@@ -28,13 +30,13 @@ class ExportProjectButton extends StatelessWidget {
             'Export Flowchart',
             style: TextStyle(
               fontFamily: 'Fredrik',
-              fontSize: 18.sp,
+              fontSize:device == rh.DeviceType.desktop? 18.sp : 25.sp,
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
           ),
           SizedBox(width: 16.w),
-          Icon(PhosphorIconsRegular.export, color: Colors.white, size: 24.sp),
+          Icon(PhosphorIconsRegular.export, color: Colors.white, size:device == rh.DeviceType.desktop? 24.sp : 40.sp),
         ],
       ),
     );

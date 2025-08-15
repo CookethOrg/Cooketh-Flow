@@ -99,34 +99,33 @@ class ProjectCard extends StatelessWidget {
                     padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(
-                                workspace.name,
-                                style: TextStyle(
-                                  fontFamily: 'Fredrik',
-                                  fontSize:deviceType == rh.DeviceType.desktop ? 20.sp : deviceType == rh.DeviceType.tab ? 16.sp: 50.sp,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              workspace.name,
+                              style: TextStyle(
+                                fontFamily: 'Fredrik',
+                                fontSize:deviceType == rh.DeviceType.desktop ? 20.sp : deviceType == rh.DeviceType.tab ? 18.sp: 50.sp,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w600,
                               ),
-                              SizedBox(height: 4.h),
-                              Text(
-                                dth.formatLastEdited(workspace.lastEdited),
-                                style: TextStyle(
-                                  fontFamily: 'Fredrik',
-                                  color: Colors.grey[600],
-                                  fontSize:deviceType == rh.DeviceType.desktop ? 14.sp : deviceType == rh.DeviceType.tab ?12.sp : 44.sp,
-                                  fontWeight: FontWeight.w500,
-                                ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            SizedBox(height: 4.h),
+                            Text(
+                              dth.formatLastEdited(workspace.lastEdited),
+                              style: TextStyle(
+                                fontFamily: 'Fredrik',
+                                color: Colors.grey[600],
+                                fontSize:deviceType == rh.DeviceType.desktop ? 14.sp : deviceType == rh.DeviceType.tab ?14.sp : 44.sp,
+                                fontWeight: FontWeight.w500,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         // UPDATED: Star IconButton
                         IconButton(

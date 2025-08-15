@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ExportDialog extends StatefulWidget {
   const ExportDialog({super.key});
@@ -15,6 +16,7 @@ class _ExportDialogState extends State<ExportDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -43,13 +45,18 @@ class _ExportDialogState extends State<ExportDialog> {
                 Text(
                   'Export',
                   style: TextStyle(
-                    fontSize: 22.sp,
+                    fontSize:
+                        device == rh.DeviceType.desktop
+                            ? 22.sp
+                            : device == rh.DeviceType.tab
+                            ? 22.sp
+                            : 60.sp,
                     fontWeight: FontWeight.w600,
                     color: const Color(0xFF111827),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(PhosphorIconsRegular.x, size: 24.sp),
+                  icon: Icon(PhosphorIconsRegular.x, size:device == rh.DeviceType.desktop ? 24.sp : device == rh.DeviceType.tab ? 24.sp : 55.sp),
                   onPressed: () => Navigator.of(context).pop(),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -64,10 +71,7 @@ class _ExportDialogState extends State<ExportDialog> {
               children: [
                 Text(
                   'Export as',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    color: Colors.grey[700],
-                  ),
+                  style: TextStyle(fontSize:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp, color: Colors.grey[700]),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
@@ -78,7 +82,7 @@ class _ExportDialogState extends State<ExportDialog> {
                   child: DropdownButton<String>(
                     value: _selectedFormat,
                     underline: const SizedBox.shrink(),
-                    icon: Icon(PhosphorIconsRegular.caretDown, size: 16.sp),
+                    icon: Icon(PhosphorIconsRegular.caretDown, size:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp),
                     onChanged: (String? newValue) {
                       if (newValue != null) {
                         setState(() {
@@ -86,12 +90,16 @@ class _ExportDialogState extends State<ExportDialog> {
                         });
                       }
                     },
-                    items: _formats.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value, style: TextStyle(fontSize: 16.sp)),
-                      );
-                    }).toList(),
+                    items:
+                        _formats.map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(fontSize: device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp),
+                            ),
+                          );
+                        }).toList(),
                   ),
                 ),
               ],
@@ -119,7 +127,7 @@ class _ExportDialogState extends State<ExportDialog> {
                 child: Text(
                   'Export Flowchart',
                   style: TextStyle(
-                    fontSize: 16.sp,
+                    fontSize:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

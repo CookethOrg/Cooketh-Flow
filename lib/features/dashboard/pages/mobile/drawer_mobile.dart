@@ -109,10 +109,10 @@ class DashboardDrawerMob extends StatelessWidget {
                       ],
                     ),
                     SizedBox(
-                      height: device == rh.DeviceType.desktop ? 30.h : 8.h,
+                      height : 15.h,
                     ),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
                         ElevatedButton.icon(
                           onPressed: () {
@@ -132,7 +132,7 @@ class DashboardDrawerMob extends StatelessWidget {
                               horizontal:
                                   device == rh.DeviceType.desktop ? 28.w : 65.w,
                               vertical:
-                                  device == rh.DeviceType.desktop ? 24.h : 15.h,
+                                  device == rh.DeviceType.desktop ? 24.h : 20.h,
                             ),
                             foregroundColor: primaryColor,
                             shape: RoundedRectangleBorder(
@@ -173,7 +173,7 @@ class DashboardDrawerMob extends StatelessWidget {
                               horizontal:
                                   device == rh.DeviceType.desktop ? 28.w : 65.w,
                               vertical:
-                                  device == rh.DeviceType.desktop ? 24.h : 15.h,
+                                  device == rh.DeviceType.desktop ? 24.h : 20.h,
                             ),
                             foregroundColor: primaryColor,
                             shape: RoundedRectangleBorder(

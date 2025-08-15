@@ -32,11 +32,11 @@ class WorkspaceDrawer extends StatelessWidget {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: provider.isDrawerOpen ? 1.sh : 0.08.sh,
-            width: 0.2.sw,
+            height: provider.isDrawerOpen ? 1.sh :device == rh.DeviceType.desktop ?0.089.sh : 0.08.sh,
+            width: device == rh.DeviceType.desktop ? 0.195.sw : 0.27.sw,
             padding: EdgeInsets.symmetric(
-              horizontal: device == rh.DeviceType.desktop ? 24.w : 32.w,
-              vertical: 16.h,
+              horizontal: device == rh.DeviceType.desktop ? 24.w : 15.w,
+              vertical:device == rh.DeviceType.desktop ? 16.h :10.h,
             ),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -53,24 +53,20 @@ class WorkspaceDrawer extends StatelessWidget {
                     IconButton(
                       onPressed: () {
                         // Ensure exitWorkspace is called when navigating back
-                        
-                        context
-                            .goNamed(
-                              RouteName.dashboard,
-                              pathParameters: {
-                                'username':
-                                    provider
-                                        .supabaseService
-                                        .currentUser!
-                                        .name ??
-                                    "Notfound",
-                              },
-                            );
-                            provider.exitWorkspace();
+
+                        context.goNamed(
+                          RouteName.dashboard,
+                          pathParameters: {
+                            'username':
+                                provider.supabaseService.currentUser!.name ??
+                                "Notfound",
+                          },
+                        );
+                        provider.exitWorkspace();
                       },
                       icon: Icon(
                         PhosphorIconsRegular.arrowLeft,
-                        size: 32.sp,
+                        size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
                         color: Colors.black,
                       ),
                       splashRadius: 24.r,
@@ -83,7 +79,7 @@ class WorkspaceDrawer extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Fredrik',
                           fontSize:
-                              device == rh.DeviceType.desktop ? 24.sp : 32.sp,
+                              device == rh.DeviceType.desktop ? 24.sp : 42.sp,
                           fontWeight: FontWeight.w600,
                           color: Colors.black,
                           letterSpacing: 0.6,
@@ -97,14 +93,14 @@ class WorkspaceDrawer extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(width: 80.w),
+                    SizedBox(width:device == rh.DeviceType.desktop ? 50.w : 20.w),
                     IconButton(
                       onPressed: () {
                         provider.toggleDrawer();
                       },
                       icon: Icon(
                         PhosphorIconsRegular.sidebarSimple,
-                        size: 32.sp,
+                        size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
                         color: Colors.black,
                       ),
                       splashRadius: 24.r,
@@ -126,7 +122,7 @@ class WorkspaceDrawer extends StatelessWidget {
                               ? Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  SizedBox(height: 20.h),
+                                 device == rh.DeviceType.desktop ?  SizedBox(height: 20.h) : SizedBox(height: 10.h,),
                                   const Divider(
                                     color: Colors.grey,
                                     thickness: 0.5,
@@ -139,7 +135,7 @@ class WorkspaceDrawer extends StatelessWidget {
                                           provider.canvasObjectsList.length,
                                       separatorBuilder:
                                           (context, index) =>
-                                              SizedBox(height: 8.h),
+                                              device == rh.DeviceType.desktop ? SizedBox(height: 8.h):SizedBox(height: 2.h),
                                       itemBuilder: (context, index) {
                                         CanvasObject item =
                                             provider.canvasObjectsList[index];
@@ -158,6 +154,7 @@ class WorkspaceDrawer extends StatelessWidget {
                                               provider
                                                   .currentlySelectedObjectId ==
                                               item.id,
+                                              device: device,
                                           onTap: () {
                                             provider.changeCurrentlySelectedObj(
                                               item.id,
@@ -189,18 +186,19 @@ class WorkspaceDrawer extends StatelessWidget {
     required int index,
     required bool isSelected,
     required VoidCallback onTap,
+    required rh.DeviceType device,
   }) {
     Color iconTextColor = isSelected ? Colors.blue : Colors.black;
 
     return Container(
       color: Colors.white,
       child: ListTile(
-        leading: Icon(iconData, size: 24.sp, color: iconTextColor),
+        leading: Icon(iconData, size:device == rh.DeviceType.desktop ? 24.sp : 35.sp, color: iconTextColor),
         title: Text(
           title,
           style: TextStyle(
             fontFamily: 'Fredrik',
-            fontSize: 18.sp,
+            fontSize:device == rh.DeviceType.desktop ? 18.sp : 28.sp,
             color: iconTextColor,
           ),
         ),

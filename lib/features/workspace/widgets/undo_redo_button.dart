@@ -12,10 +12,15 @@ class UndoRedoButton extends StatelessWidget {
     bool isDesktop =
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
         rh.DeviceType.desktop;
+      
+    bool isTab =
+        rh.ResponsiveLayoutHelper.getDeviceType(context) ==
+        rh.DeviceType.tab;
+      
     return Container(
       padding: EdgeInsets.symmetric(
-        horizontal: isDesktop ? 24.w : 20.w,
-        vertical:isDesktop? 17.h : 13.h,
+        horizontal: isDesktop ? 24.w :isTab? 20.w : 15.w,
+        vertical:isDesktop? 17.h : isTab? 13.h : 10.h, 
       ),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -23,7 +28,7 @@ class UndoRedoButton extends StatelessWidget {
         border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
       ),
       child: SizedBox(
-        height: 56.h, // Fixed height for consistency
+        height:isDesktop?  56.h : isTab ? 56.h : 40.h, // Fixed height for consistency
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -31,7 +36,7 @@ class UndoRedoButton extends StatelessWidget {
               onPressed: () {},
               icon: Icon(
                 PhosphorIconsRegular.arrowArcLeft,
-                size:isDesktop ? 32.sp : 55.sp,
+                size:isDesktop ? 32.sp : isTab? 55.sp : 75.sp,
                 color: Colors.black,
               ),
             ),
@@ -40,7 +45,7 @@ class UndoRedoButton extends StatelessWidget {
               onPressed: () {},
               icon: Icon(
                 PhosphorIconsRegular.arrowArcRight,
-                size:isDesktop ? 32.sp : 55.sp,
+                size:isDesktop ? 32.sp : isTab? 55.sp : 75.sp,
                 color: Colors.black,
               ),
             ),

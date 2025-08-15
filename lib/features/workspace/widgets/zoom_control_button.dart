@@ -4,12 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ZoomControlButton extends StatelessWidget {
   const ZoomControlButton({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer<CanvasProvider>(
       builder: (context, canvasProvider, child) {
         return Container(
@@ -28,17 +30,37 @@ class ZoomControlButton extends StatelessWidget {
                 style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w500,
-                  fontSize: 24.sp,
+                  fontSize:
+                      device == rh.DeviceType.desktop
+                          ? 24.sp
+                          : device == rh.DeviceType.tab
+                          ? 24.sp
+                          : 40.sp,
                 ),
               ),
-              SizedBox(width: 8.w),
+              SizedBox(
+                width:
+                    device == rh.DeviceType.desktop
+                        ? 8.w
+                        : device == rh.DeviceType.tab
+                        ? 8.w
+                        : 12.w,
+              ),
               VerticalCustomDivider(),
               SizedBox(width: 8.w),
               IconButton(
                 onPressed: () {
                   canvasProvider.zoomIn(); // Call zoomIn method
                 },
-                icon: Icon(PhosphorIconsRegular.plus, size: 24.sp),
+                icon: Icon(
+                  PhosphorIconsRegular.plus,
+                  size:
+                      device == rh.DeviceType.desktop
+                          ? 24.sp
+                          : device == rh.DeviceType.tab
+                          ? 24.sp
+                          : 40.sp,
+                ),
                 visualDensity: VisualDensity.compact,
               ),
               SizedBox(width: 8.w),
@@ -48,7 +70,15 @@ class ZoomControlButton extends StatelessWidget {
                 onPressed: () {
                   canvasProvider.zoomOut(); // Call zoomOut method
                 },
-                icon: Icon(PhosphorIconsRegular.minus, size: 24.sp),
+                icon: Icon(
+                  PhosphorIconsRegular.minus,
+                  size:
+                      device == rh.DeviceType.desktop
+                          ? 24.sp
+                          : device == rh.DeviceType.tab
+                          ? 24.sp
+                          : 40.sp,
+                ),
                 visualDensity: VisualDensity.compact,
               ),
               SizedBox(width: 8.w),
@@ -58,7 +88,15 @@ class ZoomControlButton extends StatelessWidget {
                 onPressed: () {
                   canvasProvider.resetZoom(); // Call resetZoom method
                 },
-                icon: Icon(PhosphorIconsRegular.resize, size: 24.sp), // Icon for reset
+                icon: Icon(
+                  PhosphorIconsRegular.resize,
+                  size:
+                      device == rh.DeviceType.desktop
+                          ? 24.sp
+                          : device == rh.DeviceType.tab
+                          ? 24.sp
+                          : 60.sp,
+                ), // Icon for reset
                 visualDensity: VisualDensity.compact,
                 tooltip: 'Reset Zoom',
               ),

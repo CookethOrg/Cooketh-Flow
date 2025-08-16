@@ -55,7 +55,7 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Container(
-      width:device == rh.DeviceType.desktop ?  350.w : device == rh.DeviceType.tab ? 350.w : 850.w,
+      width:device == rh.DeviceType.desktop ?  350.w : device == rh.DeviceType.tab ? 350.w : 1000.w,
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
         color: Colors.white,

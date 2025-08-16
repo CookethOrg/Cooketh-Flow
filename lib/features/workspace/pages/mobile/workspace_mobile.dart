@@ -30,19 +30,19 @@ class WorkspaceMobile extends StatelessWidget {
         return Scaffold(
           backgroundColor: provider.currentWorkspaceColor,
           body: Padding(
-            padding: EdgeInsets.symmetric(vertical: 20.h),
+            padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 20.h),
             child: Stack(
               clipBehavior: Clip.none,
               children: [
                 const CanvasPage(),
                 workspaceDrawerMob(device),
-                Positioned(right: 10.h, top: 120.h, child: UndoRedoButton()),
-                Positioned(bottom: 100.h, left: 100.h, child: ToolBar()),
-
-                Positioned(
-                  bottom: 0.h,
-                  right: 230.h,
-                  child: ZoomControlButton(),
+                Positioned(top: 120.h, right: 0.h, child: UndoRedoButton()),
+                Padding(
+                  padding: EdgeInsets.only(bottom: 40.h),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: ToolBar(),
+                  ),
                 ),
 
                 Consumer2<WorkspaceProvider, CanvasProvider>(
@@ -102,7 +102,7 @@ class WorkspaceMobile extends StatelessWidget {
   }
 }
 
-Widget workspaceDrawerMob(rh.DeviceType device) {
+Widget workspaceDrawerMob(rh.DeviceType device,) {
   return Consumer<WorkspaceProvider>(
     builder: (context, provider, child) {
       Color defaultBorderColor = const Color(0xFFD9D9D9);
@@ -122,74 +122,76 @@ Widget workspaceDrawerMob(rh.DeviceType device) {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             // Always visible header row
-            Container(
-              padding: EdgeInsets.only(bottom: 10, top: 0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      provider.toggleDrawer();
-                    },
-                    icon: Icon(
-                      PhosphorIconsRegular.sidebarSimple,
-                      size: 80.sp,
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                IconButton(
+                  onPressed: () {
+                    provider.toggleDrawer();
+                  },
+                  icon:
+                      !provider.isDrawerOpen
+                          ? Icon(
+                            PhosphorIconsRegular.sidebarSimple,
+                            size: 100.sp,
+                            color: Colors.black,
+                          )
+                          : Icon(
+                            Icons.close,
+                            size: 100.sp,
+                            color: Colors.black,
+                          ),
+                  splashRadius: 24.r,
+                  tooltip: 'Toggle Sidebar',
+                ),
+                SizedBox(width: 30.w),
+                Expanded(
+                  child: TextField(
+                    controller: provider.workspaceNameController,
+                    style: TextStyle(
+                      fontFamily: 'Fredrik',
+                      fontSize: 72.sp,
+                      fontWeight: FontWeight.w600,
                       color: Colors.black,
+                      letterSpacing: 0.6,
                     ),
-                    splashRadius: 24.r,
-                    tooltip: 'Toggle Sidebar',
-                  ),
-                  SizedBox(width: 30.w),
-                  Expanded(
-                    child: TextField(
-                      controller: provider.workspaceNameController,
-                      style: TextStyle(
-                        fontFamily: 'Fredrik',
-                        fontSize: 62.sp,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black,
-                        letterSpacing: 0.6,
-                      ),
-                      decoration: const InputDecoration(
-                        isDense: true,
-                        contentPadding: EdgeInsets.zero,
-                        border: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                      ),
+                    decoration: const InputDecoration(
+                      isDense: true,
+                      contentPadding: EdgeInsets.zero,
+                      border: InputBorder.none,
+                      focusedBorder: InputBorder.none,
+                      enabledBorder: InputBorder.none,
                     ),
                   ),
-                  SizedBox(width: 10.w),
+                ),
+                SizedBox(width: 10.w),
 
-                  Padding(
-                    padding: const EdgeInsets.only(right: 20),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (context) => ExportDialog(),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        backgroundColor: primaryColor,
-                        padding: EdgeInsets.symmetric(
-                          vertical: 25.h,
-                          horizontal: 2.w,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                      ),
-                      child: Icon(
-                        PhosphorIconsRegular.export,
-                        color: Colors.white,
-                        size: 80.sp,
-                      ),
+                ElevatedButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => ExportDialog(),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    elevation: 0,
+                    backgroundColor: primaryColor,
+                    padding: EdgeInsets.symmetric(
+                      vertical: 10.h,
+                      horizontal: 0.1.w,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12.r),
                     ),
                   ),
-                ],
-              ),
+                  child: Icon(
+                    PhosphorIconsRegular.export,
+                    color: Colors.white,
+                    size: 100.sp,
+                  ),
+                ),
+              ],
             ),
             Divider(),
             Expanded(
@@ -203,50 +205,50 @@ Widget workspaceDrawerMob(rh.DeviceType device) {
                   alignment: Alignment.topCenter,
                   child:
                       provider.isDrawerOpen
-                          ? Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              device == rh.DeviceType.desktop
-                                  ? SizedBox(height: 20.h)
-                                  : SizedBox(height: 10.h),
-                              const Divider(color: Colors.grey, thickness: 0.5),
-                              SizedBox(height: 10.h),
-                              Expanded(
-                                child: ListView.separated(
-                                  padding: EdgeInsets.zero,
-                                  itemCount: provider.canvasObjectsList.length,
-                                  separatorBuilder:
-                                      (context, index) =>
-                                          device == rh.DeviceType.desktop
-                                              ? SizedBox(height: 8.h)
-                                              : SizedBox(height: 2.h),
-                                  itemBuilder: (context, index) {
-                                    CanvasObject item =
-                                        provider.canvasObjectsList[index];
-                                    return _buildSelectableListTile(
-                                      context,
-                                      provider: provider,
-                                      title:
-                                          item.toJson()['object_type']
-                                              as String,
-                                      iconData: provider.getIconForObjectType(
-                                        item.toJson()['object_type'],
-                                      ), // Use the helper
-                                      index: index,
-                                      isSelected:
-                                          provider.currentlySelectedObjectId ==
-                                          item.id,
-                                      device: device,
-                                      onTap: () {
-                                        provider.changeCurrentlySelectedObj(
-                                          item.id,
+                          ? Align(
+                            alignment: Alignment.topLeft,
+                            child: SizedBox(
+                              width: 350.h,
+                              height: 780.h,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  Expanded(
+                                    child: ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      itemCount:
+                                          provider.canvasObjectsList.length,
+                                      itemBuilder: (context, index) {
+                                        CanvasObject item =
+                                            provider.canvasObjectsList[index];
+                                        return _buildSelectableListTile(
+                                          context,
+                                          provider: provider,
+                                          title:
+                                              item.toJson()['object_type']
+                                                  as String,
+                                          iconData: provider
+                                              .getIconForObjectType(
+                                                item.toJson()['object_type'],
+                                              ), // Use the helper
+                                          index: index,
+                                          isSelected:
+                                              provider
+                                                  .currentlySelectedObjectId ==
+                                              item.id,
+                                          device: device,
+                                          onTap: () {
+                                            provider.changeCurrentlySelectedObj(
+                                              item.id,
+                                            );
+                                          },
                                         );
                                       },
-                                    );
-                                  },
-                                ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           )
                           : const SizedBox.shrink(),
                 ),
@@ -274,16 +276,12 @@ Widget _buildSelectableListTile(
   return Container(
     color: Colors.white,
     child: ListTile(
-      leading: Icon(
-        iconData,
-        size: device == rh.DeviceType.desktop ? 24.sp : 35.sp,
-        color: iconTextColor,
-      ),
+      leading: Icon(iconData, size: 85.sp, color: iconTextColor),
       title: Text(
         title,
         style: TextStyle(
           fontFamily: 'Fredrik',
-          fontSize: device == rh.DeviceType.desktop ? 18.sp : 28.sp,
+          fontSize: 60.sp,
           color: iconTextColor,
         ),
       ),

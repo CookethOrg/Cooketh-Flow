@@ -8,6 +8,7 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math_64.dart' as vc;
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ObjectTextEditor extends StatefulWidget {
   const ObjectTextEditor({super.key});
@@ -45,6 +46,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer2<WorkspaceProvider, CanvasProvider>(
       builder: (context, workspaceProvider, canvasProvider, child) {
         final selectedObjectId = workspaceProvider.currentlySelectedObjectId;
@@ -106,23 +108,26 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                       ),
                     ],
                   ),
-                  child: QuillSimpleToolbar(
-                    controller: quillController,
-                    config: const QuillSimpleToolbarConfig(
-                      showBackgroundColorButton: true,
-                      showFontFamily: true,
-                      showLink: true,
-                      showSearchButton: false,
-                      showInlineCode: true,
-                      showListCheck: true,
-                      showQuote: true,
-                      showCodeBlock: true,
-                      showListBullets: true,
-                      showListNumbers: true,
-                      showClearFormat: true,
-                      showBoldButton: true,
-                      showItalicButton: true,
-                      showHeaderStyle: true,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: QuillSimpleToolbar(
+                      controller: quillController,
+                      config: const QuillSimpleToolbarConfig(
+                        showBackgroundColorButton: true,
+                        showFontFamily: true,
+                        showLink: true,
+                        showSearchButton: false,
+                        showInlineCode: true,
+                        showListCheck: true,
+                        showQuote: true,
+                        showCodeBlock: true,
+                        showListBullets: true,
+                        showListNumbers: true,
+                        showClearFormat: true,
+                        showBoldButton: true,
+                        showItalicButton: true,
+                        showHeaderStyle: true,
+                      ),
                     ),
                   ),
                 ),

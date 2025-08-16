@@ -19,7 +19,7 @@ class VerticalCustomDivider extends StatelessWidget {
               ? 1.5.w
               : isTab
               ? 1.5.w
-              : 3.5.w,
+              : 7.5.w,
       color: const Color(0xFFD9D9D9),
       margin: EdgeInsets.symmetric(horizontal: 8.w),
     );

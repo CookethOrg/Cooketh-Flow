@@ -32,7 +32,7 @@ class WorkspaceDrawer extends StatelessWidget {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: provider.isDrawerOpen ? 1.sh :device == rh.DeviceType.desktop ?0.089.sh : 0.08.sh,
+            height: provider.isDrawerOpen ? 1.sh :device == rh.DeviceType.desktop ?0.09.sh : 0.08.sh,
             width: device == rh.DeviceType.desktop ? 0.195.sw : 0.27.sw,
             padding: EdgeInsets.symmetric(
               horizontal: device == rh.DeviceType.desktop ? 24.w : 15.w,
@@ -98,8 +98,12 @@ class WorkspaceDrawer extends StatelessWidget {
                       onPressed: () {
                         provider.toggleDrawer();
                       },
-                      icon: Icon(
+                      icon:!provider.isDrawerOpen? Icon(
                         PhosphorIconsRegular.sidebarSimple,
+                        size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
+                        color: Colors.black,
+                      ) : Icon(
+                        Icons.close,
                         size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
                         color: Colors.black,
                       ),

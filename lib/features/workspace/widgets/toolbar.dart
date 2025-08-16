@@ -32,88 +32,91 @@ class ToolBar extends StatelessWidget {
           ),
           child:
               device == rh.DeviceType.mobile
-                  ? Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _toolIcon(
-                        PhosphorIconsRegular.paintBucket,
-                        'Select Workspace Color',
-                        device,
-                        onPressed: () {
-                          _showColorPicker(
-                            context,
-                            provider,
-                            device
-                          ); // Pass the provider
-                        },
-                      ),
-                      VerticalCustomDivider(),
-                      _toolIcon(
-                        PhosphorIconsRegular.circlesThreePlus,
-                        'Add new node',
-                        device,
-                        onPressed: () {
-                          _showNodePicker(context, device);
-                        },
-                      ),
-                      VerticalCustomDivider(),
-                      _toolIcon(
-                        PhosphorIconsRegular.cursor,
-                        'Pointer',
-                        device,
-                        iconColor:
-                            provider.currentMode == DrawMode.pointer
-                                ? Colors.blue
-                                : Colors.black,
-                        onPressed: () {
-                          provider.changeDrawMode(DrawMode.pointer);
-                        },
-                      ),
-                      VerticalCustomDivider(),
-                      _toolIcon(
-                        PhosphorIconsRegular.handGrabbing,
-                        'Pan',
-                        device,
-                        iconColor:
-                            provider.currentMode == DrawMode.hand
-                                ? Colors.blue
-                                : Colors.black,
-                        onPressed: () {
-                          provider.changeDrawMode(DrawMode.hand);
-                        },
-                      ),
-                     VerticalCustomDivider(),
-                      _toolIcon(
-                        PhosphorIconsRegular.textT,
-                        'Text box',
-                        device,
-                        iconColor:
-                            provider.currentMode == DrawMode.textBox
-                                ? Colors.blue
-                                : Colors.black,
-                        onPressed: () {
-                          provider.changeDrawMode(DrawMode.textBox);
-                        },
-                      ),
-                      VerticalCustomDivider(),
-                      _toolIcon(
-                        PhosphorIconsRegular.image,
-                        'Add Image/Media files - Coming soon',
-                        device,
-                        onPressed: () {},
-                      ),
-                      VerticalCustomDivider(),
-                      _toolIcon(
-                        PhosphorIconsFill.noteBlank,
-                        'Add new sticky note',
-                        device,
-                        iconColor:
-                            provider.currentMode == DrawMode.stickyNote
-                                ? Colors.blue
-                                : tertiaryColors[6],
-                        onPressed: () => _showStickyNote(context,device),
-                      ),
-                    ],
+                  ? FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _toolIcon(
+                          PhosphorIconsRegular.paintBucket,
+                          'Select Workspace Color',
+                          device,
+                          onPressed: () {
+                            _showColorPicker(
+                              context,
+                              provider,
+                              device
+                            ); // Pass the provider
+                          },
+                        ),
+                        VerticalCustomDivider(),
+                        _toolIcon(
+                          PhosphorIconsRegular.circlesThreePlus,
+                          'Add new node',
+                          device,
+                          onPressed: () {
+                            _showNodePicker(context, device);
+                          },
+                        ),
+                        VerticalCustomDivider(),
+                        _toolIcon(
+                          PhosphorIconsRegular.cursor,
+                          'Pointer',
+                          device,
+                          iconColor:
+                              provider.currentMode == DrawMode.pointer
+                                  ? Colors.blue
+                                  : Colors.black,
+                          onPressed: () {
+                            provider.changeDrawMode(DrawMode.pointer);
+                          },
+                        ),
+                        VerticalCustomDivider(),
+                        _toolIcon(
+                          PhosphorIconsRegular.handGrabbing,
+                          'Pan',
+                          device,
+                          iconColor:
+                              provider.currentMode == DrawMode.hand
+                                  ? Colors.blue
+                                  : Colors.black,
+                          onPressed: () {
+                            provider.changeDrawMode(DrawMode.hand);
+                          },
+                        ),
+                       VerticalCustomDivider(),
+                        _toolIcon(
+                          PhosphorIconsRegular.textT,
+                          'Text box',
+                          device,
+                          iconColor:
+                              provider.currentMode == DrawMode.textBox
+                                  ? Colors.blue
+                                  : Colors.black,
+                          onPressed: () {
+                            provider.changeDrawMode(DrawMode.textBox);
+                          },
+                        ),
+                        VerticalCustomDivider(),
+                        _toolIcon(
+                          PhosphorIconsRegular.image,
+                          'Add Image/Media files - Coming soon',
+                          device,
+                          onPressed: () {},
+                        ),
+                        VerticalCustomDivider(),
+                        _toolIcon(
+                          PhosphorIconsFill.noteBlank,
+                          'Add new sticky note',
+                          device,
+                          iconColor:
+                              provider.currentMode == DrawMode.stickyNote
+                                  ? Colors.blue
+                                  : tertiaryColors[6],
+                          onPressed: () => _showStickyNote(context,device),
+                        ),
+                      ],
+                    ),
                   )
                   : Column(
                     mainAxisSize: MainAxisSize.min,
@@ -223,7 +226,7 @@ class ToolBar extends StatelessWidget {
             tooltip: tooltip,
             icon: Icon(
               iconData,
-              size: device == rh.DeviceType.desktop ? 36.sp : device == rh.DeviceType.tab ? 60.sp : 75.sp, 
+              size: device == rh.DeviceType.desktop ? 36.sp : device == rh.DeviceType.tab ? 60.sp : 125.sp, 
             ),
             color: iconColor,
           ),
@@ -246,7 +249,7 @@ class ToolBar extends StatelessWidget {
     if (renderBox == null) return;
 
     final position = renderBox.localToGlobal(Offset.zero);
-    final nodePickerWidth = 340; // The width of the NodePicker widget
+    final nodePickerWidth=device == rh.DeviceType.desktop ? 340 : device == rh.DeviceType.tab ? 340 : 300; // The width of the NodePicker widget
     final padding = 20.w; // Padding between the toolbar and the picker
 
     showDialog(
@@ -256,8 +259,8 @@ class ToolBar extends StatelessWidget {
         double topPos;
         double leftPos;
         if (device == rh.DeviceType.mobile) {
-          topPos = 380.h;
-          leftPos = 130.w;
+          topPos = position.dy - 500.h;
+          leftPos =position.dx;
         } else {
           topPos = position.dy;
           leftPos = position.dx - nodePickerWidth - padding;
@@ -302,8 +305,8 @@ class ToolBar extends StatelessWidget {
           double topPos;
           double leftPos;
           if (device == rh.DeviceType.mobile) {
-            topPos = 450.h;
-            leftPos = 130.w;
+            topPos =  position.dy - 390.h;
+            leftPos = position.dx;
           } else {
             topPos = position.dy;
             leftPos = position.dx - pickerWidth - padding;
@@ -353,8 +356,8 @@ class ToolBar extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: 130.w,
-                  top:device == rh.DeviceType.desktop? 460.h : device == rh.DeviceType.tab ? 460.h : 490.h,
+                  right: position.dx,
+                  top:device == rh.DeviceType.desktop? 460.h : device == rh.DeviceType.tab ? 460.h :  position.dy - 390.h,
                   child: Material(
                     color: Colors.transparent,
                     child: StickyNotesWidget(),

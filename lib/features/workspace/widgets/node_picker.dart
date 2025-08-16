@@ -2,7 +2,7 @@ import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
-
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:provider/provider.dart';
 
 // The main NodePicker widget, now stateful
@@ -61,11 +61,12 @@ class _NodePickerState extends State<NodePicker> {
 
   @override
   Widget build(BuildContext context) {
+    final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Dialog(
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Container(
-        width: 340,
+        width:device == rh.DeviceType.desktop ? 340 : device == rh.DeviceType.tab ? 340 : 300,
         padding: const EdgeInsets.all(24.0),
         decoration: BoxDecoration(
           color: Colors.white,

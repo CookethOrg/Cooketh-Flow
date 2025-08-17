@@ -31,8 +31,8 @@ class DashboardDrawerMob extends StatelessWidget {
 
         return Container(
           decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
+            color: Theme.of(context).cardColor,
+            border: Border.all(color:supabaseService.isDark?Colors.grey.shade700: const Color(0xFFD9D9D9), width: 1.2),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Padding(
@@ -138,7 +138,7 @@ class DashboardDrawerMob extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20.r),
                             ),
-                            backgroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).cardColor,
                             side: BorderSide(color: primaryColor),
                             minimumSize: Size(
                               0,
@@ -240,7 +240,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                   color:
                                       isSelected
                                           ? secondaryColors[6]
-                                          : Colors.black,
+                                          : supabaseService.isDark?Colors.white: Colors.black,
                                   size:
                                       device == rh.DeviceType.desktop
                                           ? 26.sp
@@ -264,7 +264,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                           ? 18.sp
                                           : 55.sp,
                                   color:
-                                      isSelected ? Colors.blue : Colors.black,
+                                      isSelected ? Colors.blue : supabaseService.isDark?Colors.white: Colors.black,
                                   fontWeight:
                                       isSelected
                                           ? FontWeight.w800
@@ -280,7 +280,7 @@ class DashboardDrawerMob extends StatelessWidget {
                 ),
                 Spacer(),
                 Spacer(),
-                const UpgradeCard(),
+                UpgradeCard(sv: supabaseService,),
               ],
             ),
           ),

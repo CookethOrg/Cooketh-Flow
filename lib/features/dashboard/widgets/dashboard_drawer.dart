@@ -32,8 +32,9 @@ class DashboardDrawer extends StatelessWidget {
         return IntrinsicWidth(
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
+              color: Theme.of(context).cardColor,
+              //const Color(0xFFD9D9D9)
+              border: Border.all(color: supabaseService.isDark? Colors.grey.shade700:  Color(0xFFD9D9D9), width: 1.2),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Padding(
@@ -148,7 +149,7 @@ class DashboardDrawer extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.r),
                               ),
-                              backgroundColor: Colors.white,
+                              backgroundColor: Theme.of(context).cardColor,
                               side: BorderSide(color: primaryColor),
                               minimumSize: Size(
                                 0,
@@ -256,7 +257,7 @@ class DashboardDrawer extends StatelessWidget {
                                     color:
                                         isSelected
                                             ? secondaryColors[6]
-                                            : Colors.black,
+                                            : supabaseService.isDark? Colors.white : Colors.black,
                                     size:
                                         device == rh.DeviceType.desktop
                                             ? 26.sp
@@ -280,7 +281,7 @@ class DashboardDrawer extends StatelessWidget {
                                             ? 18.sp
                                             : device == rh.DeviceType.tab ? 25.sp : 16.sp,
                                     color:
-                                        isSelected ? Colors.blue : Colors.black,
+                                        isSelected ? Colors.blue : supabaseService.isDark? Colors.white :Colors.black,
                                     fontWeight:
                                         isSelected
                                             ? FontWeight.w600
@@ -295,7 +296,7 @@ class DashboardDrawer extends StatelessWidget {
                     ),
                   ),
                   Spacer(),
-                  const UpgradeCard(),
+                  UpgradeCard(sv: supabaseService,),
                 ],
               ),
             ),

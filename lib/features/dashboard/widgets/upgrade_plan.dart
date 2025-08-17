@@ -1,12 +1,19 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-class UpgradeCard extends StatelessWidget {
-  const UpgradeCard({super.key});
+class UpgradeCard extends StatefulWidget {
+  final SupabaseService sv;
+  const UpgradeCard({super.key, required this.sv});
 
+  @override
+  State<UpgradeCard> createState() => _UpgradeCardState();
+}
+
+class _UpgradeCardState extends State<UpgradeCard> {
   @override
   Widget build(BuildContext context) {
     rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
@@ -14,13 +21,26 @@ class UpgradeCard extends StatelessWidget {
     return Container(
       margin: EdgeInsets.only(top: 20.h),
       padding: EdgeInsets.symmetric(
-        horizontal: device == rh.DeviceType.desktop ? 24.w :device == rh.DeviceType.tab ? 24.w : 30.w,
-        vertical: device == rh.DeviceType.desktop ? 20.w : device == rh.DeviceType.tab ? 20.w : 30.w,
+        horizontal:
+            device == rh.DeviceType.desktop
+                ? 24.w
+                : device == rh.DeviceType.tab
+                ? 24.w
+                : 30.w,
+        vertical:
+            device == rh.DeviceType.desktop
+                ? 20.w
+                : device == rh.DeviceType.tab
+                ? 20.w
+                : 30.w,
       ),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
+        border: Border.all(
+          color: widget.sv.isDark ? Colors.grey.shade700 : Color(0xFFD9D9D9),
+          width: 1.2,
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -30,17 +50,27 @@ class UpgradeCard extends StatelessWidget {
             children: [
               Icon(
                 PhosphorIconsRegular.sparkle,
-                color: Colors.black,
-                size: device == rh.DeviceType.desktop ? 24.sp : device == rh.DeviceType.tab ? 28.sp : 20.sp,
+                color: widget.sv.isDark ? Colors.white : Colors.black,
+                size:
+                    device == rh.DeviceType.desktop
+                        ? 24.sp
+                        : device == rh.DeviceType.tab
+                        ? 28.sp
+                        : 20.sp,
               ),
               SizedBox(width: 8.w),
               Text(
                 'Upgrade your Plan',
                 style: TextStyle(
                   fontFamily: 'Fredrik',
-                  fontSize: device == rh.DeviceType.desktop ? 20.sp : device == rh.DeviceType.tab ? 24.sp: 45.sp,
+                  fontSize:
+                      device == rh.DeviceType.desktop
+                          ? 20.sp
+                          : device == rh.DeviceType.tab
+                          ? 24.sp
+                          : 45.sp,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: widget.sv.isDark ? Colors.white : Colors.black,
                 ),
               ),
             ],
@@ -50,8 +80,13 @@ class UpgradeCard extends StatelessWidget {
             'Get more with CookethFlow Pro – Access exclusive features like [feature 1], [feature 2], and [feature 3]. Cancel anytime, no strings attached.',
             style: TextStyle(
               fontFamily: 'Fredrik',
-              fontSize: device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 20.sp: 45.sp,
-              color: const Color(0xFF4B4B4B),
+              fontSize:
+                  device == rh.DeviceType.desktop
+                      ? 16.sp
+                      : device == rh.DeviceType.tab
+                      ? 20.sp
+                      : 45.sp,
+              color: widget.sv.isDark?Colors.white: Color(0xFF4B4B4B),
               height: 2,
             ),
           ),
@@ -66,7 +101,12 @@ class UpgradeCard extends StatelessWidget {
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(
-                  vertical: device == rh.DeviceType.desktop ? 12.h : device == rh.DeviceType.tab ? 16.h : 0.8.h,
+                  vertical:
+                      device == rh.DeviceType.desktop
+                          ? 12.h
+                          : device == rh.DeviceType.tab
+                          ? 16.h
+                          : 0.8.h,
                 ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(20.r),
@@ -77,7 +117,12 @@ class UpgradeCard extends StatelessWidget {
                 'Explore',
                 style: TextStyle(
                   fontFamily: 'Fredrik',
-                  fontSize: device == rh.DeviceType.desktop ? 14.sp : device == rh.DeviceType.tab ? 18.sp : 45.sp,
+                  fontSize:
+                      device == rh.DeviceType.desktop
+                          ? 14.sp
+                          : device == rh.DeviceType.tab
+                          ? 18.sp
+                          : 45.sp,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),

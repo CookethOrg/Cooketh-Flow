@@ -1,4 +1,5 @@
 
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/dashboard_drawer.dart';
 import 'package:cookethflow/features/dashboard/widgets/project_card.dart';
@@ -14,8 +15,8 @@ class DashboardDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer<DashboardProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<DashboardProvider,SupabaseService>(
+      builder: (context, provider,supabaseprovider, child) {
         return LayoutBuilder(
           builder:
               (context, constraints) => Row(
@@ -48,7 +49,7 @@ class DashboardDesktop extends StatelessWidget {
                           const SizedBox(height: 32),
                           Expanded(
                             // NEW: Conditionally build the main content area
-                            child: _buildMainContent(provider,context),
+                            child: _buildMainContent(provider,context,supabaseprovider),
                           ),
                         ],
                       ),
@@ -62,7 +63,7 @@ class DashboardDesktop extends StatelessWidget {
   }
 
   // NEW: Helper widget to build content based on the selected tab
-  Widget _buildMainContent(DashboardProvider provider,BuildContext context) {
+  Widget _buildMainContent(DashboardProvider provider,BuildContext context,SupabaseService su) {
     switch (provider.tabIndex) {
       case 2: // Trash Tab
         return Center(
@@ -72,7 +73,7 @@ class DashboardDesktop extends StatelessWidget {
               fontFamily: 'Fredrik',
               fontSize: 24.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              color: su.isDark?Colors.white: Colors.grey[600],
             ),
           ),
         );
@@ -86,7 +87,7 @@ class DashboardDesktop extends StatelessWidget {
               fontFamily: 'Fredrik',
               fontSize: 18.sp,
               height: 1.6,
-              color: Colors.black.withOpacity(0.75),
+              color: su.isDark?Colors.white: Colors.black.withOpacity(0.75),
             ),
           ),
         );
@@ -102,7 +103,7 @@ class DashboardDesktop extends StatelessWidget {
                 fontFamily: 'Fredrik',
                 fontSize: 24.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                color:su.isDark?Colors.white: Colors.grey[600],
               ),
             ),
           );
@@ -120,7 +121,7 @@ class DashboardDesktop extends StatelessWidget {
               ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];
-            return ProjectCard(workspaceId: workspace.id);
+            return ProjectCard(workspaceId: workspace.id,su: su,);
           },
         );
     }

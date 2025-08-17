@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/dashboard/pages/mobile/drawer_mobile.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/dashboard_drawer.dart';
@@ -21,8 +22,8 @@ class _DashboardMobileState extends State<DashboardMobile> {
   @override
   Widget build(BuildContext context) {
     rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer<DashboardProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<DashboardProvider,SupabaseService>(
+      builder: (context, provider,suprovider,child) {
         return LayoutBuilder(
           builder: (context, constraints) {
             return Container(
@@ -38,7 +39,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
                         Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
-                            border: Border.all(color: Colors.black),
+                            border: Border.all(color:suprovider.isDark?Colors.white: Colors.black),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: InkWell(
@@ -56,7 +57,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
                     const SizedBox(height: 34),
                             Expanded(
                               // NEW: Conditionally build the main content area
-                              child: _buildMainContent(provider),
+                              child: _buildMainContent(provider,suprovider),
                             ),
                   ],
                 ),
@@ -86,7 +87,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
 
 
     // NEW: Helper widget to build content based on the selected tab
-  Widget _buildMainContent(DashboardProvider provider) {
+  Widget _buildMainContent(DashboardProvider provider,SupabaseService su) {
     switch (provider.tabIndex) {
       case 2: // Trash Tab
         return Center(
@@ -96,7 +97,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
               fontFamily: 'Fredrik',
               fontSize: 45.sp,
               fontWeight: FontWeight.w600,
-              color: Colors.grey[600],
+              color: su.isDark? Colors.white: Colors.grey[600],
             ),
           ),
         );
@@ -110,7 +111,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
               fontFamily: 'Fredrik',
               fontSize: 40.sp,
               height: 1.6,
-              color: Colors.black.withOpacity(0.75),
+              color:su.isDark? Colors.white: Colors.black.withOpacity(0.75),
             ),
           ),
         );
@@ -126,7 +127,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
                 fontFamily: 'Fredrik',
                 fontSize: 45.sp,
                 fontWeight: FontWeight.w600,
-                color: Colors.grey[600],
+                color: su.isDark?Colors.white: Colors.grey[600],
               ),
             ),
           );
@@ -144,7 +145,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
               ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];
-            return ProjectCard(workspaceId: workspace.id);
+            return ProjectCard(workspaceId: workspace.id,su: su,);
           },
         );
     }

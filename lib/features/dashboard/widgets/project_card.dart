@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/helpers/date_time_helper.dart';
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/workspace_options_dialog.dart';
@@ -12,12 +13,13 @@ import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ProjectCard extends StatelessWidget {
-  const ProjectCard({super.key, required this.workspaceId});
+  const ProjectCard({super.key, required this.workspaceId,required this.su});
   final String workspaceId;
+  final SupabaseService su;
 
   @override
   Widget build(BuildContext context) {
-        rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     DateTimeHelper dth = DateTimeHelper();
     return Consumer2<DashboardProvider, WorkspaceProvider>(
       builder: (context, provider, workspaceProvider, child) {
@@ -38,9 +40,9 @@ class ProjectCard extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
+              border: Border.all(color: su.isDark?Colors.grey.shade700: const Color(0xFFD9D9D9), width: 1.2),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -50,7 +52,8 @@ class ProjectCard extends StatelessWidget {
                   child: Container(
                     // Use the workspace background color for the thumbnail
                     decoration: BoxDecoration(
-                      color: workspace.backgroundColor ?? const Color(0xFFD3D3D3),
+                      color:
+                          workspace.backgroundColor ?? (su.isDark?Colors.grey.shade700: const Color(0xFFD3D3D3)),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(12.r),
                         topRight: Radius.circular(12.r),
@@ -62,9 +65,12 @@ class ProjectCard extends StatelessWidget {
                           top: 12.h,
                           right: 12.w,
                           child: Container(
-                            padding:deviceType == rh.DeviceType.desktop ? EdgeInsets.all(8.w) : EdgeInsets.all(8.w),
+                            padding:
+                                deviceType == rh.DeviceType.desktop
+                                    ? EdgeInsets.all(8.w)
+                                    : EdgeInsets.all(8.w),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.8),
+                              color:su.isDark? Theme.of(context).scaffoldBackgroundColor: Colors.white.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(12.r),
                             ),
                             child: IconButton(
@@ -73,18 +79,26 @@ class ProjectCard extends StatelessWidget {
                               onPressed: () {
                                 showDialog(
                                   context: context,
-                                  builder: (dialogContext) => WorkspaceOptionsDialog(
-                                    onPressed: () async {
-                                      Navigator.of(dialogContext).pop();
-                                      await provider.deleteWorkspace(workspaceId);
-                                    },
-                                  ),
+                                  builder:
+                                      (dialogContext) => WorkspaceOptionsDialog(
+                                        onPressed: () async {
+                                          Navigator.of(dialogContext).pop();
+                                          await provider.deleteWorkspace(
+                                            workspaceId,
+                                          );
+                                        },
+                                      ),
                                 );
                               },
                               icon: Icon(
                                 PhosphorIconsRegular.dotsThree,
-                                size: deviceType == rh.DeviceType.desktop ? 32.sp : deviceType == rh.DeviceType.tab ? 32.sp : 80.sp,
-                                color: Colors.black,
+                                size:
+                                    deviceType == rh.DeviceType.desktop
+                                        ? 32.sp
+                                        : deviceType == rh.DeviceType.tab
+                                        ? 32.sp
+                                        : 80.sp,
+                                color: su.isDark?Colors.white: Colors.black,
                               ),
                             ),
                           ),
@@ -109,8 +123,13 @@ class ProjectCard extends StatelessWidget {
                               workspace.name,
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
-                                fontSize:deviceType == rh.DeviceType.desktop ? 20.sp : deviceType == rh.DeviceType.tab ? 18.sp: 50.sp,
-                                color: Colors.black,
+                                fontSize:
+                                    deviceType == rh.DeviceType.desktop
+                                        ? 20.sp
+                                        : deviceType == rh.DeviceType.tab
+                                        ? 18.sp
+                                        : 50.sp,
+                                color: su.isDark?Colors.white: Colors.black,
                                 fontWeight: FontWeight.w600,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -120,8 +139,13 @@ class ProjectCard extends StatelessWidget {
                               dth.formatLastEdited(workspace.lastEdited),
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
-                                color: Colors.grey[600],
-                                fontSize:deviceType == rh.DeviceType.desktop ? 14.sp : deviceType == rh.DeviceType.tab ?14.sp : 44.sp,
+                                color: su.isDark?Colors.white: Colors.grey[600],
+                                fontSize:
+                                    deviceType == rh.DeviceType.desktop
+                                        ? 14.sp
+                                        : deviceType == rh.DeviceType.tab
+                                        ? 14.sp
+                                        : 44.sp,
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -136,15 +160,28 @@ class ProjectCard extends StatelessWidget {
                           icon: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 300),
                             transitionBuilder: (child, animation) {
-                              return ScaleTransition(scale: animation, child: child);
+                              return ScaleTransition(
+                                scale: animation,
+                                child: child,
+                              );
                             },
                             child: Icon(
                               // Conditionally show filled or regular star
-                              workspace.isStarred ? PhosphorIconsFill.star : PhosphorIconsRegular.star,
+                              workspace.isStarred
+                                  ? PhosphorIconsFill.star
+                                  : PhosphorIconsRegular.star,
                               // Use a key to help AnimatedSwitcher differentiate between the two icons
                               key: ValueKey<bool>(workspace.isStarred),
-                              size:deviceType == rh.DeviceType.desktop ? 32.sp : deviceType == rh.DeviceType.tab ?32.sp: 62.sp,
-                              color: workspace.isStarred ? Colors.amber : Colors.black54,
+                              size:
+                                  deviceType == rh.DeviceType.desktop
+                                      ? 32.sp
+                                      : deviceType == rh.DeviceType.tab
+                                      ? 32.sp
+                                      : 62.sp,
+                              color:
+                                  workspace.isStarred
+                                      ? Colors.amber
+                                      :su.isDark?Colors.white: Colors.black54,
                             ),
                           ),
                         ),

@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/build_project.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,7 @@ class AddProject extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DashboardProvider>(builder: (context, provider, child) {
+    return Consumer2<DashboardProvider,SupabaseService>(builder: (context, provider,suprovider, child) {
       return AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: Text(
@@ -28,6 +29,8 @@ class AddProject extends StatelessWidget {
                 context.pop();
                 provider.createNewProject(context);
               },
+              txtColor: suprovider.isDark?Colors.white:Colors.black,
+              borderColor: suprovider.isDark?Colors.white:Colors.black,
             ),
             SizedBox(height: 16),
             BuildProject(
@@ -37,6 +40,8 @@ class AddProject extends StatelessWidget {
                 context.pop();
                 provider.importExistingProject(context);
               },
+              txtColor: suprovider.isDark?Colors.white:Colors.black,
+              borderColor: suprovider.isDark?Colors.white:Colors.black,
             ),
           ],
         ),

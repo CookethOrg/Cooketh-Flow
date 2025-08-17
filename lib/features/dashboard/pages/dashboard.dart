@@ -27,7 +27,7 @@ class DashboardPage extends StatelessWidget {
     return Consumer<SupabaseService>(
       builder: (context, supa, child) {
         return Scaffold(
-          backgroundColor: Color.fromRGBO(248, 248, 248, 1),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           // backgroundColor: Colors.black,
           body: Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 50.h),

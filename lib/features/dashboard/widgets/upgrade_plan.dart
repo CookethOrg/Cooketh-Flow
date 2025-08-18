@@ -35,7 +35,9 @@ class _UpgradeCardState extends State<UpgradeCard> {
                 : 30.w,
       ),
       decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
+        color: widget.sv.isDark
+                      ? Color.fromRGBO(48, 48, 48, 100)
+                      : Color.fromRGBO(255, 255, 255, 100),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: widget.sv.isDark ? Colors.grey.shade700 : Color(0xFFD9D9D9),

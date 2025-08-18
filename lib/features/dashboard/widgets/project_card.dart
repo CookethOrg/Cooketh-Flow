@@ -13,7 +13,7 @@ import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ProjectCard extends StatelessWidget {
-  const ProjectCard({super.key, required this.workspaceId,required this.su});
+  const ProjectCard({super.key, required this.workspaceId, required this.su});
   final String workspaceId;
   final SupabaseService su;
 
@@ -40,9 +40,16 @@ class ProjectCard extends StatelessWidget {
           },
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color:
+                  su.isDark
+                      ? Color.fromRGBO(75, 75, 75, 100)
+                      : Color.fromRGBO(217, 217, 217, 100),
               borderRadius: BorderRadius.circular(12.r),
-              border: Border.all(color: su.isDark?Colors.grey.shade700: const Color(0xFFD9D9D9), width: 1.2),
+              border: Border.all(
+                color:
+                    su.isDark ? Colors.grey.shade700 : const Color(0xFFD9D9D9),
+                width: 1.2,
+              ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -53,7 +60,10 @@ class ProjectCard extends StatelessWidget {
                     // Use the workspace background color for the thumbnail
                     decoration: BoxDecoration(
                       color:
-                          workspace.backgroundColor ?? (su.isDark?Colors.grey.shade700: const Color(0xFFD3D3D3)),
+                          workspace.backgroundColor ??
+                          (su.isDark
+                              ? Colors.grey.shade700
+                              : const Color(0xFFD3D3D3)),
                       borderRadius: BorderRadius.only(
                         topLeft: Radius.circular(12.r),
                         topRight: Radius.circular(12.r),
@@ -70,8 +80,17 @@ class ProjectCard extends StatelessWidget {
                                     ? EdgeInsets.all(8.w)
                                     : EdgeInsets.all(8.w),
                             decoration: BoxDecoration(
-                              color:su.isDark? Theme.of(context).scaffoldBackgroundColor: Colors.white.withOpacity(0.8),
+                              color:
+                                  su.isDark
+                                      ? Color.fromRGBO(48, 48, 48, 1)
+                                      : Color.fromRGBO(255, 255, 255, 1),
                               borderRadius: BorderRadius.circular(12.r),
+                              border: BoxBorder.all(
+                                color:
+                                    su.isDark
+                                        ? Color.fromRGBO(75, 75, 75, 1)
+                                        : Color.fromRGBO(217, 217, 217, 1),
+                              ),
                             ),
                             child: IconButton(
                               padding: EdgeInsets.zero,
@@ -98,7 +117,7 @@ class ProjectCard extends StatelessWidget {
                                         : deviceType == rh.DeviceType.tab
                                         ? 32.sp
                                         : 80.sp,
-                                color: su.isDark?Colors.white: Colors.black,
+                                color: su.isDark ? Colors.white : Colors.black,
                               ),
                             ),
                           ),
@@ -110,7 +129,10 @@ class ProjectCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: 24,
+                      vertical: 16,
+                    ),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -129,7 +151,8 @@ class ProjectCard extends StatelessWidget {
                                         : deviceType == rh.DeviceType.tab
                                         ? 18.sp
                                         : 50.sp,
-                                color: su.isDark?Colors.white: Colors.black,
+                                color:
+                                    su.isDark ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w600,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -139,7 +162,10 @@ class ProjectCard extends StatelessWidget {
                               dth.formatLastEdited(workspace.lastEdited),
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
-                                color: su.isDark?Colors.white: Colors.grey[600],
+                                color:
+                                    su.isDark
+                                        ? Colors.white
+                                        : Colors.grey[600],
                                 fontSize:
                                     deviceType == rh.DeviceType.desktop
                                         ? 14.sp
@@ -181,7 +207,9 @@ class ProjectCard extends StatelessWidget {
                               color:
                                   workspace.isStarred
                                       ? Colors.amber
-                                      :su.isDark?Colors.white: Colors.black54,
+                                      : su.isDark
+                                      ? Colors.white
+                                      : Colors.black54,
                             ),
                           ),
                         ),

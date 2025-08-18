@@ -32,9 +32,18 @@ class DashboardDrawer extends StatelessWidget {
         return IntrinsicWidth(
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).cardColor,
+              color:
+                  supabaseService.isDark
+                      ? Color.fromRGBO(48, 48, 48, 1)
+                      : Color.fromRGBO(255, 255, 255, 1),
               //const Color(0xFFD9D9D9)
-              border: Border.all(color: supabaseService.isDark? Color.fromARGB(1, 174, 174, 174):  Color(0xFFD9D9D9), width: 1.2),
+              border: Border.all(
+                color:
+                    supabaseService.isDark
+                        ? Color.fromRGBO(75, 75, 75, 1)
+                        : Color.fromRGBO(217, 217, 217, 1),
+                width: 1.2,
+              ),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Padding(
@@ -53,9 +62,17 @@ class DashboardDrawer extends StatelessWidget {
                           ClipOval(
                             child: SizedBox(
                               width:
-                                  device == rh.DeviceType.desktop ?  72.w : device == rh.DeviceType.tab ? 72.w : 80.w,
+                                  device == rh.DeviceType.desktop
+                                      ? 72.w
+                                      : device == rh.DeviceType.tab
+                                      ? 72.w
+                                      : 80.w,
                               height:
-                                  device == rh.DeviceType.desktop ? 72.h : device == rh.DeviceType.tab ?72.h : 80.h,
+                                  device == rh.DeviceType.desktop
+                                      ? 72.h
+                                      : device == rh.DeviceType.tab
+                                      ? 72.h
+                                      : 80.h,
                               child:
                                   displayAvatarUrl.isNotEmpty
                                       ? CachedNetworkImage(
@@ -79,7 +96,12 @@ class DashboardDrawer extends StatelessWidget {
                             ),
                           ),
                           SizedBox(
-                            width: device == rh.DeviceType.desktop ? 8.w : device == rh.DeviceType.tab ? 8.w : 24.w,
+                            width:
+                                device == rh.DeviceType.desktop
+                                    ? 8.w
+                                    : device == rh.DeviceType.tab
+                                    ? 8.w
+                                    : 24.w,
                           ),
                           Flexible(
                             child: Column(
@@ -93,7 +115,9 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 24.sp
-                                            : device == rh.DeviceType.tab ?24.sp : 36.sp,
+                                            : device == rh.DeviceType.tab
+                                            ? 24.sp
+                                            : 36.sp,
                                     fontWeight: FontWeight.w600,
                                     letterSpacing: 0.6,
                                   ),
@@ -106,7 +130,9 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 16.sp
-                                            : device == rh.DeviceType.tab ? 16.sp : 24.sp,
+                                            : device == rh.DeviceType.tab
+                                            ? 16.sp
+                                            : 24.sp,
                                   ),
                                 ),
                               ],
@@ -115,11 +141,19 @@ class DashboardDrawer extends StatelessWidget {
                         ],
                       ),
                       SizedBox(
-                        height: device == rh.DeviceType.desktop ? 30.h : device == rh.DeviceType.tab ?30.h : 16.h,
+                        height:
+                            device == rh.DeviceType.desktop
+                                ? 30.h
+                                : device == rh.DeviceType.tab
+                                ? 30.h
+                                : 16.h,
                       ),
                       Row(
                         mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: device == rh.DeviceType.desktop ? MainAxisAlignment.start : MainAxisAlignment.spaceBetween ,
+                        mainAxisAlignment:
+                            device == rh.DeviceType.desktop
+                                ? MainAxisAlignment.start
+                                : MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton.icon(
                             onPressed: () {
@@ -132,7 +166,8 @@ class DashboardDrawer extends StatelessWidget {
                             icon: Icon(
                               PhosphorIcons.pencilSimple(),
                               color: primaryColor,
-                              size:device == rh.DeviceType.desktop ? 30.h : 25.h ,
+                              size:
+                                  device == rh.DeviceType.desktop ? 30.h : 25.h,
                             ),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
@@ -149,11 +184,18 @@ class DashboardDrawer extends StatelessWidget {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.r),
                               ),
-                              backgroundColor: Theme.of(context).cardColor,
+                              backgroundColor:
+                                  supabaseService.isDark
+                                      ? Color.fromRGBO(48, 48, 48, 1)
+                                      : Color.fromRGBO(255, 255, 255, 1),
                               side: BorderSide(color: primaryColor),
                               minimumSize: Size(
                                 0,
-                                device == rh.DeviceType.desktop ? 48.h : device == rh.DeviceType.tab ?48.h: 40.h,
+                                device == rh.DeviceType.desktop
+                                    ? 48.h
+                                    : device == rh.DeviceType.tab
+                                    ? 48.h
+                                    : 40.h,
                               ),
                             ),
                             label: Text(
@@ -163,7 +205,9 @@ class DashboardDrawer extends StatelessWidget {
                                 fontSize:
                                     device == rh.DeviceType.desktop
                                         ? 16.sp
-                                        : device == rh.DeviceType.tab ? 18.sp : 24.sp,
+                                        : device == rh.DeviceType.tab
+                                        ? 18.sp
+                                        : 24.sp,
                                 color: primaryColor,
                               ),
                             ),
@@ -177,7 +221,8 @@ class DashboardDrawer extends StatelessWidget {
                             icon: Icon(
                               PhosphorIcons.signOut(),
                               color: Colors.white,
-                              size:device == rh.DeviceType.desktop ? 30.h : 25.h ,
+                              size:
+                                  device == rh.DeviceType.desktop ? 30.h : 25.h,
                             ),
                             style: ElevatedButton.styleFrom(
                               padding: EdgeInsets.symmetric(
@@ -198,7 +243,11 @@ class DashboardDrawer extends StatelessWidget {
                               side: BorderSide(color: primaryColor),
                               minimumSize: Size(
                                 0,
-                                device == rh.DeviceType.desktop ? 48.h :device == rh.DeviceType.tab ?48.h: 40.h,
+                                device == rh.DeviceType.desktop
+                                    ? 48.h
+                                    : device == rh.DeviceType.tab
+                                    ? 48.h
+                                    : 40.h,
                               ),
                             ),
                             label: Text(
@@ -208,7 +257,9 @@ class DashboardDrawer extends StatelessWidget {
                                 fontSize:
                                     device == rh.DeviceType.desktop
                                         ? 16.sp
-                                        : device == rh.DeviceType.tab ? 18.sp: 24.sp,
+                                        : device == rh.DeviceType.tab
+                                        ? 18.sp
+                                        : 24.sp,
                                 color: Colors.white,
                               ),
                             ),
@@ -218,7 +269,12 @@ class DashboardDrawer extends StatelessWidget {
                     ],
                   ),
                   SizedBox(
-                    height: device == rh.DeviceType.desktop ? 15.h :device == rh.DeviceType.tab ?15.h: 10.h,
+                    height:
+                        device == rh.DeviceType.desktop
+                            ? 15.h
+                            : device == rh.DeviceType.tab
+                            ? 15.h
+                            : 10.h,
                   ),
                   Visibility(
                     visible: dashboardProvider.isDrawerOpen,
@@ -257,7 +313,9 @@ class DashboardDrawer extends StatelessWidget {
                                     color:
                                         isSelected
                                             ? secondaryColors[6]
-                                            : supabaseService.isDark? Colors.white : Colors.black,
+                                            : supabaseService.isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                     size:
                                         device == rh.DeviceType.desktop
                                             ? 26.sp
@@ -279,9 +337,15 @@ class DashboardDrawer extends StatelessWidget {
                                     fontSize:
                                         device == rh.DeviceType.desktop
                                             ? 18.sp
-                                            : device == rh.DeviceType.tab ? 25.sp : 16.sp,
+                                            : device == rh.DeviceType.tab
+                                            ? 25.sp
+                                            : 16.sp,
                                     color:
-                                        isSelected ? Colors.blue : supabaseService.isDark? Colors.white :Colors.black,
+                                        isSelected
+                                            ? Colors.blue
+                                            : supabaseService.isDark
+                                            ? Colors.white
+                                            : Colors.black,
                                     fontWeight:
                                         isSelected
                                             ? FontWeight.w600
@@ -296,7 +360,7 @@ class DashboardDrawer extends StatelessWidget {
                     ),
                   ),
                   Spacer(),
-                  UpgradeCard(sv: supabaseService,),
+                  UpgradeCard(sv: supabaseService),
                 ],
               ),
             ),

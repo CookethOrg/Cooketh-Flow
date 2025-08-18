@@ -89,7 +89,7 @@ class ProjectCard extends StatelessWidget {
                                 color:
                                     su.isDark
                                         ? Color.fromRGBO(75, 75, 75, 1)
-                                        : Color.fromRGBO(217, 217, 217, 1),
+                                        : Color.fromRGBO(217, 217, 217,1),
                               ),
                             ),
                             child: IconButton(

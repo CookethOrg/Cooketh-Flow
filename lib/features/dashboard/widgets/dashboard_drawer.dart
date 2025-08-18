@@ -34,7 +34,7 @@ class DashboardDrawer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Theme.of(context).cardColor,
               //const Color(0xFFD9D9D9)
-              border: Border.all(color: supabaseService.isDark? Colors.grey.shade700:  Color(0xFFD9D9D9), width: 1.2),
+              border: Border.all(color: supabaseService.isDark? Color.fromARGB(1, 174, 174, 174):  Color(0xFFD9D9D9), width: 1.2),
               borderRadius: BorderRadius.circular(12.r),
             ),
             child: Padding(

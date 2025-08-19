@@ -85,7 +85,7 @@ class ProjectCard extends StatelessWidget {
                                       ? Color.fromRGBO(48, 48, 48, 1)
                                       : Color.fromRGBO(255, 255, 255, 1),
                               borderRadius: BorderRadius.circular(12.r),
-                              border: BoxBorder.all(
+                              border: Border.all(
                                 color:
                                     su.isDark
                                         ? Color.fromRGBO(75, 75, 75, 1)

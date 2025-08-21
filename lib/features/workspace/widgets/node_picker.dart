@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -8,8 +9,9 @@ import 'package:provider/provider.dart';
 // The main NodePicker widget, now stateful
 class NodePicker extends StatefulWidget {
   final ValueChanged<ShapeType>? onShapeSelected;
+  final SupabaseService su;
 
-  const NodePicker({super.key, this.onShapeSelected});
+  const NodePicker({super.key, this.onShapeSelected, required this.su});
 
   @override
   State<NodePicker> createState() => _NodePickerState();
@@ -27,14 +29,46 @@ class _NodePickerState extends State<NodePicker> {
 
     // Define all available shapes
     _allShapes = [
-      {'name': 'Square', 'drawMode': DrawMode.square, 'shapeType': ShapeType.square},
-      {'name': 'Diamond', 'drawMode': DrawMode.diamond, 'shapeType': ShapeType.diamond},
-      {'name': 'Rounded Square', 'drawMode': DrawMode.roundedSquare, 'shapeType': ShapeType.roundedSquare},
-      {'name': 'Parallelogram', 'drawMode': DrawMode.parallelogram, 'shapeType': ShapeType.parallelogram},
-      {'name': 'Cylinder', 'drawMode': DrawMode.cylinder, 'shapeType': ShapeType.cylinder},
-      {'name': 'Circle', 'drawMode': DrawMode.circle, 'shapeType': ShapeType.circle},
-      {'name': 'Triangle', 'drawMode': DrawMode.triangle, 'shapeType': ShapeType.triangle},
-      {'name': 'Inverted Triangle', 'drawMode': DrawMode.invertedTriangle, 'shapeType': ShapeType.invertedTriangle},
+      {
+        'name': 'Square',
+        'drawMode': DrawMode.square,
+        'shapeType': ShapeType.square,
+      },
+      {
+        'name': 'Diamond',
+        'drawMode': DrawMode.diamond,
+        'shapeType': ShapeType.diamond,
+      },
+      {
+        'name': 'Rounded Square',
+        'drawMode': DrawMode.roundedSquare,
+        'shapeType': ShapeType.roundedSquare,
+      },
+      {
+        'name': 'Parallelogram',
+        'drawMode': DrawMode.parallelogram,
+        'shapeType': ShapeType.parallelogram,
+      },
+      {
+        'name': 'Cylinder',
+        'drawMode': DrawMode.cylinder,
+        'shapeType': ShapeType.cylinder,
+      },
+      {
+        'name': 'Circle',
+        'drawMode': DrawMode.circle,
+        'shapeType': ShapeType.circle,
+      },
+      {
+        'name': 'Triangle',
+        'drawMode': DrawMode.triangle,
+        'shapeType': ShapeType.triangle,
+      },
+      {
+        'name': 'Inverted Triangle',
+        'drawMode': DrawMode.invertedTriangle,
+        'shapeType': ShapeType.invertedTriangle,
+      },
     ];
 
     _filteredShapes = _allShapes;
@@ -45,10 +79,11 @@ class _NodePickerState extends State<NodePicker> {
   void _filterShapes() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredShapes = _allShapes.where((shape) {
-        final shapeName = shape['name'].toString().toLowerCase();
-        return shapeName.contains(query);
-      }).toList();
+      _filteredShapes =
+          _allShapes.where((shape) {
+            final shapeName = shape['name'].toString().toLowerCase();
+            return shapeName.contains(query);
+          }).toList();
     });
   }
 
@@ -66,10 +101,16 @@ class _NodePickerState extends State<NodePicker> {
       backgroundColor: Colors.transparent,
       elevation: 0,
       child: Container(
-        width:device == rh.DeviceType.desktop ? 340 : device == rh.DeviceType.tab ? 340 : 300,
+        width:
+            device == rh.DeviceType.desktop
+                ? 340
+                : device == rh.DeviceType.tab
+                ? 340
+                : 300,
         padding: const EdgeInsets.all(24.0),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color:
+              widget.su.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
           borderRadius: BorderRadius.circular(16.0),
           boxShadow: [
             BoxShadow(
@@ -88,16 +129,16 @@ class _NodePickerState extends State<NodePicker> {
               children: [
                 Text(
                   widget.onShapeSelected == null ? 'Nodes' : 'Change Shape',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF111827),
+                    color: widget.su.isDark ? Colors.white : Color(0xFF111827),
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.close,
-                    color: Color(0xFF111827),
+                    color: widget.su.isDark ? Colors.white : Color(0xFF111827),
                     size: 28,
                   ),
                   onPressed: () {
@@ -113,12 +154,9 @@ class _NodePickerState extends State<NodePicker> {
               decoration: InputDecoration(
                 hintText: 'Search for a shape',
                 hintStyle: const TextStyle(color: Color(0xFF9CA3AF)),
-                prefixIcon: const Icon(
-                  Icons.search,
-                  color: Color(0xFF9CA3AF),
-                ),
+                prefixIcon: const Icon(Icons.search, color: Color(0xFF9CA3AF)),
                 filled: true,
-                fillColor: const Color(0xFFF9FAFB),
+                fillColor:widget.su.isDark ? Color.fromRGBO(48, 48, 48, 1) : const Color(0xFFF9FAFB),
                 contentPadding: const EdgeInsets.symmetric(
                   vertical: 14.0,
                   horizontal: 16.0,
@@ -155,12 +193,17 @@ class _NodePickerState extends State<NodePicker> {
                     if (widget.onShapeSelected != null) {
                       widget.onShapeSelected!(shape['shapeType']);
                     } else {
-                      Provider.of<WorkspaceProvider>(context, listen: false)
-                          .changeDrawMode(shape['drawMode']);
+                      Provider.of<WorkspaceProvider>(
+                        context,
+                        listen: false,
+                      ).changeDrawMode(shape['drawMode']);
                     }
                     Navigator.of(context).pop(); // Close picker on selection
                   },
-                  child: ShapeWidget(shapeType: shape['shapeType']),
+                  child: ShapeWidget(
+                    shapeType: shape['shapeType'],
+                    su: widget.su,
+                  ),
                 );
               },
             ),
@@ -174,8 +217,9 @@ class _NodePickerState extends State<NodePicker> {
 // A widget to display a single shape
 class ShapeWidget extends StatelessWidget {
   final ShapeType shapeType;
+  final SupabaseService su;
 
-  const ShapeWidget({super.key, required this.shapeType});
+  const ShapeWidget({super.key, required this.shapeType, required this.su});
 
   @override
   Widget build(BuildContext context) {
@@ -186,7 +230,7 @@ class ShapeWidget extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: CustomPaint(painter: ShapePainter(shapeType: shapeType)),
+      child: CustomPaint(painter: ShapePainter(shapeType: shapeType, su: su)),
     );
   }
 }
@@ -194,15 +238,17 @@ class ShapeWidget extends StatelessWidget {
 // Custom painter to draw the shapes
 class ShapePainter extends CustomPainter {
   final ShapeType shapeType;
+  final SupabaseService su;
 
-  ShapePainter({required this.shapeType});
+  ShapePainter({required this.shapeType, required this.su});
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1.0;
+    final paint =
+        Paint()
+          ..color = su.isDark ? Colors.white : Colors.black
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0;
 
     final path = Path();
     final w = size.width;

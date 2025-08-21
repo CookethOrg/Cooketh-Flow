@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
@@ -15,9 +16,9 @@ class WorkspaceDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer<WorkspaceProvider>(
-      builder: (context, provider, child) {
-        Color defaultBorderColor = const Color(0xFFD9D9D9);
+    return Consumer2<WorkspaceProvider,SupabaseService>(
+      builder: (context, provider,suprovider, child) {
+        Color defaultBorderColor = suprovider.isDark ? Color.fromRGBO(75, 75, 75, 1) : const Color(0xFFD9D9D9);
 
         // Check if currentWorkspace is set before accessing its properties
         final String workspaceName =
@@ -39,7 +40,7 @@ class WorkspaceDrawer extends StatelessWidget {
               vertical:device == rh.DeviceType.desktop ? 16.h :10.h,
             ),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: suprovider.isDark ? Color.fromRGBO(48, 48, 48, 1): Colors.white,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: defaultBorderColor, width: 1.2),
             ),
@@ -67,7 +68,7 @@ class WorkspaceDrawer extends StatelessWidget {
                       icon: Icon(
                         PhosphorIconsRegular.arrowLeft,
                         size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
-                        color: Colors.black,
+                        color: suprovider.isDark ? Colors.white : Colors.black,
                       ),
                       splashRadius: 24.r,
                       tooltip: 'Back',
@@ -81,7 +82,7 @@ class WorkspaceDrawer extends StatelessWidget {
                           fontSize:
                               device == rh.DeviceType.desktop ? 24.sp : 42.sp,
                           fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                          color:suprovider.isDark ? Colors.white : Colors.black,
                           letterSpacing: 0.6,
                         ),
                         decoration: const InputDecoration(
@@ -101,11 +102,11 @@ class WorkspaceDrawer extends StatelessWidget {
                       icon:!provider.isDrawerOpen? Icon(
                         PhosphorIconsRegular.sidebarSimple,
                         size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
-                        color: Colors.black,
+                        color: suprovider.isDark ? Colors.white : Colors.black,
                       ) : Icon(
                         Icons.close,
                         size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
-                        color: Colors.black,
+                        color: suprovider.isDark ? Colors.white: Colors.black,
                       ),
                       splashRadius: 24.r,
                       tooltip: 'Toggle Sidebar',
@@ -164,6 +165,7 @@ class WorkspaceDrawer extends StatelessWidget {
                                               item.id,
                                             );
                                           },
+                                          su: suprovider
                                         );
                                       },
                                     ),
@@ -191,11 +193,12 @@ class WorkspaceDrawer extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
     required rh.DeviceType device,
+    required SupabaseService su
   }) {
-    Color iconTextColor = isSelected ? Colors.blue : Colors.black;
+    Color iconTextColor = isSelected ? Colors.blue : su.isDark ? Colors.white : Colors.black;
 
     return Container(
-      color: Colors.white,
+      color:  su.isDark ? Color.fromRGBO(48, 48, 48, 1): Colors.white,
       child: ListTile(
         leading: Icon(iconData, size:device == rh.DeviceType.desktop ? 24.sp : 35.sp, color: iconTextColor),
         title: Text(

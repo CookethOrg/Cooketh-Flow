@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
@@ -25,8 +26,8 @@ class WorkspaceMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer<WorkspaceProvider>(
-      builder: (context, provider, child) {
+    return Consumer2<WorkspaceProvider,SupabaseService>(
+      builder: (context, provider,suprovider, child) {
         return Scaffold(
           backgroundColor: provider.currentWorkspaceColor,
           body: Padding(
@@ -36,7 +37,7 @@ class WorkspaceMobile extends StatelessWidget {
               children: [
                 const CanvasPage(),
                 workspaceDrawerMob(device),
-                Positioned(top: 120.h, right: 0.h, child: UndoRedoButton()),
+                Positioned(top: 120.h, right: 0.h, child: UndoRedoButton(su: suprovider,)),
                 Padding(
                   padding: EdgeInsets.only(bottom: 40.h),
                   child: Align(

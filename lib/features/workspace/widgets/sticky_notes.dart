@@ -1,11 +1,14 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class StickyNotesWidget extends StatelessWidget {
-  const StickyNotesWidget({super.key});
+  final SupabaseService su;
+  const StickyNotesWidget({super.key, required this.su});
 
   @override
   Widget build(BuildContext context) {
@@ -14,7 +17,7 @@ class StickyNotesWidget extends StatelessWidget {
       width: 280, // Adjusted width for better spacing
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: su.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -33,16 +36,20 @@ class StickyNotesWidget extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 'Sticky notes',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
-                  color: Colors.black,
+                  color: su.isDark ? Colors.white : Colors.black,
                 ),
               ),
               IconButton(
-                icon: Icon(PhosphorIconsRegular.x, size: 24, color: Colors.black87),
+                icon: Icon(
+                  PhosphorIconsRegular.x,
+                  size: 24,
+                  color: su.isDark ? Colors.white : Colors.black87,
+                ),
                 onPressed: () => Navigator.pop(context),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
@@ -50,7 +57,7 @@ class StickyNotesWidget extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          
+
           // Grid of sticky notes
           GridView.count(
             crossAxisCount: 4, // More compact grid
@@ -73,7 +80,11 @@ class StickyNotesWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildStickyNote(BuildContext context, Color fillColor, Color borderColor) {
+  Widget _buildStickyNote(
+    BuildContext context,
+    Color fillColor,
+    Color borderColor,
+  ) {
     return GestureDetector(
       onTap: () {
         // Get the provider

@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
@@ -23,7 +24,7 @@ class WorkspaceDesktop extends StatelessWidget {
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
             rh.DeviceType.desktop;
 
-    return Consumer<WorkspaceProvider>(builder: (context, provider, child) {
+    return Consumer2<WorkspaceProvider,SupabaseService>(builder: (context, provider,suprovider, child) {
       return Scaffold(
         backgroundColor: provider.currentWorkspaceColor,
         body: Padding(
@@ -35,7 +36,7 @@ class WorkspaceDesktop extends StatelessWidget {
 
               const WorkspaceDrawer(),
               SizedBox(width: 20.w),
-              Positioned(top: 0, left: 0.21.sw, child: UndoRedoButton()),
+              Positioned(top: 0, left: 0.21.sw, child: UndoRedoButton(su: suprovider,)),
               Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton()),
 
               Positioned(right: 0, top: 0.10.sh, child: ToolBar()),

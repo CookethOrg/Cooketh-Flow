@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart';
@@ -44,10 +45,12 @@ class NodeEditingToolbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<WorkspaceProvider>();
+    final provider2 = context.read<SupabaseService>();
     final object = provider.canvasObjects[provider.currentlySelectedObjectId];
 
     // Determine which buttons to show based on object type
-    final showShapeChanger = object is! TextBoxObject &&
+    final showShapeChanger =
+        object is! TextBoxObject &&
         object is! ConnectorObject &&
         object is! StickyNoteObject;
     final showColorChanger =
@@ -66,11 +69,13 @@ class NodeEditingToolbox extends StatelessWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder: (context) => NodePicker(
-                onShapeSelected: (shapeType) {
-                  provider.changeObjectShape(shapeType);
-                },
-              ),
+              builder:
+                  (context) => NodePicker(
+                    onShapeSelected: (shapeType) {
+                      provider.changeObjectShape(shapeType);
+                    },
+                    su: provider2,
+                  ),
             );
           },
           tooltip: 'Change Shape',
@@ -90,13 +95,14 @@ class NodeEditingToolbox extends StatelessWidget {
                 provider.canvasObjects[provider.currentlySelectedObjectId!];
             showDialog(
               context: context,
-              builder: (context) => NodeColourPicker(
-                initialColor: selectedObject?.color,
-                onColorSelected: (color) {
-                  provider.changeObjectColor(color);
-                  Navigator.of(context).pop();
-                },
-              ),
+              builder:
+                  (context) => NodeColourPicker(
+                    initialColor: selectedObject?.color,
+                    onColorSelected: (color) {
+                      provider.changeObjectColor(color);
+                      Navigator.of(context).pop();
+                    },
+                  ),
             );
           },
           tooltip: 'Change Color',

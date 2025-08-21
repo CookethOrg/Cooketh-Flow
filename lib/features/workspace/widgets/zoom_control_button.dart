@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/vertical_divider.dart';
 import 'package:flutter/material.dart';
@@ -12,23 +13,22 @@ class ZoomControlButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer<CanvasProvider>(
-      builder: (context, canvasProvider, child) {
+    return Consumer2<CanvasProvider,SupabaseService>(
+      builder: (context, canvasProvider,suprovider, child) {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           decoration: BoxDecoration(
-            border: Border.all(color: const Color(0XFFD9D9D9), width: 1.2),
-            color: Colors.white,
+            border: Border.all(color:suprovider.isDark ? Color.fromRGBO(75, 75, 75, 1) :const Color(0XFFD9D9D9), width: 1.2),
+            color:suprovider.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
-            mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
                 "${canvasProvider.currentZoomPercentage.toStringAsFixed(0)}%", // Display current zoom
                 style: TextStyle(
-                  color: Colors.black,
+                  color: suprovider.isDark ? Colors.white : Colors.black,
                   fontWeight: FontWeight.w500,
                   fontSize:
                       device == rh.DeviceType.desktop

@@ -1,9 +1,11 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class WorkspaceColorPicker extends StatefulWidget {
+  final SupabaseService su;
   final Color initialColor;
   final Function(Color) onColorChanged;
 
@@ -11,6 +13,7 @@ class WorkspaceColorPicker extends StatefulWidget {
     Key? key,
     required this.initialColor,
     required this.onColorChanged,
+    required this.su,
   }) : super(key: key);
 
   @override
@@ -41,11 +44,16 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
   }
 
   void _handlePickerDrag(Offset localPosition, Size pickerSize) {
-    double saturation = (localPosition.dx.clamp(0, pickerSize.width) / pickerSize.width);
-    double value = 1.0 - (localPosition.dy.clamp(0, pickerSize.height) / pickerSize.height);
+    double saturation =
+        (localPosition.dx.clamp(0, pickerSize.width) / pickerSize.width);
+    double value =
+        1.0 -
+        (localPosition.dy.clamp(0, pickerSize.height) / pickerSize.height);
 
     setState(() {
-      currentHsvColor = currentHsvColor.withSaturation(saturation).withValue(value);
+      currentHsvColor = currentHsvColor
+          .withSaturation(saturation)
+          .withValue(value);
       pickerPosition = localPosition;
     });
     _updateColorFromHsv();
@@ -55,10 +63,18 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Container(
-      width:device == rh.DeviceType.desktop ?  350.w : device == rh.DeviceType.tab ? 350.w : 1000.w,
+      width:
+          device == rh.DeviceType.desktop
+              ? 350.w
+              : device == rh.DeviceType.tab
+              ? 350.w
+              : 1000.w,
       padding: EdgeInsets.all(20.r),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:
+            widget.su.isDark
+                ? Color.fromRGBO(48, 48, 48, 1)
+                : Colors.white, // white tha
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
         boxShadow: [
@@ -78,18 +94,34 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
             children: [
               Text(
                 'Background Colour',
-                style: TextStyle(fontSize:device == rh.DeviceType.desktop ?  20.sp : device == rh.DeviceType.tab ? 20.sp : 50.sp, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize:
+                      device == rh.DeviceType.desktop
+                          ? 20.sp
+                          : device == rh.DeviceType.tab
+                          ? 20.sp
+                          : 50.sp,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(PhosphorIconsRegular.x, size:device == rh.DeviceType.desktop ? 24.sp : device == rh.DeviceType.tab ? 24.sp : 55.sp),
+                icon: Icon(
+                  PhosphorIconsRegular.x,
+                  size:
+                      device == rh.DeviceType.desktop
+                          ? 24.sp
+                          : device == rh.DeviceType.tab
+                          ? 24.sp
+                          : 55.sp,
+                ),
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
             ],
           ),
           SizedBox(height: 20.h),
-          
+
           LayoutBuilder(
             builder: (context, constraints) {
               final pickerSize = Size(constraints.maxWidth, 180.h);
@@ -100,8 +132,12 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
               );
 
               return GestureDetector(
-                onPanUpdate: (details) => _handlePickerDrag(details.localPosition, pickerSize),
-                onPanDown: (details) => _handlePickerDrag(details.localPosition, pickerSize),
+                onPanUpdate:
+                    (details) =>
+                        _handlePickerDrag(details.localPosition, pickerSize),
+                onPanDown:
+                    (details) =>
+                        _handlePickerDrag(details.localPosition, pickerSize),
                 child: Stack(
                   children: [
                     Container(
@@ -110,19 +146,27 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(12.r),
                         gradient: LinearGradient(
-                          colors: [Colors.white, HSVColor.fromAHSV(1.0, currentHsvColor.hue, 1.0, 1.0).toColor()],
+                          colors: [
+                            Colors.white,
+                            HSVColor.fromAHSV(
+                              1.0,
+                              currentHsvColor.hue,
+                              1.0,
+                              1.0,
+                            ).toColor(),
+                          ],
                           begin: Alignment.centerLeft,
                           end: Alignment.centerRight,
                         ),
                       ),
                       child: Container(
                         decoration: BoxDecoration(
-                           borderRadius: BorderRadius.circular(12.r),
-                           gradient: LinearGradient(
-                             colors: [Colors.transparent, Colors.black],
-                             begin: Alignment.topCenter,
-                             end: Alignment.bottomCenter,
-                           ),
+                          borderRadius: BorderRadius.circular(12.r),
+                          gradient: LinearGradient(
+                            colors: [Colors.transparent, Colors.black],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                         ),
                       ),
                     ),
@@ -136,7 +180,9 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                           color: currentColor,
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2.5.r),
-                          boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                          boxShadow: [
+                            BoxShadow(color: Colors.black26, blurRadius: 4),
+                          ],
                         ),
                       ),
                     ),
@@ -146,12 +192,12 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
             },
           ),
           SizedBox(height: 20.h),
-          
+
           _buildHueSlider(),
           SizedBox(height: 20.h),
           _buildOpacitySlider(),
           SizedBox(height: 20.h),
-          
+
           Row(
             children: [
               Container(
@@ -160,13 +206,16 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                 decoration: BoxDecoration(
                   color: currentColor,
                   borderRadius: BorderRadius.circular(10.r),
-                  border: Border.all(color: Colors.grey.shade300)
+                  border: Border.all(color: Colors.grey.shade300),
                 ),
               ),
               SizedBox(width: 12.w),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 10.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(10.r),
@@ -176,8 +225,13 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                     style: TextStyle(
                       color: Colors.grey.shade800,
                       fontWeight: FontWeight.w500,
-                      fontSize:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 40.sp,
-                      fontFamily: 'monospace'
+                      fontSize:
+                          device == rh.DeviceType.desktop
+                              ? 16.sp
+                              : device == rh.DeviceType.tab
+                              ? 16.sp
+                              : 40.sp,
+                      fontFamily: 'monospace',
                     ),
                   ),
                 ),
@@ -196,8 +250,13 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
         borderRadius: BorderRadius.circular(8.r),
         gradient: const LinearGradient(
           colors: [
-            Color(0xFFFF0000), Color(0xFFFFFF00), Color(0xFF00FF00), Color(0xFF00FFFF),
-            Color(0xFF0000FF), Color(0xFFFF00FF), Color(0xFFFF0000)
+            Color(0xFFFF0000),
+            Color(0xFFFFFF00),
+            Color(0xFF00FF00),
+            Color(0xFF00FFFF),
+            Color(0xFF0000FF),
+            Color(0xFFFF00FF),
+            Color(0xFFFF0000),
           ],
         ),
       ),
@@ -235,7 +294,7 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
         ),
       ),
       child: SliderTheme(
-         data: SliderTheme.of(context).copyWith(
+        data: SliderTheme.of(context).copyWith(
           trackHeight: 25.h,
           thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12.0),
           overlayShape: const RoundSliderOverlayShape(overlayRadius: 0.0),

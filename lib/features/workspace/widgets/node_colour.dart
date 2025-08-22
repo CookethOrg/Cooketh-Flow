@@ -1,5 +1,7 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class NodeColourPicker extends StatelessWidget {
   final ValueChanged<Color> onColorSelected;
@@ -13,16 +15,14 @@ class NodeColourPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final su = context.read<SupabaseService>();
     return Dialog(
-      insetPadding: const EdgeInsets.symmetric(
-        horizontal: 20,
-        vertical: 20,
-      ),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Container(
         width: 320, // Adjusted width as mode buttons are removed
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color:su.isDark?Color.fromRGBO(48, 48, 48, 1): Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
         ),
@@ -34,18 +34,15 @@ class NodeColourPicker extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                 Text(
                   'Change Color',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: su.isDark?Colors.white:Colors.black),
                 ),
                 IconButton(
-                  icon: const Icon(
+                  icon:  Icon(
                     Icons.close,
                     size: 24,
-                    color: Colors.black54,
+                    color:su.isDark?Colors.white: Colors.black54,
                   ),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
@@ -62,25 +59,29 @@ class NodeColourPicker extends StatelessWidget {
                 Wrap(
                   spacing: 12, // Horizontal gap between color boxes
                   runSpacing: 12, // Vertical gap between rows
-                  children: secondaryColors
-                      .map((color) => _buildColorBox(
-                            color,
-                            isSelected: initialColor?.value == color.value,
-                          ))
-                      .toList(),
+                  children:
+                      secondaryColors
+                          .map(
+                            (color) => _buildColorBox(
+                              color,
+                              isSelected: initialColor?.value == color.value,
+                            ),
+                          )
+                          .toList(),
                 ),
                 const SizedBox(height: 12),
                 // Bottom row
                 Wrap(
                   spacing: 12, // Horizontal gap between color boxes
                   runSpacing: 12,
-                  children: tertiaryColors.asMap().entries.map((entry) {
-                    Color color = entry.value;
-                    return _buildColorBox(
-                      color,
-                      isSelected: initialColor?.value == color.value,
-                    );
-                  }).toList(),
+                  children:
+                      tertiaryColors.asMap().entries.map((entry) {
+                        Color color = entry.value;
+                        return _buildColorBox(
+                          color,
+                          isSelected: initialColor?.value == color.value,
+                        );
+                      }).toList(),
                 ),
               ],
             ),
@@ -90,10 +91,7 @@ class NodeColourPicker extends StatelessWidget {
     );
   }
 
-  Widget _buildColorBox(
-    Color color, {
-    bool isSelected = false,
-  }) {
+  Widget _buildColorBox(Color color, {bool isSelected = false}) {
     return GestureDetector(
       onTap: () {
         onColorSelected(color);
@@ -104,12 +102,14 @@ class NodeColourPicker extends StatelessWidget {
         decoration: BoxDecoration(
           color: color,
           borderRadius: BorderRadius.circular(4), // Added border radius
-          border: isSelected
-              ? Border.all(
-                  color: Colors.blue,
-                  width: 2.5,
-                  strokeAlign: BorderSide.strokeAlignOutside)
-              : Border.all(color: Colors.grey.shade300, width: 1),
+          border:
+              isSelected
+                  ? Border.all(
+                    color: Colors.blue,
+                    width: 2.5,
+                    strokeAlign: BorderSide.strokeAlignOutside,
+                  )
+                  : Border.all(color: Colors.grey.shade300, width: 1),
         ),
       ),
     );

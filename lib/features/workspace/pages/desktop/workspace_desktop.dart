@@ -37,7 +37,7 @@ class WorkspaceDesktop extends StatelessWidget {
               const WorkspaceDrawer(),
               SizedBox(width: 20.w),
               Positioned(top: 0, left: 0.21.sw, child: UndoRedoButton(su: suprovider,)),
-              Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton()),
+              Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton(su: suprovider,)),
 
               Positioned(right: 0, top: 0.10.sh, child: ToolBar()),
 

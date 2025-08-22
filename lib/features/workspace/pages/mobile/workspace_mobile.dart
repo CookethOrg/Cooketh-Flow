@@ -26,8 +26,8 @@ class WorkspaceMobile extends StatelessWidget {
   Widget build(BuildContext context) {
     rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer2<WorkspaceProvider,SupabaseService>(
-      builder: (context, provider,suprovider, child) {
+    return Consumer2<WorkspaceProvider, SupabaseService>(
+      builder: (context, provider, suprovider, child) {
         return Scaffold(
           backgroundColor: provider.currentWorkspaceColor,
           body: Padding(
@@ -37,7 +37,11 @@ class WorkspaceMobile extends StatelessWidget {
               children: [
                 const CanvasPage(),
                 workspaceDrawerMob(device),
-                Positioned(top: 120.h, right: 0.h, child: UndoRedoButton(su: suprovider,)),
+                Positioned(
+                  top: 120.h,
+                  right: 0.h,
+                  child: UndoRedoButton(su: suprovider),
+                ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 40.h),
                   child: Align(
@@ -103,9 +107,9 @@ class WorkspaceMobile extends StatelessWidget {
   }
 }
 
-Widget workspaceDrawerMob(rh.DeviceType device,) {
-  return Consumer<WorkspaceProvider>(
-    builder: (context, provider, child) {
+Widget workspaceDrawerMob(rh.DeviceType device) {
+  return Consumer2<WorkspaceProvider, SupabaseService>(
+    builder: (context, provider, suprovider, child) {
       Color defaultBorderColor = const Color(0xFFD9D9D9);
 
       // Check if currentWorkspace is set before accessing its properties
@@ -172,7 +176,7 @@ Widget workspaceDrawerMob(rh.DeviceType device,) {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => ExportDialog(),
+                      builder: (context) => ExportDialog(su: suprovider),
                     );
                   },
                   style: ElevatedButton.styleFrom(

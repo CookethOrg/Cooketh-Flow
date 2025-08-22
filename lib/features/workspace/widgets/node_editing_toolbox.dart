@@ -30,11 +30,12 @@ class NodeEditingToolbox extends StatelessWidget {
     required VoidCallback onPressed,
     required String tooltip,
     Color? color,
+    required SupabaseService su,
   }) {
     return IconButton(
       icon: Icon(icon, size: 22),
       onPressed: onPressed,
-      color: color ?? Colors.black87,
+      color: color ??(su.isDark?Colors.white: Colors.black87),
       splashRadius: 20,
       tooltip: tooltip,
       padding: const EdgeInsets.all(8),
@@ -76,9 +77,11 @@ class NodeEditingToolbox extends StatelessWidget {
                     },
                     su: provider2,
                   ),
+                  
             );
           },
           tooltip: 'Change Shape',
+          su: provider2
         ),
       );
       buttons.add(_buildDivider());
@@ -106,6 +109,7 @@ class NodeEditingToolbox extends StatelessWidget {
             );
           },
           tooltip: 'Change Color',
+          su: provider2
         ),
       );
       buttons.add(_buildDivider());
@@ -121,6 +125,7 @@ class NodeEditingToolbox extends StatelessWidget {
         },
         tooltip: 'Delete Object',
         color: Colors.redAccent,
+        su: provider2
       ),
     );
 
@@ -129,7 +134,8 @@ class NodeEditingToolbox extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color:
+              provider2.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.grey.shade300),
           boxShadow: [

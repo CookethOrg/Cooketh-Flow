@@ -1,10 +1,12 @@
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ExportDialog extends StatefulWidget {
-  const ExportDialog({super.key});
+  final SupabaseService su;
+  const ExportDialog({super.key, required this.su});
 
   @override
   State<ExportDialog> createState() => _ExportDialogState();
@@ -24,7 +26,8 @@ class _ExportDialogState extends State<ExportDialog> {
         width: 320.w,
         padding: EdgeInsets.all(24.r),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color:
+              widget.su.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -52,14 +55,26 @@ class _ExportDialogState extends State<ExportDialog> {
                             ? 22.sp
                             : 60.sp,
                     fontWeight: FontWeight.w600,
-                    color: const Color(0xFF111827),
+                    color:
+                        widget.su.isDark
+                            ? Colors.white
+                            : const Color(0xFF111827),
                   ),
                 ),
                 IconButton(
-                  icon: Icon(PhosphorIconsRegular.x, size:device == rh.DeviceType.desktop ? 24.sp : device == rh.DeviceType.tab ? 24.sp : 55.sp),
+                  icon: Icon(
+                    PhosphorIconsRegular.x,
+                    size:
+                        device == rh.DeviceType.desktop
+                            ? 24.sp
+                            : device == rh.DeviceType.tab
+                            ? 24.sp
+                            : 55.sp,
+                  ),
                   onPressed: () => Navigator.of(context).pop(),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
+                  color: widget.su.isDark ? Colors.white : Colors.black,
                 ),
               ],
             ),
@@ -71,7 +86,15 @@ class _ExportDialogState extends State<ExportDialog> {
               children: [
                 Text(
                   'Export as',
-                  style: TextStyle(fontSize:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp, color: Colors.grey[700]),
+                  style: TextStyle(
+                    fontSize:
+                        device == rh.DeviceType.desktop
+                            ? 16.sp
+                            : device == rh.DeviceType.tab
+                            ? 16.sp
+                            : 45.sp,
+                    color: widget.su.isDark ? Colors.white : Colors.grey[700],
+                  ),
                 ),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 12.w),
@@ -82,7 +105,15 @@ class _ExportDialogState extends State<ExportDialog> {
                   child: DropdownButton<String>(
                     value: _selectedFormat,
                     underline: const SizedBox.shrink(),
-                    icon: Icon(PhosphorIconsRegular.caretDown, size:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp),
+                    icon: Icon(
+                      PhosphorIconsRegular.caretDown,
+                      size:
+                          device == rh.DeviceType.desktop
+                              ? 16.sp
+                              : device == rh.DeviceType.tab
+                              ? 16.sp
+                              : 45.sp,
+                    ),
                     onChanged: (String? newValue) {
                       if (newValue != null) {
                         setState(() {
@@ -96,7 +127,18 @@ class _ExportDialogState extends State<ExportDialog> {
                             value: value,
                             child: Text(
                               value,
-                              style: TextStyle(fontSize: device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp),
+                              style: TextStyle(
+                                fontSize:
+                                    device == rh.DeviceType.desktop
+                                        ? 16.sp
+                                        : device == rh.DeviceType.tab
+                                        ? 16.sp
+                                        : 45.sp,
+                                color:
+                                    widget.su.isDark
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
                             ),
                           );
                         }).toList(),
@@ -127,7 +169,12 @@ class _ExportDialogState extends State<ExportDialog> {
                 child: Text(
                   'Export Flowchart',
                   style: TextStyle(
-                    fontSize:device == rh.DeviceType.desktop ? 16.sp : device == rh.DeviceType.tab ? 16.sp : 45.sp,
+                    fontSize:
+                        device == rh.DeviceType.desktop
+                            ? 16.sp
+                            : device == rh.DeviceType.tab
+                            ? 16.sp
+                            : 45.sp,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

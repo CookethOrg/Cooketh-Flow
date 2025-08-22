@@ -1,5 +1,6 @@
 // lib/features/workspace/widgets/object_text_editor.dart
 
+import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
@@ -47,12 +48,13 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
   @override
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer2<WorkspaceProvider, CanvasProvider>(
-      builder: (context, workspaceProvider, canvasProvider, child) {
+    return Consumer3<WorkspaceProvider, CanvasProvider, SupabaseService>(
+      builder: (context, workspaceProvider, canvasProvider, suprovider, child) {
         final selectedObjectId = workspaceProvider.currentlySelectedObjectId;
-        final selectedObject = selectedObjectId != null
-            ? workspaceProvider.canvasObjects[selectedObjectId]
-            : null;
+        final selectedObject =
+            selectedObjectId != null
+                ? workspaceProvider.canvasObjects[selectedObjectId]
+                : null;
 
         if (workspaceProvider.interactionMode != InteractionMode.editingText ||
             selectedObject == null) {
@@ -66,8 +68,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
         });
 
         final Rect objectBounds = selectedObject.getBounds();
-        final Matrix4 transform =
-            canvasProvider.transformationController.value;
+        final Matrix4 transform = canvasProvider.transformationController.value;
         final vc.Vector3 transformedTopLeft = transform.transform3(
           vc.Vector3(objectBounds.topLeft.dx, objectBounds.topLeft.dy, 0),
         );
@@ -83,8 +84,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
           Offset(transformedBottomRight.x, transformedBottomRight.y),
         );
 
-        final quillController =
-            workspaceProvider.selectedObjectQuillController;
+        final quillController = workspaceProvider.selectedObjectQuillController;
 
         return Positioned(
           left: visibleRect.left,
@@ -98,7 +98,10 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                   key: _toolbarKey,
                   width: visibleRect.width < 350.w ? 350.w : visibleRect.width,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color:
+                        suprovider.isDark
+                            ? Color.fromRGBO(48, 48, 48, 1)
+                            : Colors.white,
                     borderRadius: BorderRadius.circular(8.r),
                     boxShadow: [
                       BoxShadow(
@@ -138,10 +141,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                   decoration: BoxDecoration(
                     // The editor background is transparent to see the object behind it.
                     color: Colors.transparent,
-                    border: Border.all(
-                      color: Colors.blue.shade400,
-                      width: 2.0,
-                    ),
+                    border: Border.all(color: Colors.blue.shade400, width: 2.0),
                     borderRadius: BorderRadius.circular(4.r),
                   ),
                   child: QuillEditor.basic(

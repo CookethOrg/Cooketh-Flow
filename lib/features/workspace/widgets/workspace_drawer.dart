@@ -56,12 +56,7 @@ class WorkspaceDrawer extends StatelessWidget {
                         // Ensure exitWorkspace is called when navigating back
 
                         context.goNamed(
-                          RouteName.dashboard,
-                          pathParameters: {
-                            'username':
-                                provider.supabaseService.currentUser!.name ??
-                                "Notfound",
-                          },
+                          RouteName.dashboard
                         );
                         provider.exitWorkspace();
                       },

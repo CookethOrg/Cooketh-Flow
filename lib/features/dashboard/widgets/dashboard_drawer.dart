@@ -1,9 +1,11 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/upgrade_plan.dart';
@@ -215,8 +217,10 @@ class DashboardDrawer extends StatelessWidget {
                           SizedBox(width: 16),
                           ElevatedButton.icon(
                             onPressed: () async {
-                              await supabaseService!
+                              await supabaseService
                                   .logout(); // Call logout from SupabaseService
+                              // context.goNamed(RouteName.loginScreen);
+                              context.go(RoutesPath.loginScreen);
                             },
                             icon: Icon(
                               PhosphorIcons.signOut(),
@@ -359,8 +363,8 @@ class DashboardDrawer extends StatelessWidget {
                       },
                     ),
                   ),
-                  Spacer(),
-                  UpgradeCard(sv: supabaseService),
+                  // Spacer(),
+                  // UpgradeCard(sv: supabaseService),
                 ],
               ),
             ),

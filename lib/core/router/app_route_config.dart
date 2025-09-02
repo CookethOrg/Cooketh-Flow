@@ -23,10 +23,9 @@ class AppRouteConfig {
               (context, state) => NoTransitionPage(child: SignupPage()),
         ),
         GoRoute(
-          path: '${RoutesPath.dashboard}/u/:username',
+          path: RoutesPath.dashboard,
           name: RouteName.dashboard,
           pageBuilder: (context, state) {
-            final username = state.pathParameters["username"];
             return NoTransitionPage(child: DashboardPage());
           },
         ),

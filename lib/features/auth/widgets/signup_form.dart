@@ -26,8 +26,8 @@ class SignUpForm extends StatelessWidget {
         // Listener for social logins to automatically navigate after successful authentication
         if (supabaseService.currentUser != null && GoRouter.of(context).routerDelegate.currentConfiguration?.fullPath != RoutesPath.dashboard) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            // context.go(RoutesPath.dashboard);
-            context.goNamed(RouteName.dashboard,pathParameters: {'username': supabaseService.currentUser!.name!});
+            context.go(RoutesPath.dashboard);
+            // context.goNamed(RouteName.dashboard,pathParameters: {'username': supabaseService.currentUser!.name!});
             authProvider.setLoading(false); // Ensure loading is off after navigation
           });
         }
@@ -321,99 +321,99 @@ class SignUpForm extends StatelessWidget {
                 isMobile
                     ? Column(
                         children: [
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   child: ElevatedButton(
-                          //     style: ElevatedButton.styleFrom(
-                          //       shadowColor: Colors.transparent,
-                          //       padding: EdgeInsets.symmetric(
-                          //         vertical: 24.h,
-                          //         horizontal: 32.w,
-                          //       ),
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(12.r),
-                          //       ),
-                          //       backgroundColor: Colors.white,
-                          //       foregroundColor: Colors.black,
-                          //       side: const BorderSide(
-                          //         color: Color(0xFFD9D9D9),
-                          //         width: 1,
-                          //       ),
-                          //     ),
-                          //     onPressed: () async {
-                          //       await authProvider.googleAuth();
-                          //       ScaffoldMessenger.of(context).showSnackBar(
-                          //         const SnackBar(content: Text("Initiating Google Sign-Up...")),
-                          //       );
-                          //       // Navigation handled by the Consumer2's listener
-                          //     },
-                          //     child: Row(
-                          //       mainAxisSize: MainAxisSize.min,
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         Icon(PhosphorIconsRegular.googleLogo, size: 15),
-                          //         SizedBox(width: 8.w),
-                          //         Text(
-                          //           "Sign up with Google",
-                          //           style: TextStyle(
-                          //             fontFamily: 'Frederik',
-                          //             fontWeight: FontWeight.w500,
-                          //             fontSize: 12,
-                          //             overflow: TextOverflow.ellipsis,
-                          //           ),
-                          //           maxLines: 1,
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
-                          // SizedBox(height: 16.h),
-                          // SizedBox(
-                          //   width: double.infinity,
-                          //   child: ElevatedButton(
-                          //     style: ElevatedButton.styleFrom(
-                          //       shadowColor: Colors.transparent,
-                          //       padding: EdgeInsets.symmetric(
-                          //         vertical: 24.h,
-                          //         horizontal: 32.w,
-                          //       ),
-                          //       shape: RoundedRectangleBorder(
-                          //         borderRadius: BorderRadius.circular(12.r),
-                          //       ),
-                          //       backgroundColor: Colors.white,
-                          //       foregroundColor: Colors.black,
-                          //       side: const BorderSide(
-                          //         color: Color(0xFFD9D9D9),
-                          //         width: 1,
-                          //       ),
-                          //     ),
-                          //     onPressed: () async {
-                          //       await authProvider.githubSignin();
-                          //       ScaffoldMessenger.of(context).showSnackBar(
-                          //         const SnackBar(content: Text("Initiating GitHub Sign-Up...")),
-                          //       );
-                          //       // Navigation handled by the Consumer2's listener
-                          //     },
-                          //     child: Row(
-                          //       mainAxisSize: MainAxisSize.min,
-                          //       mainAxisAlignment: MainAxisAlignment.center,
-                          //       children: [
-                          //         Icon(PhosphorIconsRegular.githubLogo, size: 15),
-                          //         SizedBox(width: 8.w),
-                          //         Text(
-                          //           "Sign up with GitHub",
-                          //           style: TextStyle(
-                          //             fontFamily: 'Frederik',
-                          //             fontWeight: FontWeight.w500,
-                          //             fontSize: 12,
-                          //             overflow: TextOverflow.ellipsis,
-                          //           ),
-                          //           maxLines: 1,
-                          //         ),
-                          //       ],
-                          //     ),
-                          //   ),
-                          // ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 24.h,
+                                  horizontal: 32.w,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                side: const BorderSide(
+                                  color: Color(0xFFD9D9D9),
+                                  width: 1,
+                                ),
+                              ),
+                              onPressed: () async {
+                                await authProvider.googleAuth();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Initiating Google Sign-Up...")),
+                                );
+                                // Navigation handled by the Consumer2's listener
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(PhosphorIconsRegular.googleLogo, size: 15),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    "Sign up with Google",
+                                    style: TextStyle(
+                                      fontFamily: 'Frederik',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16.h),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                shadowColor: Colors.transparent,
+                                padding: EdgeInsets.symmetric(
+                                  vertical: 24.h,
+                                  horizontal: 32.w,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.r),
+                                ),
+                                backgroundColor: Colors.white,
+                                foregroundColor: Colors.black,
+                                side: const BorderSide(
+                                  color: Color(0xFFD9D9D9),
+                                  width: 1,
+                                ),
+                              ),
+                              onPressed: () async {
+                                await authProvider.githubSignin();
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Initiating GitHub Sign-Up...")),
+                                );
+                                // Navigation handled by the Consumer2's listener
+                              },
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(PhosphorIconsRegular.githubLogo, size: 15),
+                                  SizedBox(width: 8.w),
+                                  Text(
+                                    "Sign up with GitHub",
+                                    style: TextStyle(
+                                      fontFamily: 'Frederik',
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 12,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    maxLines: 1,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ],
                       )
                     : LayoutBuilder(
@@ -422,113 +422,113 @@ class SignUpForm extends StatelessWidget {
                           return Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              // Flexible(
-                              //   child: ConstrainedBox(
-                              //     constraints: BoxConstraints(
-                              //       maxWidth: maxButtonWidth,
-                              //     ),
-                              //     child: ElevatedButton(
-                              //       style: ElevatedButton.styleFrom(
-                              //         shadowColor: Colors.transparent,
-                              //         padding: EdgeInsets.symmetric(
-                              //           vertical: 32.h,
-                              //           horizontal: 32.w,
-                              //         ),
-                              //         shape: RoundedRectangleBorder(
-                              //           borderRadius: BorderRadius.circular(12.r),
-                              //         ),
-                              //         backgroundColor: Colors.white,
-                              //         foregroundColor: Colors.black,
-                              //         side: const BorderSide(
-                              //           color: Color(0xFFD9D9D9),
-                              //           width: 1,
-                              //         ),
-                              //       ),
-                              //       onPressed: () async {
-                              //         await authProvider.googleAuth();
-                              //         ScaffoldMessenger.of(context).showSnackBar(
-                              //           const SnackBar(content: Text("Initiating Google Sign-Up...")),
-                              //         );
-                              //         // Navigation handled by the Consumer2's listener
-                              //       },
-                              //       child: Row(
-                              //         mainAxisSize: MainAxisSize.min,
-                              //         mainAxisAlignment: MainAxisAlignment.center,
-                              //         children: [
-                              //           Icon(
-                              //             PhosphorIconsRegular.googleLogo,
-                              //             size: isDesktop ? 25.sp : 35.sp,
-                              //           ),
-                              //           SizedBox(width: 8.w),
-                              //           Text(
-                              //             "Sign up with Google",
-                              //             style: TextStyle(
-                              //               fontFamily: 'Frederik',
-                              //               fontWeight: FontWeight.w500,
-                              //               fontSize: isDesktop ? 20.sp : 28.sp,
-                              //               overflow: TextOverflow.ellipsis,
-                              //             ),
-                              //             maxLines: 1,
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
-                              // SizedBox(width: 16.w),
-                              // Flexible(
-                              //   child: ConstrainedBox(
-                              //     constraints: BoxConstraints(
-                              //       maxWidth: maxButtonWidth,
-                              //     ),
-                              //     child: ElevatedButton(
-                              //       style: ElevatedButton.styleFrom(
-                              //         shadowColor: Colors.transparent,
-                              //         padding: EdgeInsets.symmetric(
-                              //           vertical: 32.h,
-                              //           horizontal: 32.w,
-                              //         ),
-                              //         shape: RoundedRectangleBorder(
-                              //           borderRadius: BorderRadius.circular(12.r),
-                              //         ),
-                              //         backgroundColor: Colors.white,
-                              //         foregroundColor: Colors.black,
-                              //         side: const BorderSide(
-                              //           color: Color(0xFFD9D9D9),
-                              //           width: 1,
-                              //         ),
-                              //       ),
-                              //       onPressed: () async {
-                              //         await authProvider.githubSignin();
-                              //         ScaffoldMessenger.of(context).showSnackBar(
-                              //           const SnackBar(content: Text("Initiating GitHub Sign-Up...")),
-                              //         );
-                              //         // Navigation handled by the Consumer2's listener
-                              //       },
-                              //       child: Row(
-                              //         mainAxisSize: MainAxisSize.min,
-                              //         mainAxisAlignment: MainAxisAlignment.center,
-                              //         children: [
-                              //           Icon(
-                              //             PhosphorIconsRegular.githubLogo,
-                              //             size: isDesktop ? 25.sp : 35.sp,
-                              //           ),
-                              //           SizedBox(width: 8.w),
-                              //           Text(
-                              //             "Sign up with GitHub",
-                              //             style: TextStyle(
-                              //               fontFamily: 'Frederik',
-                              //               fontWeight: FontWeight.w500,
-                              //               fontSize: isDesktop ? 20.sp : 28.sp,
-                              //               overflow: TextOverflow.ellipsis,
-                              //             ),
-                              //             maxLines: 1,
-                              //           ),
-                              //         ],
-                              //       ),
-                              //     ),
-                              //   ),
-                              // ),
+                              Flexible(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: maxButtonWidth,
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shadowColor: Colors.transparent,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 32.h,
+                                        horizontal: 32.w,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12.r),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      side: const BorderSide(
+                                        color: Color(0xFFD9D9D9),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      await authProvider.googleAuth();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Initiating Google Sign-Up...")),
+                                      );
+                                      // Navigation handled by the Consumer2's listener
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          PhosphorIconsRegular.googleLogo,
+                                          size: isDesktop ? 25.sp : 35.sp,
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          "Sign up with Google",
+                                          style: TextStyle(
+                                            fontFamily: 'Frederik',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: isDesktop ? 20.sp : 28.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 16.w),
+                              Flexible(
+                                child: ConstrainedBox(
+                                  constraints: BoxConstraints(
+                                    maxWidth: maxButtonWidth,
+                                  ),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      shadowColor: Colors.transparent,
+                                      padding: EdgeInsets.symmetric(
+                                        vertical: 32.h,
+                                        horizontal: 32.w,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(12.r),
+                                      ),
+                                      backgroundColor: Colors.white,
+                                      foregroundColor: Colors.black,
+                                      side: const BorderSide(
+                                        color: Color(0xFFD9D9D9),
+                                        width: 1,
+                                      ),
+                                    ),
+                                    onPressed: () async {
+                                      await authProvider.githubSignin();
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        const SnackBar(content: Text("Initiating GitHub Sign-Up...")),
+                                      );
+                                      // Navigation handled by the Consumer2's listener
+                                    },
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          PhosphorIconsRegular.githubLogo,
+                                          size: isDesktop ? 25.sp : 35.sp,
+                                        ),
+                                        SizedBox(width: 8.w),
+                                        Text(
+                                          "Sign up with GitHub",
+                                          style: TextStyle(
+                                            fontFamily: 'Frederik',
+                                            fontWeight: FontWeight.w500,
+                                            fontSize: isDesktop ? 20.sp : 28.sp,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          maxLines: 1,
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           );
                         },

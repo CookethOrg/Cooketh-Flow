@@ -29,7 +29,10 @@ class DashboardProvider extends StateHandler {
 
   List<WorkspaceModel> get displayedWorkspaces {
     final allWorkspaces = _workspaceList.values.toList();
-    allWorkspaces.sort((a, b) => (b.lastEdited ?? DateTime(0)).compareTo(a.lastEdited ?? DateTime(0)));
+    allWorkspaces.sort(
+      (a, b) =>
+          (b.lastEdited ?? DateTime(0)).compareTo(a.lastEdited ?? DateTime(0)),
+    );
 
     switch (_tabIndex) {
       case 1: // Starred
@@ -128,7 +131,9 @@ class DashboardProvider extends StateHandler {
     final workspace = _workspaceList[workspaceId];
     if (workspace == null) return;
 
-    final updatedWorkspace = workspace.copyWith(isStarred: !workspace.isStarred);
+    final updatedWorkspace = workspace.copyWith(
+      isStarred: !workspace.isStarred,
+    );
     _workspaceList[workspaceId] = updatedWorkspace;
     notifyListeners();
 
@@ -146,7 +151,7 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  Future<void> createNewProject(BuildContext context) async {
+  Future<String> createNewProject(BuildContext context) async {
     _isLoading = true;
     try {
       var res = supabase?.auth.currentUser;
@@ -154,7 +159,7 @@ class DashboardProvider extends StateHandler {
         _isLoading = false;
         print("User not found");
         notifyListeners();
-        return;
+        return 'User not found';
       }
       Map<String, dynamic> newWorkspaceData = {
         "id": Uuid().v4(),
@@ -168,8 +173,15 @@ class DashboardProvider extends StateHandler {
       await supabase!.from('workspace').insert(newWorkspaceData);
 
       await refreshDashboard();
+      return 'Workspace created successfully!!';
     } catch (e) {
       print("Error creating new project: $e");
+      String output = e.toString();
+      if (e.toString() ==
+          'PostgrestException(message: User has reached the maximum limit of 10 workspaces., code: P0001, details: , hint: null)') {
+        output = 'Maximum limit of workspaces reached. Upgrade your plan for more!';
+      }
+      return output;
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -219,21 +231,15 @@ class DashboardProvider extends StateHandler {
 
     try {
       print('Deleting canvas_objects for workspace: $id');
-      await supabase!
-          .from('canvas_objects')
-          .delete()
-          .eq('workspace_id', id);
+      await supabase!.from('canvas_objects').delete().eq('workspace_id', id);
       print('Canvas objects for workspace $id deleted from database.');
 
       print('Deleting workspace: $id');
-      await supabase!
-          .from('workspace')
-          .delete()
-          .eq('id', id);
+      await supabase!.from('workspace').delete().eq('id', id);
       print('Workspace $id deleted from database.');
 
       _workspaceList.remove(id);
-      
+
       print("Workspace $id removed from local list.");
     } catch (e) {
       print("Error deleting workspace $id: $e");

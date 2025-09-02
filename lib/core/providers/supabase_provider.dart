@@ -136,9 +136,9 @@ class SupabaseService extends StateHandler {
       // and added to your Supabase Auth Providers -> Google -> Redirect URIs
       // For desktop, usually 'http://localhost:port' or similar is used.
       final String? redirectUrl =
-          kIsWeb?
-              'http://cookethflow.cookethcompany.xyz/dashboard' // For web development
-              // 'http://localhost:3000/dashboard'
+          kIsWeb? kReleaseMode ?
+              'http://cookethflow.cookethcompany.xyz/dashboard':
+              'http://localhost:3000/dashboard'
               : (Platform.isAndroid || Platform.isIOS
                   ? 'myapp://login-callback/'
                   : null); // For mobile/desktop
@@ -162,9 +162,9 @@ class SupabaseService extends StateHandler {
   Future<String> signInWithGithub() async {
     try {
       final String? redirectUrl =
-          kIsWeb?
-              'http://cookethflow.cookethcompany.xyz/dashboard'
-              // 'http://localhost:3000/dashboard'
+          kIsWeb? kReleaseMode ?
+              'http://cookethflow.cookethcompany.xyz/dashboard':
+              'http://localhost:3000/dashboard'
               : (Platform.isAndroid || Platform.isIOS
                   ? 'my.scheme://my-host'
                   : null); // Replace with your actual scheme

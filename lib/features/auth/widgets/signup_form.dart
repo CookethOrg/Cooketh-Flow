@@ -1,5 +1,6 @@
 import 'package:cookethflow/core/helpers/input_validators.dart';
-import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as responsive_helper;
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart'
+    as responsive_helper;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -10,25 +11,33 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 
-
 class SignUpForm extends StatelessWidget {
   const SignUpForm({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isMobile = responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
+    final isMobile =
+        responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
         responsive_helper.DeviceType.mobile;
-    final isDesktop = responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
+    final isDesktop =
+        responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
         responsive_helper.DeviceType.desktop;
 
-    return Consumer2<AuthenticationProvider, SupabaseService>( // Consume both providers
+    return Consumer2<AuthenticationProvider, SupabaseService>(
+      // Consume both providers
       builder: (context, authProvider, supabaseService, child) {
         // Listener for social logins to automatically navigate after successful authentication
-        if (supabaseService.currentUser != null && GoRouter.of(context).routerDelegate.currentConfiguration?.fullPath != RoutesPath.dashboard) {
+        if (supabaseService.currentUser != null &&
+            GoRouter.of(
+                  context,
+                ).routerDelegate.currentConfiguration?.fullPath !=
+                RoutesPath.dashboard) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go(RoutesPath.dashboard);
             // context.goNamed(RouteName.dashboard,pathParameters: {'username': supabaseService.currentUser!.name!});
-            authProvider.setLoading(false); // Ensure loading is off after navigation
+            authProvider.setLoading(
+              false,
+            ); // Ensure loading is off after navigation
           });
         }
 
@@ -207,9 +216,16 @@ class SignUpForm extends StatelessWidget {
             SizedBox(height: 12.h),
             TextFormField(
               autovalidateMode: AutovalidateMode.onUserInteraction,
-              validator: (value) => validatePassword( authProvider.passwordController.text), // Added confirm password validation
-              controller: authProvider.confirmPasswordController, // Use the new controller
-              obscureText: authProvider.obscureConfirmPassword, // Use confirm password obscure toggle
+              validator:
+                  (value) => validatePassword(
+                    authProvider.passwordController.text,
+                  ), // Added confirm password validation
+              controller:
+                  authProvider
+                      .confirmPasswordController, // Use the new controller
+              obscureText:
+                  authProvider
+                      .obscureConfirmPassword, // Use confirm password obscure toggle
               decoration: InputDecoration(
                 contentPadding: EdgeInsets.symmetric(
                   horizontal: 16.w,
@@ -243,7 +259,9 @@ class SignUpForm extends StatelessWidget {
                         : PhosphorIconsRegular.eyeSlash,
                     size: 24.sp,
                   ),
-                  onPressed: authProvider.toggleObscureConfirmPassword, // Toggle for confirm password
+                  onPressed:
+                      authProvider
+                          .toggleObscureConfirmPassword, // Toggle for confirm password
                   style: ButtonStyle(
                     overlayColor: WidgetStateProperty.all(Colors.transparent),
                     splashFactory: NoSplash.splashFactory,
@@ -253,57 +271,86 @@ class SignUpForm extends StatelessWidget {
             ),
             SizedBox(height: 32.h),
             Center(
-              child: authProvider.isLoading
-                  ? const CircularProgressIndicator()
-                  : ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        shadowColor: Colors.transparent,
-                        padding: EdgeInsets.symmetric(
-                          vertical: isMobile ? 16.h : 32.h,
-                          horizontal: isMobile ? 100.w : isDesktop ? 80.w : 150.w,
+              child:
+                  authProvider.isLoading
+                      ? const CircularProgressIndicator()
+                      : ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          shadowColor: Colors.transparent,
+                          padding: EdgeInsets.symmetric(
+                            vertical: isMobile ? 16.h : 32.h,
+                            horizontal:
+                                isMobile
+                                    ? 100.w
+                                    : isDesktop
+                                    ? 80.w
+                                    : 150.w,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.r),
+                          ),
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
                         ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
-                        ),
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                      ),
-                      onPressed: () async {
-                        // Basic validation before calling API
-                        if (authProvider.passwordController.text != authProvider.confirmPasswordController.text) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Passwords do not match!')),
-                          );
-                          return;
-                        }
+                        onPressed: () async {
+                          // Basic validation before calling API
+                          if (authProvider.passwordController.text !=
+                              authProvider.confirmPasswordController.text) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Passwords do not match!'),
+                              ),
+                            );
+                            return;
+                          }
 
-                        // We set loading true, and it will be set to false in the provider's finally block
-                        String res = await authProvider.createNewUser(
-                          name: authProvider.userNameController.text, // Use username as initial name
-                          userName: authProvider.userNameController.text,
-                          email: authProvider.emailController.text,
-                          password: authProvider.passwordController.text,
-                        );
-                        if (res != "Signed Up Successfully") {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(res),
-                              duration: const Duration(seconds: 5),
-                            ),
+                          String? passwordValidationCheck = validatePassword(
+                            authProvider.passwordController.text,
                           );
-                        }
-                        // Navigation handled by the Consumer2's listener
-                      },
-                      child: Text(
-                        "Sign up",
-                        style: TextStyle(
-                          fontFamily: 'Frederik',
-                          fontWeight: FontWeight.w700,
-                          fontSize: isMobile ? 60.sp : isDesktop ? 25.sp : 30.sp,
-                          color: Colors.white,
+                          if (passwordValidationCheck == null) {
+                            // We set loading true, and it will be set to false in the provider's finally block
+                            String res = await authProvider.createNewUser(
+                              name:
+                                  authProvider
+                                      .userNameController
+                                      .text, // Use username as initial name
+                              userName: authProvider.userNameController.text,
+                              email: authProvider.emailController.text,
+                              password: authProvider.passwordController.text,
+                            );
+                            if (res != "Signed Up Successfully") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(res),
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(passwordValidationCheck),
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          }
+                          // Navigation handled by the Consumer2's listener
+                        },
+                        child: Text(
+                          "Sign up",
+                          style: TextStyle(
+                            fontFamily: 'Frederik',
+                            fontWeight: FontWeight.w700,
+                            fontSize:
+                                isMobile
+                                    ? 60.sp
+                                    : isDesktop
+                                    ? 25.sp
+                                    : 30.sp,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
-                    ),
             ),
             SizedBox(height: 24.h),
             Column(
@@ -320,219 +367,232 @@ class SignUpForm extends StatelessWidget {
                 SizedBox(height: 12.h),
                 isMobile
                     ? Column(
-                        children: [
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.transparent,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 24.h,
-                                  horizontal: 32.w,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                side: const BorderSide(
-                                  color: Color(0xFFD9D9D9),
-                                  width: 1,
-                                ),
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.transparent,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 24.h,
+                                horizontal: 32.w,
                               ),
-                              onPressed: () async {
-                                await authProvider.googleAuth();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Initiating Google Sign-Up...")),
-                                );
-                                // Navigation handled by the Consumer2's listener
-                              },
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(PhosphorIconsRegular.googleLogo, size: 15),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    "Sign up with Google",
-                                    style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 12,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    maxLines: 1,
-                                  ),
-                                ],
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              side: const BorderSide(
+                                color: Color(0xFFD9D9D9),
+                                width: 1,
                               ),
                             ),
-                          ),
-                          SizedBox(height: 16.h),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                shadowColor: Colors.transparent,
-                                padding: EdgeInsets.symmetric(
-                                  vertical: 24.h,
-                                  horizontal: 32.w,
+                            onPressed: () async {
+                              await authProvider.googleAuth();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Initiating Google Sign-Up..."),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.r),
-                                ),
-                                backgroundColor: Colors.white,
-                                foregroundColor: Colors.black,
-                                side: const BorderSide(
-                                  color: Color(0xFFD9D9D9),
-                                  width: 1,
-                                ),
-                              ),
-                              onPressed: () async {
-                                await authProvider.githubSignin();
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Initiating GitHub Sign-Up...")),
-                                );
-                                // Navigation handled by the Consumer2's listener
-                              },
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(PhosphorIconsRegular.githubLogo, size: 15),
-                                  SizedBox(width: 8.w),
-                                  Text(
-                                    "Sign up with GitHub",
-                                    style: TextStyle(
-                                      fontFamily: 'Frederik',
-                                      fontWeight: FontWeight.w500,
-                                      fontSize: 12,
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                    maxLines: 1,
+                              );
+                              // Navigation handled by the Consumer2's listener
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(PhosphorIconsRegular.googleLogo, size: 15),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "Sign up with Google",
+                                  style: TextStyle(
+                                    fontFamily: 'Frederik',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                              ),
+                                  maxLines: 1,
+                                ),
+                              ],
                             ),
                           ),
-                        ],
-                      )
+                        ),
+                        SizedBox(height: 16.h),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              shadowColor: Colors.transparent,
+                              padding: EdgeInsets.symmetric(
+                                vertical: 24.h,
+                                horizontal: 32.w,
+                              ),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12.r),
+                              ),
+                              backgroundColor: Colors.white,
+                              foregroundColor: Colors.black,
+                              side: const BorderSide(
+                                color: Color(0xFFD9D9D9),
+                                width: 1,
+                              ),
+                            ),
+                            onPressed: () async {
+                              await authProvider.githubSignin();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Initiating GitHub Sign-Up..."),
+                                ),
+                              );
+                              // Navigation handled by the Consumer2's listener
+                            },
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(PhosphorIconsRegular.githubLogo, size: 15),
+                                SizedBox(width: 8.w),
+                                Text(
+                                  "Sign up with GitHub",
+                                  style: TextStyle(
+                                    fontFamily: 'Frederik',
+                                    fontWeight: FontWeight.w500,
+                                    fontSize: 12,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  maxLines: 1,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    )
                     : LayoutBuilder(
-                        builder: (context, constraints) {
-                          final maxButtonWidth = (constraints.maxWidth - 16.w) / 2;
-                          return Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Flexible(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxWidth: maxButtonWidth,
+                      builder: (context, constraints) {
+                        final maxButtonWidth =
+                            (constraints.maxWidth - 16.w) / 2;
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Flexible(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: maxButtonWidth,
+                                ),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shadowColor: Colors.transparent,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 32.h,
+                                      horizontal: 32.w,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    side: const BorderSide(
+                                      color: Color(0xFFD9D9D9),
+                                      width: 1,
+                                    ),
                                   ),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      shadowColor: Colors.transparent,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 32.h,
-                                        horizontal: 32.w,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12.r),
-                                      ),
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: Colors.black,
-                                      side: const BorderSide(
-                                        color: Color(0xFFD9D9D9),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      await authProvider.googleAuth();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Initiating Google Sign-Up...")),
-                                      );
-                                      // Navigation handled by the Consumer2's listener
-                                    },
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          PhosphorIconsRegular.googleLogo,
-                                          size: isDesktop ? 25.sp : 35.sp,
+                                  onPressed: () async {
+                                    await authProvider.googleAuth();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Initiating Google Sign-Up...",
                                         ),
-                                        SizedBox(width: 8.w),
-                                        Text(
-                                          "Sign up with Google",
-                                          style: TextStyle(
-                                            fontFamily: 'Frederik',
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: isDesktop ? 20.sp : 28.sp,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          maxLines: 1,
+                                      ),
+                                    );
+                                    // Navigation handled by the Consumer2's listener
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        PhosphorIconsRegular.googleLogo,
+                                        size: isDesktop ? 25.sp : 35.sp,
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        "Sign up with Google",
+                                        style: TextStyle(
+                                          fontFamily: 'Frederik',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: isDesktop ? 20.sp : 28.sp,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ],
-                                    ),
+                                        maxLines: 1,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                              SizedBox(width: 16.w),
-                              Flexible(
-                                child: ConstrainedBox(
-                                  constraints: BoxConstraints(
-                                    maxWidth: maxButtonWidth,
+                            ),
+                            SizedBox(width: 16.w),
+                            Flexible(
+                              child: ConstrainedBox(
+                                constraints: BoxConstraints(
+                                  maxWidth: maxButtonWidth,
+                                ),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shadowColor: Colors.transparent,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 32.h,
+                                      horizontal: 32.w,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12.r),
+                                    ),
+                                    backgroundColor: Colors.white,
+                                    foregroundColor: Colors.black,
+                                    side: const BorderSide(
+                                      color: Color(0xFFD9D9D9),
+                                      width: 1,
+                                    ),
                                   ),
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      shadowColor: Colors.transparent,
-                                      padding: EdgeInsets.symmetric(
-                                        vertical: 32.h,
-                                        horizontal: 32.w,
-                                      ),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12.r),
-                                      ),
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: Colors.black,
-                                      side: const BorderSide(
-                                        color: Color(0xFFD9D9D9),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      await authProvider.githubSignin();
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text("Initiating GitHub Sign-Up...")),
-                                      );
-                                      // Navigation handled by the Consumer2's listener
-                                    },
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          PhosphorIconsRegular.githubLogo,
-                                          size: isDesktop ? 25.sp : 35.sp,
+                                  onPressed: () async {
+                                    await authProvider.githubSignin();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text(
+                                          "Initiating GitHub Sign-Up...",
                                         ),
-                                        SizedBox(width: 8.w),
-                                        Text(
-                                          "Sign up with GitHub",
-                                          style: TextStyle(
-                                            fontFamily: 'Frederik',
-                                            fontWeight: FontWeight.w500,
-                                            fontSize: isDesktop ? 20.sp : 28.sp,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          maxLines: 1,
+                                      ),
+                                    );
+                                    // Navigation handled by the Consumer2's listener
+                                  },
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        PhosphorIconsRegular.githubLogo,
+                                        size: isDesktop ? 25.sp : 35.sp,
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      Text(
+                                        "Sign up with GitHub",
+                                        style: TextStyle(
+                                          fontFamily: 'Frederik',
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: isDesktop ? 20.sp : 28.sp,
+                                          overflow: TextOverflow.ellipsis,
                                         ),
-                                      ],
-                                    ),
+                                        maxLines: 1,
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ),
-                            ],
-                          );
-                        },
-                      ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
                 SizedBox(height: 12.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

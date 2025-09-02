@@ -32,9 +32,7 @@ class LoginForm extends StatelessWidget {
         // For simplicity, we'll put the navigation logic here, but for complex apps,
         // you might have a dedicated AuthWrapper or AuthStreamListener at a higher level.
         if (supabaseService.currentUser != null &&
-            GoRouter.of(
-                  context,
-                ).routerDelegate.currentConfiguration.fullPath !=
+            GoRouter.of(context).routerDelegate.currentConfiguration.fullPath !=
                 RoutesPath.dashboard) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             // Check if current route is not already dashboard to prevent loop
@@ -193,15 +191,27 @@ class LoginForm extends StatelessWidget {
                         onPressed: () async {
                           // We set loading true, and it will be set to false in the provider's finally block
                           // The navigation happens after the SupabaseService updates the current user
-                          String res = await authProvider.loginUser(
-                            email: authProvider.emailController.text,
-                            password: authProvider.passwordController.text,
+                          String? passwordValidationCheck = validatePassword(
+                            authProvider.passwordController.text,
                           );
-                          if (res != "Logged in successfully") {
+                          if (passwordValidationCheck == null) {
+                            String res = await authProvider.loginUser(
+                              email: authProvider.emailController.text,
+                              password: authProvider.passwordController.text,
+                            );
+                            if (res != "Logged in successfully") {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(res),
+                                  duration: const Duration(seconds: 5),
+                                ),
+                              );
+                            }
+                          } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text(res),
-                                duration: const Duration(seconds: 5),
+                                content: Text(passwordValidationCheck),
+                                duration: const Duration(seconds: 2),
                               ),
                             );
                           }

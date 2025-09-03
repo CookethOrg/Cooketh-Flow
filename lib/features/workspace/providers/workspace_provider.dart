@@ -1,7 +1,9 @@
+// lib/features/workspace/providers/workspace_provider.dart (Fully Modified)
+
 import 'dart:ui';
 import 'dart:convert'; // For jsonDecode/jsonEncode
 import 'dart:math';
-
+import 'package:cookethflow/core/helpers/file_helper.dart';
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/consts.dart';
@@ -76,6 +78,9 @@ class WorkspaceProvider extends StateHandler {
   String? _connectorSourceId;
   Alignment? _connectorSourceAlignment;
   Offset? _connectorDragPosition;
+  
+  // Create an instance of FileServices
+  final FileServices _fileServices = FileServices();
 
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
@@ -103,16 +108,63 @@ class WorkspaceProvider extends StateHandler {
 
   bool get hasSelectedTile => _selectedTileIndex != null;
 
-  // NEW GETTER: To determine if the floating toolbox should be shown
   bool get shouldShowObjectToolbox {
     if (_currentlySelectedObjectId == null) return false;
     final object = _canvasObjects[_currentlySelectedObjectId!];
-    // Show for any object that is NOT a TextBox or Connector
     return object != null;
   }
 
   QuillController get selectedObjectQuillController {
     return _tempQuillController;
+  }
+
+  // --- NEW EXPORT METHOD ---
+  Future<void> exportWorkspaceAsJson() async {
+    if (_currentWorkspace == null) {
+      print("Cannot export: No workspace is currently loaded.");
+      return;
+    }
+
+    try {
+      // 1. Gather all necessary data
+      final workspaceData = _currentWorkspace!.toJson();
+      final canvasObjectsData =
+          _canvasObjects.values.map((obj) => obj.toJson()).toList();
+
+      // 2. Structure the data into a single map
+      final exportData = {
+        'workspace': {
+          'name': workspaceData["name"],
+          'data': workspaceData["data"]
+        },
+        'canvasObjects': canvasObjectsData,
+      };
+
+      // 3. Encode the map into a formatted JSON string
+      const jsonEncoder = JsonEncoder.withIndent('  '); // For pretty printing
+      final jsonString = jsonEncoder.convert(exportData);
+
+      // 4. Generate a safe and unique file name
+      final safeWorkspaceName = _currentWorkspace!.name
+          .replaceAll(RegExp(r'[^\w\s-]'), '')
+          .replaceAll(' ', '_');
+      final uniqueId = const Uuid().v4().substring(0, 8);
+      final fileName = '${safeWorkspaceName}_$uniqueId'; // Service adds extension
+
+      // 5. Use the FileServices to trigger the download
+      final result = await _fileServices.exportFile(
+        defaultName: fileName,
+        jsonString: jsonString,
+      );
+
+      if (result == 'success') {
+        print("Workspace exported successfully as $fileName.json");
+      } else {
+        print("Workspace export failed or was cancelled: $result");
+      }
+    } catch (e) {
+      print("An error occurred during JSON export: $e");
+    }
   }
 
   void setStickyNoteMode(Color color) {
@@ -227,8 +279,7 @@ class WorkspaceProvider extends StateHandler {
                     }
                   }
                 }
-
-                // NEW: Handle object deletion broadcast
+                
                 if (payload['deleted_ids'] != null) {
                   final List<String> deletedIds = List<String>.from(
                     payload['deleted_ids'],
@@ -332,7 +383,6 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-  // NEW: Method to delete objects from the database
   Future<void> _deleteCanvasObjectsFromDb(List<String> objectIds) async {
     if (_currentWorkspace == null || objectIds.isEmpty) return;
     try {
@@ -340,7 +390,6 @@ class WorkspaceProvider extends StateHandler {
           .from('canvas_objects')
           .delete()
           .inFilter('id', objectIds);
-      // .eq('id', objectIds);
       print('Canvas objects ${objectIds.join(', ')} deleted from DB.');
     } catch (e) {
       print('Error deleting canvas objects: $e');
@@ -447,13 +496,11 @@ class WorkspaceProvider extends StateHandler {
     notifyListeners();
   }
 
-  // NEW: Method to change the color of the selected object
   void changeObjectColor(Color newColor) {
     if (_currentlySelectedObjectId == null) return;
     final object = _canvasObjects[_currentlySelectedObjectId!];
     if (object == null) return;
 
-    // Use the existing copyWith method on the abstract class
     _canvasObjects[_currentlySelectedObjectId!] = object.copyWith(color: newColor);
 
     notifyListeners();
@@ -461,12 +508,11 @@ class WorkspaceProvider extends StateHandler {
     _saveCanvasObjectToDb(_currentlySelectedObjectId!);
   }
 
-  // NEW: Helper method to convert an object from one shape to another
   CanvasObject _convertObject(CanvasObject oldObject, ShapeType newShapeType) {
     final bounds = oldObject.getBounds();
     final color = oldObject.color;
     final textDelta = oldObject.textDelta;
-    final id = oldObject.id; // Crucially, keep the same ID
+    final id = oldObject.id;
 
     switch (newShapeType) {
       case ShapeType.square:
@@ -528,7 +574,6 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
-  // NEW: Method to change the shape of the selected object
   void changeObjectShape(ShapeType newShapeType) {
     if (_currentlySelectedObjectId == null) return;
     final oldObject = _canvasObjects[_currentlySelectedObjectId!];
@@ -543,13 +588,11 @@ class WorkspaceProvider extends StateHandler {
     _saveCanvasObjectToDb(_currentlySelectedObjectId!);
   }
 
-  // Method to delete the currently selected object
   void deleteSelectedObject() async {
     if (_currentlySelectedObjectId == null) return;
 
     final String idToDelete = _currentlySelectedObjectId!;
 
-    // Find all connectors attached to this object
     final List<String> idsToDelete = [idToDelete];
     final attachedConnectors = _canvasObjects.values
         .whereType<ConnectorObject>()
@@ -562,15 +605,12 @@ class WorkspaceProvider extends StateHandler {
       idsToDelete.add(conn.id);
     }
 
-    // Remove objects from local state
     for (final id in idsToDelete) {
       _canvasObjects.remove(id);
     }
 
-    // Unselect the object
-    changeCurrentlySelectedObj(null); // This will call notifyListeners
+    changeCurrentlySelectedObj(null);
 
-    // Delete from DB and broadcast the deletion
     await _deleteCanvasObjectsFromDb(idsToDelete);
     if (_currentWorkspace != null && _canvasChannel != null) {
       await _canvasChannel!.sendBroadcastMessage(

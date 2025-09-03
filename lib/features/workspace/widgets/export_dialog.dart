@@ -1,4 +1,7 @@
+// lib/features/workspace/widgets/export_dialog.dart (Fully Modified)
+
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
@@ -6,7 +9,13 @@ import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ExportDialog extends StatefulWidget {
   final SupabaseService su;
-  const ExportDialog({super.key, required this.su});
+  final WorkspaceProvider wp; // MODIFIED: Added WorkspaceProvider
+
+  const ExportDialog({
+    super.key, 
+    required this.su, 
+    required this.wp, // MODIFIED: Added to constructor
+  });
 
   @override
   State<ExportDialog> createState() => _ExportDialogState();
@@ -41,7 +50,6 @@ class _ExportDialogState extends State<ExportDialog> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -80,7 +88,6 @@ class _ExportDialogState extends State<ExportDialog> {
             ),
             SizedBox(height: 24.h),
 
-            // Export As section
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -148,17 +155,24 @@ class _ExportDialogState extends State<ExportDialog> {
             ),
             SizedBox(height: 32.h),
 
-            // Export Button
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // TODO: Implement export logic for _selectedFormat
-                  print('Exporting as $_selectedFormat...');
+                  // MODIFIED: Implement export logic
+                  if (_selectedFormat == 'JSON') {
+                    widget.wp.exportWorkspaceAsJson();
+                  } else if (_selectedFormat == 'PNG') {
+                    // TODO: Implement PNG export logic
+                    print('Exporting as PNG is not implemented yet.');
+                  } else if (_selectedFormat == 'SVG') {
+                    // TODO: Implement SVG export logic
+                    print('Exporting as SVG is not implemented yet.');
+                  }
                   Navigator.of(context).pop();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEA580C), // Orange color
+                  backgroundColor: const Color(0xFFEA580C),
                   foregroundColor: Colors.white,
                   padding: EdgeInsets.symmetric(vertical: 16.h),
                   shape: RoundedRectangleBorder(

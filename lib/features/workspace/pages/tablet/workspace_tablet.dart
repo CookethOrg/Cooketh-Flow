@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
+import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
@@ -19,8 +20,8 @@ class WorkspaceTablet extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer<SupabaseService>(
-      builder: (context, suprovider) {
+    return Consumer2<SupabaseService,WorkspaceProvider>(
+      builder: (context, suprovider,workspaceProvider) {
        return Scaffold(
           backgroundColor: const Color(0xFFF8F8F8),
           body: Padding(
@@ -39,7 +40,7 @@ class WorkspaceTablet extends StatelessWidget {
                 Positioned(
                   top: 0,
                   right: 0.001.sw,
-                  child: ExportProjectButton(su: suprovider,),
+                  child: ExportProjectButton(su: suprovider,wp:workspaceProvider,),
                 ),
 
                 // Container(

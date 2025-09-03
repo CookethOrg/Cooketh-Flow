@@ -1,3 +1,5 @@
+// lib/features/workspace/pages/workspace_desktop.dart (Fully Modified)
+
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
@@ -30,14 +32,15 @@ class WorkspaceDesktop extends StatelessWidget {
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 40.w, vertical: 40.h),
           child: Stack(
-            clipBehavior: Clip.none, // Allow toolbox to render outside the Stack's bounds
+            clipBehavior: Clip.none,
             children: [
               const CanvasPage(),
 
               const WorkspaceDrawer(),
               SizedBox(width: 20.w),
               Positioned(top: 0, left: 0.21.sw, child: UndoRedoButton(su: suprovider,)),
-              Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton(su: suprovider,)),
+              // MODIFIED: Pass the WorkspaceProvider instance to the button
+              Positioned(top: 0, right: 0.001.sw, child: ExportProjectButton(su: suprovider, wp: provider)),
 
               Positioned(right: 0, top: 0.10.sh, child: ToolBar()),
 
@@ -47,10 +50,8 @@ class WorkspaceDesktop extends StatelessWidget {
                 child: ZoomControlButton(),
               ),
 
-              // The new Object Editing Toolbox, positioned dynamically
               Consumer2<WorkspaceProvider, CanvasProvider>(
                 builder: (context, workspaceProvider, canvasProvider, child) {
-                  // Listen for changes in the transformation to update position
                   return ListenableBuilder(
                     listenable: canvasProvider.transformationController,
                     builder: (context, child) {
@@ -61,22 +62,19 @@ class WorkspaceDesktop extends StatelessWidget {
                         final matrix =
                             canvasProvider.transformationController.value;
 
-                        // Use the matrix to find the object's top-center position on the screen
                         final transformedTopCenter = matrix.transform3(
                             vector_math.Vector3(objectBounds.topCenter.dx,
                                 objectBounds.topCenter.dy, 0));
 
-                        // Calculate the screen position
                         final screenPosition = Offset(
                             transformedTopCenter.x, transformedTopCenter.y);
 
-                        // Define an approximate size for the toolbox to help with centering.
                         const double toolboxWidth = 240;
                         const double toolboxHeight = 48;
 
                         return Positioned(
                           left: screenPosition.dx - (toolboxWidth / 2),
-                          top: screenPosition.dy - toolboxHeight - 15, // 15px margin above object
+                          top: screenPosition.dy - toolboxHeight - 15,
                           child: const NodeEditingToolbox(),
                         );
                       }

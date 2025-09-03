@@ -176,7 +176,7 @@ Widget workspaceDrawerMob(rh.DeviceType device) {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => ExportDialog(su: suprovider),
+                      builder: (context) => ExportDialog(su: suprovider,wp: provider,),
                     );
                   },
                   style: ElevatedButton.styleFrom(

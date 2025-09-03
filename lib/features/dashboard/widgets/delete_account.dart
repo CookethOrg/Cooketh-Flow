@@ -85,7 +85,8 @@ class DeleteAccountDialog extends StatelessWidget {
                       // Add your delete account logic here
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Account deleted successfully'),
+                          // content: Text('Account deleted successfully'),
+                          content: Text('Feature coming soon!'),
                           backgroundColor: Colors.red,
                         ),
                       );

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script type="text/javascript">
+    // Get the current path from the URL.
+    var path = window.location.pathname;
+    
+    // Get any search query parameters.
+    var search = window.location.search;
+
+    // Preserve the path and search query, but redirect using a hash.
+    // This tricks the GitHub Pages server into loading the index.html
+    // and lets the Flutter router handle the deep link.
+    window.location.href = '/?' + 
+      'redirect=' + encodeURIComponent(path.substr(1) + search);
+  </script>
+</head>
+<body>
+</body>
+</html>

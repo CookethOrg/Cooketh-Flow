@@ -1,6 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <script>
+      (function () {
+        // Look for the redirect parameter in the URL.
+        var params = new URLSearchParams(window.location.search);
+        var redirect = params.get('redirect');
+  
+        if (redirect) {
+          // If a redirect path is found, replace the current history state
+          // with the correct path, so the Flutter router can handle it.
+          // We use replaceState to avoid breaking the browser's back button.
+          window.history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+  
   <!--
     If you are serving your web app in a path other than the root, change the
     href value below to reflect the base path you are serving from.

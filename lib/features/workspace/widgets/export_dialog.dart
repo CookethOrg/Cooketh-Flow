@@ -1,6 +1,5 @@
-// lib/features/workspace/widgets/export_dialog.dart (Fully Modified)
-
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,13 +8,9 @@ import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ExportDialog extends StatefulWidget {
   final SupabaseService su;
-  final WorkspaceProvider wp; // MODIFIED: Added WorkspaceProvider
+  final WorkspaceProvider wp;
 
-  const ExportDialog({
-    super.key, 
-    required this.su, 
-    required this.wp, // MODIFIED: Added to constructor
-  });
+  const ExportDialog({super.key, required this.su, required this.wp});
 
   @override
   State<ExportDialog> createState() => _ExportDialogState();
@@ -36,7 +31,9 @@ class _ExportDialogState extends State<ExportDialog> {
         padding: EdgeInsets.all(24.r),
         decoration: BoxDecoration(
           color:
-              widget.su.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
+              widget.su.isDark
+                  ? const Color.fromRGBO(48, 48, 48, 1)
+                  : Colors.white,
           borderRadius: BorderRadius.circular(16.r),
           boxShadow: [
             BoxShadow(
@@ -87,7 +84,6 @@ class _ExportDialogState extends State<ExportDialog> {
               ],
             ),
             SizedBox(height: 24.h),
-
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -154,20 +150,22 @@ class _ExportDialogState extends State<ExportDialog> {
               ],
             ),
             SizedBox(height: 32.h),
-
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  // MODIFIED: Implement export logic
                   if (_selectedFormat == 'JSON') {
                     widget.wp.exportWorkspaceAsJson();
                   } else if (_selectedFormat == 'PNG') {
-                    // TODO: Implement PNG export logic
-                    print('Exporting as PNG is not implemented yet.');
+                    widget.wp.exportWorkspaceAsPng();
                   } else if (_selectedFormat == 'SVG') {
-                    // TODO: Implement SVG export logic
                     print('Exporting as SVG is not implemented yet.');
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Coming soon!'),
+                        backgroundColor: primaryColor,
+                      ),
+                    );
                   }
                   Navigator.of(context).pop();
                 },

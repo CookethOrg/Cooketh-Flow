@@ -1,6 +1,4 @@
-// lib/features/workspace/providers/workspace_provider.dart (Fully Modified)
-
-import 'dart:ui';
+import 'dart:ui' as ui;
 import 'dart:convert'; // For jsonDecode/jsonEncode
 import 'dart:math';
 import 'package:cookethflow/core/helpers/file_helper.dart';
@@ -11,6 +9,7 @@ import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
+import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
@@ -78,8 +77,7 @@ class WorkspaceProvider extends StateHandler {
   String? _connectorSourceId;
   Alignment? _connectorSourceAlignment;
   Offset? _connectorDragPosition;
-  
-  // Create an instance of FileServices
+
   final FileServices _fileServices = FileServices();
 
   bool get isLoading => _isLoading;
@@ -118,7 +116,6 @@ class WorkspaceProvider extends StateHandler {
     return _tempQuillController;
   }
 
-  // --- NEW EXPORT METHOD ---
   Future<void> exportWorkspaceAsJson() async {
     if (_currentWorkspace == null) {
       print("Cannot export: No workspace is currently loaded.");
@@ -126,32 +123,27 @@ class WorkspaceProvider extends StateHandler {
     }
 
     try {
-      // 1. Gather all necessary data
       final workspaceData = _currentWorkspace!.toJson();
       final canvasObjectsData =
           _canvasObjects.values.map((obj) => obj.toJson()).toList();
 
-      // 2. Structure the data into a single map
       final exportData = {
         'workspace': {
           'name': workspaceData["name"],
-          'data': workspaceData["data"]
+          'data': workspaceData["data"],
         },
         'canvasObjects': canvasObjectsData,
       };
 
-      // 3. Encode the map into a formatted JSON string
-      const jsonEncoder = JsonEncoder.withIndent('  '); // For pretty printing
+      const jsonEncoder = JsonEncoder.withIndent('  ');
       final jsonString = jsonEncoder.convert(exportData);
 
-      // 4. Generate a safe and unique file name
       final safeWorkspaceName = _currentWorkspace!.name
           .replaceAll(RegExp(r'[^\w\s-]'), '')
           .replaceAll(' ', '_');
       final uniqueId = const Uuid().v4().substring(0, 8);
-      final fileName = '${safeWorkspaceName}_$uniqueId'; // Service adds extension
+      final fileName = '${safeWorkspaceName}_$uniqueId';
 
-      // 5. Use the FileServices to trigger the download
       final result = await _fileServices.exportFile(
         defaultName: fileName,
         jsonString: jsonString,
@@ -166,6 +158,87 @@ class WorkspaceProvider extends StateHandler {
       print("An error occurred during JSON export: $e");
     }
   }
+
+  Future<void> exportWorkspaceAsPng() async {
+    if (_currentWorkspace == null || _canvasObjects.isEmpty) {
+      print("Cannot export: No workspace or content to export.");
+      return;
+    }
+    try {
+      Rect? contentBounds;
+      for (final object in _canvasObjects.values) {
+        if (contentBounds == null) {
+          contentBounds = object.getBounds();
+        } else {
+          contentBounds = contentBounds.expandToInclude(object.getBounds());
+        }
+      }
+
+      if (contentBounds == null) {
+        print("No objects on canvas to export.");
+        return;
+      }
+
+      const double padding = 50.0;
+      final imageBounds = Rect.fromLTRB(
+        contentBounds.left - padding,
+        contentBounds.top - padding,
+        contentBounds.right + padding,
+        contentBounds.bottom + padding,
+      );
+
+      final recorder = ui.PictureRecorder();
+      final canvas = Canvas(recorder);
+
+      canvas.translate(-imageBounds.left, -imageBounds.top);
+
+      final backgroundPaint = Paint()..color = _currentWorkspaceColor;
+      canvas.drawRect(
+          Rect.fromLTWH(0, 0, imageBounds.width, imageBounds.height),
+          backgroundPaint);
+
+      final painter = CanvasPainter(
+        canvasObjects: _canvasObjects,
+        userCursors: {},
+        currentlySelectedObjectId: null,
+        interactionMode: InteractionMode.none,
+        handleRadius: 0,
+        connectionPointRadius: _connectionPointRadius,
+        connectorDragPosition: null,
+        connectorSourceId: null,
+        connectorSourceAlignment: null,
+      );
+      painter.paint(canvas, imageBounds.size);
+
+      final picture = recorder.endRecording();
+      final img = await picture.toImage(
+        imageBounds.width.toInt(),
+        imageBounds.height.toInt(),
+      );
+      final byteData = await img.toByteData(format: ui.ImageByteFormat.png);
+      final pngBytes = byteData!.buffer.asUint8List();
+
+      final safeWorkspaceName = _currentWorkspace!.name
+          .replaceAll(RegExp(r'[^\w\s-]'), '')
+          .replaceAll(' ', '_');
+      final uniqueId = const Uuid().v4().substring(0, 8);
+      final fileName = '${safeWorkspaceName}_$uniqueId';
+
+      final result = await _fileServices.exportPNG(
+        defaultName: fileName,
+        pngBytes: pngBytes,
+      );
+
+      if (result == 'success') {
+        print("Workspace exported successfully as $fileName.png");
+      } else {
+        print("PNG export failed or was cancelled: $result");
+      }
+    } catch (e) {
+      print("An error occurred during PNG export: $e");
+    }
+  }
+
 
   void setStickyNoteMode(Color color) {
     _currentMode = DrawMode.stickyNote;
@@ -279,7 +352,7 @@ class WorkspaceProvider extends StateHandler {
                     }
                   }
                 }
-                
+
                 if (payload['deleted_ids'] != null) {
                   final List<String> deletedIds = List<String>.from(
                     payload['deleted_ids'],
@@ -1001,3 +1074,4 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 }
+

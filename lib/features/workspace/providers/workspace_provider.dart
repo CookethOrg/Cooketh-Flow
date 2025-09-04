@@ -127,11 +127,9 @@ class WorkspaceProvider extends StateHandler {
       final canvasObjectsData =
           _canvasObjects.values.map((obj) => obj.toJson()).toList();
 
+      // ** FIX: Ensure the full workspace object is exported **
       final exportData = {
-        'workspace': {
-          'name': workspaceData["name"],
-          'data': workspaceData["data"],
-        },
+        'workspace': workspaceData,
         'canvasObjects': canvasObjectsData,
       };
 

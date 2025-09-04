@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_document_picker/flutter_document_picker.dart';
 import 'package:universal_html/html.dart' as html;
@@ -77,6 +78,50 @@ class PlatformFileService {
       return jsonData;
     } catch (e) {
       print("Error parsing JSON: $e");
+      return null;
+    }
+  }
+
+  // Added methods to replace file_selector usage
+  static Future<String?> getSavePath({
+    required List<XTypeGroup> acceptedTypeGroups,
+    required String suggestedName,
+  }) async {
+    try {
+      if (kIsWeb) {
+        // Web platform does not need a save path; handled via Blob
+        return null;
+      } else {
+        final path = await FlutterDocumentPicker.openDocument(
+          params: FlutterDocumentPickerParams(
+            allowedFileExtensions:
+                acceptedTypeGroups.first.extensions ?? ['json'],
+            invalidFileNameSymbols: ['/'],
+          ),
+        );
+        return path;
+      }
+    } catch (e) {
+      print("Error getting save path: $e");
+      return null;
+    }
+  }
+
+  static Future<XFile?> openFile({
+    required List<XTypeGroup> acceptedTypeGroups,
+  }) async {
+    try {
+      final result = await pickJSONFile();
+      if (result == null) return null;
+      final fileName = result['name'] as String;
+      final bytes = result['bytes'] as Uint8List;
+      return XFile.fromData(
+        bytes,
+        mimeType: acceptedTypeGroups.first.mimeTypes?.first ?? 'application/json',
+        name: fileName,
+      );
+    } catch (e) {
+      print("Error opening file: $e");
       return null;
     }
   }

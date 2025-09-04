@@ -33,7 +33,7 @@ class AddProject extends StatelessWidget {
                 icon: PhosphorIconsRegular.plus,
                 label: 'Start Blank Project',
                 onTap: () async {
-                  String output = await provider.createNewProject(context);
+                  String output = await provider.createNewProject();
                   if (output != 'Workspace created successfully!!') {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
@@ -54,7 +54,14 @@ class AddProject extends StatelessWidget {
                 label: 'Import Existing Project',
                 onTap: () async {
                   context.pop();
-                  provider.importExistingProject(context);
+                  String output = await provider.importExistingProject();
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(output),
+                      backgroundColor: Colors.lightGreen,
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
                 },
                 txtColor: suprovider.isDark ? Colors.white : Colors.black,
                 borderColor: suprovider.isDark ? Colors.white : Colors.black,

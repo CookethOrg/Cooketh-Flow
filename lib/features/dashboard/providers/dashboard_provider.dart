@@ -5,10 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
+import 'package:cookethflow/core/helpers/file_helper.dart';
 
 class DashboardProvider extends StateHandler {
   late SupabaseClient? supabase;
   late SupabaseService supabaseService;
+  final FileServices _fileServices = FileServices();
+
   DashboardProvider(this.supabase, this.supabaseService) : super() {
     initialize();
   }
@@ -151,7 +154,7 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  Future<String> createNewProject(BuildContext context) async {
+  Future<String> createNewProject() async {
     _isLoading = true;
     try {
       var res = supabase?.auth.currentUser;
@@ -188,7 +191,87 @@ class DashboardProvider extends StateHandler {
     }
   }
 
-  void importExistingProject(BuildContext context) {}
+  Future<String> importExistingProject() async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final jsonContent = await _fileServices.importJsonFileFromUser();
+      if (jsonContent == null) {
+        return 'Import operation cancelled or failed.';
+      }
+
+      if (jsonContent['workspace'] == null || jsonContent['canvasObjects'] == null) {
+        return 'Invalid file format. Missing "workspace" or "canvasObjects" data.';
+      }
+
+      final currentUser = supabase?.auth.currentUser;
+      if (currentUser == null) {
+        return 'User not authenticated.';
+      }
+
+      final oldWorkspaceId = jsonContent['workspace']['id'];
+      final newWorkspaceId = Uuid().v4();
+
+      final newWorkspace = Map<String, dynamic>.from(jsonContent['workspace']);
+      newWorkspace['id'] = newWorkspaceId;
+      newWorkspace['owner'] = currentUser.id;
+      newWorkspace['name'] = '${newWorkspace['name']} (Imported)';
+      newWorkspace.remove('created_at');
+      newWorkspace.remove('lastEdited');
+
+      final oldToNewIdMap = <String, String>{};
+      final newCanvasObjects = <Map<String, dynamic>>[];
+
+      for (var obj in (jsonContent['canvasObjects'] as List)) {
+        final newId = Uuid().v4();
+        final oldId = obj['id'];
+        oldToNewIdMap[oldId] = newId;
+
+        final newObj = Map<String, dynamic>.from(obj);
+        newObj['id'] = newId;
+        newCanvasObjects.add(newObj);
+      }
+
+      for (var obj in newCanvasObjects) {
+        if (obj['object_type'] == 'connector') {
+          final sourceId = obj['source_id'];
+          final targetId = obj['target_id'];
+          if (sourceId != null && oldToNewIdMap.containsKey(sourceId)) {
+            obj['source_id'] = oldToNewIdMap[sourceId];
+          }
+          if (targetId != null && oldToNewIdMap.containsKey(targetId)) {
+            obj['target_id'] = oldToNewIdMap[targetId];
+          }
+        }
+      }
+
+      await supabase!.from('workspace').insert(newWorkspace);
+
+      if (newCanvasObjects.isNotEmpty) {
+        final objectsToInsert = newCanvasObjects.map((obj) {
+          return {
+            'id': obj['id'],
+            'object': obj,
+            'workspace_id': newWorkspaceId,
+          };
+        }).toList();
+        await supabase!.from('canvas_objects').insert(objectsToInsert);
+      }
+
+      await refreshDashboard();
+      return 'Workspace imported successfully!';
+    } catch (e) {
+      print("Error importing project: $e");
+      String output = 'An error occurred during import.';
+      if (e.toString().contains('maximum limit of 10 workspaces')) {
+        output = 'Maximum limit of workspaces reached. Upgrade your plan for more!';
+      }
+      return output;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
 
   Future<void> syncWithDb() async {
     if (supabase == null) {

@@ -1,12 +1,10 @@
 import 'dart:convert';
-import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:cookethflow/core/helpers/platform_file_helper.dart';
+import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:flutter/foundation.dart';
 import 'package:universal_html/html.dart' as html;
 
 class FileServices {
-  final FileSelectorPlatform fileSelector = FileSelectorPlatform.instance;
-
   Future<String> exportFile({
     required String defaultName,
     required String jsonString,
@@ -35,7 +33,7 @@ class FileServices {
           mimeTypes: ['application/json'],
         );
 
-        final String? path = await fileSelector.getSavePath(
+        final String? path = await PlatformFileService.getSavePath(
           acceptedTypeGroups: [typeGroup],
           suggestedName: sanitizedName,
         );
@@ -89,7 +87,7 @@ class FileServices {
           mimeTypes: ['image/png'],
         );
 
-        final String? path = await fileSelector.getSavePath(
+        final String? path = await PlatformFileService.getSavePath(
           acceptedTypeGroups: [typeGroup],
           suggestedName: sanitizedName,
         );
@@ -144,7 +142,7 @@ class FileServices {
           mimeTypes: ['image/svg+xml'],
         );
 
-        final String? path = await fileSelector.getSavePath(
+        final String? path = await PlatformFileService.getSavePath(
           acceptedTypeGroups: [typeGroup],
           suggestedName: sanitizedName,
         );
@@ -188,7 +186,7 @@ class FileServices {
 
     try {
       final XFile? file =
-          await fileSelector.openFile(acceptedTypeGroups: [typeGroup]);
+          await PlatformFileService.openFile(acceptedTypeGroups: [typeGroup]);
 
       if (file != null) {
         print('Selected file: ${file.path}');
@@ -201,21 +199,34 @@ class FileServices {
   }
 
   Future<XFile?> importJsonFiles() async {
-    const XTypeGroup typeGroup = XTypeGroup(
-      label: 'JSON',
-      mimeTypes: ['application/json'],
-      extensions: ['json'],
-    );
-
     try {
-      final XFile? file =
-          await fileSelector.openFile(acceptedTypeGroups: [typeGroup]);
-      if (file != null) {
-        print('Selected file: ${file.path}');
+      final result = await PlatformFileService.pickJSONFile();
+      if (result == null) {
+        return null; // User cancelled the operation
       }
-      return file;
+      final fileName = result['name'] as String;
+      final bytes = result['bytes'] as Uint8List;
+      return XFile.fromData(
+        bytes,
+        mimeType: 'application/json',
+        name: fileName,
+      );
     } catch (e) {
       print('Error in selecting file: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> importJsonFileFromUser() async {
+    try {
+      final file = await importJsonFiles();
+      if (file == null) {
+        return null; // User cancelled the operation
+      }
+      final bytes = await file.readAsBytes();
+      return PlatformFileService.parseJSONFile(bytes);
+    } catch (e) {
+      print('Error importing JSON file: $e');
       return null;
     }
   }

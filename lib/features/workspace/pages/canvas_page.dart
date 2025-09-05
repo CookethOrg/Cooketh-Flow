@@ -105,6 +105,7 @@ class CanvasPage extends StatelessWidget {
                         currentlySelectedObjectId:
                             workspaceProvider.currentlySelectedObjectId,
                         handleRadius: workspaceProvider.handleRadius,
+                        workspaceColor: workspaceProvider.currentWorkspaceColor,
                         interactionMode: workspaceProvider.interactionMode,
                         connectionPointRadius:
                             workspaceProvider.connectionPointRadius,

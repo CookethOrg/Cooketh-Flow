@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
@@ -25,6 +26,7 @@ class CanvasPainter extends CustomPainter {
   final String? currentlySelectedObjectId;
   final double handleRadius;
   final InteractionMode interactionMode;
+  final Color workspaceColor; // NEW: Added workspace color
 
   // NEW: Connector-related properties
   final double connectionPointRadius;
@@ -38,6 +40,8 @@ class CanvasPainter extends CustomPainter {
     this.currentlySelectedObjectId,
     this.handleRadius = 8.0,
     required this.interactionMode,
+    // NEW: Initialize workspace color
+    required this.workspaceColor,
     // NEW: Initialize connector properties
     this.connectionPointRadius = 6.0,
     this.connectorSourceId,
@@ -253,12 +257,12 @@ class CanvasPainter extends CustomPainter {
           canvas.drawOval(topEllipseRect, fillPaint);
           canvas.drawOval(bottomEllipseRect, fillPaint);
           
-          // Draw the white line for the top of the cylinder
-          final whitePaint = Paint()
-            ..color = Colors.white
+          // Use the workspaceColor for the "hollow" border
+          final borderPaint = Paint()
+            ..color = workspaceColor
             ..style = PaintingStyle.stroke
             ..strokeWidth = 2.0;
-          canvas.drawOval(topEllipseRect, whitePaint);
+          canvas.drawOval(topEllipseRect, borderPaint);
         }
       }
 
@@ -452,6 +456,7 @@ class CanvasPainter extends CustomPainter {
         oldPainter.canvasObjects.length != canvasObjects.length ||
         oldPainter.currentlySelectedObjectId != currentlySelectedObjectId ||
         oldPainter.interactionMode != interactionMode ||
+        oldPainter.workspaceColor != workspaceColor || // NEW: Added color check
         _hasCanvasObjectsChanged(oldPainter.canvasObjects, canvasObjects) ||
         oldPainter.connectorDragPosition !=
             connectorDragPosition; // Add check for connector drag

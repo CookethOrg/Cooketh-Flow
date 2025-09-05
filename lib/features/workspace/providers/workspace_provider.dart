@@ -205,6 +205,7 @@ class WorkspaceProvider extends StateHandler {
         connectorDragPosition: null,
         connectorSourceId: null,
         connectorSourceAlignment: null,
+        workspaceColor: _currentWorkspaceColor, // NEW: Pass the workspace color
       );
       painter.paint(canvas, imageBounds.size);
 
@@ -1072,4 +1073,3 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 }
-

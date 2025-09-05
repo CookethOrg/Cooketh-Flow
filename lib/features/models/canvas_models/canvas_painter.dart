@@ -170,18 +170,22 @@ class CanvasPainter extends CustomPainter {
             Rect.fromCircle(center: canvasObject.center, radius: canvasObject.radius);
       } else if (canvasObject is StickyNoteObject) {
         rect = canvasObject.getBounds();
-        final double borderThickness =
-            min(min(rect.width, rect.height) * 0.05, 5.0);
+        // The image shows a darker, thinner border
+        final double borderThickness = 2.0;
         final borderPaint = Paint()
-          ..color = Color.lerp(canvasObject.color, Colors.black, 0.1)!;
-        canvas.drawRect(rect, borderPaint);
+          ..color = Color.lerp(canvasObject.color, Colors.black, 0.3)!
+          ..strokeWidth = borderThickness
+          ..style = PaintingStyle.stroke;
+
         final bodyRect = Rect.fromLTRB(
             rect.left + borderThickness,
             rect.top + borderThickness,
             rect.right - borderThickness,
             rect.bottom - borderThickness);
+        
         final bodyPaint = Paint()..color = canvasObject.color;
-        canvas.drawRect(bodyRect, bodyPaint);
+        canvas.drawRect(rect, bodyPaint);
+        canvas.drawRect(rect, borderPaint);
       } else if (canvasObject is TextBoxObject) {
         rect = canvasObject.getBounds();
         if (canvasObject.color != Colors.transparent) {
@@ -269,9 +273,7 @@ class CanvasPainter extends CustomPainter {
           final List<dynamic> delta = jsonDecode(canvasObject.textDelta!);
           double textPadding = 8.0;
           if (canvasObject is StickyNoteObject) {
-            final double borderThickness =
-                min(min(rect.width, rect.height) * 0.05, 5.0);
-            textPadding += borderThickness;
+            textPadding = 12.0; // Adjusted padding for the new sticky note style
           }
           double yOffset = rect.top + textPadding;
           final List<Map<String, dynamic>> lines = [];

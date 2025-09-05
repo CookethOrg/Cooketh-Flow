@@ -17,11 +17,12 @@
 <br />
 <!-- <br /> -->
 
- [Cooketh Flow](https://cookethflow.framer.website/) is an open-source, powerful visual thinking and unified productivity tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, organizing tasks or simply just taking notes, Cooketh Flow provides an intuitive interface for organizing and executing tasks effortlessly.   <!-- <div align="center">
+ [Cooketh Flow](https://cookethflow.framer.website/) is an open-source, powerful visual thinking and unified productivity tool designed for teams and individuals to brainstorm, sketch, and organize ideas effortlessly. Whether you're mapping out ideas, designing user flows, organizing tasks or simply just taking notes, Cooketh Flow provides an intuitive interface for organizing and executing tasks effortlessly.
+  <div align="center">
   <a href="https://github.com/CookethOrg/Cooketh-Flow">
-  <img src="assets/ss.png" alt="Cooketh Flow logo" height="300" />
+  <img src="assets/images/Workspace.png" alt="Cooketh Flow Workspace" height="300" />
      </a>
-</div> -->
+</div>
 
 ---
 

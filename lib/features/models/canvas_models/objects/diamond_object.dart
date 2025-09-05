@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';

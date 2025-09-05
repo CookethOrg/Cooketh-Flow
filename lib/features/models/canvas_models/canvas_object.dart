@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/cylinder_object.dart';
@@ -17,7 +18,9 @@ import 'package:flutter/material.dart';
 
 extension RandomColor on Color {
   static Color getRandom() {
-    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
+    final random = Random();
+    final index = random.nextInt(secondaryColors.length);
+    return secondaryColors[index];
   }
 
   static Color getRandomFromUserId(String id) {

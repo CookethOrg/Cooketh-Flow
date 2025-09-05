@@ -18,6 +18,7 @@ import 'package:cookethflow/features/models/canvas_models/user_cursor.dart';
 import 'package:flutter/material.dart';
 import 'package:path_drawing/path_drawing.dart';
 
+
 class CanvasPainter extends CustomPainter {
   final Map<String, UserCursor> userCursors;
   final Map<String, CanvasObject> canvasObjects;
@@ -44,7 +45,6 @@ class CanvasPainter extends CustomPainter {
     this.connectorDragPosition,
   });
 
-  // ... (_parseColor, _getFontSize, _getTextStyle methods remain the same)
   Color _parseColor(String? colorString) {
     if (colorString == null) return Colors.black;
     try {
@@ -158,12 +158,14 @@ class CanvasPainter extends CustomPainter {
 
     // 2. Draw all shapes and their decorations
     for (final canvasObject in shapeObjects) {
-      final paint = Paint()..color = canvasObject.color;
+      final fillColor = canvasObject.color;
+      final fillPaint = Paint()..color = fillColor;
+
       Rect rect;
 
       // ... (existing shape drawing logic remains the same)
       if (canvasObject is Circle) {
-        canvas.drawCircle(canvasObject.center, canvasObject.radius, paint);
+        canvas.drawCircle(canvasObject.center, canvasObject.radius, fillPaint);
         rect =
             Rect.fromCircle(center: canvasObject.center, radius: canvasObject.radius);
       } else if (canvasObject is StickyNoteObject) {
@@ -183,19 +185,18 @@ class CanvasPainter extends CustomPainter {
       } else if (canvasObject is TextBoxObject) {
         rect = canvasObject.getBounds();
         if (canvasObject.color != Colors.transparent) {
-          canvas.drawRect(rect, paint);
+          canvas.drawRect(rect, fillPaint);
         }
       } else {
         rect = canvasObject.getBounds();
         if (canvasObject is Rectangle) {
-          canvas.drawRect(rect, paint);
+          canvas.drawRect(rect, fillPaint);
         } else if (canvasObject is Square) {
-          canvas.drawRect(rect, paint);
+          canvas.drawRect(rect, fillPaint);
         } else if (canvasObject is RoundedSquare) {
-          canvas.drawRRect(
-              RRect.fromRectAndRadius(
-                  rect, Radius.circular(canvasObject.cornerRadius)),
-              paint);
+          final rrect = RRect.fromRectAndRadius(
+              rect, Radius.circular(canvasObject.cornerRadius));
+          canvas.drawRRect(rrect, fillPaint);
         } else if (canvasObject is Diamond) {
           final path = Path()
             ..moveTo(rect.center.dx, rect.top)
@@ -203,21 +204,21 @@ class CanvasPainter extends CustomPainter {
             ..lineTo(rect.center.dx, rect.bottom)
             ..lineTo(rect.left, rect.center.dy)
             ..close();
-          canvas.drawPath(path, paint);
+          canvas.drawPath(path, fillPaint);
         } else if (canvasObject is Triangle) {
           final path = Path()
             ..moveTo(rect.center.dx, rect.top)
             ..lineTo(rect.right, rect.bottom)
             ..lineTo(rect.left, rect.bottom)
             ..close();
-          canvas.drawPath(path, paint);
+          canvas.drawPath(path, fillPaint);
         } else if (canvasObject is InvertedTriangle) {
           final path = Path()
             ..moveTo(rect.left, rect.top)
             ..lineTo(rect.right, rect.top)
             ..lineTo(rect.center.dx, rect.bottom)
             ..close();
-          canvas.drawPath(path, paint);
+          canvas.drawPath(path, fillPaint);
         } else if (canvasObject is Parallelogram) {
           final skew = rect.width * 0.25;
           final path = Path()
@@ -226,24 +227,34 @@ class CanvasPainter extends CustomPainter {
             ..lineTo(rect.right - skew, rect.bottom)
             ..lineTo(rect.left, rect.bottom)
             ..close();
-          canvas.drawPath(path, paint);
+          canvas.drawPath(path, fillPaint);
         } else if (canvasObject is Cylinder) {
           final ellipseHeight = min(rect.height * 0.3, 40.0);
           final bodyRect = Rect.fromLTRB(rect.left,
               rect.top + ellipseHeight / 2, rect.right, rect.bottom - ellipseHeight / 2);
-          canvas.drawRect(bodyRect, paint);
-          canvas.drawOval(
-              Rect.fromCenter(
-                  center: bodyRect.topCenter,
-                  width: rect.width,
-                  height: ellipseHeight),
-              paint);
-          canvas.drawOval(
-              Rect.fromCenter(
-                  center: bodyRect.bottomCenter,
-                  width: rect.width,
-                  height: ellipseHeight),
-              paint);
+
+          // Draw body
+          canvas.drawRect(bodyRect, fillPaint);
+
+          // Draw ellipses
+          final topEllipseRect = Rect.fromCenter(
+              center: bodyRect.topCenter,
+              width: rect.width,
+              height: ellipseHeight);
+          final bottomEllipseRect = Rect.fromCenter(
+              center: bodyRect.bottomCenter,
+              width: rect.width,
+              height: ellipseHeight);
+
+          canvas.drawOval(topEllipseRect, fillPaint);
+          canvas.drawOval(bottomEllipseRect, fillPaint);
+          
+          // Draw the white line for the top of the cylinder
+          final whitePaint = Paint()
+            ..color = Colors.white
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2.0;
+          canvas.drawOval(topEllipseRect, whitePaint);
         }
       }
 

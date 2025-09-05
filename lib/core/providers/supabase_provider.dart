@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io'; // For File operations in non-web platforms
-// Import the new model
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/features/models/user_model.dart';
 import 'package:flutter/foundation.dart'; // For kIsWeb
@@ -20,6 +19,10 @@ class SupabaseService extends StateHandler {
       final User? user = data.session?.user;
 
       if (user != null) {
+        // Handle OAuth sign-in flow
+        if (event == AuthChangeEvent.signedIn) {
+          await _handleOAuthSignIn(user);
+        }
         await _fetchCurrentUserDetails(
           user,
         ); // Fetch details on sign-in/refresh
@@ -56,6 +59,43 @@ class SupabaseService extends StateHandler {
   }
 
   // --- User Data Management (Internal & Public) ---
+
+  Future<void> _handleOAuthSignIn(User user) async {
+    // Check if it's a first-time sign-up via OAuth
+    final providerData = user.appMetadata;
+    final isOAuth = providerData['provider'] != null;
+    final String? currentAvatarUrl = user.userMetadata!['profile_picture_url'];
+    final String? currentName = user.userMetadata!['name'];
+
+    // If it's an OAuth user and they don't have our custom metadata fields,
+    // it's their first time.
+    if (isOAuth && (currentAvatarUrl == null || currentName == null)) {
+      final String? name = user.userMetadata!['full_name'] as String? ?? user.userMetadata!['name'] as String?;
+      final String? avatarUrl = user.userMetadata!['avatar_url'] as String?;
+
+      final Map<String, dynamic> updatedData = {};
+      if (name != null) {
+        updatedData['name'] = name;
+        updatedData['username'] = name.toLowerCase().replaceAll(' ', '');
+      }
+
+      // If an avatar URL is available from the provider, download and upload it
+      if (avatarUrl != null) {
+        try {
+          final xFile = await fetchUserProfilePictureFile(avatarUrl);
+          if (xFile != null) {
+            final publicUrl = await uploadUserProfilePicture(xFile);
+            updatedData['profile_picture_url'] = publicUrl;
+          }
+        } catch (e) {
+          print("Error handling initial PFP upload: $e");
+        }
+      }
+      if (updatedData.isNotEmpty) {
+        await supabase.auth.updateUser(UserAttributes(data: updatedData));
+      }
+    }
+  }
 
   // Called initially and on auth state changes to populate _currentUser
   Future<void> _fetchCurrentUserDetails(User? user) async {
@@ -136,9 +176,8 @@ class SupabaseService extends StateHandler {
       // and added to your Supabase Auth Providers -> Google -> Redirect URIs
       // For desktop, usually 'http://localhost:port' or similar is used.
       final String? redirectUrl =
-          kIsWeb? kReleaseMode ?
-              'http://cookethflow.cookethcompany.xyz/dashboard':
-              'http://localhost:3000/dashboard'
+          kIsWeb ?
+              kReleaseMode ? 'http://cookethflow.cookethcompany.xyz/dashboard' : 'http://localhost:3000/dashboard'
               : (Platform.isAndroid || Platform.isIOS
                   ? 'myapp://login-callback/'
                   : null); // For mobile/desktop
@@ -162,9 +201,8 @@ class SupabaseService extends StateHandler {
   Future<String> signInWithGithub() async {
     try {
       final String? redirectUrl =
-          kIsWeb? kReleaseMode ?
-              'http://cookethflow.cookethcompany.xyz/dashboard':
-              'http://localhost:3000/dashboard'
+          kIsWeb ?
+              kReleaseMode ? 'http://cookethflow.cookethcompany.xyz/dashboard' : 'http://localhost:3000/dashboard'
               : (Platform.isAndroid || Platform.isIOS
                   ? 'my.scheme://my-host'
                   : null); // Replace with your actual scheme
@@ -250,7 +288,7 @@ class SupabaseService extends StateHandler {
       // Update user_metadata directly
       final updatedData = {
         'name': newName,
-        'userName': newUsername, // Storing custom username in metadata
+        'username': newUsername, // Storing custom username in metadata
       };
 
       await supabase.auth.updateUser(UserAttributes(data: updatedData));

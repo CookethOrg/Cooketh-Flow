@@ -27,22 +27,6 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
   XFile? _selectedImage; // To hold the newly selected image for upload
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Initialize controllers with current user data when dependencies change
-    final supabaseService = Provider.of<SupabaseService>(
-      context,
-      listen: false,
-    );
-    if (supabaseService.currentUser != null) {
-      _nameController.text = supabaseService.currentUser!.name ?? '';
-      _emailController.text = supabaseService.currentUser!.email;
-      _usernameController.text = supabaseService.currentUser!.username ?? '';
-      // No need to fetch image here, CachedNetworkImage handles it
-    }
-  }
-
-  @override
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
@@ -65,8 +49,6 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
       context,
       listen: false,
     );
-    final String currentUserId =
-        supabaseService.currentUser!.id; // Ensure user is logged in
 
     // Update Name and Username
     if (_nameController.text != supabaseService.currentUser!.name ||
@@ -105,12 +87,12 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
     // Upload Profile Picture if a new one was selected
     if (_selectedImage != null) {
       try {
-        final res = await supabaseService.uploadUserProfilePicture(
+        await supabaseService.uploadUserProfilePicture(
           _selectedImage!,
         );
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(SnackBar(content: Text('Profile picture updated!')));
+        ).showSnackBar(const SnackBar(content: Text('Profile picture updated!')));
         setState(() {
           _selectedImage = null; // Clear selected image after upload
         });
@@ -120,12 +102,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
         ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
-
-    // Optionally, refresh user data to ensure everything is in sync
+    
+    // Refresh user data from Supabase to ensure UI is in sync
     await supabaseService.supabase.auth.refreshSession();
-
-    // Close the dialog after saving
-    // Navigator.of(context).pop();
   }
 
   @override
@@ -136,11 +115,16 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
     return Consumer2<DashboardProvider, SupabaseService>(
       builder: (context, dashboardProvider, supabaseService, child) {
         final currentUser = supabaseService.currentUser;
+        
+        // Update controllers with the current state of the provider
+        _nameController.text = currentUser?.name ?? '';
+        _emailController.text = currentUser?.email ?? '';
+        _usernameController.text = currentUser?.username ?? '';
+        
         final String displayAvatarUrl =
             _selectedImage != null
-                ? _selectedImage!
-                    .path // Show locally selected image immediately
-                : currentUser?.avatarUrl ?? ''; // Fallback to network or empty
+                ? _selectedImage!.path
+                : currentUser?.avatarUrl ?? '';
 
         return Dialog(
           backgroundColor: Theme.of(context).cardColor,
@@ -189,8 +173,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                           child: ClipOval(
                             child:
                                 displayAvatarUrl.isNotEmpty
-                                    ? (_selectedImage !=
-                                            null // If a new image is selected, display it from path/memory
+                                    ? (_selectedImage != null
                                         ? (kIsWeb
                                             ? Image.network(
                                               displayAvatarUrl,
@@ -201,7 +184,6 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                               fit: BoxFit.cover,
                                             ))
                                         : CachedNetworkImage(
-                                          // Otherwise, display from network cache
                                           imageUrl: displayAvatarUrl,
                                           fit: BoxFit.cover,
                                           placeholder:
@@ -225,10 +207,10 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                           bottom: 0,
                           right: 0,
                           child: InkWell(
-                            onTap: _pickImage, // Call image picker
+                            onTap: _pickImage,
                             child: Container(
                               width:
-                                  28, // Slightly larger for better tap target
+                                  28,
                               height: 28,
                               decoration: BoxDecoration(
                                 color: Theme.of(context).primaryColor,
@@ -249,8 +231,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                       ],
                     ),
                     deviceType == rh.DeviceType.desktop
-                        ? const SizedBox(height: 16)
-                        : const SizedBox(height: 8),
+                        ? const SizedBox(width: 16)
+                        : const SizedBox(width: 8),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [

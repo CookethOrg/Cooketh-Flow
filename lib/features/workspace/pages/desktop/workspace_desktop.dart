@@ -1,4 +1,5 @@
 // lib/features/workspace/pages/workspace_desktop.dart (Fully Modified)
+import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
@@ -6,6 +7,7 @@ import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/export_project_button.dart';
 import 'package:cookethflow/features/workspace/widgets/node_editing_toolbox.dart';
+import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
 import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
@@ -72,6 +74,44 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
             listen: false,
           );
           provider.changeDrawMode(DrawMode.textBox);
+          return null;
+        },
+      ),
+      StickyNoteIntent: CallbackAction<StickyNoteIntent>(
+        onInvoke: (intent) {
+          final provider = Provider.of<SupabaseService>(context, listen: false);
+          final device = rh.DeviceType.desktop;
+          _showStickyNote(context, device, provider);
+          return null;
+        },
+      ),
+      ResetIntent: CallbackAction<ResetIntent>(
+        onInvoke: (intent) {
+          final canvasProvider = Provider.of<CanvasProvider>(
+            context,
+            listen: false,
+          );
+          canvasProvider.resetZoom();
+          return null;
+        },
+      ),
+      ZoomInIntent: CallbackAction<ZoomInIntent>(
+        onInvoke: (intent) {
+          final canvasProvider = Provider.of<CanvasProvider>(
+            context,
+            listen: false,
+          );
+          canvasProvider.zoomIn();
+          return null;
+        },
+      ),
+      ZoomOutIntent: CallbackAction<ZoomOutIntent>(
+        onInvoke: (intent) {
+          final canvasProvider = Provider.of<CanvasProvider>(
+            context,
+            listen: false,
+          );
+          canvasProvider.zoomOut();
           return null;
         },
       ),
@@ -181,5 +221,44 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
         );
       },
     );
+  }
+
+  void _showStickyNote(
+    BuildContext context,
+    rh.DeviceType device,
+    SupabaseService su,
+  ) {
+    final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
+    if (renderBox != null) {
+      final position = renderBox.localToGlobal(Offset.zero);
+      showDialog(
+        context: context,
+        barrierColor: Colors.transparent,
+        builder:
+            (context) => Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(color: Colors.transparent),
+                  ),
+                ),
+                Positioned(
+                  right: device == rh.DeviceType.mobile ? position.dx : 150.w,
+                  top:
+                      device == rh.DeviceType.desktop
+                          ? 500.h
+                          : device == rh.DeviceType.tab
+                          ? 500.h
+                          : position.dy - 390.h,
+                  child: Material(
+                    color: Colors.transparent,
+                    child: StickyNotesWidget(su: su),
+                  ),
+                ),
+              ],
+            ),
+      );
+    }
   }
 }

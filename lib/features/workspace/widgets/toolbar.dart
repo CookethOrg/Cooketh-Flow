@@ -47,7 +47,7 @@ class ToolBar extends StatelessWidget {
           ),
           child:
               device == rh.DeviceType.mobile
-                  ? FittedBox(       
+                  ? FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -61,7 +61,7 @@ class ToolBar extends StatelessWidget {
                               context,
                               provider,
                               device,
-                              suprovider
+                              suprovider,
                             ); // Pass the provider
                           },
                           backgroundColor:
@@ -77,7 +77,7 @@ class ToolBar extends StatelessWidget {
                           'Add new node',
                           device,
                           onPressed: () {
-                            _showNodePicker(context, device,suprovider);
+                            _showNodePicker(context, device, suprovider);
                           },
                           backgroundColor:
                               suprovider.isDark
@@ -165,7 +165,9 @@ class ToolBar extends StatelessWidget {
                               provider.currentMode == DrawMode.stickyNote
                                   ? Colors.blue
                                   : tertiaryColors[6],
-                          onPressed: () => _showStickyNote(context, device,suprovider),
+                          onPressed:
+                              () =>
+                                  _showStickyNote(context, device, suprovider),
                           backgroundColor:
                               suprovider.isDark
                                   ? Color.fromRGBO(48, 48, 48, 1)
@@ -186,7 +188,7 @@ class ToolBar extends StatelessWidget {
                             context,
                             provider,
                             device,
-                            suprovider
+                            suprovider,
                           ); // Pass the provider
                         },
                         backgroundColor:
@@ -202,7 +204,7 @@ class ToolBar extends StatelessWidget {
                         'Add new node',
                         device,
                         onPressed: () {
-                          _showNodePicker(context, device,suprovider);
+                          _showNodePicker(context, device, suprovider);
                         },
                         backgroundColor:
                             suprovider.isDark
@@ -214,7 +216,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.cursor,
-                        'Pointer',
+                        'Pointer\nPress P',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.pointer
@@ -233,7 +235,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.handGrabbing,
-                        'Pan',
+                        'Pan\nPress A',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.hand
@@ -252,7 +254,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.textT,
-                        'Text box',
+                        'Text box\nPress T',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.textBox
@@ -284,13 +286,14 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsFill.noteBlank,
-                        'Add new sticky note',
+                        'Add new sticky note\nPress S',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.stickyNote
                                 ? Colors.blue
                                 : tertiaryColors[6],
-                        onPressed: () => _showStickyNote(context, device,suprovider),
+                        onPressed:
+                            () => _showStickyNote(context, device, suprovider),
                         backgroundColor:
                             suprovider.isDark
                                 ? Color.fromRGBO(48, 48, 48, 1)
@@ -346,7 +349,11 @@ class ToolBar extends StatelessWidget {
     );
   }
 
-  void _showNodePicker(BuildContext context, rh.DeviceType device,SupabaseService su) {
+  void _showNodePicker(
+    BuildContext context,
+    rh.DeviceType device,
+    SupabaseService su,
+  ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox == null) return;
 
@@ -385,7 +392,7 @@ class ToolBar extends StatelessWidget {
               left: leftPos,
               child: Material(
                 color: Colors.transparent,
-                child: NodePicker(su: su,),
+                child: NodePicker(su: su),
               ),
             ),
           ],
@@ -398,7 +405,7 @@ class ToolBar extends StatelessWidget {
     BuildContext context,
     WorkspaceProvider provider,
     rh.DeviceType device,
-    SupabaseService su
+    SupabaseService su,
   ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
@@ -448,7 +455,11 @@ class ToolBar extends StatelessWidget {
     }
   }
 
-  void _showStickyNote(BuildContext context, rh.DeviceType device,SupabaseService su) {
+  void _showStickyNote(
+    BuildContext context,
+    rh.DeviceType device,
+    SupabaseService su,
+  ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
     if (renderBox != null) {
       final position = renderBox.localToGlobal(Offset.zero);
@@ -465,7 +476,7 @@ class ToolBar extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right:device == rh.DeviceType.mobile ? position.dx : 150.w ,
+                  right: device == rh.DeviceType.mobile ? position.dx : 150.w,
                   top:
                       device == rh.DeviceType.desktop
                           ? 500.h
@@ -474,7 +485,7 @@ class ToolBar extends StatelessWidget {
                           : position.dy - 390.h,
                   child: Material(
                     color: Colors.transparent,
-                    child: StickyNotesWidget(su: su,),
+                    child: StickyNotesWidget(su: su),
                   ),
                 ),
               ],

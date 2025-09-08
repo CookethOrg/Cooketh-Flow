@@ -13,13 +13,22 @@ class ZoomControlButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer2<CanvasProvider,SupabaseService>(
-      builder: (context, canvasProvider,suprovider, child) {
+    return Consumer2<CanvasProvider, SupabaseService>(
+      builder: (context, canvasProvider, suprovider, child) {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 16.h),
           decoration: BoxDecoration(
-            border: Border.all(color:suprovider.isDark ? Color.fromRGBO(75, 75, 75, 1) :const Color(0XFFD9D9D9), width: 1.2),
-            color:suprovider.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
+            border: Border.all(
+              color:
+                  suprovider.isDark
+                      ? Color.fromRGBO(75, 75, 75, 1)
+                      : const Color(0XFFD9D9D9),
+              width: 1.2,
+            ),
+            color:
+                suprovider.isDark
+                    ? Color.fromRGBO(48, 48, 48, 1)
+                    : Colors.white,
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Row(
@@ -49,6 +58,7 @@ class ZoomControlButton extends StatelessWidget {
               VerticalCustomDivider(),
               SizedBox(width: 8.w),
               IconButton(
+                tooltip: "Press Z",
                 onPressed: () {
                   canvasProvider.zoomIn(); // Call zoomIn method
                 },
@@ -67,6 +77,7 @@ class ZoomControlButton extends StatelessWidget {
               VerticalCustomDivider(),
               SizedBox(width: 8.w),
               IconButton(
+                tooltip: 'Press X',
                 onPressed: () {
                   canvasProvider.zoomOut(); // Call zoomOut method
                 },
@@ -98,7 +109,7 @@ class ZoomControlButton extends StatelessWidget {
                           : 60.sp,
                 ), // Icon for reset
                 visualDensity: VisualDensity.compact,
-                tooltip: 'Reset Zoom',
+                tooltip: 'Reset Zoom\nPress R',
               ),
             ],
           ),

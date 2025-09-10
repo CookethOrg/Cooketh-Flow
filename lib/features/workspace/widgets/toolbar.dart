@@ -200,7 +200,7 @@ class ToolBar extends StatelessWidget {
                       ),
                       _horizontalDivider(device),
                       _toolIcon(
-                        PhosphorIconsRegular.circlesThreePlus,
+                      provider.nodeIconProvider(),
                         'Add new node',
                         device,
                         onPressed: () {

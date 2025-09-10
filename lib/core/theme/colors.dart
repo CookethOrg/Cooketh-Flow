@@ -23,7 +23,7 @@ const List<Color> secondaryColors = [
   Color(0xFF3B82F6), // [6] Blue
   Color(0xFFED6325), // [7] Orange
   Color(0xFF737492), // [8] Slate Gray
-  Color(0xFF000000), // [9] Black
+  // Color(0xFF000000), // [9] Black
 ];
 
 // List of tertiary colors

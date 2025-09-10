@@ -79,7 +79,9 @@ class WorkspaceProvider extends StateHandler {
   Offset? _connectorDragPosition;
 
   final FileServices _fileServices = FileServices();
+  bool _isNodePicked = false;
 
+  bool get isNodePicked => _isNodePicked;
   bool get isLoading => _isLoading;
   bool get isDrawerOpen => _isDrawerOpen;
   int? get selectedTileIndex => _selectedTileIndex;
@@ -114,6 +116,18 @@ class WorkspaceProvider extends StateHandler {
 
   QuillController get selectedObjectQuillController {
     return _tempQuillController;
+  }
+
+  IconData nodeIconProvider() {
+    if (_currentMode != DrawMode.hand &&
+        _currentMode != DrawMode.pointer &&
+        _currentMode != DrawMode.stickyNote &&
+        _currentMode != DrawMode.textBox) {
+      _isNodePicked = true;
+      notifyListeners();
+      return _currentMode.iconData;
+    }
+    return PhosphorIconsRegular.circlesThreePlus;
   }
 
   Future<void> exportWorkspaceAsJson() async {
@@ -192,8 +206,9 @@ class WorkspaceProvider extends StateHandler {
 
       final backgroundPaint = Paint()..color = _currentWorkspaceColor;
       canvas.drawRect(
-          Rect.fromLTWH(0, 0, imageBounds.width, imageBounds.height),
-          backgroundPaint);
+        Rect.fromLTWH(0, 0, imageBounds.width, imageBounds.height),
+        backgroundPaint,
+      );
 
       final painter = CanvasPainter(
         canvasObjects: _canvasObjects,
@@ -237,7 +252,6 @@ class WorkspaceProvider extends StateHandler {
       print("An error occurred during PNG export: $e");
     }
   }
-
 
   void setStickyNoteMode(Color color) {
     _currentMode = DrawMode.stickyNote;
@@ -318,57 +332,58 @@ class WorkspaceProvider extends StateHandler {
 
   void _setupRealtimeChannel(String workspaceId) {
     if (_canvasChannel?.topic != '${Constants.channelName}:$workspaceId') {
-      _canvasChannel = _supabaseService.supabase
-          .channel('${Constants.channelName}:$workspaceId')
-          .onBroadcast(
-            event: Constants.broadcastEventName,
-            callback: (payload) {
-              if (payload['workspace_id'] == _currentWorkspace?.id) {
-                final cursor = UserCursor.fromJson(payload['cursor']);
-                if (cursor.id != _myId) {
-                  _userCursors[cursor.id] = cursor;
-                }
+      _canvasChannel =
+          _supabaseService.supabase
+              .channel('${Constants.channelName}:$workspaceId')
+              .onBroadcast(
+                event: Constants.broadcastEventName,
+                callback: (payload) {
+                  if (payload['workspace_id'] == _currentWorkspace?.id) {
+                    final cursor = UserCursor.fromJson(payload['cursor']);
+                    if (cursor.id != _myId) {
+                      _userCursors[cursor.id] = cursor;
+                    }
 
-                if (payload['object'] != null) {
-                  final object = CanvasObject.fromJson(payload['object']);
-                  _canvasObjects[object.id] = object;
-                  if (object.id == _currentlySelectedObjectId &&
-                      object.textDelta != null) {
-                    try {
-                      final doc = Document.fromJson(
-                        jsonDecode(object.textDelta!),
-                      );
-                      if (!isEqual(
-                        _tempQuillController.document.toDelta().toJson(),
-                        doc.toDelta().toJson(),
-                      )) {
-                        _tempQuillController.document = doc;
+                    if (payload['object'] != null) {
+                      final object = CanvasObject.fromJson(payload['object']);
+                      _canvasObjects[object.id] = object;
+                      if (object.id == _currentlySelectedObjectId &&
+                          object.textDelta != null) {
+                        try {
+                          final doc = Document.fromJson(
+                            jsonDecode(object.textDelta!),
+                          );
+                          if (!isEqual(
+                            _tempQuillController.document.toDelta().toJson(),
+                            doc.toDelta().toJson(),
+                          )) {
+                            _tempQuillController.document = doc;
+                          }
+                        } catch (e) {
+                          print(
+                            "Error loading textDelta into QuillController: $e",
+                          );
+                        }
                       }
-                    } catch (e) {
-                      print(
-                        "Error loading textDelta into QuillController: $e",
+                    }
+
+                    if (payload['deleted_ids'] != null) {
+                      final List<String> deletedIds = List<String>.from(
+                        payload['deleted_ids'],
                       );
+                      for (final id in deletedIds) {
+                        _canvasObjects.remove(id);
+                        if (_currentlySelectedObjectId == id) {
+                          _currentlySelectedObjectId = null;
+                        }
+                      }
                     }
-                  }
-                }
 
-                if (payload['deleted_ids'] != null) {
-                  final List<String> deletedIds = List<String>.from(
-                    payload['deleted_ids'],
-                  );
-                  for (final id in deletedIds) {
-                    _canvasObjects.remove(id);
-                    if (_currentlySelectedObjectId == id) {
-                      _currentlySelectedObjectId = null;
-                    }
+                    notifyListeners();
                   }
-                }
-
-                notifyListeners();
-              }
-            },
-          )
-          .subscribe();
+                },
+              )
+              .subscribe();
     }
   }
 
@@ -573,7 +588,9 @@ class WorkspaceProvider extends StateHandler {
     final object = _canvasObjects[_currentlySelectedObjectId!];
     if (object == null) return;
 
-    _canvasObjects[_currentlySelectedObjectId!] = object.copyWith(color: newColor);
+    _canvasObjects[_currentlySelectedObjectId!] = object.copyWith(
+      color: newColor,
+    );
 
     notifyListeners();
     syncCanvasObject(_cursorPosition);
@@ -589,60 +606,68 @@ class WorkspaceProvider extends StateHandler {
     switch (newShapeType) {
       case ShapeType.square:
         return Square(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
       case ShapeType.circle:
         return Circle(
-            id: id,
-            color: color,
-            center: bounds.center,
-            radius: max(bounds.width, bounds.height) / 2,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          center: bounds.center,
+          radius: max(bounds.width, bounds.height) / 2,
+          textDelta: textDelta,
+        );
       case ShapeType.diamond:
         return Diamond(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
       case ShapeType.roundedSquare:
         return RoundedSquare(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
       case ShapeType.parallelogram:
         return Parallelogram(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
       case ShapeType.cylinder:
         return Cylinder(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
       case ShapeType.triangle:
         return Triangle(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
       case ShapeType.invertedTriangle:
         return InvertedTriangle(
-            id: id,
-            color: color,
-            topLeft: bounds.topLeft,
-            bottomRight: bounds.bottomRight,
-            textDelta: textDelta);
+          id: id,
+          color: color,
+          topLeft: bounds.topLeft,
+          bottomRight: bounds.bottomRight,
+          textDelta: textDelta,
+        );
     }
   }
 
@@ -666,12 +691,14 @@ class WorkspaceProvider extends StateHandler {
     final String idToDelete = _currentlySelectedObjectId!;
 
     final List<String> idsToDelete = [idToDelete];
-    final attachedConnectors = _canvasObjects.values
-        .whereType<ConnectorObject>()
-        .where(
-          (conn) => conn.sourceId == idToDelete || conn.targetId == idToDelete,
-        )
-        .toList();
+    final attachedConnectors =
+        _canvasObjects.values
+            .whereType<ConnectorObject>()
+            .where(
+              (conn) =>
+                  conn.sourceId == idToDelete || conn.targetId == idToDelete,
+            )
+            .toList();
 
     for (final conn in attachedConnectors) {
       idsToDelete.add(conn.id);
@@ -749,9 +776,11 @@ class WorkspaceProvider extends StateHandler {
       return;
     }
     CanvasObject? newObject;
-    final defaultTopLeft = details.globalPosition -
+    final defaultTopLeft =
+        details.globalPosition -
         const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
-    final defaultBottomRight = details.globalPosition +
+    final defaultBottomRight =
+        details.globalPosition +
         const Offset(_defaultShapeSize / 2, _defaultShapeSize / 2);
 
     switch (_currentMode) {
@@ -815,6 +844,7 @@ class WorkspaceProvider extends StateHandler {
       case DrawMode.hand:
         break;
     }
+    _currentMode = DrawMode.pointer;
 
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;
@@ -934,7 +964,8 @@ class WorkspaceProvider extends StateHandler {
         }
 
         final now = DateTime.now();
-        final isDoubleTap = _lastTappedObjectId == tappedObject.id &&
+        final isDoubleTap =
+            _lastTappedObjectId == tappedObject.id &&
             _lastTapTime != null &&
             now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
 

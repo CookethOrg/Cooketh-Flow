@@ -67,7 +67,9 @@ class StickyNotesWidget extends StatelessWidget {
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             children: List.generate(
-              tertiaryColors.length,
+              tertiaryColors.length < secondaryColors.length
+                  ? tertiaryColors.length
+                  : secondaryColors.length,
               (index) => _buildStickyNote(
                 context, // Pass context
                 tertiaryColors[index],

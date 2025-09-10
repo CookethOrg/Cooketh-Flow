@@ -16,9 +16,12 @@ class WorkspaceDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer2<WorkspaceProvider,SupabaseService>(
-      builder: (context, provider,suprovider, child) {
-        Color defaultBorderColor = suprovider.isDark ? Color.fromRGBO(75, 75, 75, 1) : const Color(0xFFD9D9D9);
+    return Consumer2<WorkspaceProvider, SupabaseService>(
+      builder: (context, provider, suprovider, child) {
+        Color defaultBorderColor =
+            suprovider.isDark
+                ? Color.fromRGBO(75, 75, 75, 1)
+                : const Color(0xFFD9D9D9);
 
         // Check if currentWorkspace is set before accessing its properties
         final String workspaceName =
@@ -33,14 +36,22 @@ class WorkspaceDrawer extends StatelessWidget {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 300),
-            height: provider.isDrawerOpen ? 1.sh :device == rh.DeviceType.desktop ?0.09.sh : 0.08.sh,
+            height:
+                provider.isDrawerOpen
+                    ? 1.sh
+                    : device == rh.DeviceType.desktop
+                    ? 0.09.sh
+                    : 0.08.sh,
             width: device == rh.DeviceType.desktop ? 0.195.sw : 0.27.sw,
             padding: EdgeInsets.symmetric(
               horizontal: device == rh.DeviceType.desktop ? 24.w : 15.w,
-              vertical:device == rh.DeviceType.desktop ? 16.h :10.h,
+              vertical: device == rh.DeviceType.desktop ? 16.h : 10.h,
             ),
             decoration: BoxDecoration(
-              color: suprovider.isDark ? Color.fromRGBO(48, 48, 48, 1): Colors.white,
+              color:
+                  suprovider.isDark
+                      ? Color.fromRGBO(48, 48, 48, 1)
+                      : Colors.white,
               borderRadius: BorderRadius.circular(12.r),
               border: Border.all(color: defaultBorderColor, width: 1.2),
             ),
@@ -55,9 +66,7 @@ class WorkspaceDrawer extends StatelessWidget {
                       onPressed: () {
                         // Ensure exitWorkspace is called when navigating back
 
-                        context.goNamed(
-                          RouteName.dashboard
-                        );
+                        context.goNamed(RouteName.dashboard);
                         provider.exitWorkspace();
                       },
                       icon: Icon(
@@ -77,7 +86,8 @@ class WorkspaceDrawer extends StatelessWidget {
                           fontSize:
                               device == rh.DeviceType.desktop ? 24.sp : 42.sp,
                           fontWeight: FontWeight.w600,
-                          color:suprovider.isDark ? Colors.white : Colors.black,
+                          color:
+                              suprovider.isDark ? Colors.white : Colors.black,
                           letterSpacing: 0.6,
                         ),
                         decoration: const InputDecoration(
@@ -89,20 +99,37 @@ class WorkspaceDrawer extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(width:device == rh.DeviceType.desktop ? 50.w : 20.w),
+                    SizedBox(
+                      width: device == rh.DeviceType.desktop ? 50.w : 20.w,
+                    ),
                     IconButton(
                       onPressed: () {
                         provider.toggleDrawer();
                       },
-                      icon:!provider.isDrawerOpen? Icon(
-                        PhosphorIconsRegular.sidebarSimple,
-                        size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
-                        color: suprovider.isDark ? Colors.white : Colors.black,
-                      ) : Icon(
-                        Icons.close,
-                        size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
-                        color: suprovider.isDark ? Colors.white: Colors.black,
-                      ),
+                      icon:
+                          !provider.isDrawerOpen
+                              ? Icon(
+                                PhosphorIconsRegular.sidebarSimple,
+                                size:
+                                    device == rh.DeviceType.desktop
+                                        ? 32.sp
+                                        : 50.sp,
+                                color:
+                                    suprovider.isDark
+                                        ? Colors.white
+                                        : Colors.black,
+                              )
+                              : Icon(
+                                Icons.close,
+                                size:
+                                    device == rh.DeviceType.desktop
+                                        ? 32.sp
+                                        : 50.sp,
+                                color:
+                                    suprovider.isDark
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
                       splashRadius: 24.r,
                       tooltip: 'Toggle Sidebar',
                     ),
@@ -122,7 +149,9 @@ class WorkspaceDrawer extends StatelessWidget {
                               ? Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                 device == rh.DeviceType.desktop ?  SizedBox(height: 20.h) : SizedBox(height: 10.h,),
+                                  device == rh.DeviceType.desktop
+                                      ? SizedBox(height: 20.h)
+                                      : SizedBox(height: 10.h),
                                   const Divider(
                                     color: Colors.grey,
                                     thickness: 0.5,
@@ -135,7 +164,9 @@ class WorkspaceDrawer extends StatelessWidget {
                                           provider.canvasObjectsList.length,
                                       separatorBuilder:
                                           (context, index) =>
-                                              device == rh.DeviceType.desktop ? SizedBox(height: 8.h):SizedBox(height: 2.h),
+                                              device == rh.DeviceType.desktop
+                                                  ? SizedBox(height: 8.h)
+                                                  : SizedBox(height: 2.h),
                                       itemBuilder: (context, index) {
                                         CanvasObject item =
                                             provider.canvasObjectsList[index];
@@ -143,8 +174,7 @@ class WorkspaceDrawer extends StatelessWidget {
                                           context,
                                           provider: provider,
                                           title:
-                                              item.toJson()['object_type']
-                                                  as String,
+                                              '${index + 1}  ${item.toJson()['object_type'] as String}',
                                           iconData: provider
                                               .getIconForObjectType(
                                                 item.toJson()['object_type'],
@@ -154,13 +184,13 @@ class WorkspaceDrawer extends StatelessWidget {
                                               provider
                                                   .currentlySelectedObjectId ==
                                               item.id,
-                                              device: device,
+                                          device: device,
                                           onTap: () {
                                             provider.changeCurrentlySelectedObj(
                                               item.id,
                                             );
                                           },
-                                          su: suprovider
+                                          su: suprovider,
                                         );
                                       },
                                     ),
@@ -188,19 +218,28 @@ class WorkspaceDrawer extends StatelessWidget {
     required bool isSelected,
     required VoidCallback onTap,
     required rh.DeviceType device,
-    required SupabaseService su
+    required SupabaseService su,
   }) {
-    Color iconTextColor = isSelected ? Colors.blue : su.isDark ? Colors.white : Colors.black;
+    Color iconTextColor =
+        isSelected
+            ? Colors.blue
+            : su.isDark
+            ? Colors.white
+            : Colors.black;
 
     return Container(
-      color:  su.isDark ? Color.fromRGBO(48, 48, 48, 1): Colors.white,
+      color: su.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
       child: ListTile(
-        leading: Icon(iconData, size:device == rh.DeviceType.desktop ? 24.sp : 35.sp, color: iconTextColor),
+        leading: Icon(
+          iconData,
+          size: device == rh.DeviceType.desktop ? 24.sp : 35.sp,
+          color: iconTextColor,
+        ),
         title: Text(
           title,
           style: TextStyle(
             fontFamily: 'Fredrik',
-            fontSize:device == rh.DeviceType.desktop ? 18.sp : 28.sp,
+            fontSize: device == rh.DeviceType.desktop ? 18.sp : 28.sp,
             color: iconTextColor,
           ),
         ),

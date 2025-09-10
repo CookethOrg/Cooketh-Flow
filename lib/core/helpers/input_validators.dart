@@ -50,8 +50,8 @@ String? validatePassword(String? value) {
     return 'Password must contain at least one number (0-9)';
   }
 
-  if (!value.contains(RegExp(r'[._#]'))) {
-    return 'Password must contain at least one special character (., _, or #)';
+  if (!value.contains(RegExp(r'[._#@]'))) {
+    return 'Password must contain at least one special character (., _, @, or #)';
   }
   
   // Optional: Check for common weak passwords

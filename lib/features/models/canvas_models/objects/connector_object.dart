@@ -59,6 +59,11 @@ class ConnectorObject extends CanvasObject {
     required Alignment sourceAlignment,
     required Alignment targetAlignment,
   }) {
+    // A connector cannot connect to its own points.
+    if (sourceId == targetId) {
+      throw StateError('A connector cannot connect to itself.');
+    }
+
     return ConnectorObject(
       id: const Uuid().v4(),
       sourceId: sourceId,

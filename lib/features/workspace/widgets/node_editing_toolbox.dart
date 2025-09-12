@@ -1,3 +1,4 @@
+// lib/features/workspace/widgets/node_editing_toolbox.dart
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
@@ -34,7 +35,7 @@ class NodeEditingToolbox extends StatelessWidget {
     return IconButton(
       icon: Icon(icon, size: 22),
       onPressed: onPressed,
-      color: color ??(su.isDark?Colors.white: Colors.black87),
+      color: color ?? (su.isDark ? Colors.white : Colors.black87),
       splashRadius: 20,
       tooltip: tooltip,
       padding: const EdgeInsets.all(8),
@@ -45,33 +46,30 @@ class NodeEditingToolbox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.read<WorkspaceProvider>();
-    final provider2 = context.read<SupabaseService>();
+    final su = context.read<SupabaseService>();
     final selectedObjectId = provider.currentlySelectedObjectId;
 
     if (selectedObjectId == null) {
       return const SizedBox.shrink();
     }
-    
+
     final object = provider.canvasObjects[selectedObjectId];
     if (object == null) {
       return const SizedBox.shrink();
     }
 
-    final isConnector = object is ConnectorObject;
-    final showShapeChanger =
-        object is! TextBoxObject &&
-        object is! ConnectorObject &&
-        object is! StickyNoteObject;
-    final showColorChanger =
-        object is! TextBoxObject;
-
     final buttons = <Widget>[];
+
+    final isConnector = object is ConnectorObject;
+    final isShape =
+        object is! TextBoxObject && object is! ConnectorObject && object is! StickyNoteObject;
+    final canChangeColor = object is! TextBoxObject && object is! ConnectorObject;
 
     if (isConnector) {
       buttons.add(
         _buildIconButton(
           context,
-          icon: PhosphorIcons.database(),
+          icon: PhosphorIcons.lineSegment(),
           onPressed: () {
             showDialog(
               context: context,
@@ -82,18 +80,42 @@ class NodeEditingToolbox extends StatelessWidget {
                 onStyleSelected: (color, type, thickness) {
                   provider.changeConnectorStyle(color, type, thickness);
                 },
-                su: provider2,
+                su: su,
               ),
             );
           },
           tooltip: 'Change Connector Style',
-          su: provider2,
+          su: su,
         ),
       );
-      buttons.add(_buildDivider());
-    }
-
-    if (showShapeChanger) {
+      if (canChangeColor) {
+        buttons.add(_buildDivider());
+        buttons.add(
+          _buildIconButton(
+            context,
+            icon: PhosphorIcons.paintBucket(),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => NodeColourPicker(
+                  initialColor: object.color,
+                  onColorSelected: (color) {
+                    provider.changeConnectorStyle(
+                      color,
+                      object.connectionType,
+                      object.thickness,
+                    );
+                    Navigator.of(context).pop();
+                  },
+                ),
+              );
+            },
+            tooltip: 'Change Color',
+            su: su,
+          ),
+        );
+      }
+    } else if (isShape) {
       buttons.add(
         _buildIconButton(
           context,
@@ -101,50 +123,67 @@ class NodeEditingToolbox extends StatelessWidget {
           onPressed: () {
             showDialog(
               context: context,
-              builder:
-                  (context) => NodePicker(
-                    onShapeSelected: (shapeType) {
-                      provider.changeObjectShape(shapeType);
-                    },
-                    su: provider2,
-                  ),
+              builder: (context) => NodePicker(
+                onShapeSelected: (shapeType) {
+                  provider.changeObjectShape(shapeType);
+                  Navigator.of(context).pop();
+                },
+                su: su,
+              ),
             );
           },
           tooltip: 'Change Shape',
-          su: provider2
+          su: su,
         ),
       );
-      buttons.add(_buildDivider());
-    }
-
-    if (showColorChanger) {
+      if (canChangeColor) {
+        buttons.add(_buildDivider());
+        buttons.add(
+          _buildIconButton(
+            context,
+            icon: PhosphorIcons.paintBucket(),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) => NodeColourPicker(
+                  initialColor: object.color,
+                  onColorSelected: (color) {
+                    provider.changeObjectColor(color);
+                    Navigator.of(context).pop();
+                  },
+                ),
+              );
+            },
+            tooltip: 'Change Color',
+            su: su,
+          ),
+        );
+      }
+    } else if (canChangeColor) {
       buttons.add(
         _buildIconButton(
           context,
           icon: PhosphorIcons.paintBucket(),
           onPressed: () {
-            final selectedObject =
-                provider.canvasObjects[selectedObjectId];
             showDialog(
               context: context,
-              builder:
-                  (context) => NodeColourPicker(
-                    initialColor: selectedObject?.color,
-                    onColorSelected: (color) {
-                      if (isConnector) {
-                        provider.changeConnectorStyle(color, (object as ConnectorObject).connectionType, (object as ConnectorObject).thickness);
-                      } else {
-                        provider.changeObjectColor(color);
-                      }
-                      Navigator.of(context).pop();
-                    },
-                  ),
+              builder: (context) => NodeColourPicker(
+                initialColor: object.color,
+                onColorSelected: (color) {
+                  provider.changeObjectColor(color);
+                  Navigator.of(context).pop();
+                },
+              ),
             );
           },
           tooltip: 'Change Color',
-          su: provider2
+          su: su,
         ),
       );
+    }
+    
+    // Always add the delete button if there's an object selected
+    if (buttons.isNotEmpty) {
       buttons.add(_buildDivider());
     }
 
@@ -157,7 +196,7 @@ class NodeEditingToolbox extends StatelessWidget {
         },
         tooltip: 'Delete Object',
         color: Colors.redAccent,
-        su: provider2
+        su: su,
       ),
     );
 
@@ -166,8 +205,7 @@ class NodeEditingToolbox extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
-          color:
-              provider2.isDark ? const Color.fromRGBO(48, 48, 48, 1) : Colors.white,
+          color: su.isDark ? const Color.fromRGBO(48, 48, 48, 1) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.grey.shade300),
           boxShadow: [

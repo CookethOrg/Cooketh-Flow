@@ -1,3 +1,4 @@
+// lib/features/models/canvas_models/objects/connector_object.dart
 import 'dart:ui';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';

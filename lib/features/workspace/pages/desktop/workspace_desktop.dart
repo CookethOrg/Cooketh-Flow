@@ -1,7 +1,8 @@
-// lib/features/workspace/pages/workspace_desktop.dart (Fully Modified)
+// lib/features/workspace/pages/workspace_desktop.dart
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
+import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
@@ -33,20 +34,17 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
   @override
   void initState() {
     super.initState();
-    // Request focus when the widget is first built
     _focusNode.requestFocus();
   }
 
   @override
   void dispose() {
-    // Clean up the focus node when the widget is disposed
     _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    // Define actions
     final Map<Type, Action<Intent>> actions = {
       PointerIntent: CallbackAction<PointerIntent>(
         onInvoke: (intent) {
@@ -136,7 +134,6 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                 backgroundColor: provider.currentWorkspaceColor,
                 body: GestureDetector(
                   onTap: () {
-                    // This ensures focus is regained when the user taps on the canvas
                     _focusNode.requestFocus();
                   },
                   child: Padding(
@@ -149,12 +146,6 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                       children: [
                         const CanvasPage(),
                         const WorkspaceDrawer(),
-                        // SizedBox(width: 20.w),
-                        // Positioned(
-                        //   top: 0,
-                        //   left: 0.21.sw,
-                        //   child: UndoRedoButton(su: suprovider),
-                        // ),
                         Positioned(
                           top: 0,
                           right: 0.001.sw,
@@ -185,23 +176,54 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                                       workspaceProvider
                                           .canvasObjects[workspaceProvider
                                           .currentlySelectedObjectId!]!;
-                                  final objectBounds =
-                                      selectedObject.getBounds();
+
+                                  Offset objectPosition;
+                                  if (selectedObject is ConnectorObject) {
+                                    // For connectors, calculate the midpoint for positioning
+                                    final sourceObject =
+                                        workspaceProvider
+                                            .canvasObjects[selectedObject
+                                            .sourceId];
+                                    final targetObject =
+                                        workspaceProvider
+                                            .canvasObjects[selectedObject
+                                            .targetId];
+                                    if (sourceObject != null &&
+                                        targetObject != null) {
+                                      final startPoint = sourceObject
+                                          .getConnectionPoint(
+                                            selectedObject.sourceAlignment,
+                                          );
+                                      final endPoint = targetObject
+                                          .getConnectionPoint(
+                                            selectedObject.targetAlignment,
+                                          );
+                                      objectPosition = Offset(
+                                        (startPoint.dx + endPoint.dx) / 2,
+                                        (startPoint.dy + endPoint.dy) / 2,
+                                      );
+                                    } else {
+                                      return const SizedBox.shrink();
+                                    }
+                                  } else {
+                                    objectPosition =
+                                        selectedObject.getBounds().topCenter;
+                                  }
+
                                   final matrix =
                                       canvasProvider
                                           .transformationController
                                           .value;
-                                  final transformedTopCenter = matrix
-                                      .transform3(
-                                        vector_math.Vector3(
-                                          objectBounds.topCenter.dx,
-                                          objectBounds.topCenter.dy,
-                                          0,
-                                        ),
-                                      );
+                                  final transformedPosition = matrix.transform3(
+                                    vector_math.Vector3(
+                                      objectPosition.dx,
+                                      objectPosition.dy,
+                                      0,
+                                    ),
+                                  );
                                   final screenPosition = Offset(
-                                    transformedTopCenter.x,
-                                    transformedTopCenter.y,
+                                    transformedPosition.x,
+                                    transformedPosition.y,
                                   );
                                   const double toolboxWidth = 240;
                                   const double toolboxHeight = 48;

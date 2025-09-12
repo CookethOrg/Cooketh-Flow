@@ -46,7 +46,16 @@ class NodeEditingToolbox extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.read<WorkspaceProvider>();
     final provider2 = context.read<SupabaseService>();
-    final object = provider.canvasObjects[provider.currentlySelectedObjectId!];
+    final selectedObjectId = provider.currentlySelectedObjectId;
+
+    if (selectedObjectId == null) {
+      return const SizedBox.shrink();
+    }
+    
+    final object = provider.canvasObjects[selectedObjectId];
+    if (object == null) {
+      return const SizedBox.shrink();
+    }
 
     final isConnector = object is ConnectorObject;
     final showShapeChanger =
@@ -115,7 +124,7 @@ class NodeEditingToolbox extends StatelessWidget {
           icon: PhosphorIcons.paintBucket(),
           onPressed: () {
             final selectedObject =
-                provider.canvasObjects[provider.currentlySelectedObjectId!];
+                provider.canvasObjects[selectedObjectId];
             showDialog(
               context: context,
               builder:
@@ -123,7 +132,7 @@ class NodeEditingToolbox extends StatelessWidget {
                     initialColor: selectedObject?.color,
                     onColorSelected: (color) {
                       if (isConnector) {
-                        provider.changeConnectorStyle(color, object.connectionType, object.thickness);
+                        provider.changeConnectorStyle(color, (object as ConnectorObject).connectionType, (object as ConnectorObject).thickness);
                       } else {
                         provider.changeObjectColor(color);
                       }

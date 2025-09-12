@@ -1,5 +1,5 @@
 import 'dart:ui' as ui;
-import 'dart:convert'; // For jsonDecode/jsonEncode
+import 'dart:convert';
 import 'dart:math';
 import 'package:cookethflow/core/helpers/file_helper.dart';
 import 'package:cookethflow/core/providers/supabase_provider.dart';
@@ -141,7 +141,6 @@ class WorkspaceProvider extends StateHandler {
       final canvasObjectsData =
           _canvasObjects.values.map((obj) => obj.toJson()).toList();
 
-      // ** FIX: Ensure the full workspace object is exported **
       final exportData = {
         'workspace': workspaceData,
         'canvasObjects': canvasObjectsData,
@@ -220,7 +219,7 @@ class WorkspaceProvider extends StateHandler {
         connectorDragPosition: null,
         connectorSourceId: null,
         connectorSourceAlignment: null,
-        workspaceColor: _currentWorkspaceColor, // NEW: Pass the workspace color
+        workspaceColor: _currentWorkspaceColor,
       );
       painter.paint(canvas, imageBounds.size);
 
@@ -597,6 +596,23 @@ class WorkspaceProvider extends StateHandler {
     _saveCanvasObjectToDb(_currentlySelectedObjectId!);
   }
 
+  void changeConnectorStyle(
+      Color color, ConnectionType type, double thickness) {
+    if (_currentlySelectedObjectId == null) return;
+    final object = _canvasObjects[_currentlySelectedObjectId!];
+    if (object == null || object is! ConnectorObject) return;
+
+    _canvasObjects[_currentlySelectedObjectId!] = object.copyWith(
+      color: color,
+      connectionType: type,
+      thickness: thickness,
+    );
+
+    notifyListeners();
+    syncCanvasObject(_cursorPosition);
+    _saveCanvasObjectToDb(_currentlySelectedObjectId!);
+  }
+
   CanvasObject _convertObject(CanvasObject oldObject, ShapeType newShapeType) {
     final bounds = oldObject.getBounds();
     final color = oldObject.color;
@@ -689,19 +705,19 @@ class WorkspaceProvider extends StateHandler {
     if (_currentlySelectedObjectId == null) return;
 
     final String idToDelete = _currentlySelectedObjectId!;
+    final objectToDelete = _canvasObjects[idToDelete];
 
     final List<String> idsToDelete = [idToDelete];
-    final attachedConnectors =
-        _canvasObjects.values
-            .whereType<ConnectorObject>()
-            .where(
-              (conn) =>
-                  conn.sourceId == idToDelete || conn.targetId == idToDelete,
-            )
-            .toList();
 
-    for (final conn in attachedConnectors) {
-      idsToDelete.add(conn.id);
+    if (objectToDelete is! ConnectorObject) {
+      final attachedConnectors = _canvasObjects.values
+          .whereType<ConnectorObject>()
+          .where((conn) => conn.sourceId == idToDelete || conn.targetId == idToDelete)
+          .toList();
+
+      for (final conn in attachedConnectors) {
+        idsToDelete.add(conn.id);
+      }
     }
 
     for (final id in idsToDelete) {
@@ -911,48 +927,22 @@ class WorkspaceProvider extends StateHandler {
         return;
       }
 
-      if (_currentlySelectedObjectId != null) {
-        final selectedObject = _canvasObjects[_currentlySelectedObjectId!];
-        if (selectedObject != null && selectedObject is! ConnectorObject) {
-          final bounds = selectedObject.getBounds();
-          if (Rect.fromCircle(
-            center: bounds.topLeft,
-            radius: _handleRadius,
-          ).contains(details.globalPosition)) {
-            _interactionMode = InteractionMode.resizingTopLeft;
-            notifyListeners();
-            return;
-          }
-          if (Rect.fromCircle(
-            center: bounds.topRight,
-            radius: _handleRadius,
-          ).contains(details.globalPosition)) {
-            _interactionMode = InteractionMode.resizingTopRight;
-            notifyListeners();
-            return;
-          }
-          if (Rect.fromCircle(
-            center: bounds.bottomLeft,
-            radius: _handleRadius,
-          ).contains(details.globalPosition)) {
-            _interactionMode = InteractionMode.resizingBottomLeft;
-            notifyListeners();
-            return;
-          }
-          if (Rect.fromCircle(
-            center: bounds.bottomRight,
-            radius: _handleRadius,
-          ).contains(details.globalPosition)) {
-            _interactionMode = InteractionMode.resizingBottomRight;
-            notifyListeners();
-            return;
-          }
-        }
-      }
-
       CanvasObject? tappedObject;
       for (final canvasObject in _canvasObjects.values.toList().reversed) {
-        if (canvasObject.intersectsWith(details.globalPosition)) {
+        // Handle hit test for Connectors first since their hit area is a line
+        if (canvasObject is ConnectorObject) {
+          final source = _canvasObjects[canvasObject.sourceId];
+          final target = _canvasObjects[canvasObject.targetId];
+          if (source != null && target != null) {
+            final startPoint = source.getConnectionPoint(canvasObject.sourceAlignment);
+            final endPoint = target.getConnectionPoint(canvasObject.targetAlignment);
+            final distance = _pointToLineDistance(details.globalPosition, startPoint, endPoint);
+            if (distance < 10) { // Tolerance for tapping a line
+              tappedObject = canvasObject;
+              break;
+            }
+          }
+        } else if (canvasObject.intersectsWith(details.globalPosition)) {
           tappedObject = canvasObject;
           break;
         }
@@ -963,20 +953,31 @@ class WorkspaceProvider extends StateHandler {
           changeCurrentlySelectedObj(tappedObject.id);
         }
 
-        final now = DateTime.now();
-        final isDoubleTap =
-            _lastTappedObjectId == tappedObject.id &&
-            _lastTapTime != null &&
-            now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
+        if (tappedObject is! ConnectorObject) {
+          final selectedObject = tappedObject;
+          final bounds = selectedObject.getBounds();
+          if (Rect.fromCircle(center: bounds.topLeft, radius: _handleRadius).contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingTopLeft;
+          } else if (Rect.fromCircle(center: bounds.topRight, radius: _handleRadius).contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingTopRight;
+          } else if (Rect.fromCircle(center: bounds.bottomLeft, radius: _handleRadius).contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingBottomLeft;
+          } else if (Rect.fromCircle(center: bounds.bottomRight, radius: _handleRadius).contains(details.globalPosition)) {
+            _interactionMode = InteractionMode.resizingBottomRight;
+          } else {
+            final now = DateTime.now();
+            final isDoubleTap = _lastTappedObjectId == tappedObject.id && _lastTapTime != null && now.difference(_lastTapTime!) < const Duration(milliseconds: 300);
 
-        _lastTapTime = now;
-        _lastTappedObjectId = tappedObject.id;
+            _lastTapTime = now;
+            _lastTappedObjectId = tappedObject.id;
 
-        if (isDoubleTap && tappedObject is! ConnectorObject) {
-          _interactionMode = InteractionMode.editingText;
-          _lastTappedObjectId = null;
-        } else {
-          _interactionMode = InteractionMode.moving;
+            if (isDoubleTap) {
+              _interactionMode = InteractionMode.editingText;
+              _lastTappedObjectId = null;
+            } else {
+              _interactionMode = InteractionMode.moving;
+            }
+          }
         }
       } else {
         changeCurrentlySelectedObj(null);
@@ -1102,5 +1103,23 @@ class WorkspaceProvider extends StateHandler {
     } else {
       return a == b;
     }
+  }
+
+  double _pointToLineDistance(Offset point, Offset start, Offset end) {
+    final double dx = end.dx - start.dx;
+    final double dy = end.dy - start.dy;
+    final double lengthSquared = dx * dx + dy * dy;
+
+    if (lengthSquared == 0) return (point - start).distance;
+
+    final double t = ((point.dx - start.dx) * dx + (point.dy - start.dy) * dy) / lengthSquared;
+    final double clampedT = t.clamp(0.0, 1.0);
+
+    final Offset closestPoint = Offset(
+      start.dx + clampedT * dx,
+      start.dy + clampedT * dy,
+    );
+
+    return (point - closestPoint).distance;
   }
 }

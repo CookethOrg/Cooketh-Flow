@@ -62,7 +62,6 @@ abstract class CanvasObject extends SyncedObject {
         return StickyNoteObject.fromJson(json);
       case TextBoxObject.type:
         return TextBoxObject.fromJson(json);
-      // NEW: Add case for ConnectorObject
       case ConnectorObject.type:
         return ConnectorObject.fromJson(json);
       default:
@@ -79,7 +78,6 @@ abstract class CanvasObject extends SyncedObject {
     Offset newBottomRight,
   );
 
-  // NEW: Method to get connection point coordinates
   Offset getConnectionPoint(Alignment alignment) {
     final bounds = getBounds();
     if (alignment == Alignment.centerLeft) return bounds.centerLeft;

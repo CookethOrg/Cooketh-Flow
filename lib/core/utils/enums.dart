@@ -18,6 +18,7 @@ enum NodeType {
 
 enum ConnectionPoint { up, down, left, right }
 
+// NEW: Enum for connector line types
 enum ConnectionType { solid, dotted, dashed }
 
 // Enum to define the different shapes
@@ -34,16 +35,16 @@ enum ShapeType {
 
 enum DrawMode {
   pointer(iconData: Icons.pan_tool_alt),
-  hand(iconData: PhosphorIconsRegular.hand), // NEW: Add hand tool for panning
+  hand(iconData: PhosphorIconsRegular.hand),
   circle(iconData: Icons.circle_outlined),
   rectangle(iconData: Icons.rectangle_outlined),
   square(iconData: Icons.square_outlined),
   diamond(iconData: Icons.diamond_outlined),
   roundedSquare(iconData: Icons.rounded_corner),
-  parallelogram(iconData: Icons.square_foot_outlined), // Placeholder
-  cylinder(iconData: Icons.view_in_ar_outlined), // Placeholder
+  parallelogram(iconData: Icons.square_foot_outlined),
+  cylinder(iconData: Icons.view_in_ar_outlined),
   triangle(iconData: Icons.change_history),
-  invertedTriangle(iconData: Icons.warning_amber_rounded), // Placeholder
+  invertedTriangle(iconData: Icons.warning_amber_rounded),
   textBox(iconData: PhosphorIconsRegular.textT),
   stickyNote(iconData: PhosphorIconsRegular.notePencil);
 

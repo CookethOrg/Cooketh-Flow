@@ -4,6 +4,7 @@ import 'package:cookethflow/features/models/canvas_models/objects/connector_obje
 import 'package:cookethflow/features/models/canvas_models/objects/sticky_note_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/text_box_object.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
+import 'package:cookethflow/features/workspace/widgets/connector_customizer.dart';
 import 'package:cookethflow/features/workspace/widgets/node_colour.dart';
 import 'package:cookethflow/features/workspace/widgets/node_picker.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +14,6 @@ import 'package:provider/provider.dart';
 class NodeEditingToolbox extends StatelessWidget {
   const NodeEditingToolbox({super.key});
 
-  // Helper widget for creating vertical dividers
   Widget _buildDivider() {
     return Container(
       height: 24,
@@ -23,7 +23,6 @@ class NodeEditingToolbox extends StatelessWidget {
     );
   }
 
-  // Helper to build icon buttons consistently
   Widget _buildIconButton(
     BuildContext context, {
     required IconData icon,
@@ -47,21 +46,44 @@ class NodeEditingToolbox extends StatelessWidget {
   Widget build(BuildContext context) {
     final provider = context.read<WorkspaceProvider>();
     final provider2 = context.read<SupabaseService>();
-    final object = provider.canvasObjects[provider.currentlySelectedObjectId];
+    final object = provider.canvasObjects[provider.currentlySelectedObjectId!];
 
-    // Determine which buttons to show based on object type
+    final isConnector = object is ConnectorObject;
     final showShapeChanger =
         object is! TextBoxObject &&
         object is! ConnectorObject &&
         object is! StickyNoteObject;
     final showColorChanger =
-        object is! TextBoxObject && object is! ConnectorObject;
-    final showDeleteButton = true; // Always show delete
+        object is! TextBoxObject;
 
-    // Collect all visible buttons
     final buttons = <Widget>[];
 
-    // 1. Node Type Alter
+    if (isConnector) {
+      buttons.add(
+        _buildIconButton(
+          context,
+          icon: PhosphorIcons.database(),
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => ConnectorCustomizer(
+                initialColor: object.color,
+                initialType: object.connectionType,
+                initialThickness: object.thickness,
+                onStyleSelected: (color, type, thickness) {
+                  provider.changeConnectorStyle(color, type, thickness);
+                },
+                su: provider2,
+              ),
+            );
+          },
+          tooltip: 'Change Connector Style',
+          su: provider2,
+        ),
+      );
+      buttons.add(_buildDivider());
+    }
+
     if (showShapeChanger) {
       buttons.add(
         _buildIconButton(
@@ -77,7 +99,6 @@ class NodeEditingToolbox extends StatelessWidget {
                     },
                     su: provider2,
                   ),
-                  
             );
           },
           tooltip: 'Change Shape',
@@ -87,7 +108,6 @@ class NodeEditingToolbox extends StatelessWidget {
       buttons.add(_buildDivider());
     }
 
-    // 2. Node Color Alter
     if (showColorChanger) {
       buttons.add(
         _buildIconButton(
@@ -102,7 +122,11 @@ class NodeEditingToolbox extends StatelessWidget {
                   (context) => NodeColourPicker(
                     initialColor: selectedObject?.color,
                     onColorSelected: (color) {
-                      provider.changeObjectColor(color);
+                      if (isConnector) {
+                        provider.changeConnectorStyle(color, object.connectionType, object.thickness);
+                      } else {
+                        provider.changeObjectColor(color);
+                      }
                       Navigator.of(context).pop();
                     },
                   ),
@@ -115,7 +139,6 @@ class NodeEditingToolbox extends StatelessWidget {
       buttons.add(_buildDivider());
     }
 
-    // 5. Delete Node
     buttons.add(
       _buildIconButton(
         context,
@@ -135,7 +158,7 @@ class NodeEditingToolbox extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
         decoration: BoxDecoration(
           color:
-              provider2.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
+              provider2.isDark ? const Color.fromRGBO(48, 48, 48, 1) : Colors.white,
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: Colors.grey.shade300),
           boxShadow: [

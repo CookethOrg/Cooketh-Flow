@@ -1,3 +1,4 @@
+import 'dart:ui';
 import 'dart:convert';
 import 'dart:math';
 import 'package:cookethflow/core/theme/colors.dart';
@@ -139,18 +140,49 @@ class CanvasPainter extends CustomPainter {
       if (source != null && target != null) {
         final startPoint = source.getConnectionPoint(connector.sourceAlignment);
         final endPoint = target.getConnectionPoint(connector.targetAlignment);
-        final paint = Paint()
-          ..color = Colors.black87
-          ..strokeWidth = 2.0
+        
+        final connectorPaint = Paint()
+          ..color = connector.color
+          ..strokeWidth = connector.thickness
           ..style = PaintingStyle.stroke;
 
-        canvas.drawLine(startPoint, endPoint, paint);
-        _drawArrowhead(canvas, startPoint, endPoint, paint);
+        final path = Path()..moveTo(startPoint.dx, startPoint.dy)..lineTo(endPoint.dx, endPoint.dy);
+
+        switch (connector.connectionType) {
+          case ConnectionType.solid:
+            canvas.drawPath(path, connectorPaint);
+            break;
+          case ConnectionType.dotted:
+            canvas.drawPath(
+              dashPath(path, dashArray: CircularIntervalList<double>([1.0, 3.0])),
+              connectorPaint,
+            );
+            break;
+          case ConnectionType.dashed:
+            canvas.drawPath(
+              dashPath(path, dashArray: CircularIntervalList<double>([10.0, 5.0])),
+              connectorPaint,
+            );
+            break;
+        }
+
+        _drawArrowhead(canvas, startPoint, endPoint, connectorPaint);
 
         final originPaint = Paint()
-          ..color = Colors.black87
+          ..color = connector.color
           ..style = PaintingStyle.fill;
         canvas.drawCircle(startPoint, 4, originPaint);
+
+        if (currentlySelectedObjectId == connector.id) {
+          final selectPaint = Paint()
+            ..color = Colors.blue
+            ..strokeWidth = 2.0
+            ..style = PaintingStyle.stroke;
+          canvas.drawPath(
+            dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])),
+            selectPaint,
+          );
+        }
       }
     }
 
@@ -339,7 +371,7 @@ class CanvasPainter extends CustomPainter {
                 ...lineSpans
               ]),
               textDirection: TextDirection.ltr,
-              textAlign: TextAlign.center, // Center-align text for all objects
+              textAlign: TextAlign.center,
             );
             final availableWidth = rect.width - (2 * textPadding) - indent;
             if (availableWidth > 0) {
@@ -460,6 +492,13 @@ class CanvasPainter extends CustomPainter {
       if (newObj.getBounds() != oldObj.getBounds()) return true;
       if (newObj.textDelta != oldObj.textDelta) return true;
       if (newObj.runtimeType != oldObj.runtimeType) return true;
+      if (newObj is ConnectorObject && oldObj is ConnectorObject) {
+        if (newObj.color != oldObj.color ||
+            newObj.thickness != oldObj.thickness ||
+            newObj.connectionType != oldObj.connectionType) {
+          return true;
+        }
+      }
     }
     return false;
   }

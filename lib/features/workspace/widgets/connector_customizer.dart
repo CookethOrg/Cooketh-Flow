@@ -1,10 +1,119 @@
-import 'package:cookethflow/core/theme/colors.dart';
-import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/core/utils/enums.dart';
+import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/theme/colors.dart';
+import 'package:provider/provider.dart';
 
-class CoonectorCustomizer extends StatelessWidget {
-  const CoonectorCustomizer({super.key});
+class ConnectorCustomizer extends StatefulWidget {
+  final Color initialColor;
+  final ConnectionType initialType;
+  final double initialThickness;
+  final Function(Color, ConnectionType, double) onStyleSelected;
+  final SupabaseService su;
+
+  const ConnectorCustomizer({
+    super.key,
+    required this.initialColor,
+    required this.initialType,
+    required this.initialThickness,
+    required this.onStyleSelected,
+    required this.su,
+  });
+
+  @override
+  _ConnectorCustomizerState createState() => _ConnectorCustomizerState();
+}
+
+class _ConnectorCustomizerState extends State<ConnectorCustomizer> {
+  late Color _selectedColor;
+  late ConnectionType _selectedType;
+  late double _selectedThickness;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedColor = widget.initialColor;
+    _selectedType = widget.initialType;
+    _selectedThickness = widget.initialThickness;
+  }
+
+  Widget _buildModeButton(String text, ConnectionType type) {
+    bool isSelected = _selectedType == type;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedType = type;
+        });
+        widget.onStyleSelected(_selectedColor, _selectedType, _selectedThickness);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFD9D9D9) : null,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildThicknessButton(String text, double thickness) {
+    bool isSelected = _selectedThickness == thickness;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedThickness = thickness;
+        });
+        widget.onStyleSelected(_selectedColor, _selectedType, _selectedThickness);
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFD9D9D9) : null,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          text,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Colors.black87,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildColorBox(Color color) {
+    bool isSelected = _selectedColor == color;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedColor = color;
+        });
+        widget.onStyleSelected(_selectedColor, _selectedType, _selectedThickness);
+      },
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: color,
+          border: isSelected
+              ? Border.all(color: Colors.blue, width: 2)
+              : Border.all(color: Colors.grey.shade300, width: 1),
+        ),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,19 +123,18 @@ class CoonectorCustomizer extends StatelessWidget {
         width: 420,
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: widget.su.isDark ? const Color.fromRGBO(48, 48, 48, 1) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Header with close button
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 IconButton(
-                  icon: const Icon(PhosphorIconsRegular.x, size: 24, color: Colors.black54),
+                  icon: Icon(PhosphorIconsRegular.x, size: 24, color: widget.su.isDark ? Colors.white70 : Colors.black54),
                   onPressed: () => Navigator.pop(context),
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(),
@@ -34,81 +142,46 @@ class CoonectorCustomizer extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 8),
-            
-            // Thickness selection buttons
+
             Row(
               children: [
-                _buildModeButton('Thin', PhosphorIconsFill.circle, color: Colors.black),
+                _buildModeButton('Solid', ConnectionType.solid),
                 const SizedBox(width: 8),
-                _buildModeButton('Medium', PhosphorIconsFill.circle, color: Colors.black),
+                _buildModeButton('Dashed', ConnectionType.dashed),
                 const SizedBox(width: 8),
-                _buildModeButton('Thick', PhosphorIconsFill.circle, color: Colors.black),
+                _buildModeButton('Dotted', ConnectionType.dotted),
+              ],
+            ),
+            const SizedBox(height: 16),
+            
+            Row(
+              children: [
+                _buildThicknessButton('Thin', 1.0),
+                const SizedBox(width: 8),
+                _buildThicknessButton('Medium', 2.0),
+                const SizedBox(width: 8),
+                _buildThicknessButton('Thick', 4.0),
               ],
             ),
             const SizedBox(height: 20),
-            
-            // Color grid
+
             Column(
               children: [
-                // Top row (darker colors)
                 Wrap(
-                  spacing: 12, // Horizontal gap between color boxes
+                  spacing: 12,
+                  runSpacing: 8,
                   children: secondaryColors.map((color) => _buildColorBox(color)).toList(),
                 ),
                 const SizedBox(height: 8),
-                // Bottom row (lighter colors)
                 Wrap(
                   spacing: 12,
+                  runSpacing: 8,
                   children: tertiaryColors.map((color) => _buildColorBox(color)).toList(),
                 ),
               ],
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildModeButton(String text, IconData icon, {Color color = Colors.black}) {
-    bool isSelected = text == 'Thin';
-    double iconSize = text == 'Thin' ? 12.0 : text == 'Medium' ? 16.0 : 20.0; // Different sizes for Thin, Medium, Thick
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: isSelected ? Color(0xFFD9D9D9) : null,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            size: iconSize,
-            color: color,
-          ),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildColorBox(Color color, {bool isSelected = false}) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: BoxDecoration(
-        color: color,
-        border: isSelected 
-          ? Border.all(color: Colors.blue, width: 2)
-          : Border.all(color: Colors.grey.shade300, width: 1),
       ),
     );
   }

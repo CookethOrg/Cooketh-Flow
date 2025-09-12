@@ -37,11 +37,11 @@ class WorkspaceMobile extends StatelessWidget {
               children: [
                 const CanvasPage(),
                 workspaceDrawerMob(device),
-                Positioned(
-                  top: 120.h,
-                  right: 0.h,
-                  child: UndoRedoButton(su: suprovider),
-                ),
+                // Positioned(
+                //   top: 120.h,
+                //   right: 0.h,
+                //   child: UndoRedoButton(su: suprovider),
+                // ),
                 Padding(
                   padding: EdgeInsets.only(bottom: 40.h),
                   child: Align(

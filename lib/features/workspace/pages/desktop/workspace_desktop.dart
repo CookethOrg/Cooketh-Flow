@@ -14,6 +14,7 @@ import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart'; // shortcut file
 import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart';
@@ -115,6 +116,12 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
           return null;
         },
       ),
+      EscapeIntent: CallbackAction<EscapeIntent>(
+        onInvoke: (intent) {
+          context.pop();
+          return null;
+        },
+      ),
     };
 
     return Consumer2<WorkspaceProvider, SupabaseService>(
@@ -142,12 +149,12 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                       children: [
                         const CanvasPage(),
                         const WorkspaceDrawer(),
-                        SizedBox(width: 20.w),
-                        Positioned(
-                          top: 0,
-                          left: 0.21.sw,
-                          child: UndoRedoButton(su: suprovider),
-                        ),
+                        // SizedBox(width: 20.w),
+                        // Positioned(
+                        //   top: 0,
+                        //   left: 0.21.sw,
+                        //   child: UndoRedoButton(su: suprovider),
+                        // ),
                         Positioned(
                           top: 0,
                           right: 0.001.sw,

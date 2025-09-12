@@ -216,7 +216,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.cursor,
-                        'Pointer\nPress P',
+                        'Pointer\nPress CTRL + P',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.pointer
@@ -235,7 +235,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.handGrabbing,
-                        'Pan\nPress A',
+                        'Pan\nPress CTRL + A',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.hand
@@ -254,7 +254,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.textT,
-                        'Text box\nPress T',
+                        'Text box\nPress ALT + T',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.textBox
@@ -286,7 +286,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsFill.noteBlank,
-                        'Add new sticky note\nPress S',
+                        'Add new sticky note\nPress CTRL + S',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.stickyNote

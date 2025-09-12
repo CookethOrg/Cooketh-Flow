@@ -34,31 +34,31 @@ class ZoomControlButton extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                "${canvasProvider.currentZoomPercentage.toStringAsFixed(0)}%", // Display current zoom
-                style: TextStyle(
-                  color: suprovider.isDark ? Colors.white : Colors.black,
-                  fontWeight: FontWeight.w500,
-                  fontSize:
-                      device == rh.DeviceType.desktop
-                          ? 24.sp
-                          : device == rh.DeviceType.tab
-                          ? 24.sp
-                          : 40.sp,
-                ),
-              ),
-              SizedBox(
-                width:
-                    device == rh.DeviceType.desktop
-                        ? 8.w
-                        : device == rh.DeviceType.tab
-                        ? 8.w
-                        : 12.w,
-              ),
-              VerticalCustomDivider(),
+              // Text(
+              //   "${canvasProvider.currentZoomPercentage.toStringAsFixed(0)}%", // Display current zoom
+              //   style: TextStyle(
+              //     color: suprovider.isDark ? Colors.white : Colors.black,
+              //     fontWeight: FontWeight.w500,
+              //     fontSize:
+              //         device == rh.DeviceType.desktop
+              //             ? 24.sp
+              //             : device == rh.DeviceType.tab
+              //             ? 24.sp
+              //             : 40.sp,
+              //   ),
+              // ),
+              // SizedBox(
+              //   width:
+              //       device == rh.DeviceType.desktop
+              //           ? 8.w
+              //           : device == rh.DeviceType.tab
+              //           ? 8.w
+              //           : 12.w,
+              // ),
+              // VerticalCustomDivider(),
               SizedBox(width: 8.w),
               IconButton(
-                tooltip: "Press Z",
+                tooltip: "Press CTRL + Z",
                 onPressed: () {
                   canvasProvider.zoomIn(); // Call zoomIn method
                 },
@@ -77,7 +77,7 @@ class ZoomControlButton extends StatelessWidget {
               VerticalCustomDivider(),
               SizedBox(width: 8.w),
               IconButton(
-                tooltip: 'Press X',
+                tooltip: 'Press CTRL + X',
                 onPressed: () {
                   canvasProvider.zoomOut(); // Call zoomOut method
                 },
@@ -109,7 +109,7 @@ class ZoomControlButton extends StatelessWidget {
                           : 60.sp,
                 ), // Icon for reset
                 visualDensity: VisualDensity.compact,
-                tooltip: 'Reset Zoom\nPress R',
+                tooltip: 'Reset Zoom\nPress CTRL + R',
               ),
             ],
           ),

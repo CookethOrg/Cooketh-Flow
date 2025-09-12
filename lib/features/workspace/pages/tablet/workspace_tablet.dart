@@ -34,9 +34,9 @@ class WorkspaceTablet extends StatelessWidget {
                 CanvasPage(),
                 // Top Bar
                 const WorkspaceDrawer(),
-                SizedBox(width: 16.w),
+                // SizedBox(width: 16.w),
 
-                Positioned(top: 0, left: 0.31.sw, child: UndoRedoButton(su: suprovider,)),
+                // Positioned(top: 0, left: 0.31.sw, child: UndoRedoButton(su: suprovider,)),
                 Positioned(
                   top: 0,
                   right: 0.001.sw,

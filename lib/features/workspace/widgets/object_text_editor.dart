@@ -88,7 +88,7 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
 
         return Positioned(
           left: visibleRect.left,
-          top: visibleRect.top - _toolbarHeight - 4.h,
+          top: visibleRect.top - 4.3*_toolbarHeight,
           child: Material(
             color: Colors.transparent,
             child: Column(

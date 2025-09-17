@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/core/theme/app_theme.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
@@ -39,7 +40,7 @@ class _ConnectorCustomizerState extends State<ConnectorCustomizer> {
     _selectedThickness = widget.initialThickness;
   }
 
-  Widget _buildModeButton(String text, ConnectionType type) {
+  Widget _buildModeButton(String text, ConnectionType type, SupabaseService supa) {
     bool isSelected = _selectedType == type;
     return GestureDetector(
       onTap: () {
@@ -51,22 +52,22 @@ class _ConnectorCustomizerState extends State<ConnectorCustomizer> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD9D9D9) : null,
+          color: isSelected ? primaryColor : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           text,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
+            color: supa.isDark ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.w300,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildThicknessButton(String text, double thickness) {
+  Widget _buildThicknessButton(String text, double thickness,SupabaseService supa) {
     bool isSelected = _selectedThickness == thickness;
     return GestureDetector(
       onTap: () {
@@ -78,15 +79,15 @@ class _ConnectorCustomizerState extends State<ConnectorCustomizer> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: isSelected ? const Color(0xFFD9D9D9) : null,
+          color: isSelected ? primaryColor : null,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           text,
-          style: const TextStyle(
+          style:  TextStyle(
             fontSize: 14,
-            color: Colors.black87,
-            fontWeight: FontWeight.w500,
+            color: supa.isDark ? Colors.white : Colors.black87,
+            fontWeight: FontWeight.w300,
           ),
         ),
       ),
@@ -117,72 +118,76 @@ class _ConnectorCustomizerState extends State<ConnectorCustomizer> {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Container(
-        width: 420,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: widget.su.isDark ? const Color.fromRGBO(48, 48, 48, 1) : Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: Icon(PhosphorIconsRegular.x, size: 24, color: widget.su.isDark ? Colors.white70 : Colors.black54),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
+    return Consumer<SupabaseService>(
+      builder: (context,supa,child) {
+        return Dialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+          child: Container(
+            width: 420,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: widget.su.isDark ? const Color.fromRGBO(48, 48, 48, 1) : Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFFE0E0E0), width: 1),
             ),
-            const SizedBox(height: 8),
-
-            Row(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                _buildModeButton('Solid', ConnectionType.solid),
-                const SizedBox(width: 8),
-                _buildModeButton('Dashed', ConnectionType.dashed),
-                const SizedBox(width: 8),
-                _buildModeButton('Dotted', ConnectionType.dotted),
-              ],
-            ),
-            const SizedBox(height: 16),
-            
-            Row(
-              children: [
-                _buildThicknessButton('Thin', 1.0),
-                const SizedBox(width: 8),
-                _buildThicknessButton('Medium', 2.0),
-                const SizedBox(width: 8),
-                _buildThicknessButton('Thick', 4.0),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            Column(
-              children: [
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: secondaryColors.map((color) => _buildColorBox(color)).toList(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: Icon(PhosphorIconsRegular.x, size: 24, color: widget.su.isDark ? Colors.white70 : Colors.black54),
+                      onPressed: () => Navigator.pop(context),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 8),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  children: tertiaryColors.map((color) => _buildColorBox(color)).toList(),
+        
+                Row(
+                  children: [
+                    _buildModeButton('Solid', ConnectionType.solid,supa),
+                    const SizedBox(width: 8),
+                    _buildModeButton('Dashed', ConnectionType.dashed,supa),
+                    const SizedBox(width: 8),
+                    _buildModeButton('Dotted', ConnectionType.dotted,supa),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                
+                Row(
+                  children: [
+                    _buildThicknessButton('Thin', 1.0,supa),
+                    const SizedBox(width: 8),
+                    _buildThicknessButton('Medium', 2.0,supa),
+                    const SizedBox(width: 8),
+                    _buildThicknessButton('Thick', 4.0,supa),
+                  ],
+                ),
+                const SizedBox(height: 20),
+        
+                Column(
+                  children: [
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: secondaryColors.map((color) => _buildColorBox(color)).toList(),
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: tertiaryColors.map((color) => _buildColorBox(color)).toList(),
+                    ),
+                  ],
                 ),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }
     );
   }
 }

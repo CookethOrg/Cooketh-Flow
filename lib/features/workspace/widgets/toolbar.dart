@@ -77,7 +77,7 @@ class ToolBar extends StatelessWidget {
                           'Add new node',
                           device,
                           onPressed: () {
-                            _showNodePicker(context, device, suprovider,provider);
+                            _showNodePicker(context, device, suprovider, provider);
                           },
                           backgroundColor:
                               suprovider.isDark
@@ -204,7 +204,7 @@ class ToolBar extends StatelessWidget {
                         'Add new node',
                         device,
                         onPressed: () {
-                          _showNodePicker(context, device, suprovider,provider);
+                          _showNodePicker(context, device, suprovider, provider);
                         },
                         backgroundColor:
                             suprovider.isDark
@@ -383,13 +383,7 @@ class ToolBar extends StatelessWidget {
         return Stack(
           children: [
             Positioned.fill(
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                  wp.changeDrawMode(DrawMode.pointer);
-                },
-                child: Container(color: Colors.transparent),
-              ),
+              child: Container(color: Colors.transparent),
             ),
             Positioned(
               top: topPos,

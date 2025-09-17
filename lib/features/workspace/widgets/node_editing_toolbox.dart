@@ -1,4 +1,3 @@
-// lib/features/workspace/widgets/node_editing_toolbox.dart
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
@@ -115,50 +114,50 @@ class NodeEditingToolbox extends StatelessWidget {
           ),
         );
       }
-    } else if (isShape) {
-      buttons.add(
-        _buildIconButton(
-          context,
-          icon: PhosphorIcons.shapes(),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) => NodePicker(
-                onShapeSelected: (shapeType) {
-                  provider.changeObjectShape(shapeType);
-                  Navigator.of(context).pop();
-                },
-                su: su,
-              ),
-            );
-          },
-          tooltip: 'Change Shape',
-          su: su,
-        ),
-      );
-      if (canChangeColor) {
-        buttons.add(_buildDivider());
-        buttons.add(
-          _buildIconButton(
-            context,
-            icon: PhosphorIcons.paintBucket(),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) => NodeColourPicker(
-                  initialColor: object.color,
-                  onColorSelected: (color) {
-                    provider.changeObjectColor(color);
-                    Navigator.of(context).pop();
-                  },
-                ),
-              );
-            },
-            tooltip: 'Change Color',
-            su: su,
-          ),
-        );
-      }
+    // } else if (isShape) {
+    //   buttons.add(
+    //     _buildIconButton(
+    //       context,
+    //       icon: PhosphorIcons.shapes(),
+    //       onPressed: () {
+    //         showDialog(
+    //           context: context,
+    //           builder: (context) => NodePicker(
+    //             onShapeSelected: (shapeType) {
+    //               provider.changeObjectShape(shapeType);
+    //               Navigator.of(context).pop();
+    //             },
+    //             su: su,
+    //           ),
+    //         );
+    //       },
+    //       tooltip: 'Change Shape',
+    //       su: su,
+    //     ),
+    //   );
+    //   if (canChangeColor) {
+    //     buttons.add(_buildDivider());
+    //     buttons.add(
+    //       _buildIconButton(
+    //         context,
+    //         icon: PhosphorIcons.paintBucket(),
+    //         onPressed: () {
+    //           showDialog(
+    //             context: context,
+    //             builder: (context) => NodeColourPicker(
+    //               initialColor: object.color,
+    //               onColorSelected: (color) {
+    //                 provider.changeObjectColor(color);
+    //                 Navigator.of(context).pop();
+    //               },
+    //             ),
+    //           );
+    //         },
+    //         tooltip: 'Change Color',
+    //         su: su,
+    //       ),
+    //     );
+    //   }
     } else if (canChangeColor) {
       buttons.add(
         _buildIconButton(

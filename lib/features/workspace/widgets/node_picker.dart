@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:provider/provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 // The main NodePicker widget, now stateful
 class NodePicker extends StatefulWidget {
@@ -113,7 +114,7 @@ class _NodePickerState extends State<NodePicker> {
             decoration: BoxDecoration(
               color:
                   widget.su.isDark
-                      ? Color.fromRGBO(48, 48, 48, 1)
+                      ? const Color.fromRGBO(48, 48, 48, 1)
                       : Colors.white,
               borderRadius: BorderRadius.circular(16.0),
               boxShadow: [
@@ -137,17 +138,21 @@ class _NodePickerState extends State<NodePicker> {
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                         color:
-                            widget.su.isDark ? Colors.white : Color(0xFF111827),
+                            widget.su.isDark ? Colors.white : const Color(0xFF111827),
                       ),
                     ),
                     IconButton(
                       icon: Icon(
                         Icons.close,
                         color:
-                            widget.su.isDark ? Colors.white : Color(0xFF111827),
+                            widget.su.isDark ? Colors.white : const Color(0xFF111827),
                         size: 28,
                       ),
                       onPressed: () {
+                        // When closing, if we're not changing a shape, reset the mode
+                        if (widget.onShapeSelected == null) {
+                          provider.changeDrawMode(DrawMode.pointer);
+                        }
                         Navigator.of(context).pop();
                       },
                     ),
@@ -167,7 +172,7 @@ class _NodePickerState extends State<NodePicker> {
                     filled: true,
                     fillColor:
                         widget.su.isDark
-                            ? Color.fromRGBO(48, 48, 48, 1)
+                            ? const Color.fromRGBO(48, 48, 48, 1)
                             : const Color(0xFFF9FAFB),
                     contentPadding: const EdgeInsets.symmetric(
                       vertical: 14.0,
@@ -205,10 +210,7 @@ class _NodePickerState extends State<NodePicker> {
                         if (widget.onShapeSelected != null) {
                           widget.onShapeSelected!(shape['shapeType']);
                         } else {
-                          Provider.of<WorkspaceProvider>(
-                            context,
-                            listen: false,
-                          ).changeDrawMode(shape['drawMode']);
+                          provider.changeDrawMode(shape['drawMode']);
                         }
                         Navigator.of(
                           context,
@@ -235,7 +237,6 @@ class _NodePickerState extends State<NodePicker> {
 class ShapeWidget extends StatelessWidget {
   final ShapeType shapeType;
   final SupabaseService su;
-
   final WorkspaceProvider provider;
 
 
@@ -244,8 +245,8 @@ class ShapeWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 60,
-      height: 60,
+      width: 60.w,
+      height: 60.h,
       decoration: BoxDecoration(
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(8.0),

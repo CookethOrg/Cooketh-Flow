@@ -865,7 +865,7 @@ class WorkspaceProvider extends StateHandler {
         break;
     }
     // No longer changing mode here, as it's handled by changeDrawMode
-    // _currentMode = DrawMode.pointer;
+    _currentMode = DrawMode.pointer;
 
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;

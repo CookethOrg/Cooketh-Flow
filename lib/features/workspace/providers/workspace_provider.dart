@@ -118,13 +118,12 @@ class WorkspaceProvider extends StateHandler {
     return _tempQuillController;
   }
 
-  IconData nodeIconProvider() {
+  // Renamed and fixed to be a pure getter without side effects
+  IconData getNodeIcon() {
     if (_currentMode != DrawMode.hand &&
         _currentMode != DrawMode.pointer &&
         _currentMode != DrawMode.stickyNote &&
         _currentMode != DrawMode.textBox) {
-      _isNodePicked = true;
-      notifyListeners();
       return _currentMode.iconData;
     }
     return PhosphorIconsRegular.circlesThreePlus;
@@ -781,6 +780,11 @@ class WorkspaceProvider extends StateHandler {
       _saveCanvasObjectToDb(_currentlySelectedObjectId!);
     }
     _currentMode = mode;
+    // Update _isNodePicked here, based on the new mode
+    _isNodePicked = (mode != DrawMode.hand &&
+        mode != DrawMode.pointer &&
+        mode != DrawMode.stickyNote &&
+        mode != DrawMode.textBox);
     _currentlySelectedObjectId = null;
     _interactionMode = InteractionMode.none;
     notifyListeners();
@@ -860,7 +864,8 @@ class WorkspaceProvider extends StateHandler {
       case DrawMode.hand:
         break;
     }
-    _currentMode = DrawMode.pointer;
+    // No longer changing mode here, as it's handled by changeDrawMode
+    // _currentMode = DrawMode.pointer;
 
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;

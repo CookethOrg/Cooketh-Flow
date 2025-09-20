@@ -34,13 +34,13 @@ class ToolBar extends StatelessWidget {
           decoration: BoxDecoration(
             color:
                 suprovider.isDark
-                    ? Color.fromRGBO(48, 48, 48, 1)
+                    ? const Color.fromRGBO(48, 48, 48, 1)
                     : Colors.white,
             borderRadius: BorderRadius.circular(12.r),
             border: Border.all(
               color:
                   suprovider.isDark
-                      ? Color.fromRGBO(75, 75, 75, 1)
+                      ? const Color.fromRGBO(75, 75, 75, 1)
                       : const Color(0xFFD9D9D9),
               width: 1.2,
             ),
@@ -66,14 +66,14 @@ class ToolBar extends StatelessWidget {
                           },
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                           iconColor:
                               suprovider.isDark ? Colors.white : Colors.black87,
                         ),
                         VerticalCustomDivider(),
                         _toolIcon(
-                          PhosphorIconsRegular.circlesThreePlus,
+                          provider.getNodeIcon(),
                           'Add new node',
                           device,
                           onPressed: () {
@@ -81,7 +81,7 @@ class ToolBar extends StatelessWidget {
                           },
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                           iconColor:
                               suprovider.isDark ? Colors.white : Colors.black87,
@@ -102,7 +102,7 @@ class ToolBar extends StatelessWidget {
                           },
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                         ),
                         VerticalCustomDivider(),
@@ -121,7 +121,7 @@ class ToolBar extends StatelessWidget {
                           },
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                         ),
                         VerticalCustomDivider(),
@@ -140,7 +140,7 @@ class ToolBar extends StatelessWidget {
                           },
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                         ),
                         VerticalCustomDivider(),
@@ -151,7 +151,7 @@ class ToolBar extends StatelessWidget {
                           onPressed: () {},
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                           iconColor:
                               suprovider.isDark ? Colors.white : Colors.black87,
@@ -170,7 +170,7 @@ class ToolBar extends StatelessWidget {
                                   _showStickyNote(context, device, suprovider),
                           backgroundColor:
                               suprovider.isDark
-                                  ? Color.fromRGBO(48, 48, 48, 1)
+                                  ? const Color.fromRGBO(48, 48, 48, 1)
                                   : Colors.white,
                         ),
                       ],
@@ -193,14 +193,14 @@ class ToolBar extends StatelessWidget {
                         },
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                         iconColor:
                             suprovider.isDark ? Colors.white : Colors.black87,
                       ),
                       _horizontalDivider(device),
                       _toolIcon(
-                      provider.nodeIconProvider(),
+                      provider.getNodeIcon(),
                         'Add new node',
                         device,
                         onPressed: () {
@@ -208,7 +208,7 @@ class ToolBar extends StatelessWidget {
                         },
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                         iconColor:
                             suprovider.isDark ? Colors.white : Colors.black87,
@@ -229,7 +229,7 @@ class ToolBar extends StatelessWidget {
                         },
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                       ),
                       _horizontalDivider(device),
@@ -248,7 +248,7 @@ class ToolBar extends StatelessWidget {
                         },
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                       ),
                       _horizontalDivider(device),
@@ -267,7 +267,7 @@ class ToolBar extends StatelessWidget {
                         },
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                       ),
                       _horizontalDivider(device),
@@ -278,7 +278,7 @@ class ToolBar extends StatelessWidget {
                         onPressed: () {},
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                         iconColor:
                             suprovider.isDark ? Colors.white : Colors.black87,
@@ -296,7 +296,7 @@ class ToolBar extends StatelessWidget {
                             () => _showStickyNote(context, device, suprovider),
                         backgroundColor:
                             suprovider.isDark
-                                ? Color.fromRGBO(48, 48, 48, 1)
+                                ? const Color.fromRGBO(48, 48, 48, 1)
                                 : Colors.white,
                       ),
                     ],

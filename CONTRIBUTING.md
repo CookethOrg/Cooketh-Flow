@@ -27,7 +27,7 @@ Thank you for your interest in contributing to **Cooketh Flow**! 🚀 We welcome
    ```sh
    git push origin feature-branch
    ```
-8. **Open a Pull Request**: Go to the original repository and open a Pull Request (PR) targeting the `dev` branch. **Ensure your PR is directed to the `dev` branch, not `master`.**
+8. **Open a Pull Request**: Go to the original repository and open a Pull Request (PR) targeting the `rewrite` branch. **Ensure your PR is directed to the `rewrite` branch, not `v0.1.0`.**
 
 ## Code Guidelines
 

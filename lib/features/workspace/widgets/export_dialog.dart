@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class ExportDialog extends StatefulWidget {
   final SupabaseService su;
@@ -54,9 +55,9 @@ class _ExportDialogState extends State<ExportDialog> {
                   'Export',
                   style: TextStyle(
                     fontSize:
-                        device == rh.DeviceType.desktop
+                        device == en.DeviceType.desktop
                             ? 22.sp
-                            : device == rh.DeviceType.tab
+                            : device == en.DeviceType.tab
                             ? 22.sp
                             : 60.sp,
                     fontWeight: FontWeight.w600,
@@ -70,9 +71,9 @@ class _ExportDialogState extends State<ExportDialog> {
                   icon: Icon(
                     PhosphorIconsRegular.x,
                     size:
-                        device == rh.DeviceType.desktop
+                        device == en.DeviceType.desktop
                             ? 24.sp
-                            : device == rh.DeviceType.tab
+                            : device == en.DeviceType.tab
                             ? 24.sp
                             : 55.sp,
                   ),
@@ -91,9 +92,9 @@ class _ExportDialogState extends State<ExportDialog> {
                   'Export as',
                   style: TextStyle(
                     fontSize:
-                        device == rh.DeviceType.desktop
+                        device == en.DeviceType.desktop
                             ? 16.sp
-                            : device == rh.DeviceType.tab
+                            : device == en.DeviceType.tab
                             ? 16.sp
                             : 45.sp,
                     color: widget.su.isDark ? Colors.white : Colors.grey[700],
@@ -111,9 +112,9 @@ class _ExportDialogState extends State<ExportDialog> {
                     icon: Icon(
                       PhosphorIconsRegular.caretDown,
                       size:
-                          device == rh.DeviceType.desktop
+                          device == en.DeviceType.desktop
                               ? 16.sp
-                              : device == rh.DeviceType.tab
+                              : device == en.DeviceType.tab
                               ? 16.sp
                               : 45.sp,
                     ),
@@ -132,9 +133,9 @@ class _ExportDialogState extends State<ExportDialog> {
                               value,
                               style: TextStyle(
                                 fontSize:
-                                    device == rh.DeviceType.desktop
+                                    device == en.DeviceType.desktop
                                         ? 16.sp
-                                        : device == rh.DeviceType.tab
+                                        : device == en.DeviceType.tab
                                         ? 16.sp
                                         : 45.sp,
                                 color:
@@ -182,9 +183,9 @@ class _ExportDialogState extends State<ExportDialog> {
                   'Export Flowchart',
                   style: TextStyle(
                     fontSize:
-                        device == rh.DeviceType.desktop
+                        device == en.DeviceType.desktop
                             ? 16.sp
-                            : device == rh.DeviceType.tab
+                            : device == en.DeviceType.tab
                             ? 16.sp
                             : 45.sp,
                     fontWeight: FontWeight.w600,

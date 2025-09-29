@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:provider/provider.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class WorkspaceDrawer extends StatelessWidget {
   const WorkspaceDrawer({super.key});
@@ -39,13 +40,13 @@ class WorkspaceDrawer extends StatelessWidget {
             height:
                 provider.isDrawerOpen
                     ? 1.sh
-                    : device == rh.DeviceType.desktop
+                    : device == en.DeviceType.desktop
                     ? 0.09.sh
                     : 0.08.sh,
-            width: device == rh.DeviceType.desktop ? 0.195.sw : 0.27.sw,
+            width: device == en.DeviceType.desktop ? 0.195.sw : 0.27.sw,
             padding: EdgeInsets.symmetric(
-              horizontal: device == rh.DeviceType.desktop ? 24.w : 15.w,
-              vertical: device == rh.DeviceType.desktop ? 16.h : 10.h,
+              horizontal: device == en.DeviceType.desktop ? 24.w : 15.w,
+              vertical: device == en.DeviceType.desktop ? 16.h : 10.h,
             ),
             decoration: BoxDecoration(
               color:
@@ -71,7 +72,7 @@ class WorkspaceDrawer extends StatelessWidget {
                       },
                       icon: Icon(
                         PhosphorIconsRegular.arrowLeft,
-                        size: device == rh.DeviceType.desktop ? 32.sp : 50.sp,
+                        size: device == en.DeviceType.desktop ? 32.sp : 50.sp,
                         color: suprovider.isDark ? Colors.white : Colors.black,
                       ),
                       splashRadius: 24.r,
@@ -84,7 +85,7 @@ class WorkspaceDrawer extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: 'Fredrik',
                           fontSize:
-                              device == rh.DeviceType.desktop ? 24.sp : 42.sp,
+                              device == en.DeviceType.desktop ? 24.sp : 42.sp,
                           fontWeight: FontWeight.w600,
                           color:
                               suprovider.isDark ? Colors.white : Colors.black,
@@ -100,7 +101,7 @@ class WorkspaceDrawer extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      width: device == rh.DeviceType.desktop ? 50.w : 20.w,
+                      width: device == en.DeviceType.desktop ? 50.w : 20.w,
                     ),
                     IconButton(
                       onPressed: () {
@@ -111,7 +112,7 @@ class WorkspaceDrawer extends StatelessWidget {
                               ? Icon(
                                 PhosphorIconsRegular.sidebarSimple,
                                 size:
-                                    device == rh.DeviceType.desktop
+                                    device == en.DeviceType.desktop
                                         ? 32.sp
                                         : 50.sp,
                                 color:
@@ -122,7 +123,7 @@ class WorkspaceDrawer extends StatelessWidget {
                               : Icon(
                                 Icons.close,
                                 size:
-                                    device == rh.DeviceType.desktop
+                                    device == en.DeviceType.desktop
                                         ? 32.sp
                                         : 50.sp,
                                 color:
@@ -149,7 +150,7 @@ class WorkspaceDrawer extends StatelessWidget {
                               ? Column(
                                 mainAxisSize: MainAxisSize.max,
                                 children: [
-                                  device == rh.DeviceType.desktop
+                                  device == en.DeviceType.desktop
                                       ? SizedBox(height: 20.h)
                                       : SizedBox(height: 10.h),
                                   const Divider(
@@ -164,7 +165,7 @@ class WorkspaceDrawer extends StatelessWidget {
                                           provider.canvasObjectsList.length,
                                       separatorBuilder:
                                           (context, index) =>
-                                              device == rh.DeviceType.desktop
+                                              device == en.DeviceType.desktop
                                                   ? SizedBox(height: 8.h)
                                                   : SizedBox(height: 2.h),
                                       itemBuilder: (context, index) {
@@ -217,7 +218,7 @@ class WorkspaceDrawer extends StatelessWidget {
     required int index,
     required bool isSelected,
     required VoidCallback onTap,
-    required rh.DeviceType device,
+    required en.DeviceType device,
     required SupabaseService su,
   }) {
     Color iconTextColor =
@@ -232,14 +233,14 @@ class WorkspaceDrawer extends StatelessWidget {
       child: ListTile(
         leading: Icon(
           iconData,
-          size: device == rh.DeviceType.desktop ? 24.sp : 35.sp,
+          size: device == en.DeviceType.desktop ? 24.sp : 35.sp,
           color: iconTextColor,
         ),
         title: Text(
           title,
           style: TextStyle(
             fontFamily: 'Fredrik',
-            fontSize: device == rh.DeviceType.desktop ? 18.sp : 28.sp,
+            fontSize: device == en.DeviceType.desktop ? 18.sp : 28.sp,
             color: iconTextColor,
           ),
         ),

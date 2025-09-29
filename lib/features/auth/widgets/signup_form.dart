@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class SignUpForm extends StatelessWidget {
   const SignUpForm({super.key});
@@ -18,10 +19,10 @@ class SignUpForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile =
         responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
-        responsive_helper.DeviceType.mobile;
+        en.DeviceType.mobile;
     final isDesktop =
         responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
-        responsive_helper.DeviceType.desktop;
+        en.DeviceType.desktop;
 
     return Consumer2<AuthenticationProvider, SupabaseService>(
       // Consume both providers

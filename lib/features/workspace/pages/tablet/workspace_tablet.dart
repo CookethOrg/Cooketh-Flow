@@ -12,6 +12,7 @@ import 'package:flutter_provider/flutter_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class WorkspaceTablet extends StatelessWidget {
   const WorkspaceTablet({super.key});
@@ -20,9 +21,9 @@ class WorkspaceTablet extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer2<SupabaseService,WorkspaceProvider>(
-      builder: (context, suprovider,workspaceProvider) {
-       return Scaffold(
+    return Consumer2<SupabaseService, WorkspaceProvider>(
+      builder: (context, suprovider, workspaceProvider) {
+        return Scaffold(
           backgroundColor: const Color(0xFFF8F8F8),
           body: Padding(
             padding: EdgeInsets.symmetric(
@@ -40,12 +41,15 @@ class WorkspaceTablet extends StatelessWidget {
                 Positioned(
                   top: 0,
                   right: 0.001.sw,
-                  child: ExportProjectButton(su: suprovider,wp:workspaceProvider,),
+                  child: ExportProjectButton(
+                    su: suprovider,
+                    wp: workspaceProvider,
+                  ),
                 ),
 
                 // Container(
                 //   padding: EdgeInsets.symmetric(
-                //     horizontal: device == rh.DeviceType.tab ? 20.w : 24.w,
+                //     horizontal: device == en.DeviceType.tab ? 20.w : 24.w,
                 //     vertical: 16.h,
                 //   ),
                 //   decoration: BoxDecoration(
@@ -147,7 +151,7 @@ class WorkspaceTablet extends StatelessWidget {
                           "100%",
                           style: TextStyle(
                             fontSize:
-                                device == rh.DeviceType.desktop ? 20.sp : 40.sp,
+                                device == en.DeviceType.desktop ? 20.sp : 40.sp,
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
                           ),
@@ -160,7 +164,7 @@ class WorkspaceTablet extends StatelessWidget {
                           icon: Icon(
                             PhosphorIconsRegular.plus,
                             size:
-                                device == rh.DeviceType.desktop ? 20.sp : 50.sp,
+                                device == en.DeviceType.desktop ? 20.sp : 50.sp,
                           ),
                           visualDensity: VisualDensity.compact,
                         ),
@@ -172,7 +176,7 @@ class WorkspaceTablet extends StatelessWidget {
                           icon: Icon(
                             PhosphorIconsRegular.minus,
                             size:
-                                device == rh.DeviceType.desktop ? 20.sp : 50.sp,
+                                device == en.DeviceType.desktop ? 20.sp : 50.sp,
                           ),
                           visualDensity: VisualDensity.compact,
                         ),

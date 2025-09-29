@@ -12,7 +12,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
-
+import 'package:cookethflow/core/utils/enums.dart' as en;
 class ProfileSettingsWidget extends StatefulWidget {
   const ProfileSettingsWidget({super.key});
 
@@ -87,12 +87,10 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
     // Upload Profile Picture if a new one was selected
     if (_selectedImage != null) {
       try {
-        await supabaseService.uploadUserProfilePicture(
-          _selectedImage!,
+        await supabaseService.uploadUserProfilePicture(_selectedImage!);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Profile picture updated!')),
         );
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text('Profile picture updated!')));
         setState(() {
           _selectedImage = null; // Clear selected image after upload
         });
@@ -102,25 +100,25 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
         ).showSnackBar(SnackBar(content: Text(e.toString())));
       }
     }
-    
+
     // Refresh user data from Supabase to ensure UI is in sync
     await supabaseService.supabase.auth.refreshSession();
   }
 
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    bool is_desk = deviceType == rh.DeviceType.desktop ? true : false;
+    en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    bool isDesk = deviceType == en.DeviceType.desktop ? true : false;
 
     return Consumer2<DashboardProvider, SupabaseService>(
       builder: (context, dashboardProvider, supabaseService, child) {
         final currentUser = supabaseService.currentUser;
-        
+
         // Update controllers with the current state of the provider
         _nameController.text = currentUser?.name ?? '';
         _emailController.text = currentUser?.email ?? '';
         _usernameController.text = currentUser?.username ?? '';
-        
+
         final String displayAvatarUrl =
             _selectedImage != null
                 ? _selectedImage!.path
@@ -132,9 +130,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            width: deviceType == rh.DeviceType.desktop ? 500 : 1.6.sw,
+            width: deviceType == en.DeviceType.desktop ? 500 : 1.6.sw,
             padding:
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const EdgeInsets.all(24)
                     : const EdgeInsets.only(top: 16, left: 10, right: 10),
             child: Column(
@@ -151,7 +149,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                     constraints: const BoxConstraints(),
                   ),
                 ),
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 16)
                     : const SizedBox(height: 8),
 
@@ -209,8 +207,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                           child: InkWell(
                             onTap: _pickImage,
                             child: Container(
-                              width:
-                                  28,
+                              width: 28,
                               height: 28,
                               decoration: BoxDecoration(
                                 color: Theme.of(context).primaryColor,
@@ -230,7 +227,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         ),
                       ],
                     ),
-                    deviceType == rh.DeviceType.desktop
+                    deviceType == en.DeviceType.desktop
                         ? const SizedBox(width: 16)
                         : const SizedBox(width: 8),
                     Column(
@@ -245,7 +242,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
-                        deviceType == rh.DeviceType.desktop
+                        deviceType == en.DeviceType.desktop
                             ? const SizedBox(height: 4)
                             : const SizedBox(height: 2),
                         Text(
@@ -260,7 +257,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 32)
                     : const SizedBox(height: 16),
 
@@ -281,7 +278,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 20)
                     : const SizedBox(height: 10),
 
@@ -293,7 +290,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   width: 250,
                 ),
 
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 32)
                     : const SizedBox(height: 16),
 
@@ -313,13 +310,14 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
-                        deviceType == rh.DeviceType.desktop
+                        deviceType == en.DeviceType.desktop
                             ? const SizedBox(height: 4)
                             : const SizedBox(height: 2),
                         Text(
                           'Toggle between light and dark mode',
                           style: TextStyle(
-                            fontSize:deviceType == rh.DeviceType.desktop? 14 : 10,
+                            fontSize:
+                                deviceType == en.DeviceType.desktop ? 14 : 10,
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
@@ -332,9 +330,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                               ? Icons.dark_mode
                               : Icons.light_mode,
                           color: Theme.of(context).iconTheme.color,
-                          size:deviceType == rh.DeviceType.desktop?20 : 10,
+                          size: deviceType == en.DeviceType.desktop ? 20 : 10,
                         ),
-                        deviceType == rh.DeviceType.desktop
+                        deviceType == en.DeviceType.desktop
                             ? const SizedBox(height: 8)
                             : const SizedBox(height: 4),
                         Switch(
@@ -347,7 +345,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 32)
                     : const SizedBox(height: 16),
 
@@ -401,11 +399,11 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   ],
                 ),
 
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 32)
                     : const SizedBox(height: 16),
                 Divider(color: Theme.of(context).dividerColor),
-                deviceType == rh.DeviceType.desktop
+                deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 24)
                     : const SizedBox(height: 12),
 
@@ -425,20 +423,21 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                                 Theme.of(context).textTheme.titleLarge?.color,
                           ),
                         ),
-                        deviceType == rh.DeviceType.desktop
+                        deviceType == en.DeviceType.desktop
                             ? const SizedBox(height: 4)
                             : const SizedBox(height: 4),
                         Text(
                           'Permanently delete your account',
                           style: TextStyle(
-                            fontSize:deviceType == rh.DeviceType.desktop? 14 : 10,
+                            fontSize:
+                                deviceType == en.DeviceType.desktop ? 14 : 10,
                             color: Theme.of(context).textTheme.bodySmall?.color,
                           ),
                         ),
                       ],
                     ),
                     Visibility(
-                      visible: is_desk,
+                      visible: isDesk,
                       child: ElevatedButton(
                         onPressed: () {
                           showDialog(
@@ -450,9 +449,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                           backgroundColor: secondaryColors[1],
                           padding: EdgeInsets.symmetric(
                             horizontal:
-                                deviceType == rh.DeviceType.desktop ? 20 : 10,
+                                deviceType == en.DeviceType.desktop ? 20 : 10,
                             vertical:
-                                deviceType == rh.DeviceType.desktop ? 10 : 5,
+                                deviceType == en.DeviceType.desktop ? 10 : 5,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -484,7 +483,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                 ),
                 const SizedBox(height: 8),
                 Visibility(
-                  visible: !is_desk,
+                  visible: !isDesk,
                   child: Center(
                     child: ElevatedButton(
                       onPressed: () {
@@ -497,9 +496,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         backgroundColor: secondaryColors[1],
                         padding: EdgeInsets.symmetric(
                           horizontal:
-                              deviceType == rh.DeviceType.desktop ? 20 : 10,
+                              deviceType == en.DeviceType.desktop ? 20 : 10,
                           vertical:
-                              deviceType == rh.DeviceType.desktop ? 10 : 5,
+                              deviceType == en.DeviceType.desktop ? 10 : 5,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),

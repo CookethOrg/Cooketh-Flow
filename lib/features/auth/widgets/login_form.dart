@@ -10,6 +10,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class LoginForm extends StatelessWidget {
   const LoginForm({super.key});
@@ -18,10 +19,10 @@ class LoginForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final isMobile =
         responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
-        responsive_helper.DeviceType.mobile;
+        en.DeviceType.mobile;
     final isDesktop =
         responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
-        responsive_helper.DeviceType.desktop;
+        en.DeviceType.desktop;
 
     // Use a MultiProvider to listen to both AuthenticationProvider and SupabaseService
     // SupabaseService's currentUser updates will trigger rebuilds related to auth state.

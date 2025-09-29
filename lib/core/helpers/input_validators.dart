@@ -54,7 +54,7 @@ String? validatePassword(String? value) {
     return 'Password must contain at least one special character (., _, @, or #)';
   }
   
-  // Optional: Check for common weak passwords
+  // Check for common weak passwords
   if (value.contains(RegExp(r'(123456|password|qwerty|abc123)'))) {
     return 'Password is too common or weak';
   }
@@ -72,7 +72,7 @@ String? validateEmail(String? value) {
            'Example: yourname@example.com';
   }
   
-  // Optional: Disallow disposable emails
+  // Disallow disposable emails
   if (value.endsWith('@tempmail.com') || 
       value.endsWith('@mailinator.com')) {
     return 'Disposable email addresses are not allowed';

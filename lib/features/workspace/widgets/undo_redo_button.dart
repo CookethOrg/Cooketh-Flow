@@ -4,19 +4,20 @@ import 'package:cookethflow/features/workspace/widgets/vertical_divider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class UndoRedoButton extends StatelessWidget {
   final SupabaseService su;
-  const UndoRedoButton({super.key,required this.su});
+  const UndoRedoButton({super.key, required this.su});
 
   @override
   Widget build(BuildContext context) {
     bool isDesktop =
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
-        rh.DeviceType.desktop;
+        en.DeviceType.desktop;
 
     bool isTab =
-        rh.ResponsiveLayoutHelper.getDeviceType(context) == rh.DeviceType.tab;
+        rh.ResponsiveLayoutHelper.getDeviceType(context) == en.DeviceType.tab;
 
     return Container(
       padding: EdgeInsets.symmetric(
@@ -34,9 +35,15 @@ class UndoRedoButton extends StatelessWidget {
                 : 8.h,
       ),
       decoration: BoxDecoration(
-        color: su.isDark ?  Color.fromRGBO(48, 48, 48, 1): Colors.white,
+        color: su.isDark ? Color.fromRGBO(48, 48, 48, 1) : Colors.white,
         borderRadius: BorderRadius.circular(12.r),
-        border: Border.all(color:su.isDark ?Color.fromRGBO(75, 75, 75, 1): const Color(0xFFD9D9D9), width: 1.2),
+        border: Border.all(
+          color:
+              su.isDark
+                  ? Color.fromRGBO(75, 75, 75, 1)
+                  : const Color(0xFFD9D9D9),
+          width: 1.2,
+        ),
       ),
       child: SizedBox(
         height:

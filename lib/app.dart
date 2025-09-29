@@ -24,15 +24,10 @@ class MyApp extends StatelessWidget {
             debugShowCheckedModeBanner: false,
             routerConfig: AppRouteConfig.returnRouter(),
             localizationsDelegates: const [
-              // GlobalMaterialLocalizations.delegate,
-              // GlobalWidgetsLocalizations.delegate,
-              // GlobalCupertinoLocalizations.delegate,
               FlutterQuillLocalizations.delegate, // REQUIRED for flutter_quill
             ],
-            // NEW: Define supported locales (at least English for now)
             supportedLocales: const [
-              Locale('en', ''), // English
-              // Add other locales your app supports if needed, e.g., Locale('es', '') for Spanish
+              Locale('en', ''), // English for now
             ],
           );
         },

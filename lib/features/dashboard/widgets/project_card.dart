@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class ProjectCard extends StatelessWidget {
   const ProjectCard({super.key, required this.workspaceId, required this.su});
@@ -19,7 +20,7 @@ class ProjectCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     DateTimeHelper dth = DateTimeHelper();
     return Consumer2<DashboardProvider, WorkspaceProvider>(
       builder: (context, provider, workspaceProvider, child) {
@@ -76,7 +77,7 @@ class ProjectCard extends StatelessWidget {
                           right: 12.w,
                           child: Container(
                             padding:
-                                deviceType == rh.DeviceType.desktop
+                                deviceType == en.DeviceType.desktop
                                     ? EdgeInsets.all(8.w)
                                     : EdgeInsets.all(8.w),
                             decoration: BoxDecoration(
@@ -89,7 +90,7 @@ class ProjectCard extends StatelessWidget {
                                 color:
                                     su.isDark
                                         ? Color.fromRGBO(75, 75, 75, 1)
-                                        : Color.fromRGBO(217, 217, 217,1),
+                                        : Color.fromRGBO(217, 217, 217, 1),
                               ),
                             ),
                             child: IconButton(
@@ -112,9 +113,9 @@ class ProjectCard extends StatelessWidget {
                               icon: Icon(
                                 PhosphorIconsRegular.dotsThree,
                                 size:
-                                    deviceType == rh.DeviceType.desktop
+                                    deviceType == en.DeviceType.desktop
                                         ? 32.sp
-                                        : deviceType == rh.DeviceType.tab
+                                        : deviceType == en.DeviceType.tab
                                         ? 32.sp
                                         : 80.sp,
                                 color: su.isDark ? Colors.white : Colors.black,
@@ -129,10 +130,7 @@ class ProjectCard extends StatelessWidget {
                 Expanded(
                   flex: 1,
                   child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 16,
-                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,13 +144,12 @@ class ProjectCard extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
                                 fontSize:
-                                    deviceType == rh.DeviceType.desktop
+                                    deviceType == en.DeviceType.desktop
                                         ? 20.sp
-                                        : deviceType == rh.DeviceType.tab
+                                        : deviceType == en.DeviceType.tab
                                         ? 18.sp
                                         : 50.sp,
-                                color:
-                                    su.isDark ? Colors.white : Colors.black,
+                                color: su.isDark ? Colors.white : Colors.black,
                                 fontWeight: FontWeight.w600,
                               ),
                               overflow: TextOverflow.ellipsis,
@@ -163,13 +160,11 @@ class ProjectCard extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Fredrik',
                                 color:
-                                    su.isDark
-                                        ? Colors.white
-                                        : Colors.grey[600],
+                                    su.isDark ? Colors.white : Colors.grey[600],
                                 fontSize:
-                                    deviceType == rh.DeviceType.desktop
+                                    deviceType == en.DeviceType.desktop
                                         ? 14.sp
-                                        : deviceType == rh.DeviceType.tab
+                                        : deviceType == en.DeviceType.tab
                                         ? 14.sp
                                         : 44.sp,
                                 fontWeight: FontWeight.w500,
@@ -199,9 +194,9 @@ class ProjectCard extends StatelessWidget {
                               // Use a key to help AnimatedSwitcher differentiate between the two icons
                               key: ValueKey<bool>(workspace.isStarred),
                               size:
-                                  deviceType == rh.DeviceType.desktop
+                                  deviceType == en.DeviceType.desktop
                                       ? 32.sp
-                                      : deviceType == rh.DeviceType.tab
+                                      : deviceType == en.DeviceType.tab
                                       ? 32.sp
                                       : 62.sp,
                               color:

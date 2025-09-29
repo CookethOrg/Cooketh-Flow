@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart';
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/auth/pages/desktop/signup_desktop.dart';
 import 'package:cookethflow/features/auth/pages/mobile/signup_mobile.dart';
 import 'package:cookethflow/features/auth/pages/tablet/signup_tablet.dart';

@@ -3,16 +3,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class ColorPickerWidget extends StatefulWidget {
   final Color initialColor;
   final Function(Color) onColorChanged;
 
   const ColorPickerWidget({
-    Key? key,
+    super.key,
     this.initialColor = Colors.red,
     required this.onColorChanged,
-  }) : super(key: key);
+  });
 
   @override
   _ColorPickerWidgetState createState() => _ColorPickerWidgetState();
@@ -83,14 +84,17 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
               ),
               IconButton(
                 onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(PhosphorIconsRegular.x, size: 28.sp), // Larger close icon
+                icon: Icon(
+                  PhosphorIconsRegular.x,
+                  size: 28.sp,
+                ), // Larger close icon
                 padding: EdgeInsets.zero,
                 constraints: const BoxConstraints(),
               ),
             ],
           ),
           SizedBox(height: 24.h),
-          
+
           // Color Picker Area (Static Gradient with Draggable Circle)
           Container(
             height: 250.h, // Increased height for better visibility
@@ -116,7 +120,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
             ),
           ),
           SizedBox(height: 24.h),
-          
+
           // Hue Slider with Rounded Edges
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r), // Rounded edges
@@ -124,7 +128,14 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
               height: 40.h, // Increased height for better interaction
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Colors.red, Colors.yellow, Colors.green, Colors.cyan, Colors.blue, Colors.purple],
+                  colors: [
+                    Colors.red,
+                    Colors.yellow,
+                    Colors.green,
+                    Colors.cyan,
+                    Colors.blue,
+                    Colors.purple,
+                  ],
                 ),
                 border: Border.all(color: Colors.grey.shade300),
               ),
@@ -144,7 +155,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
             ),
           ),
           SizedBox(height: 24.h),
-          
+
           // Opacity Slider with Rounded Edges
           ClipRRect(
             borderRadius: BorderRadius.circular(12.r), // Rounded edges
@@ -172,7 +183,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
             ),
           ),
           SizedBox(height: 24.h),
-          
+
           // Color Info
           Row(
             children: [
@@ -194,7 +205,10 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
               SizedBox(width: 12.w),
               Expanded(
                 child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 10.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 10.h,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(10.r),
@@ -228,7 +242,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
             ],
           ),
           SizedBox(height: 24.h),
-          
+
           // On this page
           Container(
             width: double.infinity,
@@ -257,7 +271,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
             ),
           ),
           SizedBox(height: 24.h),
-          
+
           // Color Palette
           Wrap(
             spacing: 12.w,
@@ -270,7 +284,7 @@ class _ColorPickerWidgetState extends State<ColorPickerWidget> {
                 Colors.purple,
                 Colors.pink[100]!,
                 Colors.green[100]!,
-                Colors.purple[100]!
+                Colors.purple[100]!,
               ])
                 Container(
                   width: 60.w, // Increased size for better visibility
@@ -307,9 +321,13 @@ class ColorToolBar extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _toolIcon(PhosphorIconsRegular.paintBucket, device, onTap: () {
-            _showColorPicker(context);
-          }),
+          _toolIcon(
+            PhosphorIconsRegular.paintBucket,
+            device,
+            onTap: () {
+              _showColorPicker(context);
+            },
+          ),
           _horizontaldivider(),
           _toolIcon(PhosphorIconsRegular.circlesThreePlus, device),
           _toolIcon(
@@ -334,21 +352,22 @@ class ColorToolBar extends StatelessWidget {
   void _showColorPicker(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => Dialog(
-        backgroundColor: Colors.transparent,
-        child: ColorPickerWidget(
-          initialColor: Colors.red,
-          onColorChanged: (color) {
-            print('Selected color: $color');
-          },
-        ),
-      ),
+      builder:
+          (context) => Dialog(
+            backgroundColor: Colors.transparent,
+            child: ColorPickerWidget(
+              initialColor: Colors.red,
+              onColorChanged: (color) {
+                print('Selected color: $color');
+              },
+            ),
+          ),
     );
   }
 
   Widget _toolIcon(
     IconData iconData,
-    rh.DeviceType device, {
+    en.DeviceType device, {
     Color iconColor = Colors.black87,
     Color backgroundColor = Colors.white,
     VoidCallback? onTap,
@@ -361,11 +380,7 @@ class ColorToolBar extends StatelessWidget {
       ),
       child: IconButton(
         onPressed: onTap ?? () {},
-        icon: Icon(
-          iconData,
-          size: 32.sp,
-          color: iconColor,
-        ),
+        icon: Icon(iconData, size: 32.sp, color: iconColor),
         splashRadius: 28.r,
       ),
     );

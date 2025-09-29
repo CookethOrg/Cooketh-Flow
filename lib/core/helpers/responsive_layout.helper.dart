@@ -1,6 +1,5 @@
+import 'package:cookethflow/core/utils/enums.dart';
 import 'package:flutter/material.dart';
-
-enum DeviceType { mobile, tab, desktop }
 
 class ResponsiveLayoutHelper {
   static const int mobileMaxWidth = 375;

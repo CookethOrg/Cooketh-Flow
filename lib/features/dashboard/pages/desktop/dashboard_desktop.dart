@@ -8,13 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class DashboardDesktop extends StatelessWidget {
   const DashboardDesktop({super.key});
 
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer2<DashboardProvider,SupabaseService>(
       builder: (context, provider,supabaseprovider, child) {
         return LayoutBuilder(
@@ -29,7 +30,7 @@ class DashboardDesktop extends StatelessWidget {
                         provider.isDrawerOpen
                             ? constraints.maxHeight
                             : 0.185.sh,
-                    width: deviceType == rh.DeviceType.desktop ? 0.24.sw : deviceType == rh.DeviceType.tab ? 0.257.sw : 600.w,
+                    width: deviceType == en.DeviceType.desktop ? 0.24.sw : deviceType == en.DeviceType.tab ? 0.257.sw : 600.w,
                     child: const DashboardDrawer(),
                   ),
 
@@ -108,7 +109,7 @@ class DashboardDesktop extends StatelessWidget {
             ),
           );
         }
-        rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+        en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
         return GridView.builder(
           shrinkWrap: true,
           itemCount: displayedWorkspaces.length,
@@ -117,7 +118,7 @@ class DashboardDesktop extends StatelessWidget {
                 crossAxisCount: 3,
                 crossAxisSpacing: 20.w,
                 mainAxisSpacing: 20.h,
-                childAspectRatio: deviceType == rh.DeviceType.desktop ? 4.0/3 :  3.2/ 3,
+                childAspectRatio: deviceType == en.DeviceType.desktop ? 4.0/3 :  3.2/ 3,
               ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];

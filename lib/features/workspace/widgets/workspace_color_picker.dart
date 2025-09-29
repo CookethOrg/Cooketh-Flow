@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class WorkspaceColorPicker extends StatefulWidget {
   final SupabaseService su;
@@ -10,11 +11,11 @@ class WorkspaceColorPicker extends StatefulWidget {
   final Function(Color) onColorChanged;
 
   const WorkspaceColorPicker({
-    Key? key,
+    super.key,
     required this.initialColor,
     required this.onColorChanged,
     required this.su,
-  }) : super(key: key);
+  });
 
   @override
   _WorkspaceColorPickerState createState() => _WorkspaceColorPickerState();
@@ -64,9 +65,9 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Container(
       width:
-          device == rh.DeviceType.desktop
+          device == en.DeviceType.desktop
               ? 350.w
-              : device == rh.DeviceType.tab
+              : device == en.DeviceType.tab
               ? 350.w
               : 1000.w,
       padding: EdgeInsets.all(20.r),
@@ -96,9 +97,9 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                 'Background Colour',
                 style: TextStyle(
                   fontSize:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 20.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 20.sp
                           : 50.sp,
                   fontWeight: FontWeight.w600,
@@ -109,9 +110,9 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                 icon: Icon(
                   PhosphorIconsRegular.x,
                   size:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 24.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 24.sp
                           : 55.sp,
                 ),
@@ -226,9 +227,9 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
                       color: Colors.grey.shade800,
                       fontWeight: FontWeight.w500,
                       fontSize:
-                          device == rh.DeviceType.desktop
+                          device == en.DeviceType.desktop
                               ? 16.sp
-                              : device == rh.DeviceType.tab
+                              : device == en.DeviceType.tab
                               ? 16.sp
                               : 40.sp,
                       fontFamily: 'monospace',

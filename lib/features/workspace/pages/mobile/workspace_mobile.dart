@@ -18,13 +18,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class WorkspaceMobile extends StatelessWidget {
   const WorkspaceMobile({super.key});
 
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    en.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
     return Consumer2<WorkspaceProvider, SupabaseService>(
       builder: (context, provider, suprovider, child) {
@@ -107,7 +108,7 @@ class WorkspaceMobile extends StatelessWidget {
   }
 }
 
-Widget workspaceDrawerMob(rh.DeviceType device) {
+Widget workspaceDrawerMob(en.DeviceType device) {
   return Consumer2<WorkspaceProvider, SupabaseService>(
     builder: (context, provider, suprovider, child) {
       Color defaultBorderColor = const Color(0xFFD9D9D9);
@@ -176,7 +177,9 @@ Widget workspaceDrawerMob(rh.DeviceType device) {
                   onPressed: () {
                     showDialog(
                       context: context,
-                      builder: (context) => ExportDialog(su: suprovider,wp: provider,),
+                      builder:
+                          (context) =>
+                              ExportDialog(su: suprovider, wp: provider),
                     );
                   },
                   style: ElevatedButton.styleFrom(
@@ -274,7 +277,7 @@ Widget _buildSelectableListTile(
   required int index,
   required bool isSelected,
   required VoidCallback onTap,
-  required rh.DeviceType device,
+  required en.DeviceType device,
 }) {
   Color iconTextColor = isSelected ? Colors.blue : Colors.black;
 

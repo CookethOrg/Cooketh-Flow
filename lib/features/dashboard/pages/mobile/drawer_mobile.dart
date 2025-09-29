@@ -9,13 +9,14 @@ import 'package:provider/provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/upgrade_plan.dart';
 import 'package:cookethflow/features/dashboard/widgets/edit_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart'; // For network images
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class DashboardDrawerMob extends StatelessWidget {
   const DashboardDrawerMob({super.key});
 
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    en.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer2<DashboardProvider, SupabaseService>(
       // Consume both providers
       builder: (context, dashboardProvider, supabaseService, child) {
@@ -32,7 +33,13 @@ class DashboardDrawerMob extends StatelessWidget {
         return Container(
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
-            border: Border.all(color:supabaseService.isDark?Colors.grey.shade700: const Color(0xFFD9D9D9), width: 1.2),
+            border: Border.all(
+              color:
+                  supabaseService.isDark
+                      ? Colors.grey.shade700
+                      : const Color(0xFFD9D9D9),
+              width: 1.2,
+            ),
             borderRadius: BorderRadius.circular(12.r),
           ),
           child: Padding(
@@ -49,9 +56,9 @@ class DashboardDrawerMob extends StatelessWidget {
                         ClipOval(
                           child: SizedBox(
                             width:
-                                device == rh.DeviceType.desktop ? 72.w : 190.w,
+                                device == en.DeviceType.desktop ? 72.w : 190.w,
                             height:
-                                device == rh.DeviceType.desktop ? 72.h : 80.h,
+                                device == en.DeviceType.desktop ? 72.h : 80.h,
                             child:
                                 displayAvatarUrl.isNotEmpty
                                     ? CachedNetworkImage(
@@ -73,7 +80,7 @@ class DashboardDrawerMob extends StatelessWidget {
                           ),
                         ),
                         SizedBox(
-                          width: device == rh.DeviceType.desktop ? 8.w : 30.w,
+                          width: device == en.DeviceType.desktop ? 8.w : 30.w,
                         ),
                         Flexible(
                           child: Column(
@@ -85,7 +92,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'Frederik',
                                   fontSize:
-                                      device == rh.DeviceType.desktop
+                                      device == en.DeviceType.desktop
                                           ? 24.sp
                                           : 75.sp,
                                   fontWeight: FontWeight.w600,
@@ -98,7 +105,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'Frederik',
                                   fontSize:
-                                      device == rh.DeviceType.desktop
+                                      device == en.DeviceType.desktop
                                           ? 16.sp
                                           : 58.sp,
                                 ),
@@ -108,9 +115,7 @@ class DashboardDrawerMob extends StatelessWidget {
                         ),
                       ],
                     ),
-                    SizedBox(
-                      height : 15.h,
-                    ),
+                    SizedBox(height: 15.h),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
@@ -130,9 +135,9 @@ class DashboardDrawerMob extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               horizontal:
-                                  device == rh.DeviceType.desktop ? 28.w : 65.w,
+                                  device == en.DeviceType.desktop ? 28.w : 65.w,
                               vertical:
-                                  device == rh.DeviceType.desktop ? 24.h : 20.h,
+                                  device == en.DeviceType.desktop ? 24.h : 20.h,
                             ),
                             foregroundColor: primaryColor,
                             shape: RoundedRectangleBorder(
@@ -142,7 +147,7 @@ class DashboardDrawerMob extends StatelessWidget {
                             side: BorderSide(color: primaryColor),
                             minimumSize: Size(
                               0,
-                              device == rh.DeviceType.desktop ? 48.h : 40.h,
+                              device == en.DeviceType.desktop ? 48.h : 40.h,
                             ),
                           ),
                           label: Text(
@@ -150,7 +155,7 @@ class DashboardDrawerMob extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Fredrik',
                               fontSize:
-                                  device == rh.DeviceType.desktop
+                                  device == en.DeviceType.desktop
                                       ? 16.sp
                                       : 45.sp,
                               color: primaryColor,
@@ -171,9 +176,9 @@ class DashboardDrawerMob extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.symmetric(
                               horizontal:
-                                  device == rh.DeviceType.desktop ? 28.w : 65.w,
+                                  device == en.DeviceType.desktop ? 28.w : 65.w,
                               vertical:
-                                  device == rh.DeviceType.desktop ? 24.h : 20.h,
+                                  device == en.DeviceType.desktop ? 24.h : 20.h,
                             ),
                             foregroundColor: primaryColor,
                             shape: RoundedRectangleBorder(
@@ -183,7 +188,7 @@ class DashboardDrawerMob extends StatelessWidget {
                             side: BorderSide(color: primaryColor),
                             minimumSize: Size(
                               0,
-                              device == rh.DeviceType.desktop ? 48.h : 40.h,
+                              device == en.DeviceType.desktop ? 48.h : 40.h,
                             ),
                           ),
                           label: Text(
@@ -191,7 +196,7 @@ class DashboardDrawerMob extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: 'Fredrik',
                               fontSize:
-                                  device == rh.DeviceType.desktop
+                                  device == en.DeviceType.desktop
                                       ? 16.sp
                                       : 45.sp,
                               color: Colors.white,
@@ -202,7 +207,7 @@ class DashboardDrawerMob extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: device == rh.DeviceType.desktop ? 15.h : 10.h),
+                SizedBox(height: device == en.DeviceType.desktop ? 15.h : 10.h),
                 Visibility(
                   visible: dashboardProvider.isDrawerOpen,
                   child: Divider(color: Colors.grey, thickness: 0.5),
@@ -224,9 +229,9 @@ class DashboardDrawerMob extends StatelessWidget {
                           margin: EdgeInsets.symmetric(vertical: 0.8.h),
                           padding: EdgeInsets.symmetric(
                             horizontal:
-                                device == rh.DeviceType.desktop ? 12.w : 16.w,
+                                device == en.DeviceType.desktop ? 12.w : 16.w,
                             vertical:
-                                device == rh.DeviceType.desktop ? 12.h : 10.h,
+                                device == en.DeviceType.desktop ? 12.h : 10.h,
                           ),
                           decoration: BoxDecoration(
                             color: Colors.transparent,
@@ -240,9 +245,11 @@ class DashboardDrawerMob extends StatelessWidget {
                                   color:
                                       isSelected
                                           ? secondaryColors[6]
-                                          : supabaseService.isDark?Colors.white: Colors.black,
+                                          : supabaseService.isDark
+                                          ? Colors.white
+                                          : Colors.black,
                                   size:
-                                      device == rh.DeviceType.desktop
+                                      device == en.DeviceType.desktop
                                           ? 26.sp
                                           : 100.sp,
                                 ),
@@ -251,7 +258,7 @@ class DashboardDrawerMob extends StatelessWidget {
                               ),
                               SizedBox(
                                 width:
-                                    device == rh.DeviceType.desktop
+                                    device == en.DeviceType.desktop
                                         ? 12.w
                                         : 10.w,
                               ),
@@ -260,11 +267,15 @@ class DashboardDrawerMob extends StatelessWidget {
                                 style: TextStyle(
                                   fontFamily: 'Fredrik',
                                   fontSize:
-                                      device == rh.DeviceType.desktop
+                                      device == en.DeviceType.desktop
                                           ? 18.sp
                                           : 55.sp,
                                   color:
-                                      isSelected ? Colors.blue : supabaseService.isDark?Colors.white: Colors.black,
+                                      isSelected
+                                          ? Colors.blue
+                                          : supabaseService.isDark
+                                          ? Colors.white
+                                          : Colors.black,
                                   fontWeight:
                                       isSelected
                                           ? FontWeight.w800
@@ -280,7 +291,7 @@ class DashboardDrawerMob extends StatelessWidget {
                 ),
                 Spacer(),
                 Spacer(),
-                UpgradeCard(sv: supabaseService,),
+                UpgradeCard(sv: supabaseService),
               ],
             ),
           ),

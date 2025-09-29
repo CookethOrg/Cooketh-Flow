@@ -6,6 +6,7 @@ import 'package:cookethflow/features/dashboard/pages/mobile/dashboard_mobile.dar
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class DashboardPage extends StatelessWidget {
   const DashboardPage({super.key});
@@ -14,13 +15,13 @@ class DashboardPage extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget dashboardScreen;
     switch (responsive_helper.ResponsiveLayoutHelper.getDeviceType(context)) {
-      case responsive_helper.DeviceType.desktop:
+      case en.DeviceType.desktop:
         dashboardScreen = DashboardDesktop();
         break;
-      case responsive_helper.DeviceType.tab:
+      case en.DeviceType.tab:
         dashboardScreen = DashboardDesktop();
         break;
-      case responsive_helper.DeviceType.mobile:
+      case en.DeviceType.mobile:
         dashboardScreen = DashboardMobile();
         break;
     }

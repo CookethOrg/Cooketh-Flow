@@ -6,6 +6,7 @@ import 'dart:math' as math;
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 // The main NodePicker widget, now stateful
 class NodePicker extends StatefulWidget {
@@ -105,9 +106,9 @@ class _NodePickerState extends State<NodePicker> {
           elevation: 0,
           child: Container(
             width:
-                device == rh.DeviceType.desktop
+                device == en.DeviceType.desktop
                     ? 340
-                    : device == rh.DeviceType.tab
+                    : device == en.DeviceType.tab
                     ? 340
                     : 300,
             padding: const EdgeInsets.all(24.0),
@@ -138,14 +139,18 @@ class _NodePickerState extends State<NodePicker> {
                         fontSize: 24,
                         fontWeight: FontWeight.w600,
                         color:
-                            widget.su.isDark ? Colors.white : const Color(0xFF111827),
+                            widget.su.isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
                       ),
                     ),
                     IconButton(
                       icon: Icon(
                         Icons.close,
                         color:
-                            widget.su.isDark ? Colors.white : const Color(0xFF111827),
+                            widget.su.isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
                         size: 28,
                       ),
                       onPressed: () {
@@ -239,8 +244,12 @@ class ShapeWidget extends StatelessWidget {
   final SupabaseService su;
   final WorkspaceProvider provider;
 
-
-  const ShapeWidget({super.key, required this.shapeType, required this.su, required this.provider});
+  const ShapeWidget({
+    super.key,
+    required this.shapeType,
+    required this.su,
+    required this.provider,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -251,7 +260,9 @@ class ShapeWidget extends StatelessWidget {
         color: Colors.transparent,
         borderRadius: BorderRadius.circular(8.0),
       ),
-      child: CustomPaint(painter: ShapePainter(shapeType: shapeType, su: su, provider: provider)),
+      child: CustomPaint(
+        painter: ShapePainter(shapeType: shapeType, su: su, provider: provider),
+      ),
     );
   }
 }
@@ -262,16 +273,17 @@ class ShapePainter extends CustomPainter {
   final SupabaseService su;
   final WorkspaceProvider provider;
 
-  ShapePainter({required this.shapeType, required this.su, required this.provider});
+  ShapePainter({
+    required this.shapeType,
+    required this.su,
+    required this.provider,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint =
         Paint()
-          ..color =
-                   su.isDark
-                  ? Colors.white
-                  : Colors.black
+          ..color = su.isDark ? Colors.white : Colors.black
           ..style = PaintingStyle.stroke
           ..strokeWidth = 1.0;
 

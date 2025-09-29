@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class VerticalCustomDivider extends StatelessWidget {
   const VerticalCustomDivider({super.key});
@@ -9,9 +10,9 @@ class VerticalCustomDivider extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isDesktop =
         rh.ResponsiveLayoutHelper.getDeviceType(context) ==
-        rh.DeviceType.desktop;
+        en.DeviceType.desktop;
     bool isTab =
-        rh.ResponsiveLayoutHelper.getDeviceType(context) == rh.DeviceType.tab;
+        rh.ResponsiveLayoutHelper.getDeviceType(context) == en.DeviceType.tab;
     return Container(
       height: 24.h,
       width:

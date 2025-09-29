@@ -3,6 +3,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 
 enum ProviderState { inital, empty, loading, loaded, success, error }
 
+enum DeviceType { mobile, tab, desktop }
+
 enum NodeType {
   note,
   rectangle,

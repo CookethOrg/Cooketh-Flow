@@ -10,7 +10,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
-import 'package:cookethflow/features/workspace/widgets/workspace_color_picker.dart'; // Import the new picker
+import 'package:cookethflow/features/workspace/widgets/workspace_color_picker.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class ToolBar extends StatelessWidget {
   const ToolBar({super.key});
@@ -24,9 +25,9 @@ class ToolBar extends StatelessWidget {
         return Container(
           padding: EdgeInsets.symmetric(
             vertical:
-                device == rh.DeviceType.desktop
+                device == en.DeviceType.desktop
                     ? 20.h
-                    : device == rh.DeviceType.tab
+                    : device == en.DeviceType.tab
                     ? 16.h
                     : 2.h,
             horizontal: 24.w,
@@ -46,7 +47,7 @@ class ToolBar extends StatelessWidget {
             ),
           ),
           child:
-              device == rh.DeviceType.mobile
+              device == en.DeviceType.mobile
                   ? FittedBox(
                     fit: BoxFit.scaleDown,
                     child: Row(
@@ -77,7 +78,12 @@ class ToolBar extends StatelessWidget {
                           'Add new node',
                           device,
                           onPressed: () {
-                            _showNodePicker(context, device, suprovider, provider);
+                            _showNodePicker(
+                              context,
+                              device,
+                              suprovider,
+                              provider,
+                            );
                           },
                           backgroundColor:
                               suprovider.isDark
@@ -204,7 +210,12 @@ class ToolBar extends StatelessWidget {
                         'Add new node',
                         device,
                         onPressed: () {
-                          _showNodePicker(context, device, suprovider, provider);
+                          _showNodePicker(
+                            context,
+                            device,
+                            suprovider,
+                            provider,
+                          );
                         },
                         backgroundColor:
                             suprovider.isDark
@@ -309,7 +320,7 @@ class ToolBar extends StatelessWidget {
   Widget _toolIcon(
     IconData iconData,
     String tooltip,
-    rh.DeviceType device, {
+    en.DeviceType device, {
     Color iconColor = Colors.black87,
     Color backgroundColor = Colors.white,
     required VoidCallback onPressed,
@@ -327,9 +338,9 @@ class ToolBar extends StatelessWidget {
             icon: Icon(
               iconData,
               size:
-                  device == rh.DeviceType.desktop
+                  device == en.DeviceType.desktop
                       ? 36.sp
-                      : device == rh.DeviceType.tab
+                      : device == en.DeviceType.tab
                       ? 60.sp
                       : 100.sp,
             ),
@@ -340,9 +351,9 @@ class ToolBar extends StatelessWidget {
     );
   }
 
-  Widget _horizontalDivider(rh.DeviceType device) {
+  Widget _horizontalDivider(en.DeviceType device) {
     return Container(
-      width: device == rh.DeviceType.desktop ? 28.w : 45.w,
+      width: device == en.DeviceType.desktop ? 28.w : 45.w,
       height: 2.h,
       color: const Color(0xFFD9D9D9),
       margin: EdgeInsets.symmetric(vertical: 8.h),
@@ -351,7 +362,7 @@ class ToolBar extends StatelessWidget {
 
   void _showNodePicker(
     BuildContext context,
-    rh.DeviceType device,
+    en.DeviceType device,
     SupabaseService su,
     WorkspaceProvider wp,
   ) {
@@ -360,9 +371,9 @@ class ToolBar extends StatelessWidget {
 
     final position = renderBox.localToGlobal(Offset.zero);
     final nodePickerWidth =
-        device == rh.DeviceType.desktop
+        device == en.DeviceType.desktop
             ? 340
-            : device == rh.DeviceType.tab
+            : device == en.DeviceType.tab
             ? 340
             : 300; // The width of the NodePicker widget
     final padding = 20.w; // Padding between the toolbar and the picker
@@ -373,7 +384,7 @@ class ToolBar extends StatelessWidget {
       builder: (context) {
         double topPos;
         double leftPos;
-        if (device == rh.DeviceType.mobile) {
+        if (device == en.DeviceType.mobile) {
           topPos = position.dy - 500.h;
           leftPos = position.dx;
         } else {
@@ -382,9 +393,7 @@ class ToolBar extends StatelessWidget {
         }
         return Stack(
           children: [
-            Positioned.fill(
-              child: Container(color: Colors.transparent),
-            ),
+            Positioned.fill(child: Container(color: Colors.transparent)),
             Positioned(
               top: topPos,
               left: leftPos,
@@ -402,7 +411,7 @@ class ToolBar extends StatelessWidget {
   void _showColorPicker(
     BuildContext context,
     WorkspaceProvider provider,
-    rh.DeviceType device,
+    en.DeviceType device,
     SupabaseService su,
   ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
@@ -417,7 +426,7 @@ class ToolBar extends StatelessWidget {
         builder: (context) {
           double topPos;
           double leftPos;
-          if (device == rh.DeviceType.mobile) {
+          if (device == en.DeviceType.mobile) {
             topPos = position.dy - 390.h;
             leftPos = position.dx;
           } else {
@@ -455,7 +464,7 @@ class ToolBar extends StatelessWidget {
 
   void _showStickyNote(
     BuildContext context,
-    rh.DeviceType device,
+    en.DeviceType device,
     SupabaseService su,
   ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
@@ -474,11 +483,11 @@ class ToolBar extends StatelessWidget {
                   ),
                 ),
                 Positioned(
-                  right: device == rh.DeviceType.mobile ? position.dx : 150.w,
+                  right: device == en.DeviceType.mobile ? position.dx : 150.w,
                   top:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 500.h
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 500.h
                           : position.dy - 390.h,
                   child: Material(

@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class ZoomControlButton extends StatelessWidget {
   const ZoomControlButton({super.key});
@@ -40,18 +41,18 @@ class ZoomControlButton extends StatelessWidget {
               //     color: suprovider.isDark ? Colors.white : Colors.black,
               //     fontWeight: FontWeight.w500,
               //     fontSize:
-              //         device == rh.DeviceType.desktop
+              //         device == en.DeviceType.desktop
               //             ? 24.sp
-              //             : device == rh.DeviceType.tab
+              //             : device == en.DeviceType.tab
               //             ? 24.sp
               //             : 40.sp,
               //   ),
               // ),
               // SizedBox(
               //   width:
-              //       device == rh.DeviceType.desktop
+              //       device == en.DeviceType.desktop
               //           ? 8.w
-              //           : device == rh.DeviceType.tab
+              //           : device == en.DeviceType.tab
               //           ? 8.w
               //           : 12.w,
               // ),
@@ -65,9 +66,9 @@ class ZoomControlButton extends StatelessWidget {
                 icon: Icon(
                   PhosphorIconsRegular.plus,
                   size:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 24.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 24.sp
                           : 40.sp,
                 ),
@@ -84,9 +85,9 @@ class ZoomControlButton extends StatelessWidget {
                 icon: Icon(
                   PhosphorIconsRegular.minus,
                   size:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 24.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 24.sp
                           : 40.sp,
                 ),
@@ -102,9 +103,9 @@ class ZoomControlButton extends StatelessWidget {
                 icon: Icon(
                   PhosphorIconsRegular.resize,
                   size:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 24.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 24.sp
                           : 60.sp,
                 ), // Icon for reset

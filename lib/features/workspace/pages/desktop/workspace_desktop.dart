@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class WorkspaceDesktop extends StatefulWidget {
   const WorkspaceDesktop({super.key});
@@ -79,7 +80,7 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
       StickyNoteIntent: CallbackAction<StickyNoteIntent>(
         onInvoke: (intent) {
           final provider = Provider.of<SupabaseService>(context, listen: false);
-          final device = rh.DeviceType.desktop;
+          final device = en.DeviceType.desktop;
           _showStickyNote(context, device, provider);
           return null;
         },
@@ -254,7 +255,7 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
 
   void _showStickyNote(
     BuildContext context,
-    rh.DeviceType device,
+    en.DeviceType device,
     SupabaseService su,
   ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
@@ -273,11 +274,11 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                   ),
                 ),
                 Positioned(
-                  right: device == rh.DeviceType.mobile ? position.dx : 150.w,
+                  right: device == en.DeviceType.mobile ? position.dx : 150.w,
                   top:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 500.h
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 500.h
                           : position.dy - 390.h,
                   child: Material(

@@ -8,14 +8,15 @@ import 'package:cookethflow/features/workspace/widgets/export_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class ExportProjectButton extends StatelessWidget {
   final SupabaseService su;
   final WorkspaceProvider wp; // MODIFIED: Added WorkspaceProvider
 
   const ExportProjectButton({
-    super.key, 
-    required this.su, 
+    super.key,
+    required this.su,
     required this.wp, // MODIFIED: Added to constructor
   });
 
@@ -25,7 +26,7 @@ class ExportProjectButton extends StatelessWidget {
     return ElevatedButton(
       onPressed: () {
         showDialog(
-          context: context, 
+          context: context,
           // MODIFIED: Pass both providers to the dialog
           builder: (context) => ExportDialog(su: su, wp: wp),
         );
@@ -45,7 +46,7 @@ class ExportProjectButton extends StatelessWidget {
             'Export Flowchart',
             style: TextStyle(
               fontFamily: 'Fredrik',
-              fontSize: device == rh.DeviceType.desktop ? 18.sp : 25.sp,
+              fontSize: device == en.DeviceType.desktop ? 18.sp : 25.sp,
               color: Colors.white,
               fontWeight: FontWeight.w500,
             ),
@@ -54,7 +55,7 @@ class ExportProjectButton extends StatelessWidget {
           Icon(
             PhosphorIconsRegular.export,
             color: Colors.white,
-            size: device == rh.DeviceType.desktop ? 24.sp : 40.sp,
+            size: device == en.DeviceType.desktop ? 24.sp : 40.sp,
           ),
         ],
       ),

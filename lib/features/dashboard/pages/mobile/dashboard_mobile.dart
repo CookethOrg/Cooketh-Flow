@@ -9,6 +9,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class DashboardMobile extends StatefulWidget {
   const DashboardMobile({super.key});
@@ -21,7 +22,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
   bool is_Visible = false;
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer2<DashboardProvider,SupabaseService>(
       builder: (context, provider,suprovider,child) {
         return LayoutBuilder(
@@ -71,7 +72,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
                           duration: const Duration(milliseconds: 500),
                           height: provider.isDrawerOpen ? 0.8.sh : 0.185.sh,
                           width:
-                              deviceType == rh.DeviceType.desktop ? 400.w : 0.70.sw,
+                              deviceType == en.DeviceType.desktop ? 400.w : 0.70.sw,
                           child: const DashboardDrawerMob(),
                         ),
                       ),

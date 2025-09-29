@@ -4,6 +4,7 @@ import 'package:cookethflow/core/theme/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class UpgradeCard extends StatefulWidget {
   final SupabaseService sv;
@@ -16,28 +17,29 @@ class UpgradeCard extends StatefulWidget {
 class _UpgradeCardState extends State<UpgradeCard> {
   @override
   Widget build(BuildContext context) {
-    rh.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
+    en.DeviceType device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
     return Container(
       margin: EdgeInsets.only(top: 20.h),
       padding: EdgeInsets.symmetric(
         horizontal:
-            device == rh.DeviceType.desktop
+            device == en.DeviceType.desktop
                 ? 24.w
-                : device == rh.DeviceType.tab
+                : device == en.DeviceType.tab
                 ? 24.w
                 : 30.w,
         vertical:
-            device == rh.DeviceType.desktop
+            device == en.DeviceType.desktop
                 ? 20.w
-                : device == rh.DeviceType.tab
+                : device == en.DeviceType.tab
                 ? 20.w
                 : 30.w,
       ),
       decoration: BoxDecoration(
-        color: widget.sv.isDark
-                      ? Color.fromRGBO(48, 48, 48, 100)
-                      : Color.fromRGBO(255, 255, 255, 100),
+        color:
+            widget.sv.isDark
+                ? Color.fromRGBO(48, 48, 48, 100)
+                : Color.fromRGBO(255, 255, 255, 100),
         borderRadius: BorderRadius.circular(12.r),
         border: Border.all(
           color: widget.sv.isDark ? Colors.grey.shade700 : Color(0xFFD9D9D9),
@@ -54,9 +56,9 @@ class _UpgradeCardState extends State<UpgradeCard> {
                 PhosphorIconsRegular.sparkle,
                 color: widget.sv.isDark ? Colors.white : Colors.black,
                 size:
-                    device == rh.DeviceType.desktop
+                    device == en.DeviceType.desktop
                         ? 24.sp
-                        : device == rh.DeviceType.tab
+                        : device == en.DeviceType.tab
                         ? 28.sp
                         : 20.sp,
               ),
@@ -66,9 +68,9 @@ class _UpgradeCardState extends State<UpgradeCard> {
                 style: TextStyle(
                   fontFamily: 'Fredrik',
                   fontSize:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 20.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 24.sp
                           : 45.sp,
                   fontWeight: FontWeight.w600,
@@ -83,12 +85,12 @@ class _UpgradeCardState extends State<UpgradeCard> {
             style: TextStyle(
               fontFamily: 'Fredrik',
               fontSize:
-                  device == rh.DeviceType.desktop
+                  device == en.DeviceType.desktop
                       ? 16.sp
-                      : device == rh.DeviceType.tab
+                      : device == en.DeviceType.tab
                       ? 20.sp
                       : 45.sp,
-              color: widget.sv.isDark?Colors.white: Color(0xFF4B4B4B),
+              color: widget.sv.isDark ? Colors.white : Color(0xFF4B4B4B),
               height: 2,
             ),
           ),
@@ -104,9 +106,9 @@ class _UpgradeCardState extends State<UpgradeCard> {
                 foregroundColor: Colors.white,
                 padding: EdgeInsets.symmetric(
                   vertical:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 12.h
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 16.h
                           : 0.8.h,
                 ),
@@ -120,9 +122,9 @@ class _UpgradeCardState extends State<UpgradeCard> {
                 style: TextStyle(
                   fontFamily: 'Fredrik',
                   fontSize:
-                      device == rh.DeviceType.desktop
+                      device == en.DeviceType.desktop
                           ? 14.sp
-                          : device == rh.DeviceType.tab
+                          : device == en.DeviceType.tab
                           ? 18.sp
                           : 45.sp,
                   fontWeight: FontWeight.w500,

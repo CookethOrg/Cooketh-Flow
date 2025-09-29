@@ -31,7 +31,7 @@ class SignUpForm extends StatelessWidget {
         if (supabaseService.currentUser != null &&
             GoRouter.of(
                   context,
-                ).routerDelegate.currentConfiguration?.fullPath !=
+                ).routerDelegate.currentConfiguration.fullPath !=
                 RoutesPath.dashboard) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             context.go(RoutesPath.dashboard);

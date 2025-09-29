@@ -24,14 +24,8 @@ class LoginForm extends StatelessWidget {
         responsive_helper.ResponsiveLayoutHelper.getDeviceType(context) ==
         en.DeviceType.desktop;
 
-    // Use a MultiProvider to listen to both AuthenticationProvider and SupabaseService
-    // SupabaseService's currentUser updates will trigger rebuilds related to auth state.
     return Consumer2<AuthenticationProvider, SupabaseService>(
       builder: (context, authProvider, supabaseService, child) {
-        // Listen to SupabaseService's auth state for automatic navigation after social login
-        // This ensures the page reacts when SupabaseService updates currentUser
-        // For simplicity, we'll put the navigation logic here, but for complex apps,
-        // you might have a dedicated AuthWrapper or AuthStreamListener at a higher level.
         if (supabaseService.currentUser != null &&
             GoRouter.of(context).routerDelegate.currentConfiguration.fullPath !=
                 RoutesPath.dashboard) {
@@ -41,7 +35,7 @@ class LoginForm extends StatelessWidget {
             // context.goNamed(RouteName.dashboard,pathParameters: {'username': supabaseService.currentUser!.name!});
             authProvider.setLoading(
               false,
-            ); // Ensure loading is off after navigation
+            );
           });
         }
 
@@ -190,8 +184,6 @@ class LoginForm extends StatelessWidget {
                           foregroundColor: Colors.white,
                         ),
                         onPressed: () async {
-                          // We set loading true, and it will be set to false in the provider's finally block
-                          // The navigation happens after the SupabaseService updates the current user
                           String? passwordValidationCheck = validatePassword(
                             authProvider.passwordController.text,
                           );

@@ -8,7 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:cookethflow/features/dashboard/widgets/upgrade_plan.dart';
 import 'package:cookethflow/features/dashboard/widgets/edit_profile.dart';
 import 'package:cached_network_image/cached_network_image.dart'; // For network images
 import 'package:cookethflow/core/utils/enums.dart' as en;

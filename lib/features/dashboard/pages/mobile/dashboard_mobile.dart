@@ -1,7 +1,6 @@
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/features/dashboard/pages/mobile/drawer_mobile.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
-import 'package:cookethflow/features/dashboard/widgets/dashboard_drawer.dart';
 import 'package:cookethflow/features/dashboard/widgets/project_card.dart';
 import 'package:cookethflow/features/dashboard/widgets/start_project.dart';
 import 'package:flutter/material.dart';
@@ -19,7 +18,7 @@ class DashboardMobile extends StatefulWidget {
 }
 
 class _DashboardMobileState extends State<DashboardMobile> {
-  bool is_Visible = false;
+  bool isVisible = false;
   @override
   Widget build(BuildContext context) {
     en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
@@ -46,7 +45,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
                           child: InkWell(
                             onTap: () {
                               setState(() {
-                                is_Visible = !is_Visible;
+                                isVisible = !isVisible;
                               });
                             },
                             child: Icon(Icons.menu, size: 30),
@@ -63,7 +62,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
                   ],
                 ),
                  Visibility(
-                      visible: is_Visible,
+                      visible: isVisible,
                       child: Positioned(
                         top: 90.h,
                         left: 8.w,

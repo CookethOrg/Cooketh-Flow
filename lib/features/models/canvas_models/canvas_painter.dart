@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'dart:convert';
 import 'dart:math';
-import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_object.dart';
 import 'package:cookethflow/features/models/canvas_models/objects/circle_object.dart';

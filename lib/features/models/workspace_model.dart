@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:flutter/material.dart'; // Required for Color
+import 'package:flutter/material.dart';
 
 class WorkspaceModel {
   String id;
@@ -9,7 +9,6 @@ class WorkspaceModel {
   List<String> viewerIdList;
   DateTime? lastEdited;
   Color? backgroundColor;
-  // NEW: Property for starring a workspace
   bool isStarred;
 
   WorkspaceModel({
@@ -20,7 +19,7 @@ class WorkspaceModel {
     required this.viewerIdList,
     required this.lastEdited,
     this.backgroundColor,
-    this.isStarred = false, // Add to constructor with a default value
+    this.isStarred = false,
   });
 
   WorkspaceModel copyWith({
@@ -50,7 +49,6 @@ class WorkspaceModel {
     if (backgroundColor != null) {
       jsonData['backgroundColor'] = '#${backgroundColor!.value.toRadixString(16).padLeft(8, '0').toUpperCase()}';
     }
-    // NEW: Add isStarred to the data field
     jsonData['isStarred'] = isStarred;
 
     return {
@@ -66,7 +64,6 @@ class WorkspaceModel {
 
   factory WorkspaceModel.fromJson(Map<String, dynamic> json) {
     Color? bgColor;
-    // NEW: Parse isStarred from the data field
     bool isStarredFlag = false;
 
     if (json['data'] != null) {

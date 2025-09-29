@@ -41,51 +41,40 @@ class AuthenticationProvider extends StateHandler {
   }
 
   /// Initiates Google authentication flow.
-  /// No longer returns a String directly, as `supabaseService.googleAuthenticate`
-  /// initiates an external flow and the app relies on the `onAuthStateChange` listener.
   Future<void> googleAuth() async {
     setLoading(true);
     try {
       await supabaseService.googleAuthenticate();
-      // The actual navigation/state update will happen via SupabaseService's
-      // onAuthStateChange listener which updates currentUser and notifies.
-      // You might show a loading indicator until the dashboard page loads.
     } catch (e) {
       print("Google Auth error: $e");
-      // Optionally show a snackbar here, but the primary response is via listener
-    } finally {
-      // setLoading(false); // Do not set false immediately, as navigation might still be pending
     }
   }
 
   /// Initiates GitHub authentication flow.
-  /// Similar to Google Auth, relies on `onAuthStateChange` listener.
   Future<void> githubSignin() async {
     setLoading(true);
     try {
       await supabaseService.signInWithGithub();
     } catch (e) {
       print("GitHub Auth error: $e");
-    } finally {
-      // setLoading(false);
     }
   }
 
   /// Creates a new user with email and password.
   /// `name` parameter added for email sign-ups to populate user metadata.
   Future<String> createNewUser({
-    required String name, // Added 'name' here
+    required String name,
     required String userName,
     required String email,
     required String password,
   }) async {
-    setLoading(true); // Start loading
+    setLoading(true);
     String res = "Some error occurred";
 
     try {
       if (email.isNotEmpty && userName.isNotEmpty && password.isNotEmpty) {
         res = await supabaseService.createNewUser(
-          name: name, // Pass name to createNewUser in SupabaseService
+          name: name,
           userName: userName,
           email: email,
           password: password,
@@ -133,7 +122,7 @@ class AuthenticationProvider extends StateHandler {
     _emailController.dispose();
     _passwordController.dispose();
     _userNameController.dispose();
-    _confirmPasswordController.dispose(); // Dispose new controller
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 }

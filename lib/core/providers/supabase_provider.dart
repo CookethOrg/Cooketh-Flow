@@ -379,22 +379,10 @@ class SupabaseService extends StateHandler {
       final user = supabase.auth.currentUser;
       if (user == null) throw Exception('No authenticated user found');
 
-      // Note: Supabase's client-side SDK doesn't directly support deleting a user
-      // from `auth.users` table for security reasons. This usually requires a
-      // backend function (Edge Function) with service_role key or a direct
-      // database operation with row level security.
-      // The current `supabase.from('User').delete()` was targeting a custom table.
-      // If you intend to truly delete the user from `auth.users`, you'll need
-      // an Edge Function or similar.
-      // For now, I'll remove the `supabase.from('User').delete()` part
-      // as per your instruction to not use the 'User' table.
-      // You can add a prompt to the user here to implement an Edge Function if needed.
-
       await supabase.auth.signOut(); // Sign out the user
       _currentUser = null; // Clear local user data
       notifyListeners();
       print("User account (locally) logged out and data cleared.");
-      // Consider adding an Edge Function call here to truly delete the user from Supabase auth.
     } catch (e) {
       print("Error deleting account: $e");
       throw Exception('Error deleting account: ${e.toString()}');

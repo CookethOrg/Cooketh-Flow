@@ -69,7 +69,7 @@ class DashboardDrawerMob extends StatelessWidget {
                                               const CircularProgressIndicator(), // Loading indicator
                                       errorWidget:
                                           (context, url, error) => Image.asset(
-                                            supabaseService!.defaultPfpPath,
+                                            supabaseService.defaultPfpPath,
                                             fit: BoxFit.cover,
                                           ), // Fallback to default asset
                                     )
@@ -165,7 +165,7 @@ class DashboardDrawerMob extends StatelessWidget {
                         SizedBox(width: 16),
                         ElevatedButton.icon(
                           onPressed: () async {
-                            await supabaseService!
+                            await supabaseService
                                 .logout(); // Call logout from SupabaseService
                           },
                           icon: Icon(
@@ -289,9 +289,9 @@ class DashboardDrawerMob extends StatelessWidget {
                     },
                   ),
                 ),
-                Spacer(),
-                Spacer(),
-                UpgradeCard(sv: supabaseService),
+                // Spacer(),
+                // Spacer(),
+                // UpgradeCard(sv: supabaseService),
               ],
             ),
           ),

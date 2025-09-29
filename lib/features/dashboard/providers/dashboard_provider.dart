@@ -21,7 +21,7 @@ class DashboardProvider extends StateHandler {
   int _tabIndex = 0;
   bool _isLoading = false;
   bool _isInitialized = false;
-  Map<String, WorkspaceModel> _workspaceList = {};
+  final Map<String, WorkspaceModel> _workspaceList = {};
 
   // getters
   bool get isDrawerOpen => _isDrawerOpen;
@@ -94,12 +94,12 @@ class DashboardProvider extends StateHandler {
       }
 
       try {
-        List<dynamic> _dbWorkspace = await supabase!
+        List<dynamic> dbWorkspace = await supabase!
             .from('workspace')
             .select()
             .eq('owner', res.id);
         _workspaceList.clear();
-        for (var workspaceData in _dbWorkspace) {
+        for (var workspaceData in dbWorkspace) {
           WorkspaceModel newWorkspace = WorkspaceModel.fromJson(workspaceData);
           _workspaceList[newWorkspace.id] = newWorkspace;
         }

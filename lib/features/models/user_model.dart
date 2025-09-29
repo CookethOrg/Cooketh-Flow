@@ -17,8 +17,6 @@ class CurrentUser {
     required this.provider,
   });
 
-  /// Factory constructor to parse a Supabase `User` object into `CurrentUser`.
-  /// It intelligently extracts data based on the authentication provider.
   factory CurrentUser.fromSupabaseUser(User user) {
     final Map<String, dynamic> userMetadata = user.userMetadata ?? {};
     final Map<String, dynamic> appMetadata = user.appMetadata ?? {};
@@ -32,8 +30,6 @@ class CurrentUser {
     switch (provider) {
       case 'google':
         name = userMetadata['full_name'] ?? userMetadata['name'];
-        // Google typically doesn't provide a 'username'. You might derive it
-        // from the email if you need one, or leave it null.
         username = null;
         avatarUrl = userMetadata['avatar_url'] ?? userMetadata['picture'];
         break;
@@ -43,9 +39,7 @@ class CurrentUser {
         avatarUrl = userMetadata['avatar_url'];
         break;
       case 'email':
-      default: // For email and any other unhandled providers
-        // For email provider, you likely store custom 'userName' and 'name'
-        // in userMetadata during signup or profile editing.
+      default:
         name = userMetadata['name'] ?? user.email?.split('@').first;
         username = userMetadata['userName'] ?? user.email?.split('@').first;
         avatarUrl = userMetadata['profile_picture_url']; // Custom field for uploaded PFP

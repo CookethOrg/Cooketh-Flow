@@ -10,9 +10,8 @@ import 'package:cookethflow/features/workspace/widgets/export_project_button.dar
 import 'package:cookethflow/features/workspace/widgets/node_editing_toolbox.dart';
 import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
-import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
-import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart'; // shortcut file
+import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart';
 import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -26,10 +25,10 @@ class WorkspaceDesktop extends StatefulWidget {
   const WorkspaceDesktop({super.key});
 
   @override
-  _WorkspaceDesktopState createState() => _WorkspaceDesktopState();
+  WorkspaceDesktopState createState() => WorkspaceDesktopState();
 }
 
-class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
+class WorkspaceDesktopState extends State<WorkspaceDesktop> {
   final FocusNode _focusNode = FocusNode();
 
   @override

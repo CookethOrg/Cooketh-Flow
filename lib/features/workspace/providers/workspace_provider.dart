@@ -31,8 +31,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:uuid/uuid.dart';
 
 class WorkspaceProvider extends StateHandler {
-  late SupabaseService _supabaseService;
-  late DashboardProvider _dashboardProvider;
+  late final SupabaseService _supabaseService;
+  late final DashboardProvider _dashboardProvider;
 
   WorkspaceModel? _currentWorkspace;
 

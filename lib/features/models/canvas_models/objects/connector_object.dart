@@ -128,9 +128,6 @@ class ConnectorObject extends CanvasObject {
 
   @override
   bool intersectsWith(Offset point) {
-    // This method is for hit detection on the connector line itself.
-    // It requires access to the source and target objects to get the start and end points.
-    // This logic is best handled in the WorkspaceProvider's onPanDown, where all objects are available.
     return false;
   }
 }

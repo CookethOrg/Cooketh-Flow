@@ -1,3 +1,4 @@
+import 'package:cookethflow/core/helpers/ui_helper.dart';
 import 'package:cookethflow/core/utils/state_handler.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/widgets.dart'; // Import for TransformationController
@@ -19,7 +20,7 @@ class CanvasProvider extends StateHandler {
   TransformationController get transformationController => _transformationController;
 
   // Define the size of your virtual canvas
-  static const Size _canvasSize = Size(20000, 20000);
+  static final Size _canvasSize = canvasDimension;
 
   void _initializeCenteredView() {
     // Calculate the center of the large virtual canvas

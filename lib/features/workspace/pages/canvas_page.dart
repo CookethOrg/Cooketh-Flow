@@ -24,11 +24,10 @@ class CanvasPage extends StatelessWidget {
               if (event.kind == PointerDeviceKind.mouse &&
                   event.buttons == kPrimaryMouseButton &&
                   event.down) {
-                // You could implement double-click logic here if needed
+                // double-click logic could be implemented here if needed
               }
             },
             child: MouseRegion(
-              // Change cursor based on the active tool
               cursor:
                   isHandToolActive
                       ? SystemMouseCursors.grab

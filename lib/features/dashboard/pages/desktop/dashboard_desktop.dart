@@ -1,5 +1,5 @@
-
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/features/dashboard/pages/desktop/short_cut_setting.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/dashboard_drawer.dart';
 import 'package:cookethflow/features/dashboard/widgets/project_card.dart';
@@ -16,8 +16,8 @@ class DashboardDesktop extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer2<DashboardProvider,SupabaseService>(
-      builder: (context, provider,supabaseprovider, child) {
+    return Consumer2<DashboardProvider, SupabaseService>(
+      builder: (context, provider, supabaseprovider, child) {
         return LayoutBuilder(
           builder:
               (context, constraints) => Row(
@@ -30,7 +30,12 @@ class DashboardDesktop extends StatelessWidget {
                         provider.isDrawerOpen
                             ? constraints.maxHeight
                             : 0.185.sh,
-                    width: deviceType == en.DeviceType.desktop ? 0.24.sw : deviceType == en.DeviceType.tab ? 0.257.sw : 600.w,
+                    width:
+                        deviceType == en.DeviceType.desktop
+                            ? 0.24.sw
+                            : deviceType == en.DeviceType.tab
+                            ? 0.257.sw
+                            : 600.w,
                     child: const DashboardDrawer(),
                   ),
 
@@ -50,7 +55,11 @@ class DashboardDesktop extends StatelessWidget {
                           const SizedBox(height: 32),
                           Expanded(
                             // NEW: Conditionally build the main content area
-                            child: _buildMainContent(provider,context,supabaseprovider),
+                            child: _buildMainContent(
+                              provider,
+                              context,
+                              supabaseprovider,
+                            ),
                           ),
                         ],
                       ),
@@ -64,7 +73,11 @@ class DashboardDesktop extends StatelessWidget {
   }
 
   // NEW: Helper widget to build content based on the selected tab
-  Widget _buildMainContent(DashboardProvider provider,BuildContext context,SupabaseService su) {
+  Widget _buildMainContent(
+    DashboardProvider provider,
+    BuildContext context,
+    SupabaseService su,
+  ) {
     switch (provider.tabIndex) {
       case 2: // Trash Tab
         return Center(
@@ -74,7 +87,7 @@ class DashboardDesktop extends StatelessWidget {
               fontFamily: 'Fredrik',
               fontSize: 24.sp,
               fontWeight: FontWeight.w600,
-              color: su.isDark?Colors.white: Colors.grey[600],
+              color: su.isDark ? Colors.white : Colors.grey[600],
             ),
           ),
         );
@@ -88,41 +101,45 @@ class DashboardDesktop extends StatelessWidget {
               fontFamily: 'Fredrik',
               fontSize: 18.sp,
               height: 1.6,
-              color: su.isDark?Colors.white: Colors.black.withOpacity(0.75),
+              color: su.isDark ? Colors.white : Colors.black.withOpacity(0.75),
             ),
           ),
         );
+      case 4:
+        return ShortcutSettingsPage();
       default: // All and Starred Tabs
         final displayedWorkspaces = provider.displayedWorkspaces;
-        
+
         // Show a message if the "Starred" tab is empty
         if (displayedWorkspaces.isEmpty && provider.tabIndex == 1) {
-           return Center(
+          return Center(
             child: Text(
               'No starred workspaces yet!',
               style: TextStyle(
                 fontFamily: 'Fredrik',
                 fontSize: 24.sp,
                 fontWeight: FontWeight.w600,
-                color:su.isDark?Colors.white: Colors.grey[600],
+                color: su.isDark ? Colors.white : Colors.grey[600],
               ),
             ),
           );
         }
-        en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
+        en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(
+          context,
+        );
         return GridView.builder(
           shrinkWrap: true,
           itemCount: displayedWorkspaces.length,
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 20.w,
-                mainAxisSpacing: 20.h,
-                childAspectRatio: deviceType == en.DeviceType.desktop ? 4.0/3 :  3.2/ 3,
-              ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+            crossAxisSpacing: 20.w,
+            mainAxisSpacing: 20.h,
+            childAspectRatio:
+                deviceType == en.DeviceType.desktop ? 4.0 / 3 : 3.2 / 3,
+          ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];
-            return ProjectCard(workspaceId: workspace.id,su: su,);
+            return ProjectCard(workspaceId: workspace.id, su: su);
           },
         );
     }

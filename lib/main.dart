@@ -4,12 +4,14 @@ import 'package:cookethflow/features/auth/providers/auth_provider.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
+import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:universal_html/js.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -82,6 +84,7 @@ void main() async {
                 Provider.of<WorkspaceProvider>(context, listen: false),
               ),
         ),
+        ChangeNotifierProvider(create: (context)=>ShortcutManagerr())
       ],
       child: const MyApp(),
     ),

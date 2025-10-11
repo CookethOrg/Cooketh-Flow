@@ -1,8 +1,6 @@
-// lib/features/workspace/pages/workspace_desktop.dart
-import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
-import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
+import 'package:cookethflow/core/utils/enums.dart' as rh;
 import 'package:cookethflow/features/workspace/pages/canvas_page.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
@@ -10,25 +8,24 @@ import 'package:cookethflow/features/workspace/widgets/export_project_button.dar
 import 'package:cookethflow/features/workspace/widgets/node_editing_toolbox.dart';
 import 'package:cookethflow/features/workspace/widgets/sticky_notes.dart';
 import 'package:cookethflow/features/workspace/widgets/toolbar.dart';
+import 'package:cookethflow/features/workspace/widgets/undo_redo_button.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_drawer.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart';
 import 'package:cookethflow/features/workspace/widgets/zoom_control_button.dart';
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math;
-import 'package:cookethflow/core/utils/enums.dart' as en;
 
 class WorkspaceDesktop extends StatefulWidget {
   const WorkspaceDesktop({super.key});
 
   @override
-  WorkspaceDesktopState createState() => WorkspaceDesktopState();
+  _WorkspaceDesktopState createState() => _WorkspaceDesktopState();
 }
 
-class WorkspaceDesktopState extends State<WorkspaceDesktop> {
+class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -45,87 +42,80 @@ class WorkspaceDesktopState extends State<WorkspaceDesktop> {
 
   @override
   Widget build(BuildContext context) {
-    final Map<Type, Action<Intent>> actions = {
-      PointerIntent: CallbackAction<PointerIntent>(
-        onInvoke: (intent) {
-          final provider = Provider.of<WorkspaceProvider>(
-            context,
-            listen: false,
-          );
-          provider.changeDrawMode(DrawMode.pointer);
-          return null;
-        },
-      ),
-      PanIntent: CallbackAction<PanIntent>(
-        onInvoke: (intent) {
-          final provider = Provider.of<WorkspaceProvider>(
-            context,
-            listen: false,
-          );
-          provider.changeDrawMode(DrawMode.hand);
-          return null;
-        },
-      ),
-      TextIntent: CallbackAction<TextIntent>(
-        onInvoke: (intent) {
-          final provider = Provider.of<WorkspaceProvider>(
-            context,
-            listen: false,
-          );
-          provider.changeDrawMode(DrawMode.textBox);
-          return null;
-        },
-      ),
-      StickyNoteIntent: CallbackAction<StickyNoteIntent>(
-        onInvoke: (intent) {
-          final provider = Provider.of<SupabaseService>(context, listen: false);
-          final device = en.DeviceType.desktop;
-          _showStickyNote(context, device, provider);
-          return null;
-        },
-      ),
-      ResetIntent: CallbackAction<ResetIntent>(
-        onInvoke: (intent) {
-          final canvasProvider = Provider.of<CanvasProvider>(
-            context,
-            listen: false,
-          );
-          canvasProvider.resetZoom();
-          return null;
-        },
-      ),
-      ZoomInIntent: CallbackAction<ZoomInIntent>(
-        onInvoke: (intent) {
-          final canvasProvider = Provider.of<CanvasProvider>(
-            context,
-            listen: false,
-          );
-          canvasProvider.zoomIn();
-          return null;
-        },
-      ),
-      ZoomOutIntent: CallbackAction<ZoomOutIntent>(
-        onInvoke: (intent) {
-          final canvasProvider = Provider.of<CanvasProvider>(
-            context,
-            listen: false,
-          );
-          canvasProvider.zoomOut();
-          return null;
-        },
-      ),
-      EscapeIntent: CallbackAction<EscapeIntent>(
-        onInvoke: (intent) {
-          context.pop();
-          return null;
-        },
-      ),
-    };
+    return Consumer3<WorkspaceProvider, SupabaseService, ShortcutManagerr>(
+      builder: (context, provider, suprovider, shortcutManager, child) {
+        // Define actions
+        final Map<Type, Action<Intent>> actions = {
+          PointerIntent: CallbackAction<PointerIntent>(
+            onInvoke: (intent) {
+              provider.changeDrawMode(DrawMode.pointer);
+              return null;
+            },
+          ),
+          PanIntent: CallbackAction<PanIntent>(
+            onInvoke: (intent) {
+              provider.changeDrawMode(DrawMode.hand);
+              return null;
+            },
+          ),
+          TextIntent: CallbackAction<TextIntent>(
+            onInvoke: (intent) {
+              provider.changeDrawMode(DrawMode.textBox);
+              return null;
+            },
+          ),
+          StickyNoteIntent: CallbackAction<StickyNoteIntent>(
+            onInvoke: (intent) {
+              final device = rh.DeviceType.desktop;
+              _showStickyNote(context, device, suprovider);
+              return null;
+            },
+          ),
+          ResetIntent: CallbackAction<ResetIntent>(
+            onInvoke: (intent) {
+              final canvasProvider = Provider.of<CanvasProvider>(
+                context,
+                listen: false,
+              );
+              canvasProvider.resetZoom();
+              return null;
+            },
+          ),
+          ZoomInIntent: CallbackAction<ZoomInIntent>(
+            onInvoke: (intent) {
+              final canvasProvider = Provider.of<CanvasProvider>(
+                context,
+                listen: false,
+              );
+              canvasProvider.zoomIn();
+              return null;
+            },
+          ),
+          ZoomOutIntent: CallbackAction<ZoomOutIntent>(
+            onInvoke: (intent) {
+              final canvasProvider = Provider.of<CanvasProvider>(
+                context,
+                listen: false,
+              );
+              canvasProvider.zoomOut();
+              return null;
+            },
+          ),
+        };
 
-    return Consumer2<WorkspaceProvider, SupabaseService>(
-      builder: (context, provider, suprovider, child) {
+        // Build dynamic shortcuts from ShortcutManager
+        final shortcuts = shortcutManager.buildShortcutsMap({
+          PointerIntent: () => PointerIntent(),
+          PanIntent: () => PanIntent(),
+          TextIntent: () => TextIntent(),
+          StickyNoteIntent: () => StickyNoteIntent(),
+          ResetIntent: () => ResetIntent(),
+          ZoomInIntent: () => ZoomInIntent(),
+          ZoomOutIntent: () => ZoomOutIntent(),
+        });
+
         return Shortcuts(
-          shortcuts: workspaceShortCut,
+          shortcuts: shortcuts,
           child: Actions(
             actions: actions,
             child: Focus(
@@ -146,6 +136,12 @@ class WorkspaceDesktopState extends State<WorkspaceDesktop> {
                       children: [
                         const CanvasPage(),
                         const WorkspaceDrawer(),
+                        SizedBox(width: 20.w),
+                        Positioned(
+                          top: 0,
+                          left: 0.21.sw,
+                          child: UndoRedoButton(su: suprovider),
+                        ),
                         Positioned(
                           top: 0,
                           right: 0.001.sw,
@@ -176,54 +172,23 @@ class WorkspaceDesktopState extends State<WorkspaceDesktop> {
                                       workspaceProvider
                                           .canvasObjects[workspaceProvider
                                           .currentlySelectedObjectId!]!;
-
-                                  Offset objectPosition;
-                                  if (selectedObject is ConnectorObject) {
-                                    // For connectors, calculate the midpoint for positioning
-                                    final sourceObject =
-                                        workspaceProvider
-                                            .canvasObjects[selectedObject
-                                            .sourceId];
-                                    final targetObject =
-                                        workspaceProvider
-                                            .canvasObjects[selectedObject
-                                            .targetId];
-                                    if (sourceObject != null &&
-                                        targetObject != null) {
-                                      final startPoint = sourceObject
-                                          .getConnectionPoint(
-                                            selectedObject.sourceAlignment,
-                                          );
-                                      final endPoint = targetObject
-                                          .getConnectionPoint(
-                                            selectedObject.targetAlignment,
-                                          );
-                                      objectPosition = Offset(
-                                        (startPoint.dx + endPoint.dx) / 2,
-                                        (startPoint.dy + endPoint.dy) / 2,
-                                      );
-                                    } else {
-                                      return const SizedBox.shrink();
-                                    }
-                                  } else {
-                                    objectPosition =
-                                        selectedObject.getBounds().topCenter;
-                                  }
-
+                                  final objectBounds =
+                                      selectedObject.getBounds();
                                   final matrix =
                                       canvasProvider
                                           .transformationController
                                           .value;
-                                  final transformedPosition = matrix.transform3(
-                                    vector_math.Vector3(
-                                      objectPosition.dx,
-                                      objectPosition.dy,
-                                      0,
-                                    ),
-                                  );
+                                  final transformedTopCenter = matrix
+                                      .transform3(
+                                        vector_math.Vector3(
+                                          objectBounds.topCenter.dx,
+                                          objectBounds.topCenter.dy,
+                                          0,
+                                        ),
+                                      );
                                   final screenPosition = Offset(
-                                    transformedPosition.x,
-                                    transformedPosition.y,
+                                    transformedTopCenter.x,
+                                    transformedTopCenter.y,
                                   );
                                   const double toolboxWidth = 240;
                                   const double toolboxHeight = 48;
@@ -254,7 +219,7 @@ class WorkspaceDesktopState extends State<WorkspaceDesktop> {
 
   void _showStickyNote(
     BuildContext context,
-    en.DeviceType device,
+    rh.DeviceType device,
     SupabaseService su,
   ) {
     final RenderBox? renderBox = context.findRenderObject() as RenderBox?;
@@ -273,11 +238,11 @@ class WorkspaceDesktopState extends State<WorkspaceDesktop> {
                   ),
                 ),
                 Positioned(
-                  right: device == en.DeviceType.mobile ? position.dx : 150.w,
+                  right: device == rh.DeviceType.mobile ? position.dx : 150.w,
                   top:
-                      device == en.DeviceType.desktop
+                      device == rh.DeviceType.desktop
                           ? 500.h
-                          : device == en.DeviceType.tab
+                          : device == rh.DeviceType.tab
                           ? 500.h
                           : position.dy - 390.h,
                   child: Material(

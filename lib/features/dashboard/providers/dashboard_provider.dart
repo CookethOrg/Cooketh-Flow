@@ -42,9 +42,9 @@ class DashboardProvider extends StateHandler {
         return allWorkspaces.where((ws) => ws.isStarred).toList();
       case 2: // Trash
       case 3: // About Us
-        // Return an empty list for non-project tabs
         return [];
       case 0: // All
+      case 4:
       default:
         return allWorkspaces;
     }
@@ -55,6 +55,7 @@ class DashboardProvider extends StateHandler {
     {"label": "Starred", "icon": Icon(PhosphorIcons.star())},
     {"label": "Trash", "icon": Icon(PhosphorIcons.trashSimple())},
     {"label": "About us", "icon": Icon(PhosphorIcons.info())},
+    {"label": "Shortcut Settings", "icon": Icon(Icons.settings)},
   ];
 
   void toggleDrawer() {
@@ -182,7 +183,8 @@ class DashboardProvider extends StateHandler {
       String output = e.toString();
       if (e.toString() ==
           'PostgrestException(message: User has reached the maximum limit of 10 workspaces., code: P0001, details: , hint: null)') {
-        output = 'Maximum limit of workspaces reached. Upgrade your plan for more!';
+        output =
+            'Maximum limit of workspaces reached. Upgrade your plan for more!';
       }
       return output;
     } finally {
@@ -200,7 +202,8 @@ class DashboardProvider extends StateHandler {
         return 'Import operation cancelled or failed.';
       }
 
-      if (jsonContent['workspace'] == null || jsonContent['canvasObjects'] == null) {
+      if (jsonContent['workspace'] == null ||
+          jsonContent['canvasObjects'] == null) {
         return 'Invalid file format. Missing "workspace" or "canvasObjects" data.';
       }
 
@@ -248,13 +251,14 @@ class DashboardProvider extends StateHandler {
       await supabase!.from('workspace').insert(newWorkspace);
 
       if (newCanvasObjects.isNotEmpty) {
-        final objectsToInsert = newCanvasObjects.map((obj) {
-          return {
-            'id': obj['id'],
-            'object': obj,
-            'workspace_id': newWorkspaceId,
-          };
-        }).toList();
+        final objectsToInsert =
+            newCanvasObjects.map((obj) {
+              return {
+                'id': obj['id'],
+                'object': obj,
+                'workspace_id': newWorkspaceId,
+              };
+            }).toList();
         await supabase!.from('canvas_objects').insert(objectsToInsert);
       }
 
@@ -264,7 +268,8 @@ class DashboardProvider extends StateHandler {
       print("Error importing project: $e");
       String output = 'An error occurred during import.';
       if (e.toString().contains('maximum limit of 10 workspaces')) {
-        output = 'Maximum limit of workspaces reached. Upgrade your plan for more!';
+        output =
+            'Maximum limit of workspaces reached. Upgrade your plan for more!';
       }
       return output;
     } finally {

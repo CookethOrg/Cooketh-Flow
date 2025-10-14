@@ -84,7 +84,9 @@ void main() async {
                 Provider.of<WorkspaceProvider>(context, listen: false),
               ),
         ),
-        ChangeNotifierProvider(create: (context)=>ShortcutManagerr())
+        ChangeNotifierProvider(
+          create: (context) => ShortcutManagerr(instance.client),
+        ),
       ],
       child: const MyApp(),
     ),

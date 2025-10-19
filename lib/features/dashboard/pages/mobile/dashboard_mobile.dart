@@ -1,4 +1,5 @@
 import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/features/dashboard/pages/desktop/short_cut_setting.dart';
 import 'package:cookethflow/features/dashboard/pages/mobile/drawer_mobile.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/project_card.dart';
@@ -22,61 +23,68 @@ class _DashboardMobileState extends State<DashboardMobile> {
   @override
   Widget build(BuildContext context) {
     en.DeviceType deviceType = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Consumer2<DashboardProvider,SupabaseService>(
-      builder: (context, provider,suprovider,child) {
+    return Consumer2<DashboardProvider, SupabaseService>(
+      builder: (context, provider, suprovider, child) {
         return LayoutBuilder(
           builder: (context, constraints) {
             return Container(
-              padding: EdgeInsets.only(left: 20,right: 16),
+              padding: EdgeInsets.only(left: 20, right: 16),
               child: Stack(
                 children: [
                   Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            border: Border.all(color:suprovider.isDark?Colors.white: Colors.black),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                isVisible = !isVisible;
-                              });
-                            },
-                            child: Icon(Icons.menu, size: 30),
-                          ),
-                        ),
-                        const StartProject(),
-                      ],
-                    ),
-                    const SizedBox(height: 34),
-                            Expanded(
-                              // NEW: Conditionally build the main content area
-                              child: _buildMainContent(provider,suprovider),
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color:
+                                    suprovider.isDark
+                                        ? Colors.white
+                                        : Colors.black,
+                              ),
+                              borderRadius: BorderRadius.circular(8),
                             ),
-                  ],
-                ),
-                 Visibility(
-                      visible: isVisible,
-                      child: Positioned(
-                        top: 90.h,
-                        left: 8.w,
-                        child: AnimatedContainer(
-                          curve: Curves.easeInOut,
-                          duration: const Duration(milliseconds: 500),
-                          height: provider.isDrawerOpen ? 0.8.sh : 0.185.sh,
-                          width:
-                              deviceType == en.DeviceType.desktop ? 400.w : 0.70.sw,
-                          child: const DashboardDrawerMob(),
-                        ),
+                            child: InkWell(
+                              onTap: () {
+                                setState(() {
+                                  isVisible = !isVisible;
+                                });
+                              },
+                              child: Icon(Icons.menu, size: 30),
+                            ),
+                          ),
+                          const StartProject(),
+                        ],
+                      ),
+                      const SizedBox(height: 34),
+                      Expanded(
+                        // NEW: Conditionally build the main content area
+                        child: _buildMainContent(provider, suprovider),
+                      ),
+                    ],
+                  ),
+                  Visibility(
+                    visible: isVisible,
+                    child: Positioned(
+                      top: 90.h,
+                      left: 8.w,
+                      child: AnimatedContainer(
+                        curve: Curves.easeInOut,
+                        duration: const Duration(milliseconds: 500),
+                        height: provider.isDrawerOpen ? 0.8.sh : 0.185.sh,
+                        width:
+                            deviceType == en.DeviceType.desktop
+                                ? 400.w
+                                : 0.70.sw,
+                        child: const DashboardDrawerMob(),
                       ),
                     ),
-                ]
+                  ),
+                ],
               ),
             );
           },
@@ -85,9 +93,8 @@ class _DashboardMobileState extends State<DashboardMobile> {
     );
   }
 
-
-    // NEW: Helper widget to build content based on the selected tab
-  Widget _buildMainContent(DashboardProvider provider,SupabaseService su) {
+  // NEW: Helper widget to build content based on the selected tab
+  Widget _buildMainContent(DashboardProvider provider, SupabaseService su) {
     switch (provider.tabIndex) {
       case 2: // Trash Tab
         return Center(
@@ -97,7 +104,7 @@ class _DashboardMobileState extends State<DashboardMobile> {
               fontFamily: 'Fredrik',
               fontSize: 45.sp,
               fontWeight: FontWeight.w600,
-              color: su.isDark? Colors.white: Colors.grey[600],
+              color: su.isDark ? Colors.white : Colors.grey[600],
             ),
           ),
         );
@@ -111,23 +118,25 @@ class _DashboardMobileState extends State<DashboardMobile> {
               fontFamily: 'Fredrik',
               fontSize: 40.sp,
               height: 1.6,
-              color:su.isDark? Colors.white: Colors.black.withOpacity(0.75),
+              color: su.isDark ? Colors.white : Colors.black.withOpacity(0.75),
             ),
           ),
         );
+      case 4:
+        return ShortcutSettingsPage();
       default: // All and Starred Tabs
         final displayedWorkspaces = provider.displayedWorkspaces;
-        
+
         // Show a message if the "Starred" tab is empty
         if (displayedWorkspaces.isEmpty && provider.tabIndex == 1) {
-           return Center(
+          return Center(
             child: Text(
               'No starred workspaces yet!',
               style: TextStyle(
                 fontFamily: 'Fredrik',
                 fontSize: 45.sp,
                 fontWeight: FontWeight.w600,
-                color: su.isDark?Colors.white: Colors.grey[600],
+                color: su.isDark ? Colors.white : Colors.grey[600],
               ),
             ),
           );
@@ -136,16 +145,15 @@ class _DashboardMobileState extends State<DashboardMobile> {
         return GridView.builder(
           shrinkWrap: true,
           itemCount: displayedWorkspaces.length,
-          gridDelegate:
-              SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 1,
-                crossAxisSpacing: 20.w,
-                mainAxisSpacing: 20.h,
-                childAspectRatio: 1.8,
-              ),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 1,
+            crossAxisSpacing: 20.w,
+            mainAxisSpacing: 20.h,
+            childAspectRatio: 1.8,
+          ),
           itemBuilder: (context, index) {
             final workspace = displayedWorkspaces[index];
-            return ProjectCard(workspaceId: workspace.id,su: su,);
+            return ProjectCard(workspaceId: workspace.id, su: su);
           },
         );
     }

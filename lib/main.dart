@@ -11,7 +11,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:universal_html/js.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -84,7 +83,9 @@ void main() async {
                 Provider.of<WorkspaceProvider>(context, listen: false),
               ),
         ),
-        ChangeNotifierProvider(create: (context)=>ShortcutManagerr())
+        ChangeNotifierProvider(
+          create: (context) => ShortcutManagerr(instance.client),
+        ),
       ],
       child: const MyApp(),
     ),

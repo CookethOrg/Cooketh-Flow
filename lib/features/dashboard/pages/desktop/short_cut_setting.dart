@@ -1,4 +1,6 @@
 // lib/features/settings/pages/shortcut_settings_page.dart
+import 'package:cookethflow/core/providers/supabase_provider.dart';
+import 'package:cookethflow/core/theme/app_theme.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,8 +12,8 @@ class ShortcutSettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Consumer<ShortcutManagerr>(
-        builder: (context, manager, child) {
+      body: Consumer2<ShortcutManagerr, SupabaseService>(
+        builder: (context, manager, su, child) {
           return ListView(
             padding: const EdgeInsets.all(16),
             children: [
@@ -22,6 +24,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Pointer Tool',
                 'Select and move objects',
                 Icons.pan_tool,
+                su,
               ),
               _buildShortcutTile(
                 context,
@@ -30,6 +33,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Pan Tool',
                 'Move the canvas',
                 Icons.pan_tool_alt,
+                su,
               ),
               _buildShortcutTile(
                 context,
@@ -38,6 +42,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Text Tool',
                 'Add text boxes',
                 Icons.text_fields,
+                su,
               ),
               _buildShortcutTile(
                 context,
@@ -46,6 +51,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Sticky Note',
                 'Add sticky notes',
                 Icons.note,
+                su,
               ),
               const Divider(height: 32),
               _buildShortcutTile(
@@ -55,6 +61,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Reset Zoom',
                 'Reset canvas zoom to 100%',
                 Icons.center_focus_strong,
+                su,
               ),
               _buildShortcutTile(
                 context,
@@ -63,6 +70,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Zoom In',
                 'Increase canvas zoom',
                 Icons.zoom_in,
+                su,
               ),
               _buildShortcutTile(
                 context,
@@ -71,6 +79,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'Zoom Out',
                 'Decrease canvas zoom',
                 Icons.zoom_out,
+                su,
               ),
             ],
           );
@@ -86,34 +95,48 @@ class ShortcutSettingsPage extends StatelessWidget {
     String title,
     String description,
     IconData icon,
+    SupabaseService su,
   ) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: Icon(icon, size: 32),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(description),
+        title: Text(
+          title,
+          style:
+              !su.isDark
+                  ? AppTheme.light().textTheme.displaySmall
+                  : AppTheme.dark().textTheme.displaySmall,
+        ),
+        subtitle: Text(
+          description,
+          style:
+              !su.isDark
+                  ? AppTheme.light().textTheme.headlineMedium
+                  : AppTheme.dark().textTheme.headlineMedium,
+        ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.secondaryContainer,
+                color: AppTheme.light().primaryColor,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 manager.getShortcutLabel(action),
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                ),
+                style:
+                    !su.isDark
+                        ? AppTheme.light().textTheme.headlineMedium
+                        : AppTheme.dark().textTheme.headlineMedium,
               ),
             ),
             const SizedBox(width: 8),
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () => _showEditDialog(context, manager, action, title),
+              onPressed:
+                  () => _showEditDialog(context, manager, action, title, su),
             ),
           ],
         ),
@@ -126,6 +149,7 @@ class ShortcutSettingsPage extends StatelessWidget {
     ShortcutManagerr manager,
     String action,
     String title,
+    SupabaseService su,
   ) {
     showDialog(
       context: context,
@@ -134,6 +158,7 @@ class ShortcutSettingsPage extends StatelessWidget {
             action: action,
             title: title,
             manager: manager,
+            su: su,
           ),
     );
   }
@@ -143,11 +168,13 @@ class _ShortcutEditDialog extends StatefulWidget {
   final String action;
   final String title;
   final ShortcutManagerr manager;
+  final SupabaseService su;
 
   const _ShortcutEditDialog({
     required this.action,
     required this.title,
     required this.manager,
+    required this.su,
   });
 
   @override
@@ -176,16 +203,25 @@ class _ShortcutEditDialogState extends State<_ShortcutEditDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text('Edit Shortcut: ${widget.title}'),
+      title: Text(
+        'Edit Shortcut: ${widget.title}',
+        style:
+            !widget.su.isDark
+                ? AppTheme.light().textTheme.displaySmall
+                : AppTheme.dark().textTheme.displaySmall,
+      ),
       content: SizedBox(
         width: 400,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Press any key combination',
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style:
+                  !widget.su.isDark
+                      ? AppTheme.light().textTheme.displaySmall
+                      : AppTheme.dark().textTheme.displaySmall,
             ),
             const SizedBox(height: 16),
             Focus(
@@ -207,7 +243,7 @@ class _ShortcutEditDialogState extends State<_ShortcutEditDialog> {
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
-                  color: Theme.of(context).colorScheme.surfaceVariant,
+                  color: widget.su.isDark ? Colors.white : Colors.black,
                 ),
                 child: Text(
                   _pressedKeys.isEmpty
@@ -234,9 +270,10 @@ class _ShortcutEditDialogState extends State<_ShortcutEditDialog> {
                             return key.keyLabel.toUpperCase();
                           })
                           .join(' + '),
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
+                    color: widget.su.isDark ? Colors.black : Colors.white,
                   ),
                   textAlign: TextAlign.center,
                 ),

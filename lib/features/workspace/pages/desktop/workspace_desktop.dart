@@ -18,6 +18,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:cookethflow/features/workspace/widgets/object_text_editor.dart';
 import 'package:vector_math/vector_math_64.dart' as vector_math;
 
+import 'package:cookethflow/features/models/canvas_models/objects/connector_object.dart';
+
 class WorkspaceDesktop extends StatefulWidget {
   const WorkspaceDesktop({super.key});
 
@@ -172,26 +174,78 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                                       workspaceProvider
                                           .canvasObjects[workspaceProvider
                                           .currentlySelectedObjectId!]!;
-                                  final objectBounds =
-                                      selectedObject.getBounds();
+
                                   final matrix =
                                       canvasProvider
                                           .transformationController
                                           .value;
-                                  final transformedTopCenter = matrix
-                                      .transform3(
-                                        vector_math.Vector3(
-                                          objectBounds.topCenter.dx,
-                                          objectBounds.topCenter.dy,
-                                          0,
-                                        ),
+                                  Offset screenPosition;
+                                  if (selectedObject is ConnectorObject) {
+                                    // For connectors, position at midpoint of the line
+                                    final source =
+                                        workspaceProvider
+                                            .canvasObjects[selectedObject
+                                            .sourceId];
+                                    final target =
+                                        workspaceProvider
+                                            .canvasObjects[selectedObject
+                                            .targetId];
+
+                                    if (source != null && target != null) {
+                                      final startPoint = source
+                                          .getConnectionPoint(
+                                            selectedObject.sourceAlignment,
+                                          );
+                                      final endPoint = target
+                                          .getConnectionPoint(
+                                            selectedObject.targetAlignment,
+                                          );
+
+                                      // Calculate midpoint
+                                      final midPoint = Offset(
+                                        (startPoint.dx + endPoint.dx) / 2,
+                                        (startPoint.dy + endPoint.dy) / 2,
                                       );
-                                  final screenPosition = Offset(
-                                    transformedTopCenter.x,
-                                    transformedTopCenter.y,
-                                  );
+
+                                      // Transform to screen coordinates
+                                      final transformedMidPoint = matrix
+                                          .transform3(
+                                            vector_math.Vector3(
+                                              midPoint.dx,
+                                              midPoint.dy,
+                                              0,
+                                            ),
+                                          );
+
+                                      screenPosition = Offset(
+                                        transformedMidPoint.x,
+                                        transformedMidPoint.y,
+                                      );
+                                    } else {
+                                      return const SizedBox.shrink();
+                                    }
+                                  } else {
+                                    // For shapes, use the top center as before
+                                    final objectBounds =
+                                        selectedObject.getBounds();
+                                    final transformedTopCenter = matrix
+                                        .transform3(
+                                          vector_math.Vector3(
+                                            objectBounds.topCenter.dx,
+                                            objectBounds.topCenter.dy,
+                                            0,
+                                          ),
+                                        );
+
+                                    screenPosition = Offset(
+                                      transformedTopCenter.x,
+                                      transformedTopCenter.y,
+                                    );
+                                  }
+
                                   const double toolboxWidth = 240;
                                   const double toolboxHeight = 48;
+
                                   return Positioned(
                                     left:
                                         screenPosition.dx - (toolboxWidth / 2),

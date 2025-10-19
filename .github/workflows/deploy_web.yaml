@@ -3,10 +3,10 @@ name: Deploy Cooketh Flow Web
 on:
   push:
     branches:
-      - v0.1.0
+      - rewrite
   pull_request:
     branches:
-      - v0.1.0
+      - rewrite
     types:
       - closed
 

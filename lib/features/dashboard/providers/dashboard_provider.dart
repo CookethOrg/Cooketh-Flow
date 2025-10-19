@@ -55,7 +55,7 @@ class DashboardProvider extends StateHandler {
     {"label": "Starred", "icon": Icon(PhosphorIcons.star())},
     {"label": "Trash", "icon": Icon(PhosphorIcons.trashSimple())},
     {"label": "About us", "icon": Icon(PhosphorIcons.info())},
-    {"label": "Shortcut Settings", "icon": Icon(Icons.settings)},
+    {"label": "Shortcut Settings", "icon": Icon(PhosphorIcons.gear())},
   ];
 
   void toggleDrawer() {

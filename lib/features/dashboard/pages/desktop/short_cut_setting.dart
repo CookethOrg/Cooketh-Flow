@@ -1,9 +1,9 @@
-// lib/features/settings/pages/shortcut_settings_page.dart
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/app_theme.dart';
 import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 
 class ShortcutSettingsPage extends StatelessWidget {
@@ -23,7 +23,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'pointer',
                 'Pointer Tool',
                 'Select and move objects',
-                Icons.pan_tool,
+                PhosphorIconsRegular.cursor,
                 su,
               ),
               _buildShortcutTile(
@@ -32,7 +32,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'pan',
                 'Pan Tool',
                 'Move the canvas',
-                Icons.pan_tool_alt,
+                PhosphorIconsRegular.hand,
                 su,
               ),
               _buildShortcutTile(
@@ -41,7 +41,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'text',
                 'Text Tool',
                 'Add text boxes',
-                Icons.text_fields,
+                PhosphorIconsRegular.textT,
                 su,
               ),
               _buildShortcutTile(
@@ -50,7 +50,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'stickyNote',
                 'Sticky Note',
                 'Add sticky notes',
-                Icons.note,
+                PhosphorIconsRegular.note,
                 su,
               ),
               const Divider(height: 32),
@@ -60,7 +60,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'reset',
                 'Reset Zoom',
                 'Reset canvas zoom to 100%',
-                Icons.center_focus_strong,
+                PhosphorIconsRegular.arrowsOutCardinal,
                 su,
               ),
               _buildShortcutTile(
@@ -69,7 +69,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'zoomIn',
                 'Zoom In',
                 'Increase canvas zoom',
-                Icons.zoom_in,
+                PhosphorIconsRegular.magnifyingGlassPlus,
                 su,
               ),
               _buildShortcutTile(
@@ -78,7 +78,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'zoomOut',
                 'Zoom Out',
                 'Decrease canvas zoom',
-                Icons.zoom_out,
+                PhosphorIconsRegular.magnifyingGlassMinus,
                 su,
               ),
             ],
@@ -134,7 +134,7 @@ class ShortcutSettingsPage extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             IconButton(
-              icon: const Icon(Icons.edit),
+              icon: Icon(PhosphorIconsRegular.pencilSimple),
               onPressed:
                   () => _showEditDialog(context, manager, action, title, su),
             ),
@@ -298,7 +298,7 @@ class _ShortcutEditDialogState extends State<_ShortcutEditDialog> {
                   _error = '';
                 });
               },
-              icon: const Icon(Icons.clear),
+              icon: Icon(PhosphorIconsRegular.x),
               label: const Text('Clear'),
             ),
           ],

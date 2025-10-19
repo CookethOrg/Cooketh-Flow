@@ -23,7 +23,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'pointer',
                 'Pointer Tool',
                 'Select and move objects',
-                PhosphorIconsRegular.cursor,
+                PhosphorIcons.cursor(),
                 su,
               ),
               _buildShortcutTile(
@@ -32,7 +32,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'pan',
                 'Pan Tool',
                 'Move the canvas',
-                PhosphorIconsRegular.hand,
+                PhosphorIcons.hand(),
                 su,
               ),
               _buildShortcutTile(
@@ -41,7 +41,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'text',
                 'Text Tool',
                 'Add text boxes',
-                PhosphorIconsRegular.textT,
+                PhosphorIcons.textT(),
                 su,
               ),
               _buildShortcutTile(
@@ -50,7 +50,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'stickyNote',
                 'Sticky Note',
                 'Add sticky notes',
-                PhosphorIconsRegular.note,
+                PhosphorIcons.note(),
                 su,
               ),
               const Divider(height: 32),
@@ -60,7 +60,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'reset',
                 'Reset Zoom',
                 'Reset canvas zoom to 100%',
-                PhosphorIconsRegular.arrowsOutCardinal,
+                PhosphorIcons.arrowsOutCardinal(),
                 su,
               ),
               _buildShortcutTile(
@@ -69,7 +69,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'zoomIn',
                 'Zoom In',
                 'Increase canvas zoom',
-                PhosphorIconsRegular.magnifyingGlassPlus,
+                PhosphorIcons.magnifyingGlassPlus(),
                 su,
               ),
               _buildShortcutTile(
@@ -78,7 +78,7 @@ class ShortcutSettingsPage extends StatelessWidget {
                 'zoomOut',
                 'Zoom Out',
                 'Decrease canvas zoom',
-                PhosphorIconsRegular.magnifyingGlassMinus,
+                PhosphorIcons.magnifyingGlassMinus(),
                 su,
               ),
             ],
@@ -134,7 +134,7 @@ class ShortcutSettingsPage extends StatelessWidget {
             ),
             const SizedBox(width: 8),
             IconButton(
-              icon: Icon(PhosphorIconsRegular.pencilSimple),
+              icon: Icon(PhosphorIcons.pencilSimple()),
               onPressed:
                   () => _showEditDialog(context, manager, action, title, su),
             ),
@@ -298,7 +298,7 @@ class _ShortcutEditDialogState extends State<_ShortcutEditDialog> {
                   _error = '';
                 });
               },
-              icon: Icon(PhosphorIconsRegular.x),
+              icon: Icon(PhosphorIcons.x()),
               label: const Text('Clear'),
             ),
           ],

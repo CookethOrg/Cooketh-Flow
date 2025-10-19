@@ -1,5 +1,4 @@
 // lib/core/services/shortcut_manager.dart
-import 'package:cookethflow/features/models/user_setting%20_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';

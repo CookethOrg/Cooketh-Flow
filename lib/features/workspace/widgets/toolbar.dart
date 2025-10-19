@@ -3,6 +3,7 @@ import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:cookethflow/features/workspace/widgets/node_picker.dart';
 import 'package:cookethflow/features/workspace/widgets/vertical_divider.dart';
+import 'package:cookethflow/features/workspace/widgets/workspace_shortcuts.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,8 +21,16 @@ class ToolBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
 
-    return Consumer2<WorkspaceProvider, SupabaseService>(
-      builder: (context, provider, suprovider, child) {
+    return Consumer3<WorkspaceProvider, SupabaseService, ShortcutManagerr>(
+      builder: (context, provider, suprovider, shortcutManager, child) {
+        // Get shortcut labels
+        final pointerShortcut = shortcutManager.getShortcutLabel('pointer');
+        final panShortcut = shortcutManager.getShortcutLabel('pan');
+        final textShortcut = shortcutManager.getShortcutLabel('text');
+        final stickyNoteShortcut = shortcutManager.getShortcutLabel(
+          'stickyNote',
+        );
+
         return Container(
           padding: EdgeInsets.symmetric(
             vertical:
@@ -63,7 +72,7 @@ class ToolBar extends StatelessWidget {
                               provider,
                               device,
                               suprovider,
-                            ); // Pass the provider
+                            );
                           },
                           backgroundColor:
                               suprovider.isDark
@@ -95,7 +104,7 @@ class ToolBar extends StatelessWidget {
                         VerticalCustomDivider(),
                         _toolIcon(
                           PhosphorIconsRegular.cursor,
-                          'Pointer',
+                          'Pointer - Press $pointerShortcut',
                           device,
                           iconColor:
                               provider.currentMode == DrawMode.pointer
@@ -114,7 +123,7 @@ class ToolBar extends StatelessWidget {
                         VerticalCustomDivider(),
                         _toolIcon(
                           PhosphorIconsRegular.handGrabbing,
-                          'Pan',
+                          'Pan - Press $panShortcut',
                           device,
                           iconColor:
                               provider.currentMode == DrawMode.hand
@@ -133,7 +142,7 @@ class ToolBar extends StatelessWidget {
                         VerticalCustomDivider(),
                         _toolIcon(
                           PhosphorIconsRegular.textT,
-                          'Text box',
+                          'Text box - Press $textShortcut',
                           device,
                           iconColor:
                               provider.currentMode == DrawMode.textBox
@@ -165,7 +174,7 @@ class ToolBar extends StatelessWidget {
                         VerticalCustomDivider(),
                         _toolIcon(
                           PhosphorIconsFill.noteBlank,
-                          'Add new sticky note',
+                          'Add new sticky note - Press $stickyNoteShortcut',
                           device,
                           iconColor:
                               provider.currentMode == DrawMode.stickyNote
@@ -195,7 +204,7 @@ class ToolBar extends StatelessWidget {
                             provider,
                             device,
                             suprovider,
-                          ); // Pass the provider
+                          );
                         },
                         backgroundColor:
                             suprovider.isDark
@@ -227,7 +236,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.cursor,
-                        'Pointer\nPress CTRL + P',
+                        'Pointer\nPress $pointerShortcut',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.pointer
@@ -246,7 +255,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.handGrabbing,
-                        'Pan\nPress CTRL + A',
+                        'Pan\nPress $panShortcut',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.hand
@@ -265,7 +274,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsRegular.textT,
-                        'Text box\nPress ALT + T',
+                        'Text box\nPress $textShortcut',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.textBox
@@ -297,7 +306,7 @@ class ToolBar extends StatelessWidget {
                       _horizontalDivider(device),
                       _toolIcon(
                         PhosphorIconsFill.noteBlank,
-                        'Add new sticky note\nPress CTRL + S',
+                        'Add new sticky note\nPress $stickyNoteShortcut',
                         device,
                         iconColor:
                             provider.currentMode == DrawMode.stickyNote
@@ -375,8 +384,8 @@ class ToolBar extends StatelessWidget {
             ? 340
             : device == en.DeviceType.tab
             ? 340
-            : 300; // The width of the NodePicker widget
-    final padding = 20.w; // Padding between the toolbar and the picker
+            : 300;
+    final padding = 20.w;
 
     showDialog(
       context: context,

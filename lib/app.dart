@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
       child: Consumer<SupabaseService>(
         builder: (context, themeProvider, _) {
           return MaterialApp.router(
+            title: 'Cooketh Flow',
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
             themeMode: themeProvider.isDark ? ThemeMode.dark : ThemeMode.light,

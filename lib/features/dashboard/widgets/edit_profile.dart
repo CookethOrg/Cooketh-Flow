@@ -13,6 +13,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/utils/enums.dart' as en;
+
 class ProfileSettingsWidget extends StatefulWidget {
   const ProfileSettingsWidget({super.key});
 
@@ -130,10 +131,10 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Container(
-            width: deviceType == en.DeviceType.desktop ? 500 : 1.6.sw,
+            width: deviceType == en.DeviceType.desktop ? 0.57.sw : 1.6.sw,
             padding:
                 deviceType == en.DeviceType.desktop
-                    ? const EdgeInsets.all(24)
+                    ? const EdgeInsets.all(35)
                     : const EdgeInsets.only(top: 16, left: 10, right: 10),
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -144,23 +145,24 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                   alignment: Alignment.topRight,
                   child: IconButton(
                     onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, size: 24),
+                    icon: const Icon(Icons.close, size: 32),
                     padding: EdgeInsets.zero,
                     constraints: const BoxConstraints(),
                   ),
                 ),
                 deviceType == en.DeviceType.desktop
-                    ? const SizedBox(height: 16)
+                    ? const SizedBox(height: 26)
                     : const SizedBox(height: 8),
 
                 // Profile section
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Stack(
                       children: [
                         Container(
-                          width: 80,
-                          height: 80,
+                          width: 100,
+                          height: 100,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -228,8 +230,8 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                       ],
                     ),
                     deviceType == en.DeviceType.desktop
-                        ? const SizedBox(width: 16)
-                        : const SizedBox(width: 8),
+                        ? const SizedBox(width: 26)
+                        : const SizedBox(width: 18),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -254,6 +256,15 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                         ),
                       ],
                     ),
+                    const SizedBox(width: 200),
+                    Expanded(
+                      child: _buildField(
+                        context,
+                        label: 'Name',
+                        controller: _nameController,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
                   ],
                 ),
 
@@ -263,17 +274,24 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
 
                 // Form fields
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _buildField(
-                      context,
-                      label: 'Name',
-                      controller: _nameController,
+                    // Username field
+                    Expanded(
+                      child: _buildField(
+                        context,
+                        label: 'Username',
+                        controller: _usernameController,
+                        width: 250,
+                      ),
                     ),
-                    const SizedBox(width: 16),
-                    _buildField(
-                      context,
-                      label: 'Email',
-                      controller: _emailController,
+                    const SizedBox(width: 50),
+                    Expanded(
+                      child: _buildField(
+                        context,
+                        label: 'Email',
+                        controller: _emailController,
+                      ),
                     ),
                   ],
                 ),
@@ -281,14 +299,6 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                 deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 20)
                     : const SizedBox(height: 10),
-
-                // Username field
-                _buildField(
-                  context,
-                  label: 'Username',
-                  controller: _usernameController,
-                  width: 250,
-                ),
 
                 deviceType == en.DeviceType.desktop
                     ? const SizedBox(height: 32)
@@ -329,7 +339,7 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                           supabaseService.isDark
                               ? Icons.dark_mode
                               : Icons.light_mode,
-                          color: Theme.of(context).iconTheme.color,
+                          color: secondaryColors[7],
                           size: deviceType == en.DeviceType.desktop ? 20 : 10,
                         ),
                         deviceType == en.DeviceType.desktop
@@ -351,37 +361,36 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
 
                 // Buttons
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
                       onPressed: () => Navigator.of(context).pop(),
                       style: TextButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
-                          vertical: 12,
+                          vertical: 18,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
-                          side: BorderSide(
-                            color: Theme.of(context).dividerColor,
-                          ),
+                          side: BorderSide(color: secondaryColors[7]),
                         ),
                       ),
                       child: Text(
                         'Cancel',
                         style: TextStyle(
-                          color: Theme.of(context).textTheme.titleLarge?.color,
+                          color: secondaryColors[7],
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
+                    const SizedBox(width: 16),
                     ElevatedButton(
                       onPressed: _saveChanges, // Call the save changes function
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Theme.of(context).primaryColor,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
-                          vertical: 12,
+                          vertical: 18,
                         ),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -449,9 +458,9 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
                           backgroundColor: secondaryColors[1],
                           padding: EdgeInsets.symmetric(
                             horizontal:
-                                deviceType == en.DeviceType.desktop ? 20 : 10,
+                                deviceType == en.DeviceType.desktop ? 24 : 10,
                             vertical:
-                                deviceType == en.DeviceType.desktop ? 10 : 5,
+                                deviceType == en.DeviceType.desktop ? 18 : 5,
                           ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
@@ -541,39 +550,36 @@ class _ProfileSettingsWidgetState extends State<ProfileSettingsWidget> {
     required TextEditingController controller,
     double? width,
   }) {
-    return Expanded(
-      flex: width != null ? 0 : 1,
-      child: SizedBox(
-        width: width,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Theme.of(context).textTheme.titleLarge?.color,
+    return SizedBox(
+      width: width,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Theme.of(context).textTheme.titleLarge?.color,
+            ),
+          ),
+          const SizedBox(height: 8),
+          TextFormField(
+            controller: controller, // Use the provided controller
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: Theme.of(context).cardColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(8),
+                borderSide: BorderSide(color: Theme.of(context).dividerColor),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 12,
               ),
             ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: controller, // Use the provided controller
-              decoration: InputDecoration(
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide(color: Theme.of(context).dividerColor),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-              ),
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

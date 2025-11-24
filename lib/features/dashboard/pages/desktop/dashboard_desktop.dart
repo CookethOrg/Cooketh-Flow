@@ -48,9 +48,12 @@ class DashboardDesktop extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 20.h),
-                            child: const StartProject(),
+                          Visibility(
+                            visible: provider.tabIndex <= 1,
+                            child: Padding(
+                              padding: EdgeInsets.only(bottom: 20.h),
+                              child: const StartProject(),
+                            ),
                           ),
                           const SizedBox(height: 32),
                           Expanded(

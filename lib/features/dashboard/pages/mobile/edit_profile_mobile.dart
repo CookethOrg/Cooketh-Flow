@@ -133,7 +133,7 @@ class _ProfileSettingsWidgetMobState extends State<ProfileSettingsWidgetMob> {
           ),
           child: Container(
             width: 1.5.sw,
-            height: 1.2.sh,
+            height: 1.3.sh,
             padding:
                 deviceType == en.DeviceType.desktop
                     ? const EdgeInsets.all(35)
@@ -272,14 +272,7 @@ class _ProfileSettingsWidgetMobState extends State<ProfileSettingsWidgetMob> {
                   label: 'Email',
                   controller: _emailController,
                 ),
-
-                deviceType == en.DeviceType.desktop
-                    ? const SizedBox(height: 20)
-                    : const SizedBox(height: 10),
-
-                deviceType == en.DeviceType.desktop
-                    ? const SizedBox(height: 32)
-                    : const SizedBox(height: 16),
+                 const SizedBox(height: 16),
 
                 // Theme toggle section
                 Row(
@@ -329,7 +322,7 @@ class _ProfileSettingsWidgetMobState extends State<ProfileSettingsWidgetMob> {
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: 12),
 
                 // Buttons
                 Row(
@@ -380,13 +373,9 @@ class _ProfileSettingsWidgetMobState extends State<ProfileSettingsWidgetMob> {
                   ],
                 ),
 
-                deviceType == en.DeviceType.desktop
-                    ? const SizedBox(height: 32)
-                    : const SizedBox(height: 16),
+                const SizedBox(height: 12),
                 Divider(color: Theme.of(context).dividerColor),
-                deviceType == en.DeviceType.desktop
-                    ? const SizedBox(height: 24)
-                    : const SizedBox(height: 12),
+                const SizedBox(height: 10),
 
                 // Delete account
                 Column(
@@ -395,24 +384,22 @@ class _ProfileSettingsWidgetMobState extends State<ProfileSettingsWidgetMob> {
                     Text(
                       'Delete Account',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w500,
                         color: Theme.of(context).textTheme.titleLarge?.color,
                       ),
                     ),
-                    deviceType == en.DeviceType.desktop
-                        ? const SizedBox(height: 4)
-                        : const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                       'Permanently delete your account',
                       style: TextStyle(
-                        fontSize: deviceType == en.DeviceType.desktop ? 14 : 12,
+                        fontSize: 12,
                         color: Theme.of(context).textTheme.bodySmall?.color,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 Visibility(
                   visible: !isDesk,
                   child: Center(

@@ -1,6 +1,7 @@
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/theme/colors.dart';
+import 'package:cookethflow/features/dashboard/pages/mobile/edit_profile_mobile.dart';
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -124,7 +125,7 @@ class DashboardDrawerMob extends StatelessWidget {
                             showDialog(
                               context: context,
                               builder:
-                                  (context) => const ProfileSettingsWidget(),
+                                  (context) => const ProfileSettingsWidgetMob(),
                             );
                           },
                           icon: Icon(

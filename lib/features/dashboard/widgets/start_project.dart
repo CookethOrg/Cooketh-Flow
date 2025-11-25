@@ -27,7 +27,7 @@ class StartProject extends StatelessWidget {
                     ? EdgeInsets.symmetric(vertical: 35.h, horizontal: 24.w)
                     : deviceType == en.DeviceType.tab
                     ? EdgeInsets.symmetric(vertical: 35.h, horizontal: 24.w)
-                    : EdgeInsets.symmetric(vertical: 20.h, horizontal: 24.w),
+                    : EdgeInsets.symmetric(vertical: 30.h, horizontal: 34.w),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.r),
             ),
@@ -44,13 +44,22 @@ class StartProject extends StatelessWidget {
                           ? 18.sp
                           : deviceType == en.DeviceType.tab
                           ? 25.sp
-                          : 35.sp,
+                          : 65.sp,
                   color: Colors.white,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               SizedBox(width: 16.w),
-              Icon(PhosphorIconsRegular.plus, color: Colors.white, size: 24.sp),
+              Icon(
+                PhosphorIconsRegular.plus,
+                color: Colors.white,
+                size:
+                    deviceType == en.DeviceType.desktop
+                        ? 24.sp
+                        : deviceType == en.DeviceType.tab
+                        ? 24.sp
+                        : 44.sp,
+              ),
             ],
           ),
         );

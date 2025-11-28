@@ -3,6 +3,7 @@ import 'package:cookethflow/features/dashboard/pages/desktop/short_cut_setting.d
 import 'package:cookethflow/features/dashboard/providers/dashboard_provider.dart';
 import 'package:cookethflow/features/dashboard/widgets/dashboard_drawer.dart';
 import 'package:cookethflow/features/dashboard/widgets/project_card.dart';
+import 'package:cookethflow/features/dashboard/widgets/snackbar.dart';
 import 'package:cookethflow/features/dashboard/widgets/start_project.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -10,8 +11,31 @@ import 'package:provider/provider.dart';
 import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 import 'package:cookethflow/core/utils/enums.dart' as en;
 
-class DashboardDesktop extends StatelessWidget {
+class DashboardDesktop extends StatefulWidget {
   const DashboardDesktop({super.key});
+
+  @override
+  State<DashboardDesktop> createState() => _DashboardDesktopState();
+}
+
+class _DashboardDesktopState extends State<DashboardDesktop> {
+  @override
+  void initState() {
+    super.initState();
+
+    // Show snackbar after the first frame is rendered
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final su = Provider.of<SupabaseService>(context, listen: false);
+      if (su.loginSnackShown) {
+        CustomSnackbar.showSuccess(context, "Successfully Logged in");
+        Future.delayed(Duration(seconds: 4), () {
+          if (mounted) {
+            context.read<SupabaseService>().setLoginSnackShown(false);
+          }
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

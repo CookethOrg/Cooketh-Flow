@@ -66,3 +66,5 @@ enum InteractionMode {
 }
 
 enum ConnectorAnchor { top, bottom, left, right }
+
+enum SnackbarType { success, error, info, warning }

@@ -31,7 +31,7 @@ class StickyNotesWidget extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+        children: [ 
           // Header
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,

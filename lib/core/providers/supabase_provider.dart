@@ -21,6 +21,7 @@ class SupabaseService extends StateHandler {
       if (user != null) {
         // Handle OAuth sign-in flow
         if (event == AuthChangeEvent.signedIn) {
+          _loginSnackShown = true;
           await _handleOAuthSignIn(user);
         }
         await _fetchCurrentUserDetails(
@@ -39,10 +40,17 @@ class SupabaseService extends StateHandler {
 
   CurrentUser? _currentUser; // Holds the consolidated user data
   bool _isDark = false;
+  bool _loginSnackShown = false;
 
   bool get isDark => _isDark;
   CurrentUser? get currentUser => _currentUser;
   String get defaultPfpPath => _defaultPfpPath;
+  bool get loginSnackShown => _loginSnackShown;
+
+  void setLoginSnackShown(bool value) {
+    _loginSnackShown = value;
+    notifyListeners();
+  }
 
   // --- Theme Management ---
   Future<void> _loadTheme() async {
@@ -70,7 +78,9 @@ class SupabaseService extends StateHandler {
     // If it's an OAuth user and they don't have our custom metadata fields,
     // it's their first time.
     if (isOAuth && (currentAvatarUrl == null || currentName == null)) {
-      final String? name = user.userMetadata!['full_name'] as String? ?? user.userMetadata!['name'] as String?;
+      final String? name =
+          user.userMetadata!['full_name'] as String? ??
+          user.userMetadata!['name'] as String?;
       final String? avatarUrl = user.userMetadata!['avatar_url'] as String?;
 
       final Map<String, dynamic> updatedData = {};
@@ -176,8 +186,10 @@ class SupabaseService extends StateHandler {
       // and added to your Supabase Auth Providers -> Google -> Redirect URIs
       // For desktop, usually 'http://localhost:port' or similar is used.
       final String? redirectUrl =
-          kIsWeb ?
-              kReleaseMode ? 'http://cookethflow.cookethcompany.xyz/dashboard' : 'http://localhost:3000/dashboard'
+          kIsWeb
+              ? kReleaseMode
+                  ? 'http://cookethflow.cookethcompany.xyz/dashboard'
+                  : 'http://localhost:3000/dashboard'
               : (Platform.isAndroid || Platform.isIOS
                   ? 'myapp://login-callback/'
                   : null); // For mobile/desktop
@@ -201,8 +213,10 @@ class SupabaseService extends StateHandler {
   Future<String> signInWithGithub() async {
     try {
       final String? redirectUrl =
-          kIsWeb ?
-              kReleaseMode ? 'http://cookethflow.cookethcompany.xyz/dashboard' : 'http://localhost:3000/dashboard'
+          kIsWeb
+              ? kReleaseMode
+                  ? 'http://cookethflow.cookethcompany.xyz/dashboard'
+                  : 'http://localhost:3000/dashboard'
               : (Platform.isAndroid || Platform.isIOS
                   ? 'my.scheme://my-host'
                   : null); // Replace with your actual scheme
@@ -390,8 +404,7 @@ class SupabaseService extends StateHandler {
   }
 
   // --- Profile Picture Management ---
-  final String _profileBucketName =
-      'profile'; // Renamed bucket for clarity
+  final String _profileBucketName = 'profile'; // Renamed bucket for clarity
   final String _defaultPfpPath =
       'assets/images/pfp.png'; // Make sure this asset exists!
 

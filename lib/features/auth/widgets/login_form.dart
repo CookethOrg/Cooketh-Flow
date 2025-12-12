@@ -5,6 +5,7 @@ import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/router/app_route_const.dart';
 import 'package:cookethflow/core/theme/colors.dart';
 import 'package:cookethflow/features/auth/providers/auth_provider.dart';
+import 'package:cookethflow/features/dashboard/widgets/snackbar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
@@ -33,9 +34,7 @@ class LoginForm extends StatelessWidget {
             // Check if current route is not already dashboard to prevent loop
             context.go(RoutesPath.dashboard);
             // context.goNamed(RouteName.dashboard,pathParameters: {'username': supabaseService.currentUser!.name!});
-            authProvider.setLoading(
-              false,
-            );
+            authProvider.setLoading(false);
           });
         }
 
@@ -150,7 +149,7 @@ class LoginForm extends StatelessWidget {
                     authProvider.obscurePassword
                         ? PhosphorIconsRegular.eye
                         : PhosphorIconsRegular.eyeSlash,
-                    size: 24.sp,
+                    size: isMobile ? 45.sp : 24.sp,
                   ),
                   onPressed: authProvider.toggleObscurePassword,
                   style: ButtonStyle(
@@ -193,19 +192,12 @@ class LoginForm extends StatelessWidget {
                               password: authProvider.passwordController.text,
                             );
                             if (res != "Logged in successfully") {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(res),
-                                  duration: const Duration(seconds: 5),
-                                ),
-                              );
+                              CustomSnackbar.showError(context, res);
                             }
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(passwordValidationCheck),
-                                duration: const Duration(seconds: 2),
-                              ),
+                            CustomSnackbar.showError(
+                              context,
+                              passwordValidationCheck,
                             );
                           }
                           // Navigation handled by the Consumer2's listener
@@ -265,10 +257,9 @@ class LoginForm extends StatelessWidget {
                             onPressed: () async {
                               // Call void method, loading handled by provider
                               await authProvider.googleAuth();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Initiating Google Sign-In..."),
-                                ),
+                              CustomSnackbar.showInfo(
+                                context,
+                                "Initiating Google Sign-In...",
                               );
                               // Navigation handled by the Consumer2's listener
                             },
@@ -316,10 +307,9 @@ class LoginForm extends StatelessWidget {
                             onPressed: () async {
                               // Call void method, loading handled by provider
                               await authProvider.githubSignin();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text("Initiating GitHub Sign-In..."),
-                                ),
+                              CustomSnackbar.showInfo(
+                                context,
+                                "Initiating GitHub Sign-In...",
                               );
                               // Navigation handled by the Consumer2's listener
                             },
@@ -377,12 +367,9 @@ class LoginForm extends StatelessWidget {
                                   onPressed: () async {
                                     // Call void method, loading handled by provider
                                     await authProvider.googleAuth();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Initiating Google Sign-In...",
-                                        ),
-                                      ),
+                                    CustomSnackbar.showInfo(
+                                      context,
+                                      "Initiating Google Sign-In...",
                                     );
                                     // Navigation handled by the Consumer2's listener
                                   },
@@ -436,12 +423,9 @@ class LoginForm extends StatelessWidget {
                                   onPressed: () async {
                                     // Call void method, loading handled by provider
                                     await authProvider.githubSignin();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          "Initiating GitHub Sign-In...",
-                                        ),
-                                      ),
+                                    CustomSnackbar.showInfo(
+                                      context,
+                                      "Initiating GitHub Sign-In...",
                                     );
                                     // Navigation handled by the Consumer2's listener
                                   },

@@ -25,7 +25,6 @@ class ToolBar extends StatelessWidget {
       builder: (context, provider, suprovider, shortcutManager, child) {
         // Get shortcut labels
         final pointerShortcut = shortcutManager.getShortcutLabel('pointer');
-        final panShortcut = shortcutManager.getShortcutLabel('pan');
         final textShortcut = shortcutManager.getShortcutLabel('text');
         final stickyNoteShortcut = shortcutManager.getShortcutLabel(
           'stickyNote',
@@ -114,25 +113,6 @@ class ToolBar extends StatelessWidget {
                                   : Colors.black,
                           onPressed: () {
                             provider.changeDrawMode(DrawMode.pointer);
-                          },
-                          backgroundColor:
-                              suprovider.isDark
-                                  ? const Color.fromRGBO(48, 48, 48, 1)
-                                  : Colors.white,
-                        ),
-                        VerticalCustomDivider(),
-                        _toolIcon(
-                          PhosphorIconsRegular.handGrabbing,
-                          'Pan - Press $panShortcut',
-                          device,
-                          iconColor:
-                              provider.currentMode == DrawMode.hand
-                                  ? Colors.blue
-                                  : suprovider.isDark
-                                  ? Colors.white
-                                  : Colors.black,
-                          onPressed: () {
-                            provider.changeDrawMode(DrawMode.hand);
                           },
                           backgroundColor:
                               suprovider.isDark
@@ -246,25 +226,6 @@ class ToolBar extends StatelessWidget {
                                 : Colors.black,
                         onPressed: () {
                           provider.changeDrawMode(DrawMode.pointer);
-                        },
-                        backgroundColor:
-                            suprovider.isDark
-                                ? const Color.fromRGBO(48, 48, 48, 1)
-                                : Colors.white,
-                      ),
-                      _horizontalDivider(device),
-                      _toolIcon(
-                        PhosphorIconsRegular.handGrabbing,
-                        'Pan\nPress $panShortcut',
-                        device,
-                        iconColor:
-                            provider.currentMode == DrawMode.hand
-                                ? Colors.blue
-                                : suprovider.isDark
-                                ? Colors.white
-                                : Colors.black,
-                        onPressed: () {
-                          provider.changeDrawMode(DrawMode.hand);
                         },
                         backgroundColor:
                             suprovider.isDark
@@ -402,7 +363,12 @@ class ToolBar extends StatelessWidget {
         }
         return Stack(
           children: [
-            Positioned.fill(child: Container(color: Colors.transparent)),
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(color: Colors.transparent),
+              ),
+            ),
             Positioned(
               top: topPos,
               left: leftPos,

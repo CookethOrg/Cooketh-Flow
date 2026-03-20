@@ -136,11 +136,9 @@ class _ConnectorCustomizerState extends State<ConnectorCustomizer> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    IconButton(
-                      icon: Icon(PhosphorIconsRegular.x, size: 24, color: widget.su.isDark ? Colors.white70 : Colors.black54),
-                      onPressed: () => Navigator.pop(context),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
+                    GestureDetector(
+                      onTap: () => Navigator.pop(context),
+                      child: Icon(PhosphorIconsRegular.x, size: 20, color: widget.su.isDark ? Colors.white70 : Colors.black54),
                     ),
                   ],
                 ),

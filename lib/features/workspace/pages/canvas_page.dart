@@ -1,7 +1,6 @@
 import 'package:cookethflow/core/providers/supabase_provider.dart';
 import 'package:cookethflow/core/utils/enums.dart';
 import 'package:cookethflow/features/models/canvas_models/canvas_painter.dart';
-import 'package:cookethflow/features/models/workspace_model.dart';
 import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/gestures.dart';
@@ -16,7 +15,6 @@ class CanvasPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer3<WorkspaceProvider, CanvasProvider, SupabaseService>(
       builder: (context, workspaceProvider, canvasProvider, suprovider, child) {
-        final isHandToolActive = workspaceProvider.currentMode == DrawMode.hand;
         return Scaffold(
           backgroundColor: workspaceProvider.currentWorkspaceColor,
           body: Listener(
@@ -27,11 +25,16 @@ class CanvasPage extends StatelessWidget {
                 // double-click logic could be implemented here if needed
               }
             },
+            onPointerSignal: (event) {
+              if (event is PointerScrollEvent) {
+                // Scroll to pan (like Figma)
+                final matrix = canvasProvider.transformationController.value.clone();
+                matrix.translate(-event.scrollDelta.dx, -event.scrollDelta.dy);
+                canvasProvider.transformationController.value = matrix;
+              }
+            },
             child: MouseRegion(
-              cursor:
-                  isHandToolActive
-                      ? SystemMouseCursors.grab
-                      : SystemMouseCursors.basic,
+              cursor: SystemMouseCursors.basic,
               onHover: (event) {
                 final Matrix4 transform =
                     canvasProvider.transformationController.value;
@@ -64,38 +67,29 @@ class CanvasPage extends StatelessWidget {
                 maxScale: 4.0,
                 boundaryMargin: const EdgeInsets.all(double.infinity),
                 constrained: false,
-                // Enable panning only when Hand Tool is active
-                panEnabled: isHandToolActive,
+                panEnabled: false,
                 scaleEnabled:
                     workspaceProvider.interactionMode !=
                     InteractionMode.editingText,
                 child: Container(
                   color: workspaceProvider.currentWorkspaceColor,
                   child: GestureDetector(
-                    // Disable GestureDetector's pan events when Hand Tool is active
-                    onPanDown:
-                        isHandToolActive
-                            ? null
-                            : (details) {
-                              workspaceProvider.onPanDown(
-                                DragDownDetails(
-                                  globalPosition: details.localPosition,
-                                ),
-                              );
-                            },
-                    onPanUpdate:
-                        isHandToolActive
-                            ? null
-                            : (details) {
-                              workspaceProvider.onPanUpdate(
-                                DragUpdateDetails(
-                                  globalPosition: details.localPosition,
-                                  delta: details.delta,
-                                ),
-                              );
-                            },
-                    onPanEnd:
-                        isHandToolActive ? null : workspaceProvider.onPanEnd,
+                    onPanDown: (details) {
+                      workspaceProvider.onPanDown(
+                        DragDownDetails(
+                          globalPosition: details.localPosition,
+                        ),
+                      );
+                    },
+                    onPanUpdate: (details) {
+                      workspaceProvider.onPanUpdate(
+                        DragUpdateDetails(
+                          globalPosition: details.localPosition,
+                          delta: details.delta,
+                        ),
+                      );
+                    },
+                    onPanEnd: workspaceProvider.onPanEnd,
                     child: CustomPaint(
                       size: const Size(20000, 20000),
                       painter: CanvasPainter(

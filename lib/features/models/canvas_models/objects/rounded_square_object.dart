@@ -16,7 +16,7 @@ class RoundedSquare extends CanvasObject {
     required super.color,
     required this.topLeft,
     required this.bottomRight,
-    this.cornerRadius = 10.0,
+    this.cornerRadius = 16.0,
     super.textDelta,
   });
 
@@ -26,7 +26,7 @@ class RoundedSquare extends CanvasObject {
         json['bottom_right']['y'],
       ),
       topLeft = Offset(json['top_left']['x'], json['top_left']['y']),
-      cornerRadius = json['corner_radius'] ?? 10.0,
+      cornerRadius = json['corner_radius'] ?? 16.0,
       super(
         id: json['id'],
         color: Color(json['color'] as int),
@@ -36,7 +36,7 @@ class RoundedSquare extends CanvasObject {
   RoundedSquare.createNew(Offset defaultTopLeft, Offset defaultBottomRight)
     : topLeft = defaultTopLeft,
       bottomRight = defaultBottomRight,
-      cornerRadius = 10.0,
+      cornerRadius = 16.0,
       super(
         color: RandomColor.getRandom(),
         id: const Uuid().v4(),

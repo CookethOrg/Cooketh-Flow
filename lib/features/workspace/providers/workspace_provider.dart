@@ -73,6 +73,7 @@ class WorkspaceProvider extends StateHandler {
   String? _lastTappedObjectId;
 
   Color _nextObjectColor = Colors.yellow;
+  int _nodeCounter = 0;
 
   String? _connectorSourceId;
   Alignment? _connectorSourceAlignment;
@@ -296,8 +297,11 @@ class WorkspaceProvider extends StateHandler {
     _userCursors.clear();
     _currentlySelectedObjectId = null;
     _tempQuillController.clear();
+    _nodeCounter = 0;
 
     await _fetchCanvasObjects();
+    // Set node counter based on existing objects
+    _nodeCounter = _canvasObjects.values.where((o) => o is! ConnectorObject && o is! TextBoxObject && o is! StickyNoteObject).length;
     _setupRealtimeChannel(_currentWorkspace!.id);
 
     notifyListeners();
@@ -482,7 +486,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanEnd(DragEndDetails details) async {
-    if (_currentMode == DrawMode.hand) return;
 
     if (_interactionMode == InteractionMode.drawingConnector &&
         _connectorSourceId != null) {
@@ -493,6 +496,7 @@ class WorkspaceProvider extends StateHandler {
           sourceAlignment: _connectorSourceAlignment!,
           targetId: target['id'] as String,
           targetAlignment: target['alignment'] as Alignment,
+          color: tertiaryColors[8],
         );
         _canvasObjects[newConnector.id] = newConnector;
         await _saveCanvasObjectToDb(newConnector.id);
@@ -561,6 +565,21 @@ class WorkspaceProvider extends StateHandler {
     }
 
     notifyListeners();
+  }
+
+  void _clearDefaultNodeText(String objectId) {
+    final plainText = _tempQuillController.document.toPlainText().trim();
+    // Check if text matches default "Node X" pattern
+    if (RegExp(r'^Node \d+$').hasMatch(plainText)) {
+      _tempQuillController.clear();
+      // Also update the canvas object
+      final obj = _canvasObjects[objectId];
+      if (obj != null) {
+        _canvasObjects[objectId] = obj.copyWith(
+          textDelta: jsonEncode(_tempQuillController.document.toDelta().toJson()),
+        );
+      }
+    }
   }
 
   void toggleDrawer() {
@@ -867,6 +886,18 @@ class WorkspaceProvider extends StateHandler {
     // No longer changing mode here, as it's handled by changeDrawMode
     _currentMode = DrawMode.pointer;
 
+    // Add default "Node X" text to shape nodes (not sticky notes, text boxes, or connectors)
+    if (newObject != null &&
+        newObject is! StickyNoteObject &&
+        newObject is! TextBoxObject &&
+        newObject.textDelta == null) {
+      _nodeCounter++;
+      final defaultDoc = Document()..insert(0, 'Node $_nodeCounter');
+      newObject = newObject.copyWith(
+        textDelta: jsonEncode(defaultDoc.toDelta().toJson()),
+      );
+    }
+
     if (newObject != null) {
       _canvasObjects[newObject.id] = newObject;
       changeCurrentlySelectedObj(newObject.id);
@@ -883,7 +914,13 @@ class WorkspaceProvider extends StateHandler {
     }
   }
 
+  static const double _connectionSnapDistance = 30.0;
+
   Map<String, dynamic>? _findConnectionTarget(Offset point) {
+    // Find the closest connection point within snap distance
+    double bestDistance = double.infinity;
+    Map<String, dynamic>? bestTarget;
+
     for (final object in _canvasObjects.values) {
       if (object is ConnectorObject) continue;
 
@@ -895,19 +932,35 @@ class WorkspaceProvider extends StateHandler {
       ];
       for (final alignment in alignments) {
         final connectionPoint = object.getConnectionPoint(alignment);
-        if ((point - connectionPoint).distance <= _connectionPointRadius * 2) {
-          return {'id': object.id, 'alignment': alignment};
+        final distance = (point - connectionPoint).distance;
+        if (distance <= _connectionSnapDistance && distance < bestDistance) {
+          bestDistance = distance;
+          bestTarget = {'id': object.id, 'alignment': alignment};
+        }
+      }
+
+      // Also snap when cursor is near the node bounds (within snap distance)
+      // Find nearest connection point on this node
+      if (bestTarget == null || (bestTarget['id'] as String) != object.id) {
+        final bounds = object.getBounds();
+        final expandedBounds = bounds.inflate(_connectionSnapDistance);
+        if (expandedBounds.contains(point) && !bounds.contains(point)) {
+          // Cursor is near the node edge - find nearest connection point
+          for (final alignment in alignments) {
+            final connectionPoint = object.getConnectionPoint(alignment);
+            final distance = (point - connectionPoint).distance;
+            if (distance < bestDistance) {
+              bestDistance = distance;
+              bestTarget = {'id': object.id, 'alignment': alignment};
+            }
+          }
         }
       }
     }
-    return null;
+    return bestTarget;
   }
 
   void onPanDown(DragDownDetails details) {
-    if (_currentMode == DrawMode.hand) {
-      return;
-    }
-
     _cursorPosition = details.globalPosition;
     _panStartPoint = details.globalPosition;
 
@@ -922,8 +975,11 @@ class WorkspaceProvider extends StateHandler {
     }
 
     if (_currentMode == DrawMode.pointer) {
+      // Only allow connector dragging from connection points of the currently selected node
       final connectionTarget = _findConnectionTarget(details.globalPosition);
-      if (connectionTarget != null) {
+      if (connectionTarget != null &&
+          _currentlySelectedObjectId != null &&
+          connectionTarget['id'] == _currentlySelectedObjectId) {
         _interactionMode = InteractionMode.drawingConnector;
         _connectorSourceId = connectionTarget['id'] as String;
         _connectorSourceAlignment = connectionTarget['alignment'] as Alignment;
@@ -979,6 +1035,8 @@ class WorkspaceProvider extends StateHandler {
             if (isDoubleTap) {
               _interactionMode = InteractionMode.editingText;
               _lastTappedObjectId = null;
+              // Clear default "Node X" text when entering edit mode
+              _clearDefaultNodeText(tappedObject.id);
             } else {
               _interactionMode = InteractionMode.moving;
             }
@@ -994,10 +1052,6 @@ class WorkspaceProvider extends StateHandler {
   }
 
   void onPanUpdate(DragUpdateDetails details) {
-    if (_currentMode == DrawMode.hand) {
-      return;
-    }
-
     _cursorPosition = details.globalPosition;
 
     if (_interactionMode == InteractionMode.drawingConnector) {
@@ -1051,6 +1105,7 @@ class WorkspaceProvider extends StateHandler {
         );
         break;
       case InteractionMode.none:
+      case InteractionMode.panning:
       case InteractionMode.editingText:
       case InteractionMode.drawingConnector:
         break;

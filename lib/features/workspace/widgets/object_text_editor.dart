@@ -6,10 +6,8 @@ import 'package:cookethflow/features/workspace/providers/canvas_provider.dart';
 import 'package:cookethflow/features/workspace/providers/workspace_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:provider/provider.dart';
 import 'package:vector_math/vector_math_64.dart' as vc;
-import 'package:cookethflow/core/helpers/responsive_layout.helper.dart' as rh;
 
 class ObjectTextEditor extends StatefulWidget {
   const ObjectTextEditor({super.key});
@@ -20,24 +18,6 @@ class ObjectTextEditor extends StatefulWidget {
 
 class _ObjectTextEditorState extends State<ObjectTextEditor> {
   final FocusNode _focusNode = FocusNode();
-  final GlobalKey _toolbarKey = GlobalKey();
-  double _toolbarHeight = 50.h; // A default height
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final context = _toolbarKey.currentContext;
-      if (context != null) {
-        final box = context.findRenderObject() as RenderBox;
-        if (mounted) {
-          setState(() {
-            _toolbarHeight = box.size.height;
-          });
-        }
-      }
-    });
-  }
 
   @override
   void dispose() {
@@ -47,7 +27,6 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
 
   @override
   Widget build(BuildContext context) {
-    final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
     return Consumer3<WorkspaceProvider, CanvasProvider, SupabaseService>(
       builder: (context, workspaceProvider, canvasProvider, suprovider, child) {
         final selectedObjectId = workspaceProvider.currentlySelectedObjectId;
@@ -85,82 +64,35 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
         );
 
         final quillController = workspaceProvider.selectedObjectQuillController;
+        final defaultTextColor = _getContrastColor(selectedObject.color);
 
         return Positioned(
           left: visibleRect.left,
-          top: visibleRect.top - 4.3*_toolbarHeight,
-          child: Material(
-            color: Colors.transparent,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  key: _toolbarKey,
-                  width: visibleRect.width < 350.w ? 350.w : visibleRect.width,
-                  decoration: BoxDecoration(
-                    color:
-                        suprovider.isDark
-                            ? Color.fromRGBO(48, 48, 48, 1)
-                            : Colors.white,
-                    borderRadius: BorderRadius.circular(8.r),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 8,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
-                    child: QuillSimpleToolbar(
-                      controller: quillController,
-                      config: const QuillSimpleToolbarConfig(
-                        showBackgroundColorButton: true,
-                        showFontFamily: true,
-                        showLink: true,
-                        showSearchButton: false,
-                        showInlineCode: true,
-                        showListCheck: true,
-                        showQuote: true,
-                        showCodeBlock: true,
-                        showListBullets: true,
-                        showListNumbers: true,
-                        showClearFormat: true,
-                        showBoldButton: true,
-                        showItalicButton: true,
-                        showHeaderStyle: true,
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 4.h),
-                Container(
-                  width: visibleRect.width,
-                  height: visibleRect.height,
-                  decoration: BoxDecoration(
-                    // The editor background is transparent to see the object behind it.
-                    color: Colors.transparent,
-                    border: Border.all(color: Colors.blue.shade400, width: 2.0),
-                    borderRadius: BorderRadius.circular(4.r),
-                  ),
+          top: visibleRect.top,
+          child: ClipRect(
+            child: SizedBox(
+              width: visibleRect.width,
+              height: visibleRect.height,
+              child: Material(
+                color: Colors.transparent,
+                child: Center(
                   child: QuillEditor.basic(
                     controller: quillController,
                     config: QuillEditorConfig(
                       padding: const EdgeInsets.all(8.0),
-                      scrollable: true,
-                      expands: true,
+                      scrollable: false,
+                      expands: false,
+                      autoFocus: true,
                       customStyles: DefaultStyles(
                         placeHolder: DefaultTextBlockStyle(
-                          const TextStyle(color: Colors.grey),
+                          TextStyle(color: defaultTextColor.withOpacity(0.5)),
                           const HorizontalSpacing(0, 0),
                           const VerticalSpacing(0, 0),
                           const VerticalSpacing(0, 0),
                           null,
                         ),
                         paragraph: DefaultTextBlockStyle(
-                          // Default text color
-                          const TextStyle(color: Colors.black),
+                          TextStyle(color: defaultTextColor, fontSize: 14),
                           const HorizontalSpacing(0, 0),
                           const VerticalSpacing(0, 0),
                           const VerticalSpacing(0, 0),
@@ -173,11 +105,16 @@ class _ObjectTextEditorState extends State<ObjectTextEditor> {
                     scrollController: ScrollController(),
                   ),
                 ),
-              ],
+              ),
             ),
           ),
         );
       },
     );
+  }
+
+  Color _getContrastColor(Color background) {
+    final luminance = background.computeLuminance();
+    return luminance > 0.4 ? Colors.black : Colors.white;
   }
 }

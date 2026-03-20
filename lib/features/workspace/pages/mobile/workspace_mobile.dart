@@ -230,13 +230,15 @@ class _WorkspaceMobileState extends State<WorkspaceMobile> {
                                   );
                                 }
 
-                                const double toolboxWidth = 240;
                                 const double toolboxHeight = 48;
 
                                 return Positioned(
-                                  left: screenPosition.dx - (toolboxWidth / 2),
+                                  left: screenPosition.dx,
                                   top: screenPosition.dy - toolboxHeight - 15,
-                                  child: const NodeEditingToolbox(),
+                                  child: const FractionalTranslation(
+                                    translation: Offset(-0.5, 0),
+                                    child: NodeEditingToolbox(),
+                                  ),
                                 );
                               }
                               return const SizedBox.shrink();

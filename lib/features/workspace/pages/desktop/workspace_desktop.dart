@@ -128,140 +128,99 @@ class _WorkspaceDesktopState extends State<WorkspaceDesktop> {
                   onTap: () {
                     _focusNode.requestFocus();
                   },
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 40.w,
-                      vertical: 40.h,
-                    ),
-                    child: Stack(
+                  child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        const CanvasPage(),
-                        const WorkspaceDrawer(),
-                        SizedBox(width: 20.w),
-                        Positioned(
-                          top: 0,
-                          left: 0.21.sw,
-                          child: UndoRedoButton(su: suprovider),
-                        ),
-                        Positioned(
-                          top: 0,
-                          right: 0.001.sw,
-                          child: ExportProjectButton(
-                            su: suprovider,
-                            wp: provider,
-                          ),
-                        ),
-                        Positioned(right: 0, top: 0.10.sh, child: ToolBar()),
-                        Positioned(
-                          bottom: 0.h,
-                          right: 0.w,
-                          child: ZoomControlButton(),
-                        ),
-                        Consumer2<WorkspaceProvider, CanvasProvider>(
-                          builder: (
-                            context,
-                            workspaceProvider,
-                            canvasProvider,
-                            child,
-                          ) {
-                            return ListenableBuilder(
-                              listenable:
-                                  canvasProvider.transformationController,
-                              builder: (context, child) {
-                                if (workspaceProvider.shouldShowObjectToolbox) {
-                                  final selectedObject =
-                                      workspaceProvider
-                                          .canvasObjects[workspaceProvider
-                                          .currentlySelectedObjectId!]!;
-
-                                  final matrix =
-                                      canvasProvider
-                                          .transformationController
-                                          .value;
-                                  Offset screenPosition;
-                                  if (selectedObject is ConnectorObject) {
-                                    // For connectors, position at midpoint of the line
-                                    final source =
-                                        workspaceProvider
-                                            .canvasObjects[selectedObject
-                                            .sourceId];
-                                    final target =
-                                        workspaceProvider
-                                            .canvasObjects[selectedObject
-                                            .targetId];
-
-                                    if (source != null && target != null) {
-                                      final startPoint = source
-                                          .getConnectionPoint(
-                                            selectedObject.sourceAlignment,
-                                          );
-                                      final endPoint = target
-                                          .getConnectionPoint(
-                                            selectedObject.targetAlignment,
-                                          );
-
-                                      // Calculate midpoint
-                                      final midPoint = Offset(
-                                        (startPoint.dx + endPoint.dx) / 2,
-                                        (startPoint.dy + endPoint.dy) / 2,
-                                      );
-
-                                      // Transform to screen coordinates
-                                      final transformedMidPoint = matrix
-                                          .transform3(
-                                            vector_math.Vector3(
-                                              midPoint.dx,
-                                              midPoint.dy,
-                                              0,
+                        // Canvas fills entire area, no padding
+                        const Positioned.fill(child: CanvasPage()),
+                        // UI overlay with 24px inset
+                        Positioned.fill(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24),
+                            child: Stack(
+                              clipBehavior: Clip.none,
+                              children: [
+                                const WorkspaceDrawer(),
+                                Positioned(
+                                  top: 0,
+                                  left: 0.21.sw,
+                                  child: UndoRedoButton(su: suprovider),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 0,
+                                  child: ExportProjectButton(
+                                    su: suprovider,
+                                    wp: provider,
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 0,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Center(child: ToolBar()),
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: ZoomControlButton(),
+                                ),
+                                Consumer2<WorkspaceProvider, CanvasProvider>(
+                                  builder: (context, workspaceProvider, canvasProvider, child) {
+                                    return ListenableBuilder(
+                                      listenable: canvasProvider.transformationController,
+                                      builder: (context, child) {
+                                        if (workspaceProvider.shouldShowObjectToolbox) {
+                                          final selectedObject = workspaceProvider
+                                              .canvasObjects[workspaceProvider.currentlySelectedObjectId!]!;
+                                          final matrix = canvasProvider.transformationController.value;
+                                          Offset screenPosition;
+                                          if (selectedObject is ConnectorObject) {
+                                            final source = workspaceProvider.canvasObjects[selectedObject.sourceId];
+                                            final target = workspaceProvider.canvasObjects[selectedObject.targetId];
+                                            if (source != null && target != null) {
+                                              final startPoint = source.getConnectionPoint(selectedObject.sourceAlignment);
+                                              final endPoint = target.getConnectionPoint(selectedObject.targetAlignment);
+                                              final midPoint = Offset(
+                                                (startPoint.dx + endPoint.dx) / 2,
+                                                (startPoint.dy + endPoint.dy) / 2,
+                                              );
+                                              final transformedMidPoint = matrix.transform3(
+                                                vector_math.Vector3(midPoint.dx, midPoint.dy, 0),
+                                              );
+                                              screenPosition = Offset(transformedMidPoint.x, transformedMidPoint.y);
+                                            } else {
+                                              return const SizedBox.shrink();
+                                            }
+                                          } else {
+                                            final objectBounds = selectedObject.getBounds();
+                                            final transformedTopCenter = matrix.transform3(
+                                              vector_math.Vector3(objectBounds.topCenter.dx, objectBounds.topCenter.dy, 0),
+                                            );
+                                            screenPosition = Offset(transformedTopCenter.x, transformedTopCenter.y);
+                                          }
+                                          const double toolboxHeight = 48;
+                                          return Positioned(
+                                            left: screenPosition.dx,
+                                            top: screenPosition.dy - toolboxHeight - 15,
+                                            child: const FractionalTranslation(
+                                              translation: Offset(-0.5, 0),
+                                              child: NodeEditingToolbox(),
                                             ),
                                           );
-
-                                      screenPosition = Offset(
-                                        transformedMidPoint.x,
-                                        transformedMidPoint.y,
-                                      );
-                                    } else {
-                                      return const SizedBox.shrink();
-                                    }
-                                  } else {
-                                    // For shapes, use the top center as before
-                                    final objectBounds =
-                                        selectedObject.getBounds();
-                                    final transformedTopCenter = matrix
-                                        .transform3(
-                                          vector_math.Vector3(
-                                            objectBounds.topCenter.dx,
-                                            objectBounds.topCenter.dy,
-                                            0,
-                                          ),
-                                        );
-
-                                    screenPosition = Offset(
-                                      transformedTopCenter.x,
-                                      transformedTopCenter.y,
+                                        }
+                                        return const SizedBox.shrink();
+                                      },
                                     );
-                                  }
-
-                                  const double toolboxWidth = 240;
-                                  const double toolboxHeight = 48;
-
-                                  return Positioned(
-                                    left:
-                                        screenPosition.dx - (toolboxWidth / 2),
-                                    top: screenPosition.dy - toolboxHeight - 15,
-                                    child: const NodeEditingToolbox(),
-                                  );
-                                }
-                                return const SizedBox.shrink();
-                              },
-                            );
-                          },
+                                  },
+                                ),
+                                const ObjectTextEditor(),
+                              ],
+                            ),
+                          ),
                         ),
-                        const ObjectTextEditor(),
                       ],
                     ),
-                  ),
                 ),
               ),
             ),

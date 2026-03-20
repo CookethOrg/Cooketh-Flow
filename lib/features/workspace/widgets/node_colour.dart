@@ -36,17 +36,15 @@ class NodeColourPicker extends StatelessWidget {
               children: [
                  Text(
                   'Change Color',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: su.isDark?Colors.white:Colors.black),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: su.isDark?Colors.white:Colors.black),
                 ),
-                IconButton(
-                  icon:  Icon(
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Icon(
                     Icons.close,
-                    size: 24,
-                    color:su.isDark?Colors.white: Colors.black54,
+                    size: 20,
+                    color: su.isDark ? Colors.white : Colors.black54,
                   ),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
                 ),
               ],
             ),

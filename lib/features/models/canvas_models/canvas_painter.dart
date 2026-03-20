@@ -73,9 +73,19 @@ class CanvasPainter extends CustomPainter {
     return 14.0;
   }
 
-  TextStyle _getTextStyle(Map<String, dynamic>? attributes) {
+  Color _getContrastColor(Color background) {
+    // Always use white text on colored nodes for better visibility
+    // Only use black text on very light backgrounds (like white or near-white)
+    final luminance = background.computeLuminance();
+    return luminance > 0.7 ? Colors.black : Colors.white;
+  }
+
+  static const String _defaultFontFamily = 'Frederik';
+  static const double _defaultFontSize = 16.0;
+
+  TextStyle _getTextStyle(Map<String, dynamic>? attributes, [Color defaultTextColor = Colors.black]) {
     if (attributes == null) {
-      return const TextStyle(fontSize: 14.0, color: Colors.black);
+      return TextStyle(fontSize: _defaultFontSize, color: defaultTextColor, fontFamily: _defaultFontFamily);
     }
 
     final isLink = attributes['link'] != null;
@@ -83,7 +93,7 @@ class CanvasPainter extends CustomPainter {
         attributes['code'] == true || attributes['code-block'] == true;
     final headerLevel = attributes['header'];
 
-    double fontSize = 14.0;
+    double fontSize = _defaultFontSize;
     if (headerLevel == 1) {
       fontSize = 22.0;
     } else if (headerLevel == 2) {
@@ -92,14 +102,16 @@ class CanvasPainter extends CustomPainter {
       fontSize = _getFontSize(attributes['size']);
     }
 
+    final hasExplicitColor = attributes['color'] != null;
+
     return TextStyle(
       fontWeight:
           attributes['bold'] == true ? FontWeight.bold : FontWeight.normal,
       fontStyle:
           attributes['italic'] == true ? FontStyle.italic : FontStyle.normal,
-      color: isLink ? Colors.blue : _parseColor(attributes['color'] as String?),
+      color: isLink ? Colors.blue : (hasExplicitColor ? _parseColor(attributes['color'] as String?) : defaultTextColor),
       fontSize: fontSize,
-      fontFamily: isCode ? 'monospace' : (attributes['font'] as String?),
+      fontFamily: isCode ? 'monospace' : (attributes['font'] as String? ?? _defaultFontFamily),
       decoration: attributes['underline'] == true || isLink
           ? TextDecoration.underline
           : TextDecoration.none,
@@ -111,18 +123,164 @@ class CanvasPainter extends CustomPainter {
     );
   }
 
-  void _drawArrowhead(Canvas canvas, Offset start, Offset end, Paint paint) {
-    final double arrowSize = 12;
+  /// Returns the outward direction vector for a given alignment.
+  Offset _alignmentDirection(Alignment alignment) {
+    if (alignment == Alignment.topCenter) return const Offset(0, -1);
+    if (alignment == Alignment.bottomCenter) return const Offset(0, 1);
+    if (alignment == Alignment.centerLeft) return const Offset(-1, 0);
+    if (alignment == Alignment.centerRight) return const Offset(1, 0);
+    return const Offset(0, 1);
+  }
+
+  void _drawArrowhead(Canvas canvas, Offset from, Offset to, Paint paint) {
+    final double arrowSize = 10;
     final double arrowAngle = 25 * pi / 180;
-    final angle = atan2(end.dy - start.dy, end.dx - start.dx);
+    final angle = atan2(to.dy - from.dy, to.dx - from.dx);
 
     final path = Path();
-    path.moveTo(end.dx - arrowSize * cos(angle - arrowAngle),
-        end.dy - arrowSize * sin(angle - arrowAngle));
-    path.lineTo(end.dx, end.dy);
-    path.lineTo(end.dx - arrowSize * cos(angle + arrowAngle),
-        end.dy - arrowSize * sin(angle + arrowAngle));
+    path.moveTo(to.dx - arrowSize * cos(angle - arrowAngle),
+        to.dy - arrowSize * sin(angle - arrowAngle));
+    path.lineTo(to.dx, to.dy);
+    path.lineTo(to.dx - arrowSize * cos(angle + arrowAngle),
+        to.dy - arrowSize * sin(angle + arrowAngle));
     canvas.drawPath(path, paint..style = PaintingStyle.stroke);
+  }
+
+  /// Builds an orthogonal (right-angle) path with rounded corners between two points.
+  Path _buildOrthogonalPath(Offset start, Offset end, Alignment sourceAlignment, Alignment targetAlignment) {
+    final path = Path();
+    path.moveTo(start.dx, start.dy);
+
+    final sourceDir = _alignmentDirection(sourceAlignment);
+    final targetDir = _alignmentDirection(targetAlignment);
+    final bool sourceVertical = sourceDir.dy != 0;
+    final bool targetVertical = targetDir.dy != 0;
+
+    const double cornerRadius = 16.0;
+
+    if (sourceVertical && !targetVertical) {
+      // L-shape: source goes vertical, target comes horizontal
+      final bendX = start.dx;
+      final bendY = end.dy;
+      _drawRoundedLPath(path, start, Offset(bendX, bendY), end, cornerRadius);
+    } else if (!sourceVertical && targetVertical) {
+      // L-shape: source goes horizontal, target comes vertical
+      final bendX = end.dx;
+      final bendY = start.dy;
+      _drawRoundedLPath(path, start, Offset(bendX, bendY), end, cornerRadius);
+    } else if (sourceVertical && targetVertical) {
+      // Both vertical: Z-shape with two bends
+      final midY = (start.dy + end.dy) / 2;
+      final bend1 = Offset(start.dx, midY);
+      final bend2 = Offset(end.dx, midY);
+      _drawRoundedZPath(path, start, bend1, bend2, end, cornerRadius);
+    } else {
+      // Both horizontal: Z-shape with two bends
+      final midX = (start.dx + end.dx) / 2;
+      final bend1 = Offset(midX, start.dy);
+      final bend2 = Offset(midX, end.dy);
+      _drawRoundedZPath(path, start, bend1, bend2, end, cornerRadius);
+    }
+
+    return path;
+  }
+
+  void _drawRoundedLPath(Path path, Offset start, Offset bend, Offset end, double radius) {
+    final dx1 = bend.dx - start.dx;
+    final dy1 = bend.dy - start.dy;
+    final dx2 = end.dx - bend.dx;
+    final dy2 = end.dy - bend.dy;
+
+    final len1 = sqrt(dx1 * dx1 + dy1 * dy1);
+    final len2 = sqrt(dx2 * dx2 + dy2 * dy2);
+    final r = min(radius, min(len1 / 2, len2 / 2));
+
+    if (r < 1) {
+      path.lineTo(bend.dx, bend.dy);
+      path.lineTo(end.dx, end.dy);
+      return;
+    }
+
+    // Point before the bend
+    final beforeBend = Offset(
+      bend.dx - (dx1 / len1) * r,
+      bend.dy - (dy1 / len1) * r,
+    );
+    // Point after the bend
+    final afterBend = Offset(
+      bend.dx + (dx2 / len2) * r,
+      bend.dy + (dy2 / len2) * r,
+    );
+
+    path.lineTo(beforeBend.dx, beforeBend.dy);
+    path.quadraticBezierTo(bend.dx, bend.dy, afterBend.dx, afterBend.dy);
+    path.lineTo(end.dx, end.dy);
+  }
+
+  void _drawRoundedZPath(Path path, Offset start, Offset bend1, Offset bend2, Offset end, double radius) {
+    // First bend
+    final dx1 = bend1.dx - start.dx;
+    final dy1 = bend1.dy - start.dy;
+    final dx2 = bend2.dx - bend1.dx;
+    final dy2 = bend2.dy - bend1.dy;
+    final dx3 = end.dx - bend2.dx;
+    final dy3 = end.dy - bend2.dy;
+
+    final len1 = sqrt(dx1 * dx1 + dy1 * dy1);
+    final len2 = sqrt(dx2 * dx2 + dy2 * dy2);
+    final len3 = sqrt(dx3 * dx3 + dy3 * dy3);
+
+    final r1 = len1 > 0 && len2 > 0 ? min(radius, min(len1 / 2, len2 / 2)) : 0.0;
+    final r2 = len2 > 0 && len3 > 0 ? min(radius, min(len2 / 2, len3 / 2)) : 0.0;
+
+    if (r1 < 1 && r2 < 1) {
+      path.lineTo(bend1.dx, bend1.dy);
+      path.lineTo(bend2.dx, bend2.dy);
+      path.lineTo(end.dx, end.dy);
+      return;
+    }
+
+    if (len1 > 0 && r1 >= 1) {
+      final before1 = Offset(bend1.dx - (dx1 / len1) * r1, bend1.dy - (dy1 / len1) * r1);
+      final after1 = Offset(bend1.dx + (dx2 / len2) * r1, bend1.dy + (dy2 / len2) * r1);
+      path.lineTo(before1.dx, before1.dy);
+      path.quadraticBezierTo(bend1.dx, bend1.dy, after1.dx, after1.dy);
+    } else {
+      path.lineTo(bend1.dx, bend1.dy);
+    }
+
+    if (len3 > 0 && r2 >= 1) {
+      final before2 = Offset(bend2.dx - (dx2 / len2) * r2, bend2.dy - (dy2 / len2) * r2);
+      final after2 = Offset(bend2.dx + (dx3 / len3) * r2, bend2.dy + (dy3 / len3) * r2);
+      path.lineTo(before2.dx, before2.dy);
+      path.quadraticBezierTo(bend2.dx, bend2.dy, after2.dx, after2.dy);
+    } else {
+      path.lineTo(bend2.dx, bend2.dy);
+    }
+
+    path.lineTo(end.dx, end.dy);
+  }
+
+  /// Gets the last segment direction for arrowhead drawing on orthogonal paths.
+  Offset _getLastSegmentStart(Offset start, Offset end, Alignment sourceAlignment, Alignment targetAlignment) {
+    final sourceDir = _alignmentDirection(sourceAlignment);
+    final targetDir = _alignmentDirection(targetAlignment);
+    final bool sourceVertical = sourceDir.dy != 0;
+    final bool targetVertical = targetDir.dy != 0;
+
+    if (sourceVertical && !targetVertical) {
+      // L-shape: last segment is horizontal
+      return Offset(start.dx, end.dy);
+    } else if (!sourceVertical && targetVertical) {
+      // L-shape: last segment is vertical
+      return Offset(end.dx, start.dy);
+    } else if (sourceVertical && targetVertical) {
+      // Z-shape: last segment is vertical
+      return Offset(end.dx, (start.dy + end.dy) / 2);
+    } else {
+      // Z-shape: last segment is horizontal
+      return Offset((start.dx + end.dx) / 2, end.dy);
+    }
   }
 
   @override
@@ -145,7 +303,7 @@ class CanvasPainter extends CustomPainter {
           ..strokeWidth = connector.thickness
           ..style = PaintingStyle.stroke;
 
-        final path = Path()..moveTo(startPoint.dx, startPoint.dy)..lineTo(endPoint.dx, endPoint.dy);
+        final path = _buildOrthogonalPath(startPoint, endPoint, connector.sourceAlignment, connector.targetAlignment);
 
         switch (connector.connectionType) {
           case ConnectionType.solid:
@@ -165,7 +323,9 @@ class CanvasPainter extends CustomPainter {
             break;
         }
 
-        _drawArrowhead(canvas, startPoint, endPoint, connectorPaint);
+        // Draw arrowhead using last segment direction
+        final arrowFrom = _getLastSegmentStart(startPoint, endPoint, connector.sourceAlignment, connector.targetAlignment);
+        _drawArrowhead(canvas, arrowFrom, endPoint, connectorPaint);
 
         final originPaint = Paint()
           ..color = connector.color
@@ -220,14 +380,13 @@ class CanvasPainter extends CustomPainter {
         }
       } else {
         rect = canvasObject.getBounds();
+        const _shapeRadius = Radius.circular(16.0);
         if (canvasObject is Rectangle) {
-          canvas.drawRect(rect, fillPaint);
+          canvas.drawRRect(RRect.fromRectAndRadius(rect, _shapeRadius), fillPaint);
         } else if (canvasObject is Square) {
-          canvas.drawRect(rect, fillPaint);
+          canvas.drawRRect(RRect.fromRectAndRadius(rect, _shapeRadius), fillPaint);
         } else if (canvasObject is RoundedSquare) {
-          final rrect = RRect.fromRectAndRadius(
-              rect, Radius.circular(canvasObject.cornerRadius));
-          canvas.drawRRect(rrect, fillPaint);
+          canvas.drawRRect(RRect.fromRectAndRadius(rect, Radius.circular(canvasObject.cornerRadius)), fillPaint);
         } else if (canvasObject is Diamond) {
           final path = Path()
             ..moveTo(rect.center.dx, rect.top)
@@ -298,7 +457,10 @@ class CanvasPainter extends CustomPainter {
           if (canvasObject is StickyNoteObject) {
             textPadding = 12.0;
           }
-          double yOffset = rect.top + textPadding;
+
+          // Determine default text color based on node background brightness
+          final defaultTextColor = _getContrastColor(canvasObject.color);
+
           final List<Map<String, dynamic>> lines = [];
           List<Map<String, dynamic>> currentLineOps = [];
           for (final op in delta) {
@@ -327,6 +489,12 @@ class CanvasPainter extends CustomPainter {
           if (currentLineOps.isNotEmpty) {
             lines.add({'ops': currentLineOps, 'attributes': {}});
           }
+
+          // First pass: measure total text height
+          final availableWidth = rect.width - (2 * textPadding);
+          double totalTextHeight = 0;
+          final List<TextPainter> painters = [];
+          final List<double> indents = [];
           int orderedListCounter = 1;
           for (final line in lines) {
             final lineOps =
@@ -335,7 +503,7 @@ class CanvasPainter extends CustomPainter {
             final lineSpans = lineOps
                 .map((o) => TextSpan(
                     text: o['insert'],
-                    style: _getTextStyle(o['attributes'] as Map<String, dynamic>?)))
+                    style: _getTextStyle(o['attributes'] as Map<String, dynamic>?, defaultTextColor)))
                 .toList();
             String prefix = '';
             double indent = 0;
@@ -352,6 +520,34 @@ class CanvasPainter extends CustomPainter {
             }
             if (blockAttributes['blockquote'] == true) {
               indent = 20.0;
+            }
+            final textPainter = TextPainter(
+              text: TextSpan(children: [
+                TextSpan(text: prefix, style: _getTextStyle(blockAttributes, defaultTextColor)),
+                ...lineSpans
+              ]),
+              textDirection: TextDirection.ltr,
+              textAlign: TextAlign.center,
+            );
+            final lineAvailableWidth = availableWidth - indent;
+            if (lineAvailableWidth > 0) {
+              textPainter.layout(maxWidth: lineAvailableWidth);
+              totalTextHeight += textPainter.height;
+            }
+            painters.add(textPainter);
+            indents.add(indent);
+          }
+
+          // Second pass: draw text vertically centered
+          double yOffset = rect.top + (rect.height - totalTextHeight) / 2;
+          orderedListCounter = 1;
+          for (int i = 0; i < painters.length; i++) {
+            final textPainter = painters[i];
+            final indent = indents[i];
+            final blockAttributes = lines[i]['attributes'] as Map<String, dynamic>;
+            final lineAvailableWidth = availableWidth - indent;
+
+            if (blockAttributes['blockquote'] == true) {
               final blockPaint = Paint()
                 ..color = Colors.grey.shade300
                 ..strokeWidth = 2;
@@ -361,24 +557,15 @@ class CanvasPainter extends CustomPainter {
             if (blockAttributes['code-block'] == true) {
               final blockPaint = Paint()..color = Colors.grey.shade200;
               canvas.drawRect(
-                  Rect.fromLTWH(rect.left, yOffset, rect.width, 20),
+                  Rect.fromLTWH(rect.left, yOffset, rect.width, textPainter.height),
                   blockPaint);
             }
-            final textPainter = TextPainter(
-              text: TextSpan(children: [
-                TextSpan(text: prefix, style: _getTextStyle(blockAttributes)),
-                ...lineSpans
-              ]),
-              textDirection: TextDirection.ltr,
-              textAlign: TextAlign.center,
-            );
-            final availableWidth = rect.width - (2 * textPadding) - indent;
-            if (availableWidth > 0) {
-              textPainter.layout(maxWidth: availableWidth);
+
+            if (lineAvailableWidth > 0) {
               textPainter.paint(
                   canvas,
                   Offset(
-                    rect.left + textPadding + indent + (availableWidth - textPainter.width) / 2,
+                    rect.left + textPadding + indent + (lineAvailableWidth - textPainter.width) / 2,
                     yOffset,
                   ));
               yOffset += textPainter.height;
@@ -390,22 +577,24 @@ class CanvasPainter extends CustomPainter {
       }
 
       if (canvasObject.id == currentlySelectedObjectId && !isEditingText) {
-        final handlePaint = Paint()
-          ..color = Colors.blue
-          ..style = PaintingStyle.fill;
-        canvas.drawCircle(rect.topLeft, handleRadius, handlePaint);
-        canvas.drawCircle(rect.topRight, handleRadius, handlePaint);
-        canvas.drawCircle(rect.bottomLeft, handleRadius, handlePaint);
-        canvas.drawCircle(rect.bottomRight, handleRadius, handlePaint);
-
+        // Solid blue selection border
         final borderPaint = Paint()
           ..color = Colors.blue
           ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.0;
-        final path = Path()..addRect(rect);
-        canvas.drawPath(
-            dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])),
-            borderPaint);
+          ..strokeWidth = 1.5;
+        canvas.drawRect(rect, borderPaint);
+
+        // Filled blue square handles at corners
+        final double handleSize = handleRadius;
+        final handlePaint = Paint()
+          ..color = Colors.blue
+          ..style = PaintingStyle.fill;
+        for (final corner in [rect.topLeft, rect.topRight, rect.bottomLeft, rect.bottomRight]) {
+          canvas.drawRect(
+            Rect.fromCenter(center: corner, width: handleSize, height: handleSize),
+            handlePaint,
+          );
+        }
 
         final connectionPointPaint = Paint()
           ..color = Colors.white
@@ -443,13 +632,24 @@ class CanvasPainter extends CustomPainter {
           ..strokeWidth = 2.0
           ..style = PaintingStyle.stroke;
 
-        final path = Path()
-          ..moveTo(startPoint.dx, startPoint.dy)
-          ..lineTo(endPoint.dx, endPoint.dy);
+        // Use orthogonal preview path based on source alignment
+        // Guess target alignment as opposite of source direction
+        final Alignment guessedTarget;
+        if (connectorSourceAlignment == Alignment.topCenter) {
+          guessedTarget = Alignment.bottomCenter;
+        } else if (connectorSourceAlignment == Alignment.bottomCenter) {
+          guessedTarget = Alignment.topCenter;
+        } else if (connectorSourceAlignment == Alignment.centerLeft) {
+          guessedTarget = Alignment.centerRight;
+        } else {
+          guessedTarget = Alignment.centerLeft;
+        }
+        final path = _buildOrthogonalPath(startPoint, endPoint, connectorSourceAlignment!, guessedTarget);
         canvas.drawPath(
             dashPath(path, dashArray: CircularIntervalList<double>([5.0, 3.0])),
             paint);
-        _drawArrowhead(canvas, startPoint, endPoint, paint);
+        final arrowFrom = _getLastSegmentStart(startPoint, endPoint, connectorSourceAlignment!, guessedTarget);
+        _drawArrowhead(canvas, arrowFrom, endPoint, paint);
       }
     }
 

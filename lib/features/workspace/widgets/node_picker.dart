@@ -136,7 +136,7 @@ class _NodePickerState extends State<NodePicker> {
                     Text(
                       widget.onShapeSelected == null ? 'Nodes' : 'Change Shape',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color:
                             widget.su.isDark
@@ -144,22 +144,21 @@ class _NodePickerState extends State<NodePicker> {
                                 : const Color(0xFF111827),
                       ),
                     ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color:
-                            widget.su.isDark
-                                ? Colors.white
-                                : const Color(0xFF111827),
-                        size: 28,
-                      ),
-                      onPressed: () {
-                        // When closing, if we're not changing a shape, reset the mode
+                    GestureDetector(
+                      onTap: () {
                         if (widget.onShapeSelected == null) {
                           provider.changeDrawMode(DrawMode.pointer);
                         }
                         Navigator.of(context).pop();
                       },
+                      child: Icon(
+                        Icons.close,
+                        color:
+                            widget.su.isDark
+                                ? Colors.white
+                                : const Color(0xFF111827),
+                        size: 20,
+                      ),
                     ),
                   ],
                 ),

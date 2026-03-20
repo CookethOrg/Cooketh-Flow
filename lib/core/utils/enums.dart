@@ -57,6 +57,7 @@ enum DrawMode {
 enum InteractionMode {
   none,
   moving,
+  panning,
   resizingTopLeft,
   resizingTopRight,
   resizingBottomLeft,

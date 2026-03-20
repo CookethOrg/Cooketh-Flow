@@ -96,28 +96,16 @@ class _WorkspaceColorPickerState extends State<WorkspaceColorPicker> {
               Text(
                 'Background Colour',
                 style: TextStyle(
-                  fontSize:
-                      device == en.DeviceType.desktop
-                          ? 20.sp
-                          : device == en.DeviceType.tab
-                          ? 20.sp
-                          : 50.sp,
+                  fontSize: 16,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-              IconButton(
-                onPressed: () => Navigator.of(context).pop(),
-                icon: Icon(
+              GestureDetector(
+                onTap: () => Navigator.of(context).pop(),
+                child: Icon(
                   PhosphorIconsRegular.x,
-                  size:
-                      device == en.DeviceType.desktop
-                          ? 24.sp
-                          : device == en.DeviceType.tab
-                          ? 24.sp
-                          : 55.sp,
+                  size: 20,
                 ),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
               ),
             ],
           ),

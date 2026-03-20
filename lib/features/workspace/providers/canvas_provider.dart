@@ -125,6 +125,16 @@ class CanvasProvider extends StateHandler {
     return scale * 100;
   }
 
+  void setZoomPercentage(double percentage) {
+    final clampedPercentage = percentage.clamp(10.0, 400.0);
+    final newScale = clampedPercentage / 100.0;
+    final translation = _transformationController.value.getTranslation();
+    _transformationController.value = Matrix4.identity()
+      ..translate(translation.x, translation.y)
+      ..scale(newScale);
+    notifyListeners();
+  }
+
   @override
   void dispose() {
     _transformationController.dispose();

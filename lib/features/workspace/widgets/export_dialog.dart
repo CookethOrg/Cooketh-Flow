@@ -24,9 +24,8 @@ class _ExportDialogState extends State<ExportDialog> {
   @override
   Widget build(BuildContext context) {
     final device = rh.ResponsiveLayoutHelper.getDeviceType(context);
-    return Dialog(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
+    return Material(
+      color: Colors.transparent,
       child: Container(
         width: 320.w,
         padding: EdgeInsets.all(24.r),
@@ -36,11 +35,12 @@ class _ExportDialogState extends State<ExportDialog> {
                   ? const Color.fromRGBO(48, 48, 48, 1)
                   : Colors.white,
           borderRadius: BorderRadius.circular(16.r),
+          border: Border.all(color: const Color(0xFFD9D9D9), width: 1.2),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: Colors.black.withOpacity(0.12),
+              blurRadius: 16,
+              offset: const Offset(0, 6),
             ),
           ],
         ),

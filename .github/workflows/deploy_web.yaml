@@ -46,7 +46,7 @@ jobs:
           SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
 
       - name: Build web
-        run: flutter build web --release --no-source-maps --dart-define="SUPABASE_URL=${{ secrets.SUPABASE_URL }}" --dart-define="SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}"
+        run: flutter build web --release --no-source-maps --base-href="/Cooketh-Flow/" --dart-define="SUPABASE_URL=${{ secrets.SUPABASE_URL }}" --dart-define="SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}"
 
       - name: Debug build output
         run: |
@@ -77,7 +77,6 @@ jobs:
           git checkout -B gh-pages
           rm -rf ./*
           cp -r /tmp/web-build/* .
-          echo "cookethflow.cookethcompany.xyz" > CNAME
           git add .
           git commit -m "Deploy web build to gh-pages" || echo "No changes to commit"
           git push origin gh-pages --force

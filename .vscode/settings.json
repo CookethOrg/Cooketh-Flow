@@ -1,3 +1,4 @@
 {
-    "cmake.sourceDirectory": "/home/teewrath/work/Flutter/cookethflow/linux"
+  "cmake.sourceDirectory": "/home/teewrath/work/Flutter/cookethflow/linux",
+  "dart.flutterSdkPath": ".fvm/versions/3.41.0"
 }

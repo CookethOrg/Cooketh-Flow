@@ -47,3 +47,6 @@ run.sh
 run.ps1
 run-release.sh
 run-release.ps1
+
+# FVM Version Cache
+.fvm/

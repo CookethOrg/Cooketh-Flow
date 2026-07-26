@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+      (function () {
+        // Look for the redirect parameter in the URL.
+        var params = new URLSearchParams(window.location.search);
+        var redirect = params.get('redirect');
+  
+        if (redirect) {
+          // If a redirect path is found, replace the current history state
+          // with the correct path, so the Flutter router can handle it.
+          // We use replaceState to avoid breaking the browser's back button.
+          window.history.replaceState(null, null, redirect);
+        }
+      })();
+    </script>
+  
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+  <base href="/Cooketh-Flow/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="Transform chaos into clarity.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="cookethflow">
+  <link rel="apple-touch-icon" href="favicon.ico">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.ico"/>
+
+  <title>cookethflow</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
